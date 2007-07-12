@@ -6,6 +6,12 @@
 
 As host actually only linux x386 is supported.
 
+As target actually a board with H83003 is supported.
+For crosscompiling you need to extract the compiler tool chain
+package in the trunk folder. I didn check in the compiler tool
+chain to the repository, if you need it i can send it per email(2,5MB).
+
+
 2.1.) Commandline and editor(emacs):
 ------------------------------------
 
@@ -15,8 +21,9 @@ To setup the environment type at commandline in the "trunk" folder:
 2.2.) Eclipse:
 --------------
 
+Install the C/C++ Plugin
 Import the Project:
-File->Import->Excisting Project into Workspace
+File->Import->General->Excisting Project into Workspace
 
 3.) Compile.
 ============
@@ -69,6 +76,9 @@ Project->Clean
 Project->Build make target 
  
 4.) Download.
-Have a look to the board support packages.
+Have a look to the board support package as example.
+Actually the download works with serial cable (binary),
+or ethernet with bootp and tftp.
+
 
 End!
