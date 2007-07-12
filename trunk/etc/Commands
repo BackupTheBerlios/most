@@ -1,0 +1,3 @@
+REMOVE := rm -rfv
+MAKEDIR := mkdir -p
+ECHO := echo

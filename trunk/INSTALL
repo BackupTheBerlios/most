@@ -1,0 +1,74 @@
+1.) Checkout the MOST trunk.
+============================
+
+2.) Setup.
+==========
+
+As host actually only linux x386 is supported.
+
+2.1.) Commandline and editor(emacs):
+------------------------------------
+
+To setup the environment type at commandline in the "trunk" folder: 
+"source etc/Settings.env" for each shell.
+
+2.2.) Eclipse:
+--------------
+
+Import the Project:
+File->Import->Excisting Project into Workspace
+
+3.) Compile.
+============
+
+There are a lot of makefiles:
+for building the objects, libraries, bsp and programms.
+
+The main makefile in the trunk folder calls the makefiles
+for libraries and programms and these call makefiles for the objects.
+
+You can build all, a programm, just a library or just some objects.
+
+The common makefiles are placed in etc and you should not use them directly.
+
+trunk>
+	Makefile   (all)
+	sys/src>
+			Makefile (sys libs)
+			ace>
+				Makefile (ace lib)
+				stdio>
+					Makefile (objects)
+					src>
+						all *.c files are build
+			...
+		inc>
+			Makefile (documentation)
+			ace/doc>
+					Makefile (ace documentation)
+			...		
+	usr/...
+	bsp/mdc/sys/src>
+					Makefile (bsp objects)
+					...
+			usr/boot/
+					Makefile (prog, bin, srec)
+					src/ (Application)
+					
+
+3.1.) Commandline:
+------------------
+
+Type "make" or "make help" to get more information.
+
+3.2.) Eclipse:
+--------------
+
+Project->Build
+Project->Clean
+Project->Build make target 
+ 
+4.) Download.
+Have a look to the board support packages.
+
+End!

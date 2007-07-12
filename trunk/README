@@ -1,0 +1,30 @@
+This README file describes the MOST release.
+Comments, questions, and bug reports are always welcome.
+
+MOST is a collection of libraries and board support packages
+to provide an operating system for embedded systems.
+They are linked together with the the application.
+The goal is to develope a small, clean and simple os wich runs on
+microcontrollers without mmu and to provide
+a plattform for embedded development.   
+
+MOST features:
+	* a collection of standard ansi c functions
+	* multithreading, inter process communication, memmory management
+	* device drivers for serial port, timers, digital io.
+	* commandline interpreter for interaction and debugging. 
+    * udp/ip networking (tcp has do be done).
+	* network protocols bootp, tftp (others have to be done).
+    * board support packages and bootloaders (actualy only h83003).
+	* api documentation generated with doxygen(in work).
+	
+MOST is freely avaliable under the LGPL license(see COPYING).
+MOST must allways be free and there is no commercial version.
+The applications which are linked with MOST can be commercial.
+
+MOST is in development and has some(maybe more) bugs,
+but it is useable on my board.
+I am looking for help to design and hack the OS, port it to other architectures,
+write board support packages and to write documentation.
+
+Michael Feiner

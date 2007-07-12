@@ -1,0 +1,21 @@
+/*
+ *  Copyright (C) 2004-2006  Michael Feiner
+ *
+ */
+
+// #include "net/debug.h"
+// #include "net/opt.h"
+#include "net/loopif.h"
+// #include "net/ip.h"
+
+static NET_err_t
+loopif_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
+{
+    return netif->input (netif, p);
+}
+
+extern void
+NET_loopif_init (NET_netif_t * netif)
+{
+    netif->output = loopif_output;
+}

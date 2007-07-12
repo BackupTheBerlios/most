@@ -1,0 +1,57 @@
+-include $(MOST_ROOT)/etc/Commands
+
+LIB_NAMES_SYS := -l_nap\
+	        -l_cli\
+			-l_mfs\
+            -l_net\
+            -l_dev\
+	        -l_uso\
+            -l_ace\
+            -lgcc
+
+LIB_NAMES := $(LIB_NAMES_OPT) $(LIB_NAMES_SYS) 
+
+export LIB_PATH_OPT LIB_NAMES LDFLAGS_OPT
+
+export PROG_NAME OBJ_NAMES
+
+.PHONY : default help objects prog bin srec info clean_prog
+
+default:
+	@$(ECHO) "Please use <make help> for more information."
+
+help :
+	@$(call makegoal, help)
+	@$(ECHO) ""
+	@$(ECHO) "---------------------- Makefile.prog -------------------------------------------------------"
+	@$(ECHO) "Built the objects for your program and link it with the most libs."
+	@$(ECHO) "---------------------"
+	@$(ECHO) "help"
+	@$(ECHO) "obj_target : makegoal"
+	@$(ECHO) "prog    : build, obj_target"
+	@$(ECHO) "bin     : build, prog" 
+	@$(ECHO) "srec    : build, prog"
+	@$(ECHO) "info    : build"
+	@$(ECHO) "clean_prog  : makegoal -> clean_obj, build"
+	@$(ECHO) "---------------------------------------------------------------------------------------------"
+	@$(ECHO) ""
+
+prog : obj_target
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+
+bin : prog
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+
+srec : prog
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+
+info :
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+
+obj_target :
+	@$(call makegoal, $@)
+
+clean_prog : 
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+	@$(call makegoal, clean_obj)
+

@@ -1,0 +1,34 @@
+-include $(MOST_ROOT)/etc/Commands
+
+export INC_PATH_OPT CCFLAGS_OPT DEFINES_OPT
+
+.PHONY : default help obj_target asm_cpu clean_obj clean_obj_target
+
+default:
+	@$(ECHO) "Please use <make help> for more information."
+
+help :
+	@make help --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+	@$(ECHO) ""
+	@$(ECHO) "---------------------- Makefile.objects -------------------------------------------------------"
+	@$(ECHO) "Built the objects for this folder."
+	@$(ECHO) "---------------------"
+	@$(ECHO) "help"
+	@$(ECHO) "asm_cpu   : build"
+	@$(ECHO) "obj_target    : build"
+	@$(ECHO) "clean_obj          : build" 
+	@$(ECHO) "clean_obj_target   : build"
+	@$(ECHO) "---------------------------------------------------------------------------------------------"
+	@$(ECHO) ""
+
+obj_target: 
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+
+asm_cpu :
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+
+clean_obj : 
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+
+clean_obj_target : 
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build

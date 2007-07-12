@@ -1,0 +1,42 @@
+-include $(MOST_ROOT)/etc/Commands
+
+export LIB_NAME LIB_TYPE OBJ_NAMES
+
+.PHONY : default help lib_target obj_target asm_cpu clean_obj clean_obj_target clean_lib_target
+
+default:
+	@$(ECHO) "Please use <make help> for more information."
+
+help :
+	@$(call makegoal, help)
+	@$(ECHO) ""
+	@$(ECHO) "---------------------- Makefile.lib -------------------------------------------------------"
+	@$(ECHO) "Build the most lib $(LIB_NAME)."
+	@$(ECHO) "---------------------"
+	@$(ECHO) "help"
+	@$(ECHO) "asm_cpu   : makegoal"
+	@$(ECHO) "obj_target    : makegoal"
+	@$(ECHO) "lib_target        : build, obj_target"
+	@$(ECHO) "clean_obj          : makegoal"
+	@$(ECHO) "clean_obj_target   : makegoal"
+	@$(ECHO) "clean_lib_target   : build, clean_obj_target"
+	@$(ECHO) "---------------------------------------------------------------------------------------------"
+	@$(ECHO) ""
+
+lib_target : obj_target
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+
+obj_target :
+	@$(call makegoal, $@)
+
+asm_cpu :
+	@$(call makegoal, $@)
+
+clean_obj : 
+	@$(call makegoal, $@)
+
+clean_obj_target : 
+	@$(call makegoal, $@)
+
+clean_lib_target : clean_obj_target 
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build

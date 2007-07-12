@@ -1,0 +1,25 @@
+-include $(MOST_ROOT)/etc/Commands
+
+.PHONY : default help lib clean_lib
+
+default:
+	@$(ECHO) "Please use <make help> for more information."
+
+help :
+	@$(call makegoal, help)
+	@$(ECHO) ""
+	@$(ECHO) "---------------------- Makefile.libs -------------------------------------------------------"
+	@$(ECHO) "Built all libraries in in thid directorie tree."
+	@$(ECHO) "---------------------"
+	@$(ECHO) "help"
+	@$(ECHO) "lib   : makegoal lib_target"
+	@$(ECHO) "clean_lib : makegoal clean_obj, build"
+	@$(ECHO) "---------------------------------------------------------------------------------------------"
+	@$(ECHO) ""
+
+lib :
+	@$(call makegoal, lib_target)
+
+clean_lib :
+	@$(call makegoal, clean_obj)
+	@make  $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
