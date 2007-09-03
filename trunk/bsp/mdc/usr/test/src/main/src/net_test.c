@@ -26,7 +26,6 @@ static NET_ip_addr_t remote_addr;
 static USO_buf_pool_t test_pool;
 struct test_packet
 {
-    NET_netbuf_t buf_hdr;
     char data[16];
     long trans_nr;
 } _PACKED_;
@@ -58,7 +57,7 @@ net_test_exec (char *nix)
         buf = NET_udp_recv (&udp_sock, NULL, NULL);
         USO_kputs (USO_LL_INFO, "USER received udp.\n");
         NET_netbuf_free (buf);
-        p = NET_netbuf_alloc (&test_pool, 0, NULL);
+        p = NET_netbuf_alloc_pool (&test_pool);
         memcpy (((struct test_packet *)p)->data, "**Maik Threads**", 16);
         ((struct test_packet *)p)->trans_nr = tn++;
         if ((NET_udp_send (&udp_sock, p)) < 0)

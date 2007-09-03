@@ -16,7 +16,7 @@
 #include "mfs/directory.h"
 #include "mfs/sysfs.h"
 
-#define VERSION "Test 0.1.0"
+#define VERSION "Test 0.1.1"
 
 extern void
 MDC_main (void)

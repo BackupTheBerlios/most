@@ -22,24 +22,10 @@
 
 static USO_list_t udp_socks;
 
-static USO_buf_pool_t udp_pool;
-struct udp_packet
-{
-    NET_netbuf_t buf_hdr;
-    struct NET_eth_hdr eth_hdr;
-    struct NET_ip_hdr ip_hdr;
-    struct NET_udp_hdr udp_hdr;
-} _PACKED_;
-
-static struct udp_packet udp_packets[NET_ETH_RX_TX_QUE_SIZE];
-
 extern void
 NET_udp_init (void)
 {
     USO_list_init (&udp_socks);
-    USO_buf_pool_init (&udp_pool, udp_packets,
-                       NET_ETH_RX_TX_QUE_SIZE, sizeof (struct udp_packet));
-
 }
 
 #if NET_UDP_HEAD_DEBUG
@@ -335,11 +321,10 @@ NET_udp_send (NET_udp_socket_t * sock, NET_netbuf_t * p)
     short tot_len;
 
 
-    q = NET_netbuf_alloc (&udp_pool, 0, NULL);
+    q = NET_netbuf_alloc_trans ();
     p = NET_netbuf_chain (q, p);
 
-    NET_netbuf_index_inc (p, sizeof (struct NET_eth_hdr) +
-                          sizeof (struct NET_ip_hdr));
+    NET_netbuf_index_inc (p, -sizeof(struct NET_udp_hdr));
 
     tot_len = (unsigned short)NET_netbuf_tot_len (p);
 
@@ -378,7 +363,7 @@ NET_udp_send (NET_udp_socket_t * sock, NET_netbuf_t * p)
         udphdr->chksum = 0x0000;
         
 #if 1        
-         udphdr->chksum = NET_inet_chksum_pseudo (p, src_ip, &(sock->remote_ip),
+        udphdr->chksum = NET_inet_chksum_pseudo (p, src_ip, &(sock->remote_ip),
                                     NET_IP_PROTO_UDP, sock->chksum_len);
         if (udphdr->chksum == 0x0000)
         {

@@ -53,7 +53,6 @@ MDC_eth_init (void)
     NET_netif_init (&MDC_lo, "lo", &local, &netmask_lo, &gateway_lo, NET_ip_input);
     NET_loopif_init (&MDC_lo);
     NET_netif_init (&MDC_eth0, "eth0", &ipaddr, &netmask_eth0, &gateway, NET_ip_input);
-    NET_icmp_init ();
     NET_udp_init ();
     NET_smc_init (&smc, MDC_get_eth0_mac_addr (), SMC_IOADDR);
     NET_ethif_init (&ethif0, &MDC_eth0, MDC_get_eth0_mac_addr (), (NET_ethdev_t *) &smc);

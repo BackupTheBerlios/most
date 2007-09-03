@@ -60,15 +60,6 @@ static struct arp_entry arp_table[ARP_TABLE_SIZE];
 static u8_t ctime;
 static DEV_timer_t clear_entry;
 
-static USO_buf_pool_t arp_pool;
-
-static struct arp_packet
-{
-    NET_netbuf_t buf_hdr;
-    struct arp_hdr arp_hdr;
-} _PACKED_ arp_packets[NET_ETH_RX_TX_QUE_SIZE];
-
-
 /*
  * The arp_tmr() function should be called every ARP_TMR_INTERVAL
  * microseconds (10 seconds). This function is responsible for expiring
@@ -96,9 +87,6 @@ extern void
 NET_arp_init (void)
 {
     u8_t i;
-
-    USO_buf_pool_init (&arp_pool, arp_packets,
-                       NET_ETH_RX_TX_QUE_SIZE, sizeof (struct arp_packet));
 
     for (i = 0; i < ARP_TABLE_SIZE; ++i)
     {
@@ -333,45 +321,33 @@ NET_arp_query (NET_netif_t * netif,
     NET_netbuf_t *p;
     u8_t i;
 
-    p = NET_netbuf_alloc (&arp_pool, 0, NULL);
+    p = NET_netbuf_alloc_trans();
+    if(p == NULL) { return NULL; }
+	if (NET_netbuf_index_inc (p, -sizeof(struct arp_hdr))){
+	    hdr = (struct arp_hdr *)(((NET_netbuf_t *) p)->index);
+	    hdr->opcode = htons (ARP_REQUEST);
+	    for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
+    	{
+        	hdr->dhwaddr.addr[i] = 0x00;
+        	hdr->shwaddr.addr[i] = ethaddr->addr[i];
+    	}
+	    NET_ip_addr_set (&(hdr->dipaddr), ipaddr);
+    	NET_ip_addr_set (&(hdr->sipaddr), &(netif->ip_addr));
+	    hdr->hwtype = htons (HWTYPE_ETHERNET);
+	    ARPH_HWLEN_SET (hdr, NET_ETH_ADDR_SIZE);
+	    hdr->proto = htons (NET_ETH_TYPE_IP);
+    	ARPH_PROTOLEN_SET (hdr, sizeof (NET_ip_addr_t));
 
-    // if(p == NULL) {
-    // return NULL;
-    // }
+    	for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
+    	{
+        	hdr->ethhdr.dest.addr[i] = 0xff;
+        	hdr->ethhdr.src.addr[i] = ethaddr->addr[i];
+    	}
 
-
-	/* eth hdr ist im arp hdr
-    hdr =
-        (struct arp_hdr *)(((NET_netbuf_t *) p)->index +
-                           sizeof (struct NET_eth_hdr));
-	*/
-
-    hdr =
-        (struct arp_hdr *)(((NET_netbuf_t *) p)->index);
-
-    hdr->opcode = htons (ARP_REQUEST);
-
-    for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
-    {
-        hdr->dhwaddr.addr[i] = 0x00;
-        hdr->shwaddr.addr[i] = ethaddr->addr[i];
-    }
-
-    NET_ip_addr_set (&(hdr->dipaddr), ipaddr);
-    NET_ip_addr_set (&(hdr->sipaddr), &(netif->ip_addr));
-
-    hdr->hwtype = htons (HWTYPE_ETHERNET);
-    ARPH_HWLEN_SET (hdr, NET_ETH_ADDR_SIZE);
-
-    hdr->proto = htons (NET_ETH_TYPE_IP);
-    ARPH_PROTOLEN_SET (hdr, sizeof (NET_ip_addr_t));
-
-    for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
-    {
-        hdr->ethhdr.dest.addr[i] = 0xff;
-        hdr->ethhdr.src.addr[i] = ethaddr->addr[i];
-    }
-
-    hdr->ethhdr.type = htons (NET_ETH_TYPE_ARP);
-    return p;
+    	hdr->ethhdr.type = htons (NET_ETH_TYPE_ARP);
+	} else {
+		NET_netbuf_free(p);
+		p = NULL;
+	}
+   	return p;
 }

@@ -56,7 +56,6 @@ static const char* error[] = {
 
 struct tftp_packet
 {
-    NET_netbuf_t buf_hdr;
     unsigned char data[NAP_TFTP_MAXSIZE];
 } _PACKED_;
 
@@ -113,8 +112,8 @@ static void init_read_request(void)
 	char* data;
 	unsigned short temp;
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP init read request\n") );
-	send_packet = NET_netbuf_alloc (&pool, 0, NULL);
-	data = send_packet->data;
+	send_packet = NET_netbuf_alloc_pool (&pool);
+	data = send_packet->index;
 	temp = htons(READ_REQUEST);
 	memcpy(data, &temp, sizeof(temp));
 	data += sizeof(temp);
@@ -122,7 +121,7 @@ static void init_read_request(void)
 	data += strlen(file_name) + 1;
 	strcpy(data, mode[1]); 
 	data += strlen(mode[1]) + 1;
-	NET_netbuf_len_adjust (send_packet, data - send_packet->data);
+	NET_netbuf_len_adjust (send_packet, data - send_packet->index);
 	state.action = send;
 }  
 
@@ -130,15 +129,15 @@ static void init_ack(void){
 	char* data;
 	unsigned short temp;
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP init ack\n") );
-	send_packet = NET_netbuf_alloc (&pool, 0, NULL);
-	data = send_packet->data;
+	send_packet = NET_netbuf_alloc_pool (&pool);
+	data = send_packet->index;
 	temp = htons(ACK);
 	memcpy(data, &temp, sizeof(temp));
 	data += sizeof(temp);
 	temp = htons(state.block_nr);
 	memcpy(data, &temp, sizeof(temp));
 	data += sizeof(temp);
-	NET_netbuf_len_adjust (send_packet, data - send_packet->data);
+	NET_netbuf_len_adjust (send_packet, data - send_packet->index);
 	state.action = send;
 }
 

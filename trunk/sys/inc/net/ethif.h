@@ -8,7 +8,6 @@
 
 #include <uso/mailbox.h>
 #include <uso/thread.h>
-#include <uso/buf_pool.h>
 
 #include "net/netif.h"
 #include "net/ethdev.h"
@@ -25,8 +24,6 @@
 
 struct NET_ethif
 {
-    USO_buf_pool_t rx_pool;
-    NET_netbuf_t rx_packets[NET_ETH_RX_TX_QUE_SIZE];
     USO_mailbox_t ll_tx_que;
     USO_thread_t ll_rx_thread;
     USO_stack_t ll_rx_stack[400];

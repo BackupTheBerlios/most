@@ -357,7 +357,7 @@ smc_interrupt (NET_ethdev_t * smc)
  */
 
 static NET_netbuf_t *
-smc_rx_read_data (NET_smc91c94_t * smc, USO_buf_pool_t * pool)
+smc_rx_read_data (NET_smc91c94_t * smc)
 {
     /*-------------------------------------------------------------
       .
@@ -415,7 +415,7 @@ smc_rx_read_data (NET_smc91c94_t * smc, USO_buf_pool_t * pool)
         {
             if (pnr & SMC_RFS_ODDFRAME)
                 ++plen;
-            if ((packet = NET_netbuf_alloc (pool, plen, NULL)) != NULL)
+            if ((packet = NET_netbuf_alloc_ram (plen)) != NULL)
             {
                 data = (unsigned char *)packet->data;
                 DEV_in_nw (smc->io_addr + SMC_DATA1,
@@ -447,10 +447,10 @@ smc_rx_read_data (NET_smc91c94_t * smc, USO_buf_pool_t * pool)
 
 
 static NET_netbuf_t *
-smc_receive_packet (NET_ethdev_t * smc, USO_buf_pool_t * pool)
+smc_receive_packet (NET_ethdev_t * smc)
 {
     USO_wait (&((NET_smc91c94_t *) smc)->rx_sem);
-    NET_netbuf_t *packet = smc_rx_read_data ((NET_smc91c94_t *) smc, pool);
+    NET_netbuf_t *packet = smc_rx_read_data ((NET_smc91c94_t *) smc);
     smc_enable_int (SMC_IM_RCV_INT, (NET_smc91c94_t *) smc);
     return packet;
 }

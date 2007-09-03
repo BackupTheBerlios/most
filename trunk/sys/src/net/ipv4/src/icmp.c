@@ -20,27 +20,6 @@
 
 /*-----------------------------------------------------------------------------------*/
 
-static USO_buf_pool_t icmp_pool;
-
-struct icmp_packet
-{
-    NET_netbuf_t buf_hdr;
-    struct NET_eth_hdr eth_hdr;
-    struct NET_ip_hdr ip_hdr;
-    char icmp_hdr[8];
-    struct NET_ip_hdr icmp_data_ip_hdr;
-    char icmp_data_icmp_hdr[8];
-} _PACKED_;
-
-static struct icmp_packet icmp_packets[NET_ETH_RX_TX_QUE_SIZE];
-
-extern void
-NET_icmp_init (void)
-{
-    USO_buf_pool_init (&icmp_pool, icmp_packets,
-                       NET_ETH_RX_TX_QUE_SIZE, sizeof (struct icmp_packet));
-}
-
 extern NET_err_t
 NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
 {
@@ -121,28 +100,17 @@ NET_icmp_dest_unreach (NET_netbuf_t * p, enum NET_icmp_dur_type t)
     struct NET_ip_hdr *iphdr;
     struct NET_icmp_dur_hdr *idur;
 
-    q = NET_netbuf_alloc (&icmp_pool, 0, NULL);
-
-    NET_netbuf_index_inc (q, sizeof (struct NET_eth_hdr) +
-                          sizeof (struct NET_ip_hdr));
-
+    q = NET_netbuf_alloc_trans ();
+    NET_netbuf_index_inc (q, -sizeof(struct NET_icmp_dur_hdr));
     iphdr = (struct NET_ip_hdr *)p->index;
-
     idur = (struct NET_icmp_dur_hdr *)q->index;
     NET_ICMPH_TYPE_SET (idur, NET_ICMP_DUR);
     NET_ICMPH_CODE_SET (idur, t);
-
     bcopy (p->index, (char *)q->index + 8, sizeof (struct NET_ip_hdr) + 8);
-
-    /*
-     * calculate checksum 
-     */
     idur->chksum = 0;
     idur->chksum = NET_inet_chksum (idur, q->len);
     ++stats.icmp.tx;
-
     NET_ip_output (q, NULL, &(iphdr->src), NET_ICMP_TTL, NET_IP_PROTO_ICMP);
-
 }
 
 #if 0

@@ -21,7 +21,8 @@ enum NET_buf_type
 {
     NET_BUF_ROM, /**< ROM */
     NET_BUF_RAM, /**< RAM */
-    NET_BUF_POOL /**< POOL */
+    NET_BUF_POOL, /**< POOL */
+    NET_BUF_TRANS /**< Transport */
 };
 
 /** Networ buffer */
@@ -41,10 +42,20 @@ struct NET_netbuf
 };
 
 
+extern void NET_netbuf_init (void);
+
 /**
  * ?
  */
-extern NET_netbuf_t *NET_netbuf_alloc (USO_buf_pool_t *, long, char *);
+extern NET_netbuf_t *NET_netbuf_alloc_trans (void);
+
+extern NET_netbuf_t *NET_netbuf_alloc_pool (USO_buf_pool_t * pool);
+
+extern NET_netbuf_t *NET_netbuf_alloc_ram (long size);
+
+extern NET_netbuf_t *NET_netbuf_alloc_rom (long size, char *data);
+
+
 
 /**
  * ?
@@ -59,7 +70,7 @@ extern NET_netbuf_t *NET_netbuf_chain (NET_netbuf_t *, NET_netbuf_t *);
 /**
  * ?
  */
-extern void NET_netbuf_index_inc (NET_netbuf_t *, long);
+extern bool_t NET_netbuf_index_inc (NET_netbuf_t *, long);
 
 /**
  * ?

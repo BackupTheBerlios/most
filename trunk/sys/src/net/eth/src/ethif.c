@@ -153,7 +153,7 @@ eth_ll_rx_enter (void *netif)
     NET_ethdev_t *ethdev = ethif->ethdev;
     for (;;)
     {
-        NET_netbuf_t *p = ethdev->receive_packet (ethdev, &ethif->rx_pool);
+        NET_netbuf_t *p = ethdev->receive_packet (ethdev);
         if (p != NULL)
         {
             ethif_input ((NET_netif_t *) netif, p);
@@ -208,7 +208,4 @@ NET_ethif_init (NET_ethif_t * ethif,
     ethif->ethdev = ethdev;
 
     USO_mailbox_init (&ethif->ll_tx_que, NET_ETH_RX_TX_QUE_SIZE);
-
-    USO_buf_pool_init (&ethif->rx_pool, ethif->rx_packets,
-                       NET_ETH_RX_TX_QUE_SIZE, sizeof (NET_netbuf_t));
 }
