@@ -53,7 +53,7 @@ find(char* name)
 }
 
 
-static void
+static int
 parse (CLI_interpreter_t *cli, char* buf)
 {
     char *token = buf;
@@ -68,7 +68,17 @@ parse (CLI_interpreter_t *cli, char* buf)
 			}
 			if (c == '\n') {
                 *token = '\0';
-                break;
+                return 0;
+			} else if (c == '\b') {
+				if (token > buf) {
+					putc ((unsigned char)c);
+					putc ((unsigned char)' ');
+					putc ((unsigned char)c);	
+					token--;
+				} else if (cli->argc > 1) {
+					cli->argc--;
+					return (-1);
+				}
 			} else if (isgraph (c)) {
                 if (token < buf + CLI_TOKEN_SIZE - 1) {
                     *token++ = c;
@@ -76,9 +86,12 @@ parse (CLI_interpreter_t *cli, char* buf)
             } else if (c == ' ') {
                 *token = '\0';
 		        if (cli->argc < CLI_TOKEN_COUNTER) { 
-		        	parse (cli, cli->token_buffer[cli->argc]);
-		        }
-                break;
+		        	if (parse (cli, cli->token_buffer[cli->argc]) < 0)
+		        		putc ((unsigned char)'\b');
+		        	else
+		        		return (token - buf);		
+		        } else
+                	return (token - buf);
             }
         }
     }
@@ -112,7 +125,7 @@ CLI_interpreter_run (void *param)
 		idx = 0;
 
         promt (cli);
-        parse (cli, cli->token_buffer[cli->argc]);
+        (void) parse (cli, cli->token_buffer[cli->argc]);
         putc ('\n');
 
 		if (cli->argv[0][0] == '/'){
