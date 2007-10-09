@@ -68,7 +68,7 @@ parse (CLI_interpreter_t *cli, char* buf)
 			}
 			if (c == '\n') {
                 *token = '\0';
-                return 0;
+                return (token - buf);
 			} else if (c == '\b') {
 				if (token > buf) {
 					putc ((unsigned char)c);
