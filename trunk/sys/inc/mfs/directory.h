@@ -24,12 +24,11 @@ struct MFS_directory
 extern MFS_descriptor_t *MFS_next_entry(MFS_descriptor_t *dir_desc, MFS_descriptor_t *iterator);
 extern MFS_descriptor_t *MFS_lookup (MFS_descriptor_t *dir_desc, char* name);
 
-extern void MFS_create_desc(MFS_descriptor_t *dir_desc, MFS_descriptor_t *desc);
 extern MFS_descriptor_t * MFS_create_dir(MFS_descriptor_t *dir_desc, char *name);
 extern MFS_descriptor_t * MFS_create_file(MFS_descriptor_t *dir_desc, char *name);
 extern MFS_descriptor_t * MFS_create_io(MFS_descriptor_t *dir_desc, char *name,
 				 struct MFS_stream_op *io_op, MFS_stream_represent_t *represent);
-extern MFS_descriptor_t * MFS_create_unknowen(MFS_descriptor_t *dir_desc, char *name, MFS_entry_t* entry,
+extern MFS_descriptor_t * MFS_create_desc(MFS_descriptor_t *dir_desc, char *name, MFS_entry_t* entry,
  						enum MFS_entry_type type, struct MFS_descriptor_op *desc_op);
 
 extern void MFS_remove_desc(MFS_descriptor_t *dir_desc, MFS_descriptor_t *desc);

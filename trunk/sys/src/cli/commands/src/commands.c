@@ -69,5 +69,5 @@ CLI_exec_init (MFS_descriptor_t * dir, CLI_exec_t * exec,
 {
     exec->description = description;
     exec->f = f;
-	MFS_create_unknowen(dir, name, (MFS_entry_t*) exec, MFS_EXEC, &exec_descriptor_op);
+	MFS_create_desc(dir, name, (MFS_entry_t*) exec, MFS_EXEC, &exec_descriptor_op);
 }

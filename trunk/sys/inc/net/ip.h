@@ -107,6 +107,11 @@ struct NET_ip_hdr
 
 
 /**
+ * Initialize.
+ */
+extern void NET_ip_init (void);
+
+/**
  * Route.
  */
 extern NET_netif_t *NET_ip_route (NET_ip_addr_t *);

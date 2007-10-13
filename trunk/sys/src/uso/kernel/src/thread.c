@@ -55,8 +55,8 @@ USO_thread_init (USO_thread_t * thread,
     thread->state = USO_INIT;
     thread->stack = stack;
     thread->ticks = 0;
-	thread->desc = MFS_create_unknowen(MFS_sysfs_threads(), name,
-				 (MFS_entry_t*) thread, MFS_UNKNOWEN, &thread_descriptor_op);
+	thread->desc = MFS_create_desc(MFS_sysfs_threads(), name,
+				 (MFS_entry_t*) thread, MFS_DESC, &thread_descriptor_op);
 }
 
 extern USO_thread_t *

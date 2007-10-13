@@ -46,11 +46,6 @@ extern void NET_netif_init (NET_netif_t *,
 /**
  * ?
  */
-extern NET_netif_t *NET_netif_find (char *);
-
-/**
- * ?
- */
 extern void NET_netif_set_default (NET_netif_t *);
 
 /**

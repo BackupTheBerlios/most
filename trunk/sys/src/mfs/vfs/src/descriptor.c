@@ -66,7 +66,7 @@ MFS_descriptor_info(MFS_descriptor_t *desc)
 			type = "exec";
 			break;
 		default:
-			type = "?";
+			type = "desc";
 			break;
 	}
 	printf("%s \t%s\t", type, desc->name );

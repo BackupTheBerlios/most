@@ -178,7 +178,7 @@ print_heap_list (USO_heap_t* heap)
 }
 #endif
 
-extern void
+static void
 info (MFS_entry_t *entry)
 {
 	USO_heap_t* heap = (USO_heap_t*) entry;
@@ -201,8 +201,8 @@ static struct MFS_descriptor_op heap_descriptor_op = {.open = NULL,
 extern void
 USO_heap_install(USO_heap_t* heap, char *name)
 {
-	MFS_create_unknowen(MFS_sysfs_heaps(), name,
-				 (MFS_entry_t*) heap, MFS_UNKNOWEN, &heap_descriptor_op);
+	MFS_create_desc(MFS_sysfs_heaps(), name,
+				 (MFS_entry_t*) heap, MFS_DESC, &heap_descriptor_op);
 }
 
 extern bool_t

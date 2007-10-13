@@ -62,8 +62,8 @@ MFS_lookup(MFS_descriptor_t *dir_desc, char* name)
 	return desc;
 }
 
-extern void
-MFS_create_desc(MFS_descriptor_t *dir_desc, MFS_descriptor_t *desc)
+static void
+create_desc(MFS_descriptor_t *dir_desc, MFS_descriptor_t *desc)
 {
 	if ( (dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER) ){
 		MFS_directory_t *dir = (MFS_directory_t *)dir_desc->entry;
@@ -84,7 +84,7 @@ MFS_create_dir(MFS_descriptor_t *dir_desc, char *name)
 		    desc = MFS_descriptor_new((MFS_entry_t*)new_dir, &MFS_dir_descriptor_op,
 								 name, MFS_DIRECTORY, dir_desc);
 		    if (desc != NULL){
-                MFS_create_desc(dir_desc, desc);
+                create_desc(dir_desc, desc);
             } else {
                 free(new_dir);
             }
@@ -105,7 +105,7 @@ MFS_create_file(MFS_descriptor_t *dir_desc, char *name)
 		    desc = MFS_descriptor_new((MFS_entry_t*)file, &MFS_stream_descriptor_op,
 									 name, MFS_STREAM, dir_desc);
 		    if (desc != NULL){
-                MFS_create_desc(dir_desc, desc);
+                create_desc(dir_desc, desc);
             } else {
                 free(file);            
             }
@@ -126,7 +126,7 @@ MFS_create_io(MFS_descriptor_t *dir_desc, char *name, struct MFS_stream_op *io_o
 		    desc = MFS_descriptor_new((MFS_entry_t*)io, &MFS_stream_descriptor_op,
 									 name, MFS_STREAM, dir_desc);
 		    if (desc != NULL) {  
-                MFS_create_desc(dir_desc, desc);
+                create_desc(dir_desc, desc);
             } else {
                 free(io);
             }
@@ -136,14 +136,14 @@ MFS_create_io(MFS_descriptor_t *dir_desc, char *name, struct MFS_stream_op *io_o
 }
 
 extern MFS_descriptor_t *
-MFS_create_unknowen(MFS_descriptor_t *dir_desc, char *name, MFS_entry_t* entry,
+MFS_create_desc(MFS_descriptor_t *dir_desc, char *name, MFS_entry_t* entry,
 					enum MFS_entry_type type, struct MFS_descriptor_op *desc_op)
 {
 	MFS_descriptor_t *desc = NULL;
 	if ( (dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER) ){
 		desc = MFS_descriptor_new(entry, desc_op, name, type, dir_desc);
 		if (desc != NULL) {
-            MFS_create_desc(dir_desc, desc);
+            create_desc(dir_desc, desc);
         }
 	}
 	return desc;

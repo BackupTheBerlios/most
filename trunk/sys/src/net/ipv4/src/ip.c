@@ -8,6 +8,10 @@
 #include <uso/buf_pool.h>
 #include <uso/list.h>
 
+#include <mfs/descriptor.h>
+#include <mfs/directory.h>
+#include <mfs/sysfs.h>
+
 #include "net/debug.h"
 #include "net/ip.h"
 #include "net/inet.h"
@@ -26,20 +30,22 @@
  */
 /*-----------------------------------------------------------------------------------*/
 
-void
-ip_init (void)
+static MFS_descriptor_t *net_interfaces;
+
+extern void
+NET_ip_init (void)
 {
+    net_interfaces = MFS_sysfs_netif();
 }
 
 static NET_netif_t *
 find_route(NET_ip_addr_t *dest)
 {
+	MFS_descriptor_t *desc = NULL;
 	NET_netif_t *netif = NULL;
-	while ( (netif = (NET_netif_t*)USO_next_element(&NET_netif_list, (USO_node_t*)netif))
-			!= NULL){
-    	if (NET_ip_addr_maskcmp (dest,
-                             &(netif->ip_addr),
-                             &(netif->netmask)))
+	while ( (desc = MFS_next_entry(net_interfaces, desc)) != NULL) {
+		netif = (NET_netif_t *)desc->entry;
+    	if (NET_ip_addr_maskcmp (dest, &(netif->ip_addr), &(netif->netmask)))
 	    {
    			break;	   	
     	}
@@ -130,19 +136,15 @@ ip_head_debug (struct NET_ip_hdr *iphdr)
 static NET_netif_t *
 find_netif(struct NET_ip_hdr *iphdr)
 {
+	MFS_descriptor_t *desc = NULL;
 	NET_netif_t *netif = NULL;
-	while ( (netif = (NET_netif_t*)USO_next_element(&NET_netif_list, (USO_node_t*)netif))
-			!= NULL){
-    if (NET_ip_addr_isany (&(netif->ip_addr)) ||
-        NET_ip_addr_cmp (&(iphdr->dest),
-                         &(netif->ip_addr)) ||
-        (NET_ip_addr_isbroadcast (&(iphdr->dest),
-                                  &(netif->netmask)) &&
-         NET_ip_addr_maskcmp (&(iphdr->dest),
-                              &(netif->ip_addr),
-                              &(netif->netmask)))
-        || NET_ip_addr_cmp (&(iphdr->dest),
-                            &NET_ip_addr_broadcast))
+	while ( (desc = MFS_next_entry(net_interfaces, desc)) != NULL) {
+		netif = (NET_netif_t *)desc->entry;
+	    if (NET_ip_addr_isany (&(netif->ip_addr)) ||
+    	    NET_ip_addr_cmp (&(iphdr->dest), &(netif->ip_addr)) ||
+        	(NET_ip_addr_isbroadcast (&(iphdr->dest), &(netif->netmask)) &&
+        	 NET_ip_addr_maskcmp (&(iphdr->dest), &(netif->ip_addr), &(netif->netmask))) ||
+        	NET_ip_addr_cmp (&(iphdr->dest), &NET_ip_addr_broadcast))
 	    {
    			break;	   	
     	}
@@ -352,7 +354,7 @@ NET_ip_output_if (NET_netbuf_t * p,
 
     ++stats.ip.tx;
 
-    DEBUGF (NET_IP_DEBUG, ("\nIp: output if %s.", netif->name));
+   // DEBUGF (NET_IP_DEBUG, ("\nIp: output if %s.", netif->name));
 
 #if NET_IP_HEAD_DEBUG_TX
     ip_head_debug (iphdr);

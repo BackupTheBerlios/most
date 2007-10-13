@@ -4,40 +4,16 @@
  */
 
 #include <ace/string.h>
+#include <mfs/directory.h>
+#include <mfs/sysfs.h>
 
 #include "net/debug.h"
 #include "net/netif.h"
 
+
+
 NET_netif_t *NET_netif_default = NULL;
 
-static NET_netif_t *
-find(char* name)
-{
-	NET_netif_t *netif = NULL;
-	while ( (netif = (NET_netif_t*)USO_next_element(&NET_netif_list, (USO_node_t*)netif))
-			!= NULL){
-	    if (strcmp ( netif->name, name) == 0 ){
-   			break;	   	
-    	}		   		
-	}    
-	return netif;
-}
-
-NET_netif_t *
-NET_netif_find (char *name)
-{
-    NET_netif_t *netif;
-    netif = find(name);
-    if (netif != NULL)
-    {
-        DEBUGF (NET_NETIF_DEBUG, ("\nNetif: found %s.", name));
-    }
-    else
-    {
-        DEBUGF (NET_NETIF_DEBUG, ("\nNetif: not found %s.", name));
-    }
-    return netif;
-}
 
 void
 NET_netif_set_ipaddr (NET_netif_t * netif, NET_ip_addr_t * ipaddr)
@@ -63,22 +39,40 @@ NET_netif_set_default (NET_netif_t * netif)
     NET_netif_default = netif;
 }
 
-static struct MFS_descriptor_op netif_descriptor_op = {.open = netif_open,
-								        		      .close = netif_close,
-										              .info = netif_info};
+static void
+print_ipaddr(char* name, NET_ip_addr_t ipaddr)
+{
+ 	printf("\n\t%s: %3ld.%3ld.%3ld.%3ld.", 
+			 name,
+             ipaddr.addr >> 24 & 0xff,
+             ipaddr.addr >> 16 & 0xff,
+             ipaddr.addr >> 8 & 0xff,
+             ipaddr.addr & 0xff);
+ }
+
+static void
+info (MFS_entry_t *entry)
+{
+	NET_netif_t* netif = (NET_netif_t*) entry;
+
+	print_ipaddr("ip_addr", netif->ip_addr);	
+	print_ipaddr("netmask", netif->netmask);	
+	print_ipaddr("gateway", netif->gateway);	
+}
+
+static struct MFS_descriptor_op netif_descriptor_op = {.open = NULL,
+								        		      .close = NULL,
+										              .info = info};
 
 extern void
-NET_netif_init (MFS_descriptor_t * dir,
-				NET_netif_t * netif,
+NET_netif_init (NET_netif_t * netif,
                 char *name,
             	NET_err_t (*input) (NET_netif_t * netif, NET_netbuf_t * p) )
 {
     netif->state = NULL;
     netif->input = input;
-    //NET_ip_addr_set (&(netif->ip_addr), ipaddr);
-    //NET_ip_addr_set (&(netif->netmask), netmask);
-    //NET_ip_addr_set (&(netif->gateway), gateway);
-    //USO_enqueue (&NET_netif_list, (USO_node_t *) netif);
-	MFS_create_unknowen(dir, name, (MFS_entry_t*) netif, MFS_NETIF, &netif_descriptor_op);
+    NET_ip_addr_set (&(netif->ip_addr), &NET_ip_addr_any);
+    NET_ip_addr_set (&(netif->netmask), &NET_ip_addr_any);
+    NET_ip_addr_set (&(netif->gateway), &NET_ip_addr_any);
+	MFS_create_desc(MFS_sysfs_netif(), name, (MFS_entry_t*) netif, MFS_DESC, &netif_descriptor_op);
 }
-										              

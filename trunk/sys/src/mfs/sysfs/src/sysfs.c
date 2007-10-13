@@ -9,7 +9,7 @@
 static MFS_descriptor_t *root = NULL;
 static MFS_descriptor_t *threads = NULL;
 static MFS_descriptor_t *serial = NULL;
-static MFS_descriptor_t *ether = NULL;
+static MFS_descriptor_t *netif = NULL;
 static MFS_descriptor_t *heaps = NULL;
 
 static struct MFS_super_op MFS_sysfs_super_op = { .mount = NULL,
@@ -46,7 +46,7 @@ MFS_sysfs_init(void)
 	root = MFS_mount("root", &MFS_sysfs_vfs_op, info);
     if (root != NULL){
     	if ( (dir = MFS_create_dir(root, "net")) != NULL){
-			ether = MFS_create_dir(dir, "ether");
+			netif = MFS_create_dir(dir, "netif");
     	}
 	    if ( (dir = MFS_create_dir(root, "dev")) != NULL){
 			serial = MFS_create_dir(dir, "serial");
@@ -56,7 +56,7 @@ MFS_sysfs_init(void)
 			heaps = MFS_create_dir(dir, "heaps");
 		}
     }
-	return root && ether && serial && heaps && threads;    
+	return root && netif && serial && heaps && threads;    
 }
 
 extern MFS_descriptor_t *
@@ -83,3 +83,8 @@ MFS_sysfs_heaps(void)
 	return heaps;
 }
 
+extern MFS_descriptor_t *
+MFS_sysfs_netif(void)
+{
+	return netif;
+}

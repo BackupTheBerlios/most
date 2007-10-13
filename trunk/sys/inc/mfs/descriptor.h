@@ -17,7 +17,7 @@ enum MFS_entry_type
 	MFS_DIRECTORY,
 	MFS_STREAM,
 	MFS_EXEC,
-	MFS_UNKNOWEN
+	MFS_DESC
 };
 
 struct MFS_descriptor
