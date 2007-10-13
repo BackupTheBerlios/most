@@ -1,0 +1,102 @@
+This file contains some overall coding style conventions of MOST.
+It shall not take away to much freedom to programm your style, so i try to keep it short.
+
+
+1.) Namespaces
+==============
+
+1.1.) All global functions and variables and defines in a library begin with 3 big letters and an underscore.
+      This should provide a namespace.
+ 	
+      Examples:
+
+	system libs:
+
+	ACE_ (a C environment)
+	USO_ (micro system operation)
+	DEV_ (devices)
+	CLI_ (comman line interpreter)
+	NET_ (network)
+	NAP_ (network application protocols)
+ 	MFS_ (mini file system)
+
+	board support package:
+
+	MDC_ (most development controller)
+
+	user libs:
+
+
+
+1.2.) All static functions and variables shall not use this namespace.
+
+1.3.) The only exeption to this rules are functions needed by gcc. (this global functions have no namespace. (memcpy(),..))
+
+
+
+2.) Types
+=========
+
+2.1.) All structs which are act as types, this means you have a struct of data and functions 
+      which work on this data shall be defined with a typedef and structurename with an _t.
+      In Emacs than the syntax highlighting is correct for this types.
+      Most the member variables of such structs are private.	
+
+      Example:
+
+		struct ACE_list{
+			ACE_node_t *head;
+			ACE_node_t *tail;
+			void *data_p;
+		};
+
+	typedef ACE_list ACE_list_t;
+
+	extern void ACE_enqueue(ACE_list_t *list, ACE_node_t *node);
+		  
+2.2.) All structs where no set of functions act on its data are no types and shall not follow this rule.
+      Here we always use "struct name".
+	
+      Example:
+
+      	struct MFS_interface_i {
+			int (*read) (char *buf, int len);
+			int (*write) (char *buf, int len);
+		};
+
+2.3.) The structures often are placed in header files so that the compiler knows the structur and its size
+      if you use this type static but normaly you shall not know the member variable of this structs. They are private
+      and shall only be used in implementation of the functions wich act on this structs. The name of public data
+      variables may end with an "_p" to mark them as public.
+
+
+
+3.) Concurrency
+===============
+
+3.1.) Functions and data may be marked for their level of safety. 
+      Names of thread safe functions shall end with      _ts  . (the function body is protected by a mutex)
+      Names of inerrupt safe functions shall end with    _is  . (the function body is protected by disabling interrupts)
+      Names of reentrant functions shall end with        _re  . (all variables used by the function are on the stack)
+      Names of unsafe functions shall end with           _us  . (global data is not protected by any kind)	
+
+	  Names for data wich must be protected by thread safety       _ts  .
+	  Names for data wich must be protected by interrupt safety    _is  .
+
+
+/* This shall not use this */
+3.2.) Functions and data may be marked if they will block or not.
+      Names for blocking behavior end with       _b  .
+      Names for non blocking behavior end with   _nb .
+      This is placed after the safety level.
+
+
+
+4.) Documentation
+=================		       	
+
+4.1.) The header files act as interface, so the doxygen comments are just used in the header files and
+      only to public data and functions which must be knowen by the user.
+
+4.2.) Implementation details are documented in the c files just as normal comments.
+
