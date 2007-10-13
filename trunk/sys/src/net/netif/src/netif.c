@@ -8,32 +8,7 @@
 #include "net/debug.h"
 #include "net/netif.h"
 
-USO_list_t NET_netif_list;
 NET_netif_t *NET_netif_default = NULL;
-
-
-void
-NET_netif_list_init (void)
-{
-    USO_list_init (&NET_netif_list);
-}
-
-extern void
-NET_netif_init (NET_netif_t * netif,
-                char *name,
-                NET_ip_addr_t * ipaddr,
-                NET_ip_addr_t * netmask,
-                NET_ip_addr_t * gateway,
-                NET_err_t (*input) (NET_netif_t * netif, NET_netbuf_t * p))
-{
-    netif->state = NULL;
-    netif->name = name;
-    netif->input = input;
-    NET_ip_addr_set (&(netif->ip_addr), ipaddr);
-    NET_ip_addr_set (&(netif->netmask), netmask);
-    NET_ip_addr_set (&(netif->gateway), gateway);
-    USO_enqueue (&NET_netif_list, (USO_node_t *) netif);
-}
 
 static NET_netif_t *
 find(char* name)
@@ -87,3 +62,23 @@ NET_netif_set_default (NET_netif_t * netif)
 {
     NET_netif_default = netif;
 }
+
+static struct MFS_descriptor_op netif_descriptor_op = {.open = netif_open,
+								        		      .close = netif_close,
+										              .info = netif_info};
+
+extern void
+NET_netif_init (MFS_descriptor_t * dir,
+				NET_netif_t * netif,
+                char *name,
+            	NET_err_t (*input) (NET_netif_t * netif, NET_netbuf_t * p) )
+{
+    netif->state = NULL;
+    netif->input = input;
+    //NET_ip_addr_set (&(netif->ip_addr), ipaddr);
+    //NET_ip_addr_set (&(netif->netmask), netmask);
+    //NET_ip_addr_set (&(netif->gateway), gateway);
+    //USO_enqueue (&NET_netif_list, (USO_node_t *) netif);
+	MFS_create_unknowen(dir, name, (MFS_entry_t*) netif, MFS_NETIF, &netif_descriptor_op);
+}
+										              

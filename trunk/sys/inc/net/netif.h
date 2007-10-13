@@ -23,8 +23,6 @@ typedef struct NET_netif NET_netif_t;
 /** ? */
 struct NET_netif
 {
-    USO_node_t node;
-    char *name;
     NET_ip_addr_t ip_addr;
     NET_ip_addr_t netmask;      /* netmask in network byte order */
     NET_ip_addr_t gateway;
@@ -35,25 +33,14 @@ struct NET_netif
 };
 
 /** ? */
-extern USO_list_t NET_netif_list;
-
-/** ? */
 extern NET_netif_t *NET_netif_default;
 
 
 /**
  * ?
  */
-extern void NET_netif_list_init (void);
-
-/**
- * ?
- */
 extern void NET_netif_init (NET_netif_t *,
                             char *,
-                            NET_ip_addr_t *,
-                            NET_ip_addr_t *,
-                            NET_ip_addr_t *,
                             NET_err_t (*)(NET_netif_t *, NET_netbuf_t *));
 
 /**
