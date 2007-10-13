@@ -12,6 +12,7 @@
 #include <net/loopif.h>
 #include <net/icmp.h>
 #include <net/udp.h>
+#include <net/netbuf.h>
 
 #include "arch/digio.h"
 #include "arch/eth.h"
@@ -49,6 +50,7 @@ MDC_eth_init (void)
     NET_ip4_addr (&netmask_eth0, 0, 0, 0, 0);
     NET_ip4_addr (&gateway_lo, 0, 0, 0, 0);
     NET_ip4_addr (&gateway, 0, 0, 0, 0);
+    NET_netbuf_init ();
     NET_netif_list_init ();
     NET_netif_init (&MDC_lo, "lo", &local, &netmask_lo, &gateway_lo, NET_ip_input);
     NET_loopif_init (&MDC_lo);
