@@ -1,0 +1,6 @@
+putboot.data
+putboot.unstripped
+putboot.map
+putboot.bin
+putboot.coff
+putboot.code

@@ -1,0 +1,6 @@
+boot.bin
+boot.code
+boot.coff
+boot.data
+boot.map
+boot.unstripped
