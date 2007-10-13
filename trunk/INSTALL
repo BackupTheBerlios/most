@@ -24,6 +24,7 @@ To setup the environment type at commandline in the "trunk" folder:
 Install the C/C++ Plugin
 Import the Project:
 File->Import->General->Excisting Project into Workspace
+Change variable MOST_ROOT in the projects environment to your needs. 
 
 3.) Compile.
 ============
@@ -80,5 +81,3 @@ Have a look to the board support package as example.
 Actually the download works with serial cable (binary),
 or ethernet with bootp and tftp.
 
-
-End!
