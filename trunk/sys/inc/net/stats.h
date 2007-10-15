@@ -18,9 +18,9 @@
 /** ? */
 struct NET_stats_proto
 {
-    u16_t tx;                   /**< Transmitted packets. */
-    u16_t rx;                   /**< Received packets. */
-    u16_t rx_drop;              /**< Misc error. */
+    unsigned int tx;                   /**< Transmitted packets. */
+    unsigned int rx;                   /**< Received packets. */
+    unsigned int rx_drop;              /**< Misc error. */
 };
 
 /** ? */
@@ -33,7 +33,7 @@ struct NET_stats
 };
 
 /** Net Statistic */
-extern struct NET_stats stats;
+extern struct NET_stats NET_stats;
 
 /**
  * Initialize Statistic
