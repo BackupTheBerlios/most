@@ -42,13 +42,13 @@ NET_netif_set_default (NET_netif_t * netif)
 static void
 print_ipaddr(char* name, NET_ip_addr_t ipaddr)
 {
- 	printf("\n\t%s: %3ld.%3ld.%3ld.%3ld.", 
+ 	printf("\n\t%s: %3ld.%3ld.%3ld.%3ld", 
 			 name,
              ipaddr.addr >> 24 & 0xff,
              ipaddr.addr >> 16 & 0xff,
              ipaddr.addr >> 8 & 0xff,
              ipaddr.addr & 0xff);
- }
+}
 
 static void
 info (MFS_entry_t *entry)
@@ -57,7 +57,8 @@ info (MFS_entry_t *entry)
 
 	print_ipaddr("ip_addr", netif->ip_addr);	
 	print_ipaddr("netmask", netif->netmask);	
-	print_ipaddr("gateway", netif->gateway);	
+	print_ipaddr("gateway", netif->gateway);
+	printf("\n TX: %u RX: %u\n", netif->tx, netif->rx);	
 }
 
 static struct MFS_descriptor_op netif_descriptor_op = {.open = NULL,
@@ -65,12 +66,11 @@ static struct MFS_descriptor_op netif_descriptor_op = {.open = NULL,
 										              .info = info};
 
 extern void
-NET_netif_init (NET_netif_t * netif,
-                char *name,
-            	NET_err_t (*input) (NET_netif_t * netif, NET_netbuf_t * p) )
+NET_netif_init (NET_netif_t * netif, char *name)
 {
-    netif->state = NULL;
-    netif->input = input;
+	netif->tx = 0;
+	netif->rx = 0;
+    netif->device = NULL;
     NET_ip_addr_set (&(netif->ip_addr), &NET_ip_addr_any);
     NET_ip_addr_set (&(netif->netmask), &NET_ip_addr_any);
     NET_ip_addr_set (&(netif->gateway), &NET_ip_addr_any);

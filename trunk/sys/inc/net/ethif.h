@@ -10,7 +10,6 @@
 #include <uso/thread.h>
 
 #include "net/netif.h"
-#include "net/ethdev.h"
 #include "net/ethaddr.h"
 
 /** @defgroup ethif ethif.h
@@ -20,36 +19,32 @@
  * @{
  */
 
-#define NET_ETH_RX_TX_QUE_SIZE 10 /**< ? */
-
 struct NET_ethif
 {
-    USO_mailbox_t ll_tx_que;
-    USO_thread_t ll_rx_thread;
-    USO_stack_t ll_rx_stack[400];
-    USO_thread_t ll_tx_thread;
-    USO_stack_t ll_tx_stack[400];
-    struct NET_eth_addr *ethaddr;
-    NET_ethdev_t *ethdev;
+    struct NET_eth_addr *eth_addr;
+    void *mac;
+    void (*start) (void*);
+    NET_netbuf_t* (*receive) (void *);
+    void (*transmit) (void *, NET_netbuf_t *);
+	USO_thread_t rx_thread;
+	USO_stack_t rx_stack[400];
 };
 
 /** Ethernet Interface */
 typedef struct NET_ethif NET_ethif_t;
 
-#define NET_ETH_TYPE_ARP 0x0806 /**< ARP Protocol */
-#define NET_ETH_TYPE_IP  0x0800 /**< IP Protocol */
+/**
+ * Initialize ethernet interface 
+ */
+extern void NET_ethif_init (NET_netif_t *netif,
+							NET_ethif_t *ethif,
+                            struct NET_eth_addr *hwaddr);
+
 
 /**
  * Start ethernet interface 
  */
-extern void NET_ethif_start (NET_netif_t * netif);
-
-/**
- * Initialize ethernet interface 
- */
-extern void NET_ethif_init (NET_ethif_t *,
-                            NET_netif_t *,
-                            struct NET_eth_addr *hwaddr, NET_ethdev_t * ethdev);
+extern void NET_ethif_start (NET_ethif_t *ethif);
 
 /** @}
  */

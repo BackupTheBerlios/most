@@ -9,6 +9,7 @@
 #include "net/debug.h"
 #include "net/inet.h"
 #include "net/arp.h"
+#include "net/ethernet.h"
 #include "net/ip.h"
 
 #define ARP_TABLE_SIZE 10

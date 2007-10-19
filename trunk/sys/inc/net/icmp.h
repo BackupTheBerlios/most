@@ -54,11 +54,6 @@ enum NET_icmp_te_type
 /**
  * 
  */
-extern void NET_icmp_init (void);
-
-/**
- * 
- */
 extern NET_err_t NET_icmp_input (NET_netbuf_t *, NET_netif_t *);
 
 /**

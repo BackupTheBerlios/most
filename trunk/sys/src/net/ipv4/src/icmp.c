@@ -29,7 +29,7 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
     NET_ip_addr_t tmpaddr;
     long hlen;
 
-    ++stats.icmp.rx;
+    ++NET_stats.icmp.rx;
     DEBUGF (NET_ICMP_DEBUG, ("\nIcmp: rx."));
 
 
@@ -46,14 +46,14 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
             NET_ip_addr_ismulticast (&iphdr->dest))
         {
             DEBUGF (NET_ICMP_DEBUG, ("\nIcmp: Smurf."));
-            ++stats.icmp.rx_drop;
+            ++NET_stats.icmp.rx_drop;
             return NET_ERR_BAD;
         }
         DEBUGF (NET_ICMP_DEBUG, ("\nIcmp: ping."));
         if (NET_netbuf_tot_len (p) < sizeof (struct NET_icmp_echo_hdr))
         {
             DEBUGF (NET_ICMP_DEBUG, ("\nIcmp: bad ICMP echo received."));
-            ++stats.icmp.rx_drop;
+            ++NET_stats.icmp.rx_drop;
             return NET_ERR_BAD;
         }
         iecho = (struct NET_icmp_echo_hdr *)p->index;
@@ -61,7 +61,7 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
         {
             DEBUGF (NET_ICMP_DEBUG,
                     ("\nIcmp: checksum failed for received ICMP echo."));
-            ++stats.icmp.rx_drop;
+            ++NET_stats.icmp.rx_drop;
             return NET_ERR_BAD;
         }
         tmpaddr.addr = iphdr->src.addr;
@@ -79,7 +79,7 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
         {
             iecho->chksum += htons (NET_ICMP_ECHO << 8);
         }
-        ++stats.icmp.tx;
+        ++NET_stats.icmp.tx;
 
         NET_netbuf_index_inc (p, -hlen);
         NET_ip_output_if (p, &(iphdr->src), NET_IP_HDRINCL,
@@ -88,7 +88,7 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
 
     default:
         DEBUGF (NET_ICMP_DEBUG, ("\nIcmp: type not supported."));
-        ++stats.icmp.rx_drop;
+        ++NET_stats.icmp.rx_drop;
         return NET_ERR_BAD;
     }
 }
@@ -109,7 +109,7 @@ NET_icmp_dest_unreach (NET_netbuf_t * p, enum NET_icmp_dur_type t)
     bcopy (p->index, (char *)q->index + 8, sizeof (struct NET_ip_hdr) + 8);
     idur->chksum = 0;
     idur->chksum = NET_inet_chksum (idur, q->len);
-    ++stats.icmp.tx;
+    ++NET_stats.icmp.tx;
     NET_ip_output (q, NULL, &(iphdr->src), NET_ICMP_TTL, NET_IP_PROTO_ICMP);
 }
 
@@ -159,7 +159,7 @@ NET_icmp_time_exceeded (NET_netbuf_t * p, enum NET_icmp_te_type t)
      */
     tehdr->chksum = 0;
     tehdr->chksum = NET_inet_chksum (tehdr, q->len);
-    ++stats.icmp.tx;
+    ++NET_stats.icmp.tx;
     NET_ip_output (q, NULL, &(iphdr->src), NET_ICMP_TTL, NET_IP_PROTO_ICMP);
 
 }

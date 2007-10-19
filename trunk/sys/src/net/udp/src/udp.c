@@ -53,7 +53,7 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
     NET_udp_socket_t *sock = NULL;
     u16_t src, dest;
 
-    ++stats.udp.rx;
+    ++NET_stats.udp.rx;
 
     iphdr = (struct NET_ip_hdr *)p->index;
     NET_netbuf_index_inc (p, sizeof (struct NET_ip_hdr));
@@ -120,7 +120,7 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
             {
                 DEBUGF (NET_UDP_DEBUG,
                         ("\nUdp: udp lite datagram discarded due to failing checksum."));
-                ++stats.udp.rx_drop;
+                ++NET_stats.udp.rx_drop;
                 return NET_ERR_BAD;
             }
 #endif            
@@ -175,7 +175,7 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
             NET_icmp_dest_unreach (p, NET_ICMP_DUR_PORT);
         }
 
-        ++stats.udp.rx_drop;
+        ++NET_stats.udp.rx_drop;
         return NET_ERR_BAD;
     }
 
@@ -183,13 +183,13 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
 }
 
 
-
+#define NET_UDP_RX_QUE_SIZE 10
 
 extern void
 NET_udp_socket_init (NET_udp_socket_t * sock)
 {
     bzero (sock, sizeof (NET_udp_socket_t));
-    USO_mailbox_init (&sock->rx_que, NET_ETH_RX_TX_QUE_SIZE);
+    USO_mailbox_init (&sock->rx_que, NET_UDP_RX_QUE_SIZE);
     sock->rx_timeout = FALSE;
 }
 
@@ -406,7 +406,7 @@ NET_udp_send (NET_udp_socket_t * sock, NET_netbuf_t * p)
                                 NET_UDP_TTL, NET_IP_PROTO_UDP, netif);
     }
 
-    ++stats.udp.tx;
+    ++NET_stats.udp.tx;
  	if (err != NET_ERR_OK){
 		NET_netbuf_free (p);
  	} 	

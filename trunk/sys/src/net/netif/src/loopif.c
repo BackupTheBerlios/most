@@ -6,12 +6,15 @@
 // #include "net/debug.h"
 // #include "net/opt.h"
 #include "net/loopif.h"
-// #include "net/ip.h"
+#include "net/ip.h"
 
 static NET_err_t
 loopif_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
 {
-    return netif->input (netif, p);
+ 	++netif->tx;
+ 	NET_err_t err = NET_ip_input (netif, p); 
+	++netif->rx;
+    return err;
 }
 
 extern void

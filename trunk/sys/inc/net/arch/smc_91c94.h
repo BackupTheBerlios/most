@@ -7,7 +7,6 @@
 #define NET_SMC_91C94_H
 
 #include "net/ethif.h"
-#include "net/ethdev.h"
 
 /** @addtogroup arch
  *
@@ -27,7 +26,6 @@
 
 struct NET_smc91c94
 {
-    NET_ethdev_t ethdev;
     unsigned long io_addr;
     unsigned char mac_addr[NET_ETH_ADDR_SIZE];
     // unsigned long rx_packets;
@@ -56,17 +54,19 @@ struct NET_smc91c94
     // static unsigned long eth_chip_resets = 0;
 
     bool_t link_is_up;
-
     USO_semaphore_t rx_sem;
-
 };
 
 /** SMC91C94 device type. */
 typedef struct NET_smc91c94 NET_smc91c94_t;
 
+extern void
+NET_smc_interrupt (NET_smc91c94_t * smc);
+
 /** ? */
-extern void NET_smc_init (NET_smc91c94_t * smc,
-                          struct NET_eth_addr *hwaddr, unsigned long io_addr);
+extern void NET_smc_init (NET_ethif_t *ethif,
+						  NET_smc91c94_t * smc,
+						  unsigned long io_addr);
 
 /** @}
  */

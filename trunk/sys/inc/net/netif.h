@@ -23,13 +23,13 @@ typedef struct NET_netif NET_netif_t;
 /** ? */
 struct NET_netif
 {
+    unsigned int tx;                   /**< Transmitted packets. */
+    unsigned int rx;                   /**< Received packets. */
     NET_ip_addr_t ip_addr;
     NET_ip_addr_t netmask;      /* netmask in network byte order */
     NET_ip_addr_t gateway;
-      NET_err_t (*input) (NET_netif_t *, NET_netbuf_t *);
-      NET_err_t (*output) (NET_netif_t *,
-                           NET_netbuf_t *, NET_ip_addr_t * ipaddr);
-    void *state;
+    NET_err_t (*output) (NET_netif_t *,NET_netbuf_t *, NET_ip_addr_t * ipaddr);
+    void *device;
 };
 
 /** ? */
@@ -39,9 +39,7 @@ extern NET_netif_t *NET_netif_default;
 /**
  * ?
  */
-extern void NET_netif_init (NET_netif_t *,
-                            char *,
-                            NET_err_t (*)(NET_netif_t *, NET_netbuf_t *));
+extern void NET_netif_init (NET_netif_t *, char *);
 
 /**
  * ?

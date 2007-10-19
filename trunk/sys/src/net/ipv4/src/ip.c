@@ -160,7 +160,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
     static NET_netif_t *netif;
     static u8_t hl;
 
-    ++stats.ip.rx;
+    ++NET_stats.ip.rx;
 
     iphdr = (struct NET_ip_hdr *)p->index;
 
@@ -178,7 +178,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
         DEBUGF (NET_IP_DEBUG,
                 ("\nIp: packet dropped due to bad version number %d.",
                  NET_IPH_V (iphdr)));
-        ++stats.ip.rx_drop;
+        ++NET_stats.ip.rx_drop;
         return NET_ERR_BAD;
     }
 
@@ -188,7 +188,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
     {
         DEBUGF (NET_IP_DEBUG,
                 ("\nIp: packet dropped due to too short packet %d.", p->len));
-        ++stats.ip.rx_drop;
+        ++NET_stats.ip.rx_drop;
         return NET_ERR_BAD;
     }
 
@@ -200,7 +200,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
         DEBUGF (NET_IP_DEBUG,
                 ("\nIp: packet dropped due to failing checksum 0x%x.",
                  NET_inet_chksum (iphdr, hl * 4)));
-        ++stats.ip.rx_drop;
+        ++NET_stats.ip.rx_drop;
         return NET_ERR_BAD;
     }
 
@@ -242,7 +242,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
         DEBUGF (NET_IP_DEBUG,
                 ("\nIp: packet dropped since it was fragmented (0x%x).",
                  ntohs (NET_IPH_OFFSET (iphdr))));
-        ++stats.ip.rx_drop;
+        ++NET_stats.ip.rx_drop;
         return NET_ERR_BAD;
     }
 
@@ -250,7 +250,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
     {
         DEBUGF (NET_IP_DEBUG,
                 ("\nIp: packet dropped since there were IP options."));
-        ++stats.ip.rx_drop;
+        ++NET_stats.ip.rx_drop;
         return NET_ERR_BAD;
     }
 
@@ -289,7 +289,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
                 ("\nIp: unsupported transportation protocol %d.",
                  NET_IPH_PROTO (iphdr)));
 
-        ++stats.ip.rx_drop;
+        ++NET_stats.ip.rx_drop;
 
         break;
     }
@@ -352,7 +352,7 @@ NET_ip_output_if (NET_netbuf_t * p,
         dest = &(iphdr->dest);
     }
 
-    ++stats.ip.tx;
+    ++NET_stats.ip.tx;
 
    // DEBUGF (NET_IP_DEBUG, ("\nIp: output if %s.", netif->name));
 

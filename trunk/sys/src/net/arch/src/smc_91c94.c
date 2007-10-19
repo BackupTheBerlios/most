@@ -21,9 +21,8 @@
 #include "net/debug.h"
 #include "net/netif.h"
 #include "net/ethif.h"
-#include "net/ethdev.h"
 
-#define SMC_SELECT_BANK(x)  { DEV_out_w( x , ((NET_smc91c94_t*)smc)->io_addr + SMC_BANK_SELECT ); }
+#define SMC_SELECT_BANK(x)  { DEV_out_w( x , smc->io_addr + SMC_BANK_SELECT ); }
 
 
 #define ETHIRQ_ON()   H8_BITSET( H8_IER_IRQ7E, h8_IER)
@@ -85,7 +84,7 @@ smc_check_ios (NET_smc91c94_t * smc)
  * Write the MAC address ( bank 1, regs 4 - 9 ) 
  */
 static void
-smc_set_mac_addr (NET_smc91c94_t * smc)
+smc_set_mac_addr (NET_smc91c94_t *smc)
 {
     int i;
     SMC_SELECT_BANK (1);
@@ -96,41 +95,41 @@ smc_set_mac_addr (NET_smc91c94_t * smc)
 }
 
 static void
-smc_start (NET_ethdev_t * smc)
+smc_start (NET_smc91c94_t *smc)
 {
     ETHIRQ_OFF ();
 
-    ((NET_smc91c94_t *) smc)->link_is_up = TRUE;
-    smc_soft_reset ((NET_smc91c94_t *) smc);
-    smc_check_ios ((NET_smc91c94_t *) smc);
-    smc_set_mac_addr ((NET_smc91c94_t *) smc);
+    smc->link_is_up = TRUE;
+    smc_soft_reset (smc);
+    smc_check_ios (smc);
+    smc_set_mac_addr (smc);
 
     /*
      * Set the transmit and receive configuration registers to default
      * values 
      */
     SMC_SELECT_BANK (0);
-    DEV_out_w (SMC_RCR_CLEAR, ((NET_smc91c94_t *) smc)->io_addr + SMC_RCR);
-    DEV_out_w (SMC_TCR_CLEAR, ((NET_smc91c94_t *) smc)->io_addr + SMC_TCR);
+    DEV_out_w (SMC_RCR_CLEAR, smc->io_addr + SMC_RCR);
+    DEV_out_w (SMC_TCR_CLEAR, smc->io_addr + SMC_TCR);
 
     /*
      * set the control register to automatically release successfully
      * transmitted packets, to make the best use out of our limited memory 
      */
     SMC_SELECT_BANK (1);
-    DEV_out_w (SMC_CTR_NORMAL, ((NET_smc91c94_t *) smc)->io_addr + SMC_CTR);
+    DEV_out_w (SMC_CTR_NORMAL, smc->io_addr + SMC_CTR);
 
     /*
      * select 10BaseT port !!! 
      */
-    DEV_out_w ((DEV_in_w (((NET_smc91c94_t *) smc)->io_addr + SMC_CR)) &
-               ~SMC_CR_AUI_SELECT, ((NET_smc91c94_t *) smc)->io_addr + SMC_CR);
+    DEV_out_w ((DEV_in_w (smc->io_addr + SMC_CR)) &
+               ~SMC_CR_AUI_SELECT, smc->io_addr + SMC_CR);
 
     /*
      * Reset the MMU 
      */
     SMC_SELECT_BANK (2);
-    DEV_out_w (SMC_MMUCR_RESET, ((NET_smc91c94_t *) smc)->io_addr + SMC_MMUCR);
+    DEV_out_w (SMC_MMUCR_RESET, smc->io_addr + SMC_MMUCR);
 
     /*
      * Note: It doesn't seem that waiting for the MMU busy is needed here,
@@ -138,20 +137,20 @@ smc_start (NET_ethdev_t * smc)
      * issuing another MMU command right after this 
      */
 
-    DEV_OUT_B (0, ((NET_smc91c94_t *) smc)->io_addr + SMC_MSK);
+    DEV_OUT_B (0, smc->io_addr + SMC_MSK);
 
     SMC_SELECT_BANK (0);
     /*
      * see the header file for options in TCR/RCR NORMAL 
      */
-    DEV_out_w (SMC_TCR_NORMAL, ((NET_smc91c94_t *) smc)->io_addr + SMC_TCR);
-    DEV_out_w (SMC_RCR_NORMAL, ((NET_smc91c94_t *) smc)->io_addr + SMC_RCR);
+    DEV_out_w (SMC_TCR_NORMAL, smc->io_addr + SMC_TCR);
+    DEV_out_w (SMC_RCR_NORMAL, smc->io_addr + SMC_RCR);
 
     /*
      * now, enable interrupts 
      */
     SMC_SELECT_BANK (2);
-    DEV_OUT_B (SMC_INT_MASK, ((NET_smc91c94_t *) smc)->io_addr + SMC_MSK);
+    DEV_OUT_B (SMC_INT_MASK, smc->io_addr + SMC_MSK);
 
     ETHIRQ_QUIT ();
     ETHIRQ_ON ();
@@ -290,8 +289,8 @@ eph_int (NET_smc91c94_t * smc)
     }
 }
 
-static void
-smc_interrupt (NET_ethdev_t * smc)
+extern void
+NET_smc_interrupt (NET_smc91c94_t *smc)
 {
     unsigned short saved_bank_select;
     unsigned short saved_pointer;
@@ -300,54 +299,54 @@ smc_interrupt (NET_ethdev_t * smc)
     ETHIRQ_QUIT ();
 
     saved_bank_select =
-        DEV_in_w (((NET_smc91c94_t *) smc)->io_addr + SMC_BANK_SELECT);
+        DEV_in_w (smc->io_addr + SMC_BANK_SELECT);
     SMC_SELECT_BANK (2);
-    saved_pointer = DEV_in_w (((NET_smc91c94_t *) smc)->io_addr + SMC_PTR);
-    status = DEV_IN_B (((NET_smc91c94_t *) smc)->io_addr + SMC_IST);
+    saved_pointer = DEV_in_w (smc->io_addr + SMC_PTR);
+    status = DEV_IN_B (smc->io_addr + SMC_IST);
 
     if (status & SMC_IM_RCV_INT)
     {
-        smc_disable_int (SMC_IM_RCV_INT, (NET_smc91c94_t *) smc);
-        receive_int ((NET_smc91c94_t *) smc);
+        smc_disable_int (SMC_IM_RCV_INT, smc);
+        receive_int (smc);
     }
     else if (status & SMC_IAM_TX_INT)
     {
-        smc_disable_int (SMC_IAM_TX_INT, (NET_smc91c94_t *) smc);
-        DEV_OUT_B (SMC_IAM_TX_INT, ((NET_smc91c94_t *) smc)->io_addr + SMC_ACK);
-        transmit_int ((NET_smc91c94_t *) smc);
+        smc_disable_int (SMC_IAM_TX_INT, smc);
+        DEV_OUT_B (SMC_IAM_TX_INT, smc->io_addr + SMC_ACK);
+        transmit_int (smc);
     }
     else if (status & SMC_IM_EPH_INT)
     {
-        eph_int ((NET_smc91c94_t *) smc);
+        eph_int (smc);
     }
     else if (status & SMC_IAM_RX_OVRN_INT)
     {
         DEV_OUT_B (SMC_IAM_RX_OVRN_INT,
-                   ((NET_smc91c94_t *) smc)->io_addr + SMC_ACK);
-        rx_overrun_int ((NET_smc91c94_t *) smc);
+                   smc->io_addr + SMC_ACK);
+        rx_overrun_int (smc);
     }
     else if (status & SMC_IAM_ERCV_INT)
     {
         DEV_OUT_B (SMC_IAM_ERCV_INT,
-                   ((NET_smc91c94_t *) smc)->io_addr + SMC_ACK);
-        early_rx_int ((NET_smc91c94_t *) smc);
+                   smc->io_addr + SMC_ACK);
+        early_rx_int (smc);
     }
     else if (status & SMC_IAM_TX_EMPTY_INT)
     {
-        smc_disable_int (SMC_IAM_TX_EMPTY_INT, (NET_smc91c94_t *) smc);
+        smc_disable_int (SMC_IAM_TX_EMPTY_INT, smc);
         DEV_OUT_B (SMC_IAM_TX_EMPTY_INT,
-                   ((NET_smc91c94_t *) smc)->io_addr + SMC_ACK);
+                   smc->io_addr + SMC_ACK);
         tx_empty_int ();
     }
     else if (status & SMC_IM_ALLOC_INT)
     {
-        smc_disable_int (SMC_IM_ALLOC_INT, (NET_smc91c94_t *) smc);
+        smc_disable_int (SMC_IM_ALLOC_INT, smc);
         alloc_int ();
     }
 
-    DEV_out_w (saved_pointer, ((NET_smc91c94_t *) smc)->io_addr + SMC_PTR);
+    DEV_out_w (saved_pointer, smc->io_addr + SMC_PTR);
     DEV_out_w (saved_bank_select,
-               ((NET_smc91c94_t *) smc)->io_addr + SMC_BANK_SELECT);
+               smc->io_addr + SMC_BANK_SELECT);
 }
 
 
@@ -355,7 +354,6 @@ smc_interrupt (NET_ethdev_t * smc)
  *  ethread - read a single packet from the ethernet
  *------------------------------------------------------------------------
  */
-
 static NET_netbuf_t *
 smc_rx_read_data (NET_smc91c94_t * smc)
 {
@@ -445,13 +443,12 @@ smc_rx_read_data (NET_smc91c94_t * smc)
     return packet;
 }
 
-
 static NET_netbuf_t *
-smc_receive_packet (NET_ethdev_t * smc)
+smc_receive_packet (NET_smc91c94_t *smc)
 {
-    USO_wait (&((NET_smc91c94_t *) smc)->rx_sem);
-    NET_netbuf_t *packet = smc_rx_read_data ((NET_smc91c94_t *) smc);
-    smc_enable_int (SMC_IM_RCV_INT, (NET_smc91c94_t *) smc);
+    USO_wait (&smc->rx_sem);
+    NET_netbuf_t *packet = smc_rx_read_data (smc);
+    smc_enable_int (SMC_IM_RCV_INT, smc);
     return packet;
 }
 
@@ -462,9 +459,7 @@ smc_receive_packet (NET_ethdev_t * smc)
  *  ethwrite - write a single packet to the ethernet
  *------------------------------------------------------------------------
  */
-
-
-
+ 
 static bool_t
 smc_tx_alloc_mem (NET_netbuf_t * packet, NET_smc91c94_t * smc)
 {
@@ -493,7 +488,6 @@ smc_tx_alloc_mem (NET_netbuf_t * packet, NET_smc91c94_t * smc)
      */
     SMC_SELECT_BANK (2);
     DEV_out_w (SMC_MMUCR_ALLOC | numPages, smc->io_addr + SMC_MMUCR);
-
 
     ETHIRQ_ON ();
     return (TRUE);
@@ -617,40 +611,35 @@ smc_tx_write_data (NET_smc91c94_t * smc, NET_netbuf_t * packet, bool_t wirq)
 
 
 static void
-smc_transmit_packet (NET_ethdev_t * smc, NET_netbuf_t * packet)
+smc_transmit_packet (NET_smc91c94_t *smc, NET_netbuf_t *packet)
 {
     unsigned char status;
 
-    if (smc_tx_alloc_mem (packet, (NET_smc91c94_t *) smc) == TRUE)
+    if (smc_tx_alloc_mem (packet, smc) == TRUE)
     {
         SMC_SELECT_BANK (2);
         for (;;)
         {
-            status = DEV_IN_B (((NET_smc91c94_t *) smc)->io_addr + SMC_IST);
+            status = DEV_IN_B ( smc->io_addr + SMC_IST);
             if (status & SMC_IM_ALLOC_INT)
                 break;
         }
-
-        smc_tx_write_data ((NET_smc91c94_t *) smc, packet, FALSE);
+        smc_tx_write_data (smc, packet, FALSE);
     }
 }
 
-static void
-smc_if_init (NET_ethdev_t * ethdev)
-{
-    ethdev->start = smc_start;
-    ethdev->interrupt = smc_interrupt;
-    ethdev->transmit_packet = smc_transmit_packet;
-    ethdev->receive_packet = smc_receive_packet;
-}
-
+    
 extern void
-NET_smc_init (NET_smc91c94_t * smc,
-              struct NET_eth_addr *hwaddr, unsigned long io_addr)
+NET_smc_init (NET_ethif_t *ethif,
+			  NET_smc91c94_t *smc,
+              unsigned long io_addr)
 {
-    smc_if_init ((NET_ethdev_t *) smc);
+    ethif->mac = smc;
+    ethif->start = (void(*)(void*)) smc_start;
+    ethif->receive = (NET_netbuf_t*(*)(void *))smc_receive_packet;
+    ethif->transmit = (void (*)(void*,NET_netbuf_t*))smc_transmit_packet;
     smc->io_addr = io_addr;
-    memcpy (smc->mac_addr, hwaddr->addr, NET_ETH_ADDR_SIZE);
+    memcpy (smc->mac_addr, ethif->eth_addr->addr, NET_ETH_ADDR_SIZE);
     // smc->rx_overruns = 0;
     // smc->rx_dropped = 0;
     // smc->rx_error = 0;
@@ -663,6 +652,6 @@ NET_smc_init (NET_smc91c94_t * smc,
     // smc->tx_mcc = 0;
     // smc->tx_scc = 0;
     // smc->link_down_count = 0;
-    ((NET_smc91c94_t *) smc)->link_is_up = FALSE;
-    USO_semaphore_init (&((NET_smc91c94_t *) smc)->rx_sem, 0);
+    smc->link_is_up = FALSE;
+    USO_semaphore_init (&smc->rx_sem, 0);
 }
