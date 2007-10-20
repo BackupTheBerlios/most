@@ -12,8 +12,8 @@ static NET_err_t
 loopif_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
 {
  	++netif->tx;
- 	NET_err_t err = NET_ip_input (netif, p); 
 	++netif->rx;
+ 	NET_err_t err = NET_ip_input (netif, p); 
     return err;
 }
 

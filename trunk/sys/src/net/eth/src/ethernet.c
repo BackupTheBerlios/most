@@ -32,6 +32,7 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
 
         NET_arp_ip_input (netif, p);
         NET_netbuf_index_inc (p, sizeof (struct NET_eth_hdr));
+        ++netif->rx;
         if (NET_ip_input (netif, p) < NET_ERR_OK)
         {
             NET_netbuf_free (p);
@@ -47,6 +48,7 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
         break;
     default:
         USO_kputs (USO_LL_INFO, "Eth: rx unsuport.\n");
+        ++netif->rx_drop;
         NET_netbuf_free (p);
         break;
     }
@@ -125,9 +127,11 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
             	USO_sleep(ACE_MSEC_2_TICKS(100));
 		        dest = NET_arp_lookup (queryaddr);
             }else {
+			  	++netif->tx_drop;
             	return NET_ERR_ARP;
             }
         } else {
+		  	++netif->tx_drop;
         	return NET_ERR_MEM;
         }
     }
@@ -139,6 +143,7 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
     }
     ethhdr->type = htons (NET_ETH_TYPE_IP);
     if (ethif->transmit != NULL) { ethif->transmit (ethif->mac, p); }
+  	++netif->tx;
     return NET_ERR_OK;
 }
 

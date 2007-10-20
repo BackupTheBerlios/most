@@ -28,31 +28,23 @@ struct NET_smc91c94
 {
     unsigned long io_addr;
     unsigned char mac_addr[NET_ETH_ADDR_SIZE];
-    // unsigned long rx_packets;
-    unsigned long rx_overruns;
-    unsigned long rx_dropped;
-    unsigned long rx_error;
-    unsigned long rx_badlen;
+    unsigned long rx_packets;
+    unsigned short rx_overruns;
+    unsigned short rx_dropped;
+    unsigned short rx_error;
+    unsigned short rx_badlen;
     unsigned long tx_packets;
-    // static unsigned long tx_errors;
-    // static unsigned long tx_alloc;
-    // static unsigned long tx_alloctries;
-    unsigned long tx_allocfailed;
-    // static unsigned long tx_allocfatal = 0;
-    // static unsigned long tx_ptfovrn;
-    // static unsigned long tx_povrn;
-    unsigned long ercv_ints;
-    // static unsigned long eph_ints;
-    // static unsigned long tx_ints;
-    // static unsigned long tx_empty;
+    unsigned short tx_errors;
+    unsigned short tx_empty;
+    unsigned short tx_allocfailed;
+    unsigned short ercv_ints;
+    unsigned short eph_ints;
+    unsigned short alloc_ints;
     unsigned long tx_exc_def;
     unsigned long tx_def;
     unsigned long tx_mcc;
     unsigned long tx_scc;
-
-    unsigned long link_down_count;
-    // static unsigned long eth_chip_resets = 0;
-
+    unsigned short link_down_count;
     bool_t link_is_up;
     USO_semaphore_t rx_sem;
 };

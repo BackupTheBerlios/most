@@ -201,6 +201,8 @@ smc_tx_error (NET_smc91c94_t * smc)
     unsigned char packet_no;
     unsigned short tx_status;
 
+    ++smc->tx_errors;
+
     // assume bank 2
 
     saved_packet = DEV_IN_B (smc->io_addr + SMC_PNR);
@@ -236,15 +238,17 @@ transmit_int (NET_smc91c94_t * smc)
 }
 
 static void
-tx_empty_int (void)
+tx_empty_int (NET_smc91c94_t * smc)
 {
     DEBUGF (NET_SMC_DEBUG, ("\nSmc: tx empty int."));
+    ++smc->ercv_ints;
 }
 
 static void
-alloc_int (void)
+alloc_int (NET_smc91c94_t * smc)
 {
     DEBUGF (NET_SMC_DEBUG, ("\nSmc: alloc int."));
+    ++smc->alloc_ints;
 }
 
 static void
@@ -253,6 +257,8 @@ eph_int (NET_smc91c94_t * smc)
     unsigned short tmp;
     DEBUGF (NET_SMC_DEBUG, ("\nSmc: eph int."));
 
+    ++smc->eph_ints;
+    
     /*
      * Ack eph int 
      */
@@ -336,12 +342,12 @@ NET_smc_interrupt (NET_smc91c94_t *smc)
         smc_disable_int (SMC_IAM_TX_EMPTY_INT, smc);
         DEV_OUT_B (SMC_IAM_TX_EMPTY_INT,
                    smc->io_addr + SMC_ACK);
-        tx_empty_int ();
+        tx_empty_int (smc);
     }
     else if (status & SMC_IM_ALLOC_INT)
     {
         smc_disable_int (SMC_IM_ALLOC_INT, smc);
-        alloc_int ();
+        alloc_int (smc);
     }
 
     DEV_out_w (saved_pointer, smc->io_addr + SMC_PTR);
@@ -440,6 +446,7 @@ smc_rx_read_data (NET_smc91c94_t * smc)
      * error or good, tell the card to get rid of this packet 
      */
     DEV_out_w (SMC_MMUCR_RELEASE, smc->io_addr + SMC_MMUCR);
+	++smc->rx_packets;
     return packet;
 }
 
@@ -585,10 +592,6 @@ smc_tx_write_data (NET_smc91c94_t * smc, NET_netbuf_t * packet, bool_t wirq)
         }
     }
 
-    // nur ein versuch
-    //DEV_out_w (0, smc->io_addr + SMC_DATA1);
-
-
     /*
      * enable the interrupts 
      */
@@ -609,7 +612,6 @@ smc_tx_write_data (NET_smc91c94_t * smc, NET_netbuf_t * packet, bool_t wirq)
     return (TRUE);
 }
 
-
 static void
 smc_transmit_packet (NET_smc91c94_t *smc, NET_netbuf_t *packet)
 {
@@ -628,6 +630,30 @@ smc_transmit_packet (NET_smc91c94_t *smc, NET_netbuf_t *packet)
     }
 }
 
+static void
+smc_info (NET_smc91c94_t *smc)
+{
+	printf("/tSMC91C94 io_addr: %lu\n"
+		   "/trx: %lu, ovr %u, drop %u, err %u, bad %u\n"
+		   "/ttx: %lu, err %u, empty %u, alloc fail %u\n"
+		   "/tint: early rx %u, eph %u, alloc %u\n"
+		   "/tlink: %s, down cnt %u\n",  
+		    smc->io_addr,
+		    smc->rx_packets,
+    		smc->rx_overruns,
+    		smc->rx_dropped,
+    		smc->rx_error,
+    		smc->rx_badlen,
+    		smc->tx_packets,
+    		smc->tx_errors,
+    		smc->tx_empty,
+    		smc->tx_allocfailed,
+    		smc->ercv_ints,
+    		smc->eph_ints,
+    		smc->alloc_ints,
+		    smc->link_is_up ? "up" : "down",
+    		smc->link_down_count);	
+}
     
 extern void
 NET_smc_init (NET_ethif_t *ethif,
@@ -638,20 +664,26 @@ NET_smc_init (NET_ethif_t *ethif,
     ethif->start = (void(*)(void*)) smc_start;
     ethif->receive = (NET_netbuf_t*(*)(void *))smc_receive_packet;
     ethif->transmit = (void (*)(void*,NET_netbuf_t*))smc_transmit_packet;
+    ethif->info = (void (*) (void*))smc_info;
     smc->io_addr = io_addr;
     memcpy (smc->mac_addr, ethif->eth_addr->addr, NET_ETH_ADDR_SIZE);
-    // smc->rx_overruns = 0;
-    // smc->rx_dropped = 0;
-    // smc->rx_error = 0;
-    // smc->rx_badlen = 0;
-    // smc->tx_packets = 0;
-    // smc->tx_allocfailed = 0;
-    // smc->ercv_ints = 0;
-    // smc->tx_exc_def = 0;
-    // smc->tx_def = 0;
-    // smc->tx_mcc = 0;
-    // smc->tx_scc = 0;
-    // smc->link_down_count = 0;
+    smc->rx_packets = 0;
+    smc->rx_overruns = 0;
+    smc->rx_dropped = 0;
+    smc->rx_error = 0;
+    smc->rx_badlen = 0;
+    smc->tx_packets = 0;
+    smc->tx_errors = 0;
+    smc->tx_empty = 0;
+    smc->tx_allocfailed = 0;
+    smc->ercv_ints = 0;
+    smc->eph_ints = 0;
+    smc->alloc_ints = 0;
+    smc->tx_exc_def = 0;
+    smc->tx_def = 0;
+    smc->tx_mcc = 0;
+    smc->tx_scc = 0;
+    smc->link_down_count = 0;
     smc->link_is_up = FALSE;
     USO_semaphore_init (&smc->rx_sem, 0);
 }

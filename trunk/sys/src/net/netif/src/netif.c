@@ -11,9 +11,7 @@
 #include "net/netif.h"
 
 
-
 NET_netif_t *NET_netif_default = NULL;
-
 
 void
 NET_netif_set_ipaddr (NET_netif_t * netif, NET_ip_addr_t * ipaddr)
@@ -58,7 +56,8 @@ info (MFS_entry_t *entry)
 	print_ipaddr("ip_addr", netif->ip_addr);	
 	print_ipaddr("netmask", netif->netmask);	
 	print_ipaddr("gateway", netif->gateway);
-	printf("\n TX: %u RX: %u\n", netif->tx, netif->rx);	
+	printf("\n tx: %lu drop %u rx: %lu drop %u\n", netif->tx, netif->tx_drop, netif->rx, netif->rx_drop);	
+	if (netif->info != NULL) { netif->info(netif->device); }
 }
 
 static struct MFS_descriptor_op netif_descriptor_op = {.open = NULL,
@@ -70,6 +69,8 @@ NET_netif_init (NET_netif_t * netif, char *name)
 {
 	netif->tx = 0;
 	netif->rx = 0;
+	netif->tx_drop = 0;
+	netif->rx_drop = 0;
     netif->device = NULL;
     NET_ip_addr_set (&(netif->ip_addr), &NET_ip_addr_any);
     NET_ip_addr_set (&(netif->netmask), &NET_ip_addr_any);

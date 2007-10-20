@@ -25,6 +25,19 @@ ethif_run (void *netif)
     }
 }
 
+static void
+ethif_info (NET_ethif_t *ethif)
+{
+	printf("\teth_addr: %02X %02X %02X %02X %02X %02X\n",
+			ethif->eth_addr->addr[0],  
+			ethif->eth_addr->addr[1],  
+			ethif->eth_addr->addr[2],  
+			ethif->eth_addr->addr[3],  
+			ethif->eth_addr->addr[4],  
+			ethif->eth_addr->addr[5]);
+	if (ethif->info != NULL) { ethif->info(ethif->mac); }		  
+}
+
 extern void
 NET_ethif_init (NET_netif_t *netif,
 				NET_ethif_t *ethif,
@@ -32,11 +45,13 @@ NET_ethif_init (NET_netif_t *netif,
 {
     netif->device = ethif;
     netif->output = NET_eth_output;
+    netif->info = (void (*) (void*))ethif_info;
     ethif->eth_addr = eth_addr;
     ethif->mac = NULL;
     ethif->start = NULL;
     ethif->receive = NULL;
     ethif->transmit = NULL;
+    ethif->info = NULL;
     USO_thread_init (&ethif->rx_thread,
                      ethif_run,
                      ethif->rx_stack, ARRAYSIZE (ethif->rx_stack),

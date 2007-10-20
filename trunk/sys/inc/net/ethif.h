@@ -26,6 +26,7 @@ struct NET_ethif
     void (*start) (void*);
     NET_netbuf_t* (*receive) (void *);
     void (*transmit) (void *, NET_netbuf_t *);
+    void (*info) (void*);
 	USO_thread_t rx_thread;
 	USO_stack_t rx_stack[400];
 };
