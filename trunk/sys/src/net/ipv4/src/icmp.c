@@ -30,7 +30,7 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
     long hlen;
 
     ++NET_stats.icmp.rx;
-    DEBUGF (NET_ICMP_DEBUG, ("\nIcmp: rx."));
+    DEBUGF (NET_ICMP_DEBUG, ("Icmp: rx.\n"));
 
 
     iphdr = (struct NET_ip_hdr *)p->index;
@@ -41,18 +41,18 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
     switch (type)
     {
     case NET_ICMP_ECHO:
-        DEBUGF (NET_ICMP_DEBUG, ("\nIcmp: echo."));
+        DEBUGF (NET_ICMP_DEBUG, ("Icmp: echo.\n"));
         if (NET_ip_addr_isbroadcast (&iphdr->dest, &inp->netmask) ||
             NET_ip_addr_ismulticast (&iphdr->dest))
         {
-            DEBUGF (NET_ICMP_DEBUG, ("\nIcmp: Smurf."));
+            DEBUGF (NET_ICMP_DEBUG, ("Icmp: Smurf.\n"));
             ++NET_stats.icmp.rx_drop;
             return NET_ERR_BAD;
         }
-        DEBUGF (NET_ICMP_DEBUG, ("\nIcmp: ping."));
+        DEBUGF (NET_ICMP_DEBUG, ("Icmp: ping.\n"));
         if (NET_netbuf_tot_len (p) < sizeof (struct NET_icmp_echo_hdr))
         {
-            DEBUGF (NET_ICMP_DEBUG, ("\nIcmp: bad ICMP echo received."));
+            DEBUGF (NET_ICMP_DEBUG, ("Icmp: bad ICMP echo received.\n"));
             ++NET_stats.icmp.rx_drop;
             return NET_ERR_BAD;
         }
@@ -60,7 +60,7 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
         if (NET_inet_chksum_buf (p) != 0)
         {
             DEBUGF (NET_ICMP_DEBUG,
-                    ("\nIcmp: checksum failed for received ICMP echo."));
+                    ("Icmp: checksum failed for received ICMP echo.\n"));
             ++NET_stats.icmp.rx_drop;
             return NET_ERR_BAD;
         }
@@ -84,10 +84,11 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
         NET_netbuf_index_inc (p, -hlen);
         NET_ip_output_if (p, &(iphdr->src), NET_IP_HDRINCL,
                           NET_IPH_TTL (iphdr), NET_IP_PROTO_ICMP, inp);
+        NET_netbuf_free (p);
         return NET_ERR_OK;
 
     default:
-        DEBUGF (NET_ICMP_DEBUG, ("\nIcmp: type not supported."));
+        DEBUGF (NET_ICMP_DEBUG, ("Icmp: type not supported.\n"));
         ++NET_stats.icmp.rx_drop;
         return NET_ERR_BAD;
     }
@@ -100,17 +101,20 @@ NET_icmp_dest_unreach (NET_netbuf_t * p, enum NET_icmp_dur_type t)
     struct NET_ip_hdr *iphdr;
     struct NET_icmp_dur_hdr *idur;
 
+    DEBUGF (NET_ICMP_DEBUG, ("Icmp: dest_unreach.\n"));
+
     q = NET_netbuf_alloc_trans ();
     NET_netbuf_index_inc (q, -sizeof(struct NET_icmp_dur_hdr));
     iphdr = (struct NET_ip_hdr *)p->index;
     idur = (struct NET_icmp_dur_hdr *)q->index;
     NET_ICMPH_TYPE_SET (idur, NET_ICMP_DUR);
     NET_ICMPH_CODE_SET (idur, t);
-    bcopy (p->index, (char *)q->index + 8, sizeof (struct NET_ip_hdr) + 8);
+    bcopy (p->index, (char*)q->index + 8, sizeof (struct NET_ip_hdr) + 8);
     idur->chksum = 0;
     idur->chksum = NET_inet_chksum (idur, q->len);
     ++NET_stats.icmp.tx;
     NET_ip_output (q, NULL, &(iphdr->src), NET_ICMP_TTL, NET_IP_PROTO_ICMP);
+    NET_netbuf_free (q);
 }
 
 #if 0
@@ -129,7 +133,7 @@ NET_icmp_time_exceeded (NET_netbuf_t * p, enum NET_icmp_te_type t)
     iphdr = (struct NET_ip_hdr *)p->index;
 
 #if NET_ICMP_DEBUG
-    DEBUGF (NET_ICMP_DEBUG, ("\nIcmp:_time_exceeded from "));
+    DEBUGF (NET_ICMP_DEBUG, ("Icmp:_time_exceeded from\n"));
     /*
      * ip_addr_debug_print(&(iphdr->src)); 
      */
@@ -161,6 +165,6 @@ NET_icmp_time_exceeded (NET_netbuf_t * p, enum NET_icmp_te_type t)
     tehdr->chksum = NET_inet_chksum (tehdr, q->len);
     ++NET_stats.icmp.tx;
     NET_ip_output (q, NULL, &(iphdr->src), NET_ICMP_TTL, NET_IP_PROTO_ICMP);
-
+    NET_netbuf_free (q);
 }
 #endif

@@ -161,7 +161,6 @@ smc_start (NET_smc91c94_t *smc)
 static void
 receive_int (NET_smc91c94_t * smc)
 {
-    DEBUGF (NET_SMC_DEBUG, ("\nSmc: rx int."));
     USO_signal (&smc->rx_sem);  // signal packet received
 }
 
@@ -633,11 +632,11 @@ smc_transmit_packet (NET_smc91c94_t *smc, NET_netbuf_t *packet)
 static void
 smc_info (NET_smc91c94_t *smc)
 {
-	printf("/tSMC91C94 io_addr: %lu\n"
-		   "/trx: %lu, ovr %u, drop %u, err %u, bad %u\n"
-		   "/ttx: %lu, err %u, empty %u, alloc fail %u\n"
-		   "/tint: early rx %u, eph %u, alloc %u\n"
-		   "/tlink: %s, down cnt %u\n",  
+	printf("\tSMC91C94 io_addr: %0lx\n"
+		   "\tRX: %lu, ovr %u, drop %u, err %u, bad %u\n"
+		   "\tTX: %lu, err %u, empty %u, alloc fail %u\n"
+		   "\tINT: early rx %u, eph %u, alloc %u\n"
+		   "\tLINK: %s, down cnt %u\n",  
 		    smc->io_addr,
 		    smc->rx_packets,
     		smc->rx_overruns,

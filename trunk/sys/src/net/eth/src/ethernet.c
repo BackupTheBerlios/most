@@ -44,6 +44,7 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
         if (p != NULL)
         {
             if (ethif->transmit != NULL) {ethif->transmit(ethif->mac, p);}
+	        NET_netbuf_free (p);
         }
         break;
     default:

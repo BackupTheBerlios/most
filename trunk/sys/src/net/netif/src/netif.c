@@ -56,7 +56,7 @@ info (MFS_entry_t *entry)
 	print_ipaddr("ip_addr", netif->ip_addr);	
 	print_ipaddr("netmask", netif->netmask);	
 	print_ipaddr("gateway", netif->gateway);
-	printf("\n tx: %lu drop %u rx: %lu drop %u\n", netif->tx, netif->tx_drop, netif->rx, netif->rx_drop);	
+	printf("\n\tTX: %lu drop %u RX: %lu drop %u\n", netif->tx, netif->tx_drop, netif->rx, netif->rx_drop);	
 	if (netif->info != NULL) { netif->info(netif->device); }
 }
 

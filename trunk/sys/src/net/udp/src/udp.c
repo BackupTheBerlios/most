@@ -62,8 +62,6 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
     DEBUGF (NET_UDP_DEBUG, ("\nUdp: rx datagram of length %d.",
                             p->len - sizeof (struct NET_udp_hdr)));
 
-    // NET_netbuf_len_adjust(p, udphdr->len); 
-
     src = ntohs (udphdr->src);
     dest = ntohs (udphdr->dest);
 

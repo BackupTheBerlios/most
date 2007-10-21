@@ -17,7 +17,7 @@
 
 #if NET_DEBUGGING
 
-#define NET_SMC_DEBUG         1 /**< NET_DEBUGGING on */
+#define NET_SMC_DEBUG         0 /**< NET_DEBUGGING on */
 #define NET_ETH_DEBUG         1 /**< NET_DEBUGGING on */
 #define NET_ARP_DEBUG         1 /**< NET_DEBUGGING on */
 #define NET_NETIF_DEBUG       1 /**< NET_DEBUGGING on */
@@ -31,7 +31,7 @@
 #define NET_UDP_HEAD_DEBUG    0 /**< NET_DEBUGGING on */
 #define NET_UDP_HEAD_DEBUG_RX 0 /**< NET_DEBUGGING on */
 #define NET_UDP_HEAD_DEBUG_TX 0 /**< NET_DEBUGGING on */
-#define NET_TCP_DEBUG         1 /**< NET_DEBUGGING on */
+#define NET_TCP_DEBUG         0 /**< NET_DEBUGGING on */
 
 #else
 

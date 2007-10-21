@@ -47,7 +47,7 @@ MFS_sysfs_init(void)
 	root = MFS_mount("root", &MFS_sysfs_vfs_op, info);
     if (root != NULL){
     	if ( (net = MFS_create_dir(root, "net")) != NULL){
-			netif = MFS_create_dir(dir, "netif");
+			netif = MFS_create_dir(net, "netif");
     	}
 	    if ( (dir = MFS_create_dir(root, "dev")) != NULL){
 			serial = MFS_create_dir(dir, "serial");

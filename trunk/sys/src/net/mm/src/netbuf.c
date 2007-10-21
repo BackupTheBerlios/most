@@ -116,8 +116,13 @@ NET_netbuf_free (NET_netbuf_t * buf)
         	case NET_BUF_TRANS:
 		        USO_buf_free (&trans_pool, buf);
 		        break;
-			default:
+			case NET_BUF_ROM:
+			case NET_BUF_RAM:
+			case NET_BUF_POOL:
 		        USO_buf_free (&net_pool, buf);
+		        break;
+			default:
+				// error
 		        break;
         }
         buf = next;

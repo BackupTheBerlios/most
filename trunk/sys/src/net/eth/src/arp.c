@@ -77,7 +77,7 @@ arp_tmr (void *nix)
         if (!NET_ip_addr_isany (&arp_table[i].ipaddr) &&
             ctime - arp_table[i].ctime >= ARP_MAXAGE)
         {
-            DEBUGF (NET_ARP_DEBUG, ("\nArp: timer expired entry %d.", i));
+            DEBUGF (NET_ARP_DEBUG, ("Arp: timer expired entry %d.\n", i));
             NET_ip_addr_set (&(arp_table[i].ipaddr), &NET_ip_addr_any);
         }
     }
@@ -206,7 +206,7 @@ NET_arp_ip_input (NET_netif_t * netif, NET_netbuf_t * p)
     {
         return;
     }
-    DEBUGF (NET_ARP_DEBUG, ("\nArp: ip updating arp table."));
+    DEBUGF (NET_ARP_DEBUG, ("Arp: ip updating arp table.\n"));
     add_arp_entry (&(hdr->ip.src), &(hdr->eth.src));
 }
 
@@ -226,7 +226,7 @@ NET_arp_arp_input (NET_netif_t * netif,
     if (p->size < sizeof (struct arp_hdr))
     {
         DEBUGF (NET_ARP_DEBUG,
-                ("\nArp: arp packet too short (%d/%d).",
+                ("Arp: arp packet too short (%d/%d).\n",
                  p->size, sizeof (struct arp_hdr)));
         NET_netbuf_free (p);
         return NULL;
@@ -240,7 +240,7 @@ NET_arp_arp_input (NET_netif_t * netif,
         /*
          * ARP request. If it asked for our address, we send out a reply. 
          */
-        DEBUGF (NET_ARP_DEBUG, ("\nArp: arp request."));
+        DEBUGF (NET_ARP_DEBUG, ("Arp: arp request.\n"));
         if (NET_ip_addr_cmp (&(hdr->dipaddr), &(netif->ip_addr)))
         {
             hdr->opcode = htons (ARP_REPLY);
@@ -270,18 +270,15 @@ NET_arp_arp_input (NET_netif_t * netif,
         /*
          * ARP reply. We insert or update the ARP table. 
          */
-        DEBUGF (NET_ARP_DEBUG, ("\nArp: arp reply."));
+        DEBUGF (NET_ARP_DEBUG, ("Arp: arp reply.\n"));
         if (NET_ip_addr_cmp (&(hdr->dipaddr), &(netif->ip_addr)))
         {
             add_arp_entry (&(hdr->sipaddr), &(hdr->shwaddr));
-#if 0                           // (LWIP_DHCP && DHCP_DOES_ARP_CHECK)
-            dhcp_arp_reply (&hdr->sipaddr);
-#endif
         }
         break;
     default:
         DEBUGF (NET_ARP_DEBUG,
-                ("\nArp: unknown type %d.", htons (hdr->opcode)));
+                ("Arp: unknown type %d.\n", htons (hdr->opcode)));
         break;
     }
 

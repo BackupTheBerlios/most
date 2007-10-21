@@ -25,7 +25,7 @@ static void
 info (MFS_entry_t *entry)
 {
 	struct NET_stats *stats = (struct NET_stats*) entry;
-	printf("\nProto \tTX \tRX \tRX_Drop\n");
+	printf("\n\tProto \tTX \tRX \tRX_Drop\n");
 	print_stat("ip", &stats->ip);	
 	print_stat("icmp", &stats->icmp);	
 	print_stat("udp", &stats->udp);	

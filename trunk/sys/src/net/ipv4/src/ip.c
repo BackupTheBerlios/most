@@ -85,7 +85,7 @@ NET_ip_route (NET_ip_addr_t * dest)
 static void
 ip_head_debug (struct NET_ip_hdr *iphdr)
 {
-    DEBUGF (NET_IP_HEAD_DEBUG, ("\nIP header:\n"));
+    DEBUGF (NET_IP_HEAD_DEBUG, ("IP header:\n"));
     DEBUGF (NET_IP_HEAD_DEBUG, ("+-------------------------------+\n"));
     DEBUGF (NET_IP_DEBUG,
             ("|%2d |%2d |   %2d  |      %4d     | (v, hl, tos, len)\n",
@@ -118,7 +118,7 @@ ip_head_debug (struct NET_ip_hdr *iphdr)
              ntohl (iphdr->dest.addr) >> 16 & 0xff,
              ntohl (iphdr->dest.addr) >> 8 & 0xff,
              ntohl (iphdr->dest.addr) & 0xff));
-    DEBUGF (NET_IP_HEAD_DEBUG, ("+-------------------------------+"));
+    DEBUGF (NET_IP_HEAD_DEBUG, ("+-------------------------------+\n"));
 }
 #endif
 
@@ -164,7 +164,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
 
     iphdr = (struct NET_ip_hdr *)p->index;
 
-    DEBUGF (NET_IP_DEBUG, ("\nIp: rx p->len %d p->size %d.", p->len, p->size));
+    DEBUGF (NET_IP_DEBUG, ("Ip: rx p->len %d p->size %d.\n", p->len, p->size));
 
 #if NET_IP_HEAD_DEBUG_RX
     ip_head_debug (iphdr);
@@ -205,22 +205,6 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
     }
 
     netif = find_netif( iphdr);
-
-#if 0                           // LWIP_DHCP
-    /*
-     * If a DHCP packet has arrived on the interface, we pass it up the
-     * stack regardless of destination IP address. The reason is that DHCP 
-     * replies are sent to the IP adress that will be given to this node
-     * (as recommended by RFC 1542 section 3.1.1, referred by RFC 2131). 
-     */
-    if (NET_IPH_PROTO (iphdr) == NET_IP_PROTO_UDP &&
-        ((struct udp_hdr *)((u8_t *) iphdr +
-                            IPH_HL (iphdr) * 4 / sizeof (u8_t)))->src ==
-        DHCP_SERVER_PORT)
-    {
-        netif = inp;
-    }
-#endif /* LWIP_DHCP */
 
     if (netif == NULL)
     {
@@ -273,10 +257,9 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
 #endif
     case NET_IP_PROTO_ICMP:
         return NET_icmp_input (p, inp);
-        break;
     default:
         /*
-         * send ICMP destination protocol unreachable unless is was a
+         * send ICMP destination protocol unreachable unless it was a
          * broadcast 
          */
         if (!NET_ip_addr_isbroadcast (&(iphdr->dest), &(inp->netmask)) &&
@@ -354,11 +337,13 @@ NET_ip_output_if (NET_netbuf_t * p,
 
     ++NET_stats.ip.tx;
 
-   // DEBUGF (NET_IP_DEBUG, ("\nIp: output if %s.", netif->name));
+   // DEBUGF (NET_IP_DEBUG, ("Ip: output if %s.\n", netif->name));
+    DEBUGF (NET_IP_DEBUG, ("Ip: tx p->len %d p->size %d.\n", p->len, p->size));
 
 #if NET_IP_HEAD_DEBUG_TX
     ip_head_debug (iphdr);
 #endif
+
 
     return netif->output (netif, p, dest);
 }
@@ -378,7 +363,7 @@ NET_ip_output (NET_netbuf_t * p,
 
     if ((netif = NET_ip_route (dest)) == NULL)
     {
-        DEBUGF (NET_IP_DEBUG, ("\nIp: no route to 0x%lx.", dest->addr));
+        DEBUGF (NET_IP_DEBUG, ("Ip: no route to 0x%lx.\n", dest->addr));
 
         NET_netbuf_free (p);
         return NET_ERR_RTE;
