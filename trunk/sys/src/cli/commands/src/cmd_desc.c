@@ -17,20 +17,6 @@
 
 #define CLI_RUN_STACK_SIZE 0x400
 
-static void
-help_print (USO_node_t * command)
-{
-    printf ("%s\t[ %s ].\n", ((CLI_command_t *) command)->name,
-                ((CLI_command_t *) command)->description);
-}
-
-extern bool_t
-CLI_cmd_help (CLI_interpreter_t *cli)
-{
-    USO_map (&CLI_commands, help_print);
-    return TRUE;
-}
-
 extern bool_t
 CLI_cmd_open (CLI_interpreter_t *cli)
 {
@@ -134,6 +120,10 @@ CLI_cmd_list (CLI_interpreter_t *cli)
        		case 's' :
        			info = TRUE;
        			desc = MFS_sysfs_serial();
+       			break;
+       		case 'c' :
+       			info = TRUE;
+       			desc = MFS_sysfs_cli();
        			break;
        		default :
        			break;
