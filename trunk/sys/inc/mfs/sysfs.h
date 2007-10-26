@@ -18,5 +18,6 @@ extern MFS_descriptor_t *MFS_sysfs_threads(void);
 extern MFS_descriptor_t *MFS_sysfs_heaps(void);
 extern MFS_descriptor_t *MFS_sysfs_net(void);
 extern MFS_descriptor_t *MFS_sysfs_netif(void);
+extern MFS_descriptor_t *MFS_sysfs_cli(void);
 
 #endif
