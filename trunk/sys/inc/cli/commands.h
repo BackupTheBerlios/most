@@ -6,7 +6,6 @@
 #ifndef CLI_COMMANDS_H
 #define CLI_COMMANDS_H
 
-#include <uso/list.h>
 #include "mfs/vfs.h"
 #include "cli/interpreter.h"
 
@@ -15,13 +14,8 @@
  * Command line interpreter.
  * @{
  */
-
-extern USO_list_t CLI_commands;
-
 struct CLI_command
 {
-    USO_node_t node;
-    char *name;
     char *description;
     bool_t (*f) (CLI_interpreter_t *);
 };

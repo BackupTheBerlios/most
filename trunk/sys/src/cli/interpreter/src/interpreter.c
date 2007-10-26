@@ -14,6 +14,8 @@
 #include "cli/interpreter.h"
 #include "cli/commands.h"
 #include "cli/cmd_desc.h"
+#include "mfs/directory.h"
+#include "mfs/sysfs.h"
 
 
 #define CLI_RX_POLLING_TIME ACE_MSEC_2_TICKS(250)
@@ -42,16 +44,11 @@ promt (CLI_interpreter_t *cli)
 static CLI_command_t *
 find(char* name)
 {
-	CLI_command_t *command = NULL;
-	while ( (command = (CLI_command_t*)USO_next_element(&CLI_commands, (USO_node_t*)command))
-			!= NULL){
-	    if (strcmp ( command->name, name) == 0 ){
-   			break;	   	
-    	}		   		
-	}    
-	return command;
+	MFS_descriptor_t *desc = MFS_lookup(MFS_sysfs_cli(), name);
+	if (NULL != desc)
+		return (CLI_command_t*)desc->entry;
+	return NULL;
 }
-
 
 static int
 parse (CLI_interpreter_t *cli, char* buf)
@@ -139,11 +136,11 @@ CLI_interpreter_run (void *param)
 
         command = find (cli->argv[0]);
         if (command != NULL) {
-	       	idx = inc_argv(cli, idx);
+	       	idx = inc_argv(cli, idx);       	
             if (command->f (cli) == FALSE){
 	            puts ("error\n");
             }
-        } else {
+        } else if (strlen(cli->argv[0])) {
             printf ("? %s\n", cli->argv[0]);
         }
 
