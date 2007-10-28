@@ -6,7 +6,6 @@
 #include <ace/string.h>
 #include <ace/stdio.h>
 #include <ace/ctype.h>
-#include <uso/list.h>
 #include <uso/sleep.h>
 #include <mfs/descriptor.h>
 #include <mfs/sysfs.h>
@@ -19,6 +18,7 @@
 
 
 #define CLI_RX_POLLING_TIME ACE_MSEC_2_TICKS(250)
+#define	CLI_HISTORY_SIZE	10
 
 static const char *hostname;
 
@@ -36,9 +36,22 @@ CLI_interpreter_init (CLI_interpreter_t *cli)
 }
 
 static void
+promt_desc (MFS_descriptor_t *desc)
+{
+	if (NULL != desc->parent)
+	{
+		promt_desc (desc->parent);
+		putc ('/');
+	}
+	puts (desc->name);
+}
+
+static void
 promt (CLI_interpreter_t *cli)
 {
-    printf ("%s:%s> ", hostname, cli->desc->name);
+    printf ("%s:", hostname);
+    promt_desc (cli->desc);
+    puts ("> ");
 }
 
 static CLI_command_t *
@@ -49,46 +62,102 @@ find(char* name)
 		return (CLI_command_t*)desc->entry;
 	return NULL;
 }
-
-static int
-parse (CLI_interpreter_t *cli, char* buf)
+static void
+token_clear (CLI_interpreter_t *cli)
 {
-    char *token = buf;
-    ++cli->argc;
+	int i = cli->token.argc;
+    do {
+		char *buf = cli->token.buffer[cli->token.argc];
+    	char *token = buf + strlen (buf);
+    	
+    	while (token-- > buf)
+    		puts ("\b \b");
+    		
+    	if (cli->token.argc-- > 0)
+    		puts ("\b \b");
+	} while (i--);
+}
+
+static void
+token_print (CLI_interpreter_t *cli)
+{
+	for (int i = 0; i < cli->token.argc; i++) {
+		if (i > 0) putc (' ');
+		printf ("%s", cli->token.buffer[i]);
+	}
+}
+
+static void
+parse_cntrl (CLI_interpreter_t *cli)
+{
     for (;;) {
         int c = getc ();
         if (c == EOF) {
             USO_sleep (CLI_RX_POLLING_TIME);
         } else {
-            if (isprint (c)) {
-                putc ((unsigned char)c);
+			if (c == 'A') {
+				token_clear (cli);
+				CLI_history_next (&cli->history, &cli->token);
+				token_print (cli);
+				cli->token.argc--;
+                break;
+			} else if (c == 'B') {
+				token_clear (cli);
+				CLI_history_prev (&cli->history, &cli->token);
+				token_print (cli);
+				cli->token.argc--;
+				break;
+			} else {
+				break;
 			}
+        }
+    }
+}
+
+static void
+parse (CLI_interpreter_t *cli)
+{
+	char *buf = cli->token.buffer[0];
+    char *token = buf;
+
+    for (;;) {
+        int c = getc ();
+        if (c == EOF) {
+            USO_sleep (CLI_RX_POLLING_TIME);
+        } else {
 			if (c == '\n') {
                 *token = '\0';
-                return (token - buf);
+                if (token > buf) cli->token.argc++;
+                break;
+			} else if (c == 0x5B) {
+				*token = '\0';
+				parse_cntrl (cli);
+				buf = cli->token.buffer[cli->token.argc];
+				token = buf + strlen(buf);
 			} else if (c == '\b') {
 				if (token > buf) {
-					putc ((unsigned char)c);
-					putc ((unsigned char)' ');
-					putc ((unsigned char)c);	
+					puts ("\b \b");
 					token--;
-				} else if (cli->argc > 1) {
-					cli->argc--;
-					return (-1);
+				} else if (cli->token.argc > 0) {
+					puts ("\b \b");
+					cli->token.argc--;
+					buf = cli->token.buffer[cli->token.argc];
+					token = buf + strlen(buf);
 				}
 			} else if (isgraph (c)) {
                 if (token < buf + CLI_TOKEN_SIZE - 1) {
                     *token++ = c;
+                    putc ((unsigned char)c);
                 }
             } else if (c == ' ') {
+            	if (token == buf)
+            		continue;
                 *token = '\0';
-		        if (cli->argc < CLI_TOKEN_COUNTER) { 
-		        	if (parse (cli, cli->token_buffer[cli->argc]) < 0)
-		        		putc ((unsigned char)'\b');
-		        	else
-		        		return (token - buf);		
-		        } else
-                	return (token - buf);
+		        if (cli->token.argc < CLI_TOKEN_COUNTER - 1) {
+		        	cli->token.argc++;
+		        	buf = token = cli->token.buffer[cli->token.argc];
+		        	putc ((unsigned char)c);
+		        }
             }
         }
     }
@@ -97,10 +166,10 @@ parse (CLI_interpreter_t *cli, char* buf)
 static int
 inc_argv(CLI_interpreter_t * cli, int idx)
 {
-   	if (cli->argc > 0) { --cli->argc; }
+   	if (cli->token.argc > 0) { --cli->token.argc; }
    	++idx;
-    for (int i = 0; i < cli->argc; ++i){ 
-  		cli->argv[i] = cli->token_buffer[idx + i];
+    for (int i = 0; i < cli->token.argc; ++i){ 
+  		cli->argv[i] = cli->token.buffer[idx + i];
    	}
    	return idx;
 }
@@ -111,22 +180,26 @@ CLI_interpreter_run (void *param)
 	CLI_interpreter_t *cli = (CLI_interpreter_t *)param; 
     CLI_command_t *command;
     int idx;
+
+    CLI_history_init (&cli->history, CLI_HISTORY_SIZE);
+
     puts ("\nCLI:\n");
     for (;;)
     {
         for (int i = 0; i < CLI_TOKEN_COUNTER; ++i){ 
-        	cli->token_buffer[i][0] = '\0';
-	    	cli->argv[i] = cli->token_buffer[i];
+        	cli->token.buffer[i][0] = '\0';
+	    	cli->argv[i] = cli->token.buffer[i];
         }
-        cli->argc = 0;
+        cli->token.argc = 0;
 		idx = 0;
 
         promt (cli);
-        (void) parse (cli, cli->token_buffer[cli->argc]);
+		parse (cli);
         putc ('\n');
 
 		if (cli->argv[0][0] == '/'){
-   	    	cli->argv[0] = &cli->token_buffer[0][1];
+			CLI_history_add (&cli->history, &cli->token);
+   	    	cli->argv[0] = &cli->token.buffer[0][1];
        	    if (CLI_cmd_open(cli) == FALSE){
             	puts ("error\n");
             	continue;
@@ -136,6 +209,8 @@ CLI_interpreter_run (void *param)
 
         command = find (cli->argv[0]);
         if (command != NULL) {
+        	if (command->f != CLI_cmd_history)
+        		CLI_history_add (&cli->history, &cli->token);
 	       	idx = inc_argv(cli, idx);       	
             if (command->f (cli) == FALSE){
 	            puts ("error\n");
@@ -145,7 +220,7 @@ CLI_interpreter_run (void *param)
         }
 
 		if (idx >= 2){
-			cli->argc = 0;
+			cli->token.argc = 0;
        	    CLI_cmd_close(cli);
 		}
         

@@ -22,7 +22,7 @@ CLI_cmd_open (CLI_interpreter_t *cli)
 {
 	bool_t done = FALSE;
     MFS_descriptor_t *desc = cli->desc;
-	if (cli->argc >= 1){
+	if (cli->token.argc >= 1){
 		desc = MFS_open(desc, cli->argv[0]);
 		if (desc != NULL) {
 			cli->desc = desc;
@@ -50,7 +50,7 @@ CLI_cmd_start (CLI_interpreter_t *cli)
 {
 	bool_t done = FALSE;
     MFS_descriptor_t *desc = MFS_sysfs_threads();
-	if (cli->argc >= 1){
+	if (cli->token.argc >= 1){
 		desc = MFS_lookup(desc, cli->argv[0]);
 		if (desc != NULL) {
 			USO_start((USO_thread_t*)desc->entry);
@@ -65,7 +65,7 @@ CLI_cmd_stop (CLI_interpreter_t *cli)
 {
 	bool_t done = FALSE;
     MFS_descriptor_t *desc = MFS_sysfs_threads();
-	if (cli->argc >= 1){
+	if (cli->token.argc >= 1){
 		desc = MFS_lookup(desc, cli->argv[0]);
 		if (desc != NULL) {
 			USO_stop((USO_thread_t*)desc->entry);
@@ -79,7 +79,7 @@ extern bool_t
 CLI_cmd_info (CLI_interpreter_t *cli)
 {
     MFS_descriptor_t *desc = cli->desc;
-    if (cli->argc >= 1) {
+    if (cli->token.argc >= 1) {
 	   	switch (cli->argv[0][0]){
        		case 't' :
        			desc = MFS_sysfs_threads();
@@ -98,13 +98,12 @@ CLI_cmd_info (CLI_interpreter_t *cli)
 	return TRUE;
 }
 
-
 extern bool_t
 CLI_cmd_list (CLI_interpreter_t *cli)
 {
 	bool_t info = FALSE;
     MFS_descriptor_t *desc = cli->desc;
-    if (cli->argc >= 1) {
+    if (cli->token.argc >= 1) {
 	   	switch (cli->argv[0][0]){
        		case 'i' :
        			info = TRUE;
@@ -139,13 +138,20 @@ CLI_cmd_list (CLI_interpreter_t *cli)
 }
 
 extern bool_t
+CLI_cmd_history (CLI_interpreter_t *cli)
+{
+	CLI_history_show (&cli->history);
+	return TRUE;
+}
+
+extern bool_t
 CLI_cmd_exec (CLI_interpreter_t *cli)
 {
 	bool_t done = FALSE;
 	if (cli->desc->type == MFS_EXEC){
 		CLI_exec_t *exec = (CLI_exec_t *)cli->desc->entry;
 		char *arg = NULL;
-		if (cli->argc >= 1) {arg = cli->argv[0];}
+		if (cli->token.argc >= 1) {arg = cli->argv[0];}
 		exec->f (arg);
 		done = TRUE;
 	}	
@@ -161,7 +167,7 @@ CLI_cmd_run (CLI_interpreter_t *cli)
         char *arg = NULL;
 		int prio = USO_USER;
 		int sched = USO_ROUND_ROBIN;
-        if (cli->argc >= 1) {
+        if (cli->token.argc >= 1) {
         	switch (cli->argv[0][0]){
         		case 'u' :
         			prio = USO_USER; 
@@ -192,7 +198,7 @@ CLI_cmd_run (CLI_interpreter_t *cli)
        	USO_thread_t *t = USO_thread_new ((void (*)(void*))exec->f,
        				 CLI_RUN_STACK_SIZE, prio, sched, cli->desc->name, TRUE);
         if (t != NULL) {
-	        if (cli->argc >= 2) {
+	        if (cli->token.argc >= 2) {
     	        size_t len = strlen(cli->argv[1]) +1;
         	    arg = malloc(len);
             	if (arg) {
@@ -210,7 +216,7 @@ CLI_cmd_run (CLI_interpreter_t *cli)
 extern bool_t
 CLI_cmd_klog (CLI_interpreter_t *cli)
 {
-    if (cli->argc <= 0) {
+    if (cli->token.argc <= 0) {
         puts ("param: <ll:+|-|s>.\n");
         return FALSE;
     }

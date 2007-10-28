@@ -3,8 +3,6 @@
  *
  */
 
-#include <uso/list.h>
-#include <uso/heap.h>
 #include <ace/stdio.h>
 
 #include "cli/commands.h"
@@ -26,6 +24,7 @@ static CLI_command_t start;
 static CLI_command_t stop;
 static CLI_command_t info;
 static CLI_command_t list;
+static CLI_command_t hist;
 static CLI_command_t exec;
 static CLI_command_t run;
 static CLI_command_t klog;
@@ -61,6 +60,7 @@ CLI_commands_init (void)
     CLI_command_init (&stop, "stop", "Thread stop", CLI_cmd_stop);
     CLI_command_init (&info, "info", "Descriptor information", CLI_cmd_info);
     CLI_command_init (&list, "list", "List directory", CLI_cmd_list);
+    CLI_command_init (&hist, "h", "History show", CLI_cmd_history);
     CLI_command_init (&exec, "exec", "Execute descriptor", CLI_cmd_exec);
     CLI_command_init (&run, "run", "Run descriptor", CLI_cmd_run);
     CLI_command_init (&klog, "klog", "Kenel log level", CLI_cmd_klog);

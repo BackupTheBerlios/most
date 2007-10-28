@@ -7,16 +7,14 @@
 #define CLI_INTERPRETER_H
 
 #include "mfs/vfs.h"
-
-#define CLI_TOKEN_SIZE 16
-#define CLI_TOKEN_COUNTER 4
+#include "cli/history.h"
 
 struct CLI_interpreter
 {
 	MFS_descriptor_t *desc;
-	char token_buffer[CLI_TOKEN_COUNTER][CLI_TOKEN_SIZE];
+	CLI_history_t history;
+	CLI_token_t token;
 	char *argv[CLI_TOKEN_COUNTER];
-	int argc;
 };
 
 typedef struct CLI_interpreter CLI_interpreter_t;
