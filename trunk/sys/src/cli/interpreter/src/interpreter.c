@@ -180,36 +180,45 @@ CLI_interpreter_run (void *param)
 	CLI_interpreter_t *cli = (CLI_interpreter_t *)param; 
     CLI_command_t *command;
     int idx;
+    bool_t abbr;
 
     CLI_history_init (&cli->history, CLI_HISTORY_SIZE);
 
     puts ("\nCLI:\n");
     for (;;)
     {
-        for (int i = 0; i < CLI_TOKEN_COUNTER; ++i){ 
+        for (int i = 0; i < CLI_TOKEN_COUNTER; ++i) { 
         	cli->token.buffer[i][0] = '\0';
 	    	cli->argv[i] = cli->token.buffer[i];
         }
         cli->token.argc = 0;
 		idx = 0;
-
+		abbr = FALSE;
+		
         promt (cli);
 		parse (cli);
         putc ('\n');
 
-		if (cli->argv[0][0] == '/'){
-			CLI_history_add (&cli->history, &cli->token);
+		if (cli->argv[0][0] == '/' || cli->argv[0][0] == '&' || cli->argv[0][0] == '|') {
    	    	cli->argv[0] = &cli->token.buffer[0][1];
        	    if (CLI_cmd_open(cli) == FALSE){
             	puts ("error\n");
             	continue;
            	}
-           	idx = inc_argv(cli, idx);
+           	abbr = TRUE;
+           	CLI_history_add (&cli->history, &cli->token);
+           	if (cli->token.buffer[0][0] == '/') {
+           		idx = inc_argv(cli, idx);
+           	} else if (cli->token.buffer[0][0] == '|') {
+           		strcpy (cli->argv[0], "exec");
+           	} else {
+           		strcpy (cli->argv[0], "run");
+           	}
 		}
-
+		
         command = find (cli->argv[0]);
         if (command != NULL) {
-        	if (command->f != CLI_cmd_history)
+        	if (FALSE == abbr && command->f != CLI_cmd_history)
         		CLI_history_add (&cli->history, &cli->token);
 	       	idx = inc_argv(cli, idx);       	
             if (command->f (cli) == FALSE){
@@ -219,7 +228,7 @@ CLI_interpreter_run (void *param)
             printf ("? %s\n", cli->argv[0]);
         }
 
-		if (idx >= 2){
+		if (abbr) {
 			cli->token.argc = 0;
        	    CLI_cmd_close(cli);
 		}
