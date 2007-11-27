@@ -11,8 +11,14 @@ TARGET_CCFLAGS := -fno-builtin -std=iso9899:199x
 TARGET_DEFINES := -DMOST_TARGET_I386
 TARGET_LDFLAGS := 
 else
+ifeq ($(MOST_CPU),arm)
+TARGET_CCFLAGS := -fno-builtin -std=iso9899:199x
+TARGET_DEFINES := -DMOST_TARGET_ARM
+TARGET_LDFLAGS := 
+else
 $(error No target defined!)
 endif 
+endif
 endif
 
 EXECPREF := $(MOST_ROOT)/gcc/$(MOST_GCC)/bin/$(MOST_TARGET)-
