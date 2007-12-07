@@ -53,7 +53,7 @@ extern NET_netbuf_t *NET_netbuf_alloc_pool (USO_buf_pool_t * pool);
 
 extern NET_netbuf_t *NET_netbuf_alloc_ram (long size);
 
-extern NET_netbuf_t *NET_netbuf_alloc_rom (long size, char *data);
+extern NET_netbuf_t *NET_netbuf_alloc_rom ( char *data, long size);
 
 
 

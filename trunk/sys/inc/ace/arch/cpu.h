@@ -20,6 +20,9 @@
 /** H8300 Microcontroller */
 #define ACE_CPU_H8300    2
 
+/** ARM Microcontroller */
+#define ACE_CPU_ARM      3
+
 /*
 "Little Endian" means that the low-order byte of the number is stored in memory at the lowest address, and the high-order byte at the highest address. (The little end comes first.) For example, a 4 byte LongInt
 
@@ -68,6 +71,16 @@ Network Byte Order is also "Big Endian"
 
 /** We have a H8300 Microcontroller */
 #define ACE_CPU ACE_CPU_H8300
+
+/** We have big endian byteorder */
+#define ACE_BYTE_ORDER ACE_BIG_ENDIAN
+
+#endif
+
+#ifdef MOST_TARGET_ARM
+
+/** We have an ARM Microcontroller */
+#define ACE_CPU ACE_CPU_ARM
 
 /** We have big endian byteorder */
 #define ACE_BYTE_ORDER ACE_BIG_ENDIAN

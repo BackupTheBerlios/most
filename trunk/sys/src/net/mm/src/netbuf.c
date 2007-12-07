@@ -52,7 +52,7 @@ NET_netbuf_alloc_trans (void)
 }
 
 static void
-NET_netbuf_alloc_help(NET_netbuf_t *buf, long size, char *data)
+NET_netbuf_alloc_help(NET_netbuf_t *buf, char *data, long size)
 {
     buf->data = data;
     buf->size = size;
@@ -67,7 +67,7 @@ NET_netbuf_alloc_pool (USO_buf_pool_t * pool)
     NET_netbuf_t *buf = USO_buf_alloc (&net_pool);
     buf->type = NET_BUF_POOL;
 	buf->pool = pool;
-	NET_netbuf_alloc_help(buf, pool->buf_size, USO_buf_alloc (pool));
+	NET_netbuf_alloc_help(buf, USO_buf_alloc (pool), pool->buf_size);
     return buf;
 }
 
@@ -79,17 +79,17 @@ NET_netbuf_alloc_ram (long size)
     NET_netbuf_t *buf = USO_buf_alloc (&net_pool);
     buf->type = NET_BUF_RAM;
     buf->pool = NULL;
-	NET_netbuf_alloc_help(buf, size, data);
+	NET_netbuf_alloc_help(buf, data, size);
     return buf;
 }
 
 extern NET_netbuf_t *
-NET_netbuf_alloc_rom (long size, char *data)
+NET_netbuf_alloc_rom (char *data, long size)
 {
     NET_netbuf_t *buf = USO_buf_alloc (&net_pool);
     buf->type = NET_BUF_ROM;
     buf->pool = NULL;
-	NET_netbuf_alloc_help(buf, size, data);
+	NET_netbuf_alloc_help(buf, data, size);
     return buf;
 }
 

@@ -107,6 +107,33 @@ struct USO_cpu
     USO_cpu_status_t ps;
 };
 
+/*---------------------- ARM target--------------------------------------*/
+
+#elif ACE_CPU==ACE_CPU_ARM
+
+
+#define USO_STACK USO_HI2LOW
+
+typedef unsigned char USO_cpu_status_t;
+typedef unsigned long USO_stack_t;
+typedef unsigned long USO_cpu_register_t;
+
+#define USO_CPU_PS_INIT ((USO_cpu_status_t)0x00)
+
+struct USO_cpu
+{
+    USO_cpu_register_t pc;
+    USO_cpu_register_t er0;
+    USO_cpu_register_t er1;
+    USO_cpu_register_t er2;
+    USO_cpu_register_t er3;
+    USO_cpu_register_t er4;
+    USO_cpu_register_t er5;
+    USO_cpu_register_t er6;
+    USO_cpu_register_t sp;
+    USO_cpu_status_t ps;
+};
+
 #endif
 #endif
 

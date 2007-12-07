@@ -140,7 +140,6 @@ NAP_bootp_filename (void)
 /******************************************************************************** 
  * BOOTP
  ********************************************************************************/ 
-static USO_buf_pool_t bootp_pool;
 static struct bootp_packet_data bootp_packets[1];  /* sollte allociert
                                                  * werden, mu noch prfen 
                                                  * ? */
@@ -152,7 +151,6 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
     static NET_ip_addr_t client_addr;
 	int i;
     memcpy (hw_address, hwaddr->addr, NET_ETH_ADDR_SIZE);
-    USO_buf_pool_init (&bootp_pool, bootp_packets, 1, (sizeof(struct bootp_packet_data)));
     NET_udp_socket_init (&sock);
     NET_ip4_addr (&server_addr, 255, 255, 255, 255);
     NET_ip4_addr (&client_addr, 0, 0, 0, 0);
@@ -162,12 +160,10 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
     NET_udp_recv_timeout (&sock, REPLY_TIMEOUT);
     for (i = 0; i < RETRIES; ++i)
     {
-        NET_netbuf_t *request_packet, *reply_packet;
         u16_t server_port;
-        request_packet = NET_netbuf_alloc_pool (&bootp_pool);
-        request_data = (struct bootp_packet_data *)(request_packet->index);
+        request_data = bootp_packets;
         bootp_init_request ();
-        if ((NET_udp_send (&sock, request_packet)) < 0) {
+        if ((NET_udp_send (&sock, request_data, ) < 0) {
             USO_kputs (USO_LL_ERROR, "BOOTP send error\n");
             NET_netbuf_free (request_packet);
             USO_sleep (RETRY_TIME);
