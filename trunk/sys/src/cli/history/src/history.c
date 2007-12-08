@@ -8,6 +8,16 @@
 
 #include "cli/history.h"
 
+static void entry_info
+(
+	USO_node_t*	entry
+)
+{
+	for (int i = 0; i < ((CLI_hisentry_t*)entry)->token.argc; i++)
+		printf ("%s ", ((CLI_hisentry_t*)entry)->token.buffer[i]);
+	putc ('\n');
+}
+
 extern void CLI_history_init
 (
 	CLI_history_t*	history,
@@ -77,11 +87,11 @@ extern void CLI_history_prev
 {	
 	if (0 == history->count)
 		return;
-		
+	
 	history->actual = (CLI_hisentry_t*)USO_prev_element (&history->list, (USO_node_t*)history->actual);
 	if (NULL == history->actual)
 		history->actual = (CLI_hisentry_t*)USO_prev_element (&history->list, NULL);
-	
+		
 	memcpy (token, &history->actual->token, sizeof(CLI_token_t));
 }
 
@@ -90,12 +100,5 @@ extern void CLI_history_show
 	CLI_history_t*	history
 )
 {
-	CLI_hisentry_t* entry = NULL;
-
-	USO_LIST_FOR_EACH(&history->list, entry)
-	{
-		for (int i = 0; i < entry->token.argc; i++)
-			printf ("%s ", entry->token.buffer[i]);
-		putc ('\n');
-	}
+	USO_map (&history->list, entry_info);
 }
