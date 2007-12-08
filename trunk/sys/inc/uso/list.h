@@ -54,14 +54,6 @@ typedef struct USO_list USO_list_t;
 /*-------------- Interface -----------------------------------------------*/
 
 /**
- * Macro for going through whole list.
- */
-#define USO_LIST_FOR_EACH(list, node)\
-		for ((node) = (void*)((USO_list_t*)(list))->head;\
-			 NULL != (void*)(node);\
-			 (node) = (void*)((USO_node_t*)(node))->next)
-
-/**
  * Initialize list.
  *
  * @param list : Pointer to list.
