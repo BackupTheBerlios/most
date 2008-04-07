@@ -2,7 +2,7 @@
 
 export LIB_NAME LIB_TYPE OBJ_NAMES
 
-.PHONY : default help obj_target asm_cpu clean_obj clean_obj_target
+.PHONY : default help obj clean mrproper
 
 default:
 	@$(ECHO) "Please use <make help> for more information."
@@ -11,24 +11,18 @@ help :
 	@$(call makegoal, help)
 	@$(ECHO) ""
 	@$(ECHO) "---------------------- Makefile.bsp -------------------------------------------------------"
-	@$(ECHO) "Build all most objects for the bsp."
-	@$(ECHO) "---------------------"
 	@$(ECHO) "help"
-	@$(ECHO) "asm_cpu : makegoal"
-	@$(ECHO) "obj_target  : makegoal"
-	@$(ECHO) "clean_obj         : makegoal"
-	@$(ECHO) "clean_obj_target  : makegoal" 
+	@$(ECHO) "obj	  	: makegoal"
+	@$(ECHO) "clean		: makegoal"
+	@$(ECHO) "mrproper	: makegoal" 
 	@$(ECHO) "---------------------------------------------------------------------------------------------"
 	@$(ECHO) ""
-	
-obj_target :
+
+obj :
 	@$(call makegoal, $@)
 
-asm_cpu :
+clean : 
 	@$(call makegoal, $@)
 
-clean_obj : 
-	@$(call makegoal, $@)
-
-clean_obj_target : 
+mrproper : 
 	@$(call makegoal, $@)

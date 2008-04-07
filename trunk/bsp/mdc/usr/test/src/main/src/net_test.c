@@ -16,9 +16,9 @@
 
 static CLI_exec_t net_test;
 
-static NET_udp_socket_t udp_sock;
-static NET_ip_addr_t local_addr;
-static NET_ip_addr_t remote_addr;
+//static NET_udp_socket_t udp_sock;
+//static NET_ip_addr_t local_addr;
+//static NET_ip_addr_t remote_addr;
 
 #define LOCAL_PORT 1778
 #define REMOTE_PORT 1777
@@ -42,6 +42,9 @@ test_packet_init (struct test_packet *p)
 static void
 net_test_exec (char *nix)
 {
+	return;
+
+#if 0	
     long tn = 0;
 
     NET_udp_socket_init (&udp_sock);
@@ -70,6 +73,7 @@ net_test_exec (char *nix)
             USO_kputs (USO_LL_INFO, "USER send udp.\n");
         }
     }
+#endif
 }
 
 extern void

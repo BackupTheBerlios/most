@@ -1,3 +1,5 @@
-REMOVE := rm -rfv
+REMOVE := rm -rf
 MAKEDIR := mkdir -p
 ECHO := echo
+WC := wc -l
+DATE := date

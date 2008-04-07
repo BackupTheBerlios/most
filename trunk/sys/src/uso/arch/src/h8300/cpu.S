@@ -1,3 +1,4 @@
+/*
 ;
 ;  Copyright (C) 2004-2006  Michael Feiner
 ; 
@@ -14,9 +15,9 @@
 ;   extern USO_cpu_status_t USO_disable(void)
 ;   extern void USO_restore(USO_cpu_status_t)
 ;   extern void USO_context_switch(USO_cpu_t *, USO_cpu_t *)
-
+*/
    .h8300h
-   .file    "cpu.s"
+   .file    "cpu.S"
    .section  .text
 
    .align   1
@@ -71,4 +72,3 @@ _USO_context_switch:       ;er0 &old_thread->cpu er1 &new_thread->cpu
    rts                     ;run on the new thread yippieee!!!
    
    .END
-				

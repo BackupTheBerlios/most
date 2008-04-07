@@ -8,14 +8,14 @@ makegoal = make $(1) -C ace/doc;\
 	       make $(1) -C cli/doc;
 
 
-.PHONY : default doc clean_doc
+.PHONY : default doc clean
 
 default:
-	@$(ECHO) "Please use <make doc | make clean_doc> for generating, removing api documentation."
+	@$(ECHO) "Please use <make doc | make clean> for generating, removing api documentation."
 
 doc :
 	@$(call makegoal, $@)
 
-clean_doc :
+clean :
 	@$(call makegoal, $@)
 	       

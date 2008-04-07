@@ -1,21 +1,13 @@
+-include $(MOST_ROOT)/etc/Config
 -include $(MOST_ROOT)/etc/Commands
 
-LIB_NAMES_SYS := -l_nap\
-	        -l_cli\
-			-l_mfs\
-            -l_net\
-            -l_dev\
-	        -l_uso\
-            -l_ace\
-            -lgcc
-
-LIB_NAMES := $(LIB_NAMES_OPT) $(LIB_NAMES_SYS) 
+LIB_NAMES := $(LIB_NAMES_USR) $(LIB_NAMES_SYS) -lgcc 
 
 export LIB_PATH_OPT LIB_NAMES LDFLAGS_OPT
 
-export PROG_NAME OBJ_NAMES
+export PROG_NAME OBJ_NAMES STRIP_SECTIONS
 
-.PHONY : default help objects prog bin srec info clean_prog
+.PHONY : default help obj prog bin srec hex info clean mrproper
 
 default:
 	@$(ECHO) "Please use <make help> for more information."
@@ -26,17 +18,18 @@ help :
 	@$(ECHO) "---------------------- Makefile.prog -------------------------------------------------------"
 	@$(ECHO) "Built the objects for your program and link it with the most libs."
 	@$(ECHO) "---------------------"
-	@$(ECHO) "help"
-	@$(ECHO) "obj_target : makegoal"
-	@$(ECHO) "prog    : build, obj_target"
-	@$(ECHO) "bin     : build, prog" 
-	@$(ECHO) "srec    : build, prog"
-	@$(ECHO) "info    : build"
-	@$(ECHO) "clean_prog  : makegoal -> clean_obj, build"
+	@$(ECHO) "help		: makegoal"
+	@$(ECHO) "obj		: makegoal"
+	@$(ECHO) "prog    	: obj, build"
+	@$(ECHO) "bin	        : prog, build" 
+	@$(ECHO) "srec    	: prog, build"
+	@$(ECHO) "hex     	: prog, build"
+	@$(ECHO) "info    	: build"
+	@$(ECHO) "clean		: makegoal, rm PROG_NAME.(map, unstripped, MOST_SYSTEM, code, data, bin, srec, hex"
 	@$(ECHO) "---------------------------------------------------------------------------------------------"
 	@$(ECHO) ""
 
-prog : obj_target
+prog : obj
 	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
 
 bin : prog
@@ -45,13 +38,25 @@ bin : prog
 srec : prog
 	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
 
+hex : prog
+	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+
 info :
 	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
 
-obj_target :
+obj :
 	@$(call makegoal, $@)
 
-clean_prog : 
-	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
-	@$(call makegoal, clean_obj)
+clean : 
+	@$(call makegoal, $@)
+	-$(REMOVE) $(PROG_NAME).map
+	-$(REMOVE) $(PROG_NAME).unstripped
+	-$(REMOVE) $(PROG_NAME).$(MOST_SYSTEM)
+	-$(REMOVE) $(PROG_NAME).code
+	-$(REMOVE) $(PROG_NAME).data
+	-$(REMOVE) $(PROG_NAME).bin
+	-$(REMOVE) $(PROG_NAME).srec
+	-$(REMOVE) $(PROG_NAME).hex
 
+mrproper: clean
+	@$(call makegoal, $@)

@@ -7,17 +7,21 @@ makegoal_mdc = make $(1) -C bsp/mdc/usr/putboot;\
 	       	   make $(1) -C bsp/mdc/usr/boot;\
 			   make $(1) -C bsp/mdc/usr/frame;\
 			   make $(1) -C bsp/mdc/usr/test;
-			   
-.PHONY : default all clean
+
+.PHONY : default all clean mrproper
 
 default:
-	@$(ECHO) "Please use <make all | clean>."
+	@$(ECHO) "Please use <make all | clean | mrproper>."
 
 all :
-	@$(call makegoal_lib, lib)
+	@$(call makegoal_lib, libs)
 	@$(call makegoal_mdc, bin)
 
 clean :
-	@$(call makegoal_lib, clean_lib)
-	@$(call makegoal_mdc, clean_prog)
-	       
+	@$(call makegoal_lib, clean)
+	@$(call makegoal_mdc, clean)
+
+mrproper :
+	@$(call makegoal_lib, mrproper)
+	@$(call makegoal_mdc, mrproper)
+

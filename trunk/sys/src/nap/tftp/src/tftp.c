@@ -19,10 +19,10 @@
 #define ERROR 5
 
 static void init_read_request(void);
-static void init_ack(void);
+//static void init_ack(void);
 static void send(void);
-static void wait_reply(void);
-static void check_reply(void);
+//static void wait_reply(void);
+//static void check_reply(void);
 
 /********************************************************************************/
 /* Definitions ******************************************************************/
@@ -65,7 +65,7 @@ struct tftp_packet
 /********************************************************************************/
 static USO_buf_pool_t pool;
 static struct tftp_packet packets[3]; // sollte alloziert werden
-static NET_netbuf_t *send_packet, *receive_packet;
+static NET_netbuf_t *send_packet; // *receive_packet;
 static NET_ip_addr_t *server_addr;
 
 static const char *file_name;
@@ -125,6 +125,7 @@ static void init_read_request(void)
 	state.action = send;
 }  
 
+#if 0
 static void init_ack(void){
 	char* data;
 	unsigned short temp;
@@ -140,9 +141,13 @@ static void init_ack(void){
 	NET_netbuf_len_adjust (send_packet, data - send_packet->index);
 	state.action = send;
 }
+#endif
 
 static void send(void)
 {
+	return;
+
+#if 0
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP send\n") );
 	NET_err_t err;
 	err = NET_udp_send (&sock, send_packet);
@@ -157,11 +162,13 @@ static void send(void)
 	    USO_kprintf (USO_LL_ERROR, "TFTP send error %d\n", err);
 		state.action = NULL;
 	}
+#endif
 }
 
+#if 0
 static void wait_reply(void)
 {
-    u16_t server_port;
+    //u16_t server_port;
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP wait reply\n") );
 	receive_packet = NET_udp_recv (&sock, NULL, &server_port);
 	if (receive_packet != NULL)	{
@@ -187,7 +194,9 @@ static void wait_reply(void)
 		}
 	}
 } 
+#endif
 
+#if 0
 static void check_reply(void)
 {
 	char *data = receive_packet->index;
@@ -236,5 +245,6 @@ static void check_reply(void)
 	}
     NET_netbuf_free (receive_packet);
 }
+#endif
 
 /* eof */

@@ -1,4 +1,4 @@
-OBJ_NAMES := main/obj/$(MOST_TARGET)/*.o
+OBJ_NAMES := main/o/$(MOST_TARGET)/*.o
 
 makegoal = make $(1) -C main;
 

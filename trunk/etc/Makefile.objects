@@ -1,8 +1,9 @@
+-include $(MOST_ROOT)/etc/Config
 -include $(MOST_ROOT)/etc/Commands
 
 export INC_PATH_OPT CCFLAGS_OPT DEFINES_OPT
 
-.PHONY : default help obj_target asm_cpu clean_obj clean_obj_target
+.PHONY : default help obj asm clean mrproper
 
 default:
 	@$(ECHO) "Please use <make help> for more information."
@@ -10,25 +11,28 @@ default:
 help :
 	@make help --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
 	@$(ECHO) ""
-	@$(ECHO) "---------------------- Makefile.objects -------------------------------------------------------"
-	@$(ECHO) "Built the objects for this folder."
-	@$(ECHO) "---------------------"
-	@$(ECHO) "help"
-	@$(ECHO) "asm_cpu   : build"
-	@$(ECHO) "obj_target    : build"
-	@$(ECHO) "clean_obj          : build" 
-	@$(ECHO) "clean_obj_target   : build"
+	@$(ECHO) "---------------------- Makefile.objects -----------------------------------------------------"
+	@$(ECHO) "help          : makegoal"
+	@$(ECHO) "asm   	: build"
+	@$(ECHO) "obj		: build"
+	@$(ECHO) "clean         : build, rm o/$(MOST_TARGET), d/$(MOST_TARGET), s/$(MOST_TARGET)" 
+	@$(ECHO) "mrproper	: clean, rm o, d, s"
 	@$(ECHO) "---------------------------------------------------------------------------------------------"
 	@$(ECHO) ""
 
-obj_target: 
+obj: 
 	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
 
-asm_cpu :
+asm :
 	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
 
-clean_obj : 
+clean : 
 	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+	-$(REMOVE) o/$(MOST_TARGET)
+	-$(REMOVE) d/$(MOST_TARGET)
+	-$(REMOVE) s/$(MOST_TARGET)
 
-clean_obj_target : 
-	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/Makefile.build
+mrproper: clean
+	-$(REMOVE) o
+	-$(REMOVE) d
+	-$(REMOVE) s

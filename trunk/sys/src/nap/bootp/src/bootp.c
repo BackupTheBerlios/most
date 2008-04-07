@@ -71,10 +71,11 @@ static struct
     char filename[FILE_NAME_SIZE];
  } bootp_data;
 
-static struct bootp_packet_data *request_data;
-static struct bootp_packet_data *reply_data;
-static unsigned char hw_address[NET_ETH_ADDR_SIZE];
+//static struct bootp_packet_data *request_data;
+//static struct bootp_packet_data *reply_data;
+//static unsigned char hw_address[NET_ETH_ADDR_SIZE];
 
+#if 0
 static void
 bootp_init_request (void)
 {
@@ -112,6 +113,7 @@ bootp_check_reply (void)
     }
     return 0;
 }
+#endif
 
 extern NET_ip_addr_t *
 NAP_bootp_ip_address (void)
@@ -140,16 +142,21 @@ NAP_bootp_filename (void)
 /******************************************************************************** 
  * BOOTP
  ********************************************************************************/ 
-static struct bootp_packet_data bootp_packets[1];  /* sollte allociert
-                                                 * werden, mu noch prfen 
-                                                 * ? */
+// static struct bootp_packet_data bootp_packets[1];  /* sollte allociert
+//                                                 * werden, mu noch prfen 
+//                                                 * ? */
+
 extern void
 NAP_bootp (struct NET_eth_addr *hwaddr) 
 {
-    static NET_udp_socket_t sock;
-    static NET_ip_addr_t server_addr;
-    static NET_ip_addr_t client_addr;
-	int i;
+    // static NET_udp_socket_t sock;
+    // static NET_ip_addr_t server_addr;
+    // static NET_ip_addr_t client_addr;
+	// int i;
+	
+	return;
+
+#if 0	
     memcpy (hw_address, hwaddr->addr, NET_ETH_ADDR_SIZE);
     NET_udp_socket_init (&sock);
     NET_ip4_addr (&server_addr, 255, 255, 255, 255);
@@ -205,4 +212,6 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
          */ 
     //NET_udp_socket_close (&sock);
 	DEBUGF(NAP_BOOTP_DEBUG, ("BOOTP sock closed\n") );
+
+#endif
 }

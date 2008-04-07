@@ -1,0 +1,17 @@
+-include $(MOST_ROOT)/etc/Commands
+
+.PHONY : default doc wiz clean
+
+default:
+	@$(ECHO) "Please use <make doc | make wiz | make clean> for generating, removing api documentation."
+
+doc :
+	doxygen
+
+wiz :
+	doxywizard Doxyfile
+	
+clean :
+	-$(REMOVE) html
+	-$(REMOVE) latex
+		

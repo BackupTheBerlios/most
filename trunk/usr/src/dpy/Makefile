@@ -2,7 +2,7 @@
 
 LIB_NAME := dpy
 LIB_TYPE := usr
-OBJ_NAMES := gu256x64ser/obj/$(MOST_TARGET)/*.o
+OBJ_NAMES := gu256x64ser/o/$(MOST_TARGET)/*.o
 
 makegoal = make $(1) -C gu256x64ser;
 

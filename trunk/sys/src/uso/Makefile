@@ -2,12 +2,12 @@
 
 LIB_NAME := uso
 LIB_TYPE := sys
-OBJ_NAMES := arch/obj/$(MOST_TARGET)/*.o\
-			 log/obj/$(MOST_TARGET)/*.o\
-			 ipc/obj/$(MOST_TARGET)/*.o\
-			 kernel/obj/$(MOST_TARGET)/*.o\
-			 list/obj/$(MOST_TARGET)/*.o\
-			 mm/obj/$(MOST_TARGET)/*.o
+OBJ_NAMES := arch/o/$(MOST_TARGET)/*.o\
+			 log/o/$(MOST_TARGET)/*.o\
+			 ipc/o/$(MOST_TARGET)/*.o\
+			 kernel/o/$(MOST_TARGET)/*.o\
+			 list/o/$(MOST_TARGET)/*.o\
+			 mm/o/$(MOST_TARGET)/*.o
 
 makegoal = make $(1) -C arch;\
 	       make $(1) -C log;\

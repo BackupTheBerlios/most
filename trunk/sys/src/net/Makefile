@@ -2,12 +2,12 @@
 
 LIB_NAME := net
 LIB_TYPE := sys
-OBJ_NAMES :=  arch/obj/$(MOST_TARGET)/*.o\
-		 eth/obj/$(MOST_TARGET)/*.o\
-		 netif/obj/$(MOST_TARGET)/*.o\
-		 ipv4/obj/$(MOST_TARGET)/*.o\
-		 mm/obj/$(MOST_TARGET)/*.o\
-		 udp/obj/$(MOST_TARGET)/*.o
+OBJ_NAMES :=  arch/o/$(MOST_TARGET)/*.o\
+		 eth/o/$(MOST_TARGET)/*.o\
+		 netif/o/$(MOST_TARGET)/*.o\
+		 ipv4/o/$(MOST_TARGET)/*.o\
+		 mm/o/$(MOST_TARGET)/*.o\
+		 udp/o/$(MOST_TARGET)/*.o
 
 makegoal = make $(1) -C arch;\
 	   make $(1) -C eth;\
