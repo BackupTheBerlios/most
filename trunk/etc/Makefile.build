@@ -2,7 +2,7 @@
 -include $(MOST_ROOT)/etc/Commands
 
 ifeq ($(MOST_CPU),h8300)
-TARGET_CCFLAGS := -mh
+TARGET_CCFLAGS := -Os -mh
 TARGET_DEFINES := -DMOST_TARGET_H8300
 TARGET_LDFLAGS := -m h8300h
 else
@@ -12,7 +12,7 @@ TARGET_DEFINES := -DMOST_TARGET_I386
 TARGET_LDFLAGS := 
 else
 ifeq ($(MOST_CPU),arm)
-TARGET_CCFLAGS := -g -mcpu=arm7tdmi 
+TARGET_CCFLAGS := -O0 -g -mcpu=arm7tdmi 
 TARGET_DEFINES := -DMOST_TARGET_ARM 
 TARGET_LDFLAGS := 
 else
@@ -33,7 +33,7 @@ OBJDUMP 	:= $(EXECPREF)objdump
 
 INC_PATH 	:= -I$(MOST_ROOT)/sys/inc $(INC_PATH_OPT)
 
-CCFLAGS 	:=  -O0 $(TARGET_CCFLAGS) -fno-builtin -std=iso9899:199x -Wall -pedantic -Werror 
+CCFLAGS 	:= $(TARGET_CCFLAGS) -fno-builtin -std=iso9899:199x -Wall -pedantic -Werror 
 
 DEFINES 	:= $(TARGET_DEFINES) $(DEFINES_OPT)
 
