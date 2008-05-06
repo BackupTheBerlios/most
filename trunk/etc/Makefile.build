@@ -2,23 +2,50 @@
 -include $(MOST_ROOT)/etc/Commands
 
 ifeq ($(MOST_CPU),h8300)
-TARGET_CCFLAGS := -Os -mh
-TARGET_DEFINES := -DMOST_TARGET_H8300
+TARGET_CCFLAGS := -mh
+TARGET_DEFINES := -DMOST_CPU=1
 TARGET_LDFLAGS := -m h8300h
 else
 ifeq ($(MOST_CPU),i386)
 TARGET_CCFLAGS :=
-TARGET_DEFINES := -DMOST_TARGET_I386
+TARGET_DEFINES := -DMOST_CPU=2
 TARGET_LDFLAGS := 
 else
 ifeq ($(MOST_CPU),arm)
-TARGET_CCFLAGS := -O0 -g -mcpu=arm7tdmi 
-TARGET_DEFINES := -DMOST_TARGET_ARM 
+TARGET_CCFLAGS := -mcpu=arm7tdmi 
+TARGET_DEFINES := -DMOST_CPU=3 
+TARGET_LDFLAGS :=
+else
+ifeq ($(MOST_CPU),m68k)
+TARGET_CCFLAGS :=
+TARGET_DEFINES := -DMOST_CPU=4
 TARGET_LDFLAGS := 
 else
-$(error No target defined!)
+$(error No cpu defined!)
 endif 
 endif
+endif
+endif
+
+ifeq ($(MOST_ENDIAN),little)
+TARGET_DEFINES += -DMOST_ENDIAN=0123
+else
+ifeq ($(MOST_ENDIAN),big)
+TARGET_DEFINES += -DMOST_ENDIAN=3210
+else
+$(error No endian defined!)
+endif
+endif
+
+ifeq ($(MOST_BUILD_ERR_FILE),on)
+BUILD_ERR_FILE := $(MOST_ROOT)/build.err
+BUILD_ERR := 2>>$(BUILD_ERR_FILE)
+REMOVE_BUILD_ERR :=	-$(REMOVE) $(BUILD_ERR_FILE) 
+SHOW_BUILD_ERR := -@$(WC) $(BUILD_ERR_FILE)
+endif
+
+ifeq ($(MOST_BUILD_LOG),off)
+BUILD_LOG :=@
 endif
 
 EXECPREF 	:= $(MOST_ROOT)/gcc/$(MOST_GCC)/bin/$(MOST_TARGET)-
@@ -33,7 +60,7 @@ OBJDUMP 	:= $(EXECPREF)objdump
 
 INC_PATH 	:= -I$(MOST_ROOT)/sys/inc $(INC_PATH_OPT)
 
-CCFLAGS 	:= $(TARGET_CCFLAGS) -fno-builtin -std=iso9899:199x -Wall -pedantic -Werror 
+CCFLAGS 	:= $(MOST_OPTI) $(MOST_DEBUG) $(TARGET_CCFLAGS) -fno-builtin -std=iso9899:199x -Wall -pedantic -Werror 
 
 DEFINES 	:= $(TARGET_DEFINES) $(DEFINES_OPT)
 
@@ -51,8 +78,6 @@ ASMFILES 		:= $(subst src,s/$(MOST_CPU),$(subst .c,.s,$(SOURCES)))
 SUBMAKES 		:= $(subst src,d/$(MOST_TARGET),$(subst .c,.d,$(SOURCES)))
 ASM_SOURCES 	:= $(wildcard src/$(MOST_CPU)/*.S)
 ASM_OBJECTS 	:= $(subst src/$(MOST_CPU),o/$(MOST_TARGET),$(subst .S,.o,$(ASM_SOURCES)))
-
-BUILD_ERR 	:= build.err
 
 .PHONY : default help init asm obj lib prog bin srec hex info clean date
 
@@ -76,34 +101,36 @@ help :
 	@$(ECHO) ""
 
 clean:
-	-$(REMOVE) $(BUILD_ERR) 
+	$(REMOVE_BUILD_ERR) 
 
-date:
-	-$(DATE) >$(BUILD_ERR)
+$(BUILD_ERR_FILE):
+	@$(DATE) >$(BUILD_ERR_FILE)
 
-asm : date s/$(MOST_CPU) d/$(MOST_TARGET) $(ASMFILES)
-	@$(WC) $(BUILD_ERR)
+asm : $(BUILD_ERR_FILE) s/$(MOST_CPU) d/$(MOST_TARGET) $(ASMFILES)
+	$(SHOW_BUILD_ERR)
 
-obj : date o/$(MOST_TARGET) d/$(MOST_TARGET) $(OBJECTS) $(ASM_OBJECTS)
-	@$(WC) $(BUILD_ERR)
+obj : $(BUILD_ERR_FILE) o/$(MOST_TARGET) d/$(MOST_TARGET) $(OBJECTS) $(ASM_OBJECTS)
+	$(SHOW_BUILD_ERR)
 
-lib : date ../../lib/$(MOST_TARGET)
+lib : $(BUILD_ERR_FILE) ../../lib/$(MOST_TARGET)
 	@$(ECHO) "archive $(LIB_NAME)"
-	@$(AR) cr ../../lib/$(MOST_TARGET)/lib_$(LIB_NAME).a $(OBJ_NAMES) 2>>$(BUILD_ERR)
-	@$(WC) $(BUILD_ERR)
+	$(BUILD_LOG)$(AR) cr ../../lib/$(MOST_TARGET)/lib_$(LIB_NAME).a $(OBJ_NAMES) $(BUILD_ERR)
+	$(SHOW_BUILD_ERR)
 
-prog :
+prog : $(BUILD_ERR_FILE)
 	@$(ECHO) "link $(PROG_NAME)"
-	@$(LD) $(LDFLAGS) $(OBJ_NAMES) $(LIB_PATH) $(LIB_NAMES) -o $(PROG_NAME).unstripped
-	@$(STRIP) --target=$(MOST_SYSTEM)$(MOST_BIT)-$(MOST_ENDIAN)$(MOST_CPU) $(STRIP_SECTIONS)\
-	 -o $(PROG_NAME).$(MOST_SYSTEM) $(PROG_NAME).unstripped
+	$(BUILD_LOG)$(LD) $(LDFLAGS) $(OBJ_NAMES) $(LIB_PATH) $(LIB_NAMES) -o $(PROG_NAME).unstripped $(BUILD_ERR)
+	$(BUILD_LOG)$(STRIP) --target=$(MOST_SYSTEM)$(MOST_BIT)-$(MOST_ENDIAN)$(MOST_CPU) $(STRIP_SECTIONS)\
+	 -o $(PROG_NAME).$(MOST_SYSTEM) $(PROG_NAME).unstripped $(BUILD_ERR)
+	$(SHOW_BUILD_ERR)
 
-bin :
+bin : $(BUILD_ERR_FILE)
 	@$(ECHO) "generate $(PROG_NAME).bin"
-	@$(OBJCOPY) -O binary -j .text -j .rodata $(PROG_NAME).$(MOST_SYSTEM) $(PROG_NAME).code
-	@$(OBJCOPY) -O binary -j .data $(PROG_NAME).$(MOST_SYSTEM) $(PROG_NAME).data
-	@cat $(PROG_NAME).code $(PROG_NAME).data > $(PROG_NAME).bin
-
+	$(BUILD_LOG)$(OBJCOPY) -O binary -j .text -j .rodata $(PROG_NAME).$(MOST_SYSTEM) $(PROG_NAME).code $(BUILD_ERR)
+	$(BUILD_LOG)$(OBJCOPY) -O binary -j .data $(PROG_NAME).$(MOST_SYSTEM) $(PROG_NAME).data $(BUILD_ERR)
+	$(BUILD_LOG)cat $(PROG_NAME).code $(PROG_NAME).data > $(PROG_NAME).bin $(BUILD_ERR)
+	$(SHOW_BUILD_ERR)
+	
 srec :
 	@$(ECHO) "generate $(PROG_NAME).srec"
 	@$(OBJCOPY) -O srec $(PROG_NAME).$(MOST_SYSTEM) $(PROG_NAME).srec
@@ -119,15 +146,15 @@ info :
 
 o/$(MOST_TARGET)/%.o: src/%.c
 	@$(ECHO) "compile $<"
-	@$(CC) -c $(CCFLAGS) $(INC_PATH) $(DEFINES) -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.c,%.d,$(<F))" $< -o $@ 2>>$(BUILD_ERR)
+	$(BUILD_LOG)$(CC) -c $(CCFLAGS) $(INC_PATH) $(DEFINES) -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.c,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
 
 o/$(MOST_TARGET)/%.o: src/$(MOST_CPU)/%.S
 	@$(ECHO) "compile $<"
-	@$(CC) -c $(CCFLAGS) $(INC_PATH) $(DEFINES) -D__ASSEMBLY__ -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.s,%.d,$(<F))" $< -o $@ 2>>$(BUILD_ERR)
+	$(BUILD_LOG)$(CC) -c $(CCFLAGS) $(INC_PATH) $(DEFINES) -D__ASSEMBLY__ -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.S,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
 
 s/$(MOST_CPU)/%.s : src/%.c
 	@$(ECHO) "compile $<"
-	@$(CC) -S $(CCFLAGS) $(INC_PATH) $(DEFINES) -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.c,%.d,$(<F))" $< -o $@ 2>>$(BUILD_ERR)
+	$(BUILD_LOG)$(CC) -S $(CCFLAGS) $(INC_PATH) $(DEFINES) -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.c,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
 
 s/$(MOST_CPU) : s
 	@$(MAKEDIR) s/$(MOST_CPU)

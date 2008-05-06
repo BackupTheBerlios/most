@@ -6,7 +6,7 @@
 #include "ace/stdlib.h"
 
 #ifdef ACE_BYTE_ORDER
-#if ACE_BYTE_ORDER==ACE_LITTLE_ENDIAN
+#if ACE_BYTE_ORDER == ACE_LITTLE_ENDIAN
 
 u32_t
 htonl (u32_t n)

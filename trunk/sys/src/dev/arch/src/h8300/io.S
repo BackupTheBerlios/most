@@ -22,7 +22,7 @@ _DEV_out_w:
 	pop.w   r2
 	rts
 
-   ;; void in_nw (ioaddr, buffer, len)
+   /* void in_nw (ioaddr, buffer, len) */
    .align   1
    .global  _DEV_in_nw
 _DEV_in_nw:
@@ -36,7 +36,7 @@ __in_nw1:
 	pop.w	r4
 	rts
 
-   ;; void out_nw(ioaddr, buf, len)
+   /* void out_nw(ioaddr, buf, len) */
    .align   1
    .global  _DEV_out_nw
 _DEV_out_nw:

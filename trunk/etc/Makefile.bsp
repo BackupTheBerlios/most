@@ -1,7 +1,5 @@
 -include $(MOST_ROOT)/etc/Commands
 
-export LIB_NAME LIB_TYPE OBJ_NAMES
-
 .PHONY : default help obj clean mrproper
 
 default:

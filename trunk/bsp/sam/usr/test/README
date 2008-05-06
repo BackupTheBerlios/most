@@ -1,0 +1,18 @@
+Enter SAM-BA:
+
+set ERASE jumper fo 1 sec and reset the board
+
+
+Installing usb serial device:
+
+modprobe usbserial vendor=0x03EB product=0x6124
+
+
+Download to SRAM(after reset you stay in SAM-BA):
+
+Sam_I_Am open /dev/ttyUSB0 , send test.hex , go 0x202000
+
+
+Download to FLASH (after reset you have to enter SAM-BA again):
+
+Sam_I_Am open /dev/ttyUSB0 , flash test.hex , go 0x100000

@@ -14,14 +14,17 @@
 
 /*------------- Interface ------------------------------------------*/
 
+/** H8300 CPU */
+#define ACE_CPU_H8300    1
+
 /** I386 CPU */
-#define ACE_CPU_I386     1
+#define ACE_CPU_I386     2
 
-/** H8300 Microcontroller */
-#define ACE_CPU_H8300    2
-
-/** ARM Microcontroller */
+/** ARM CPU */
 #define ACE_CPU_ARM      3
+
+/** 68000 CPU */
+#define ACE_CPU_M68K     4
 
 /*
 "Little Endian" means that the low-order byte of the number is stored in memory at the lowest address, and the high-order byte at the highest address. (The little end comes first.) For example, a 4 byte LongInt
@@ -50,42 +53,49 @@ Network Byte Order is also "Big Endian"
 */
 
 /** Motorola */
-#define ACE_BIG_ENDIAN    3210
+#define ACE_BIG_ENDIAN      3210
 
 /** Intel */
-#define ACE_LITTLE_ENDIAN 0123
+#define ACE_LITTLE_ENDIAN   0123
 
 
-#ifdef  MOST_TARGET_I386
 
-/** We have a I386 cpu*/
-#define ACE_CPU ACE_CPU_I386
-
-/** We have little endian byteorder */
-#define ACE_BYTE_ORDER ACE_LITTLE_ENDIAN
-
-#endif
-
-
-#ifdef MOST_TARGET_H8300
-
+#ifdef  MOST_CPU
+#if MOST_CPU == ACE_CPU_H8300
 /** We have a H8300 Microcontroller */
 #define ACE_CPU ACE_CPU_H8300
-
-/** We have big endian byteorder */
-#define ACE_BYTE_ORDER ACE_BIG_ENDIAN
-
-#endif
-
-#ifdef MOST_TARGET_ARM
-
+#elif MOST_CPU == ACE_CPU_I386
+/** We have a I386 cpu*/
+#define ACE_CPU ACE_CPU_I386
+#elif MOST_CPU == ACE_CPU_ARM
 /** We have an ARM Microcontroller */
 #define ACE_CPU ACE_CPU_ARM
+#elif MOST_CPU == ACE_CPU_M68K
+/** We have a 68000 cpu*/
+#define ACE_CPU ACE_CPU_M68K
+#else
+#error "MOST_CPU not supported!"
+#endif
+#else
+#error "MOST_CPU not defined!"
+#endif
 
+
+#ifdef MOST_ENDIAN
+#if MOST_ENDIAN == ACE_BIG_ENDIAN
 /** We have big endian byteorder */
 #define ACE_BYTE_ORDER ACE_BIG_ENDIAN
-
+#elif MOST_ENDIAN == ACE_LITTLE_ENDIAN
+/** We have little endian byteorder */
+#define ACE_BYTE_ORDER ACE_LITTLE_ENDIAN
+#else
+#error "MOST_ENDIAN not valid!"
 #endif
+#else
+#error "MOST_ENDIAN not defined!"
+#endif
+
+
 
 #define ACE_TICKS_PER_SEC 1000L
 

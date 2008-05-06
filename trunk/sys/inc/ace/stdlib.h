@@ -44,14 +44,9 @@ extern int atox (char c);
  */
 extern int atoxc (char* s);
 
-/** ntohs = htons */
-#define ntohs(n) htons(n)
-
-/** ntohl = htonl */
-#define ntohl(n) htonl(n)
 
 #ifdef ACE_BYTE_ORDER
-#if ACE_BYTE_ORDER==ACE_LITTLE_ENDIAN
+#if ACE_BYTE_ORDER == ACE_LITTLE_ENDIAN
 
 /**
  * If BYTE_ORDER = LITTLE_ENDIAN.
@@ -67,7 +62,7 @@ extern u16_t htons (u16_t n);
  */
 extern u32_t htonl (u32_t n);
 
-#elif ACE_BYTE_ORDER==ACE_BIG_ENDIAN
+#elif ACE_BYTE_ORDER == ACE_BIG_ENDIAN
 
 /** If BYTE_ORDER = BIG_ENDIAN */
 #define htons(n) (n)
@@ -75,7 +70,11 @@ extern u32_t htonl (u32_t n);
 /** If BYTE_ORDER = BIG_ENDIAN */
 #define htonl(n) (n)
 
+#elif
+#error "ACE_BYTE_ORDER not valid!"
 #endif
+#elif
+#error "ACE_BYTE_ORDER not defined!"
 #endif
 
 extern void ACE_stdlib_init (USO_heap_t* heap);

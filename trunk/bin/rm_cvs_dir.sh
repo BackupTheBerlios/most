@@ -1,3 +1,3 @@
 #!/bin/sh
 
-find $1 -name \CVS -exec rm -r -i -v $2 {} \; 
+find $MOST_ROOT -name \CVS -exec rm -r -i -v $1 {} \; 

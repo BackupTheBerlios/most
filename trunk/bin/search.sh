@@ -1,3 +1,3 @@
 #!/bin/sh
 
-find $1 -name \*.$2 -print -exec grep -n -e $3 {} \;
+find $MOST_ROOT -name \*.$1 -print -exec grep -n -e $2 {} \;
