@@ -5,7 +5,7 @@ LIB_NAMES := $(LIB_NAMES_USR) $(LIB_NAMES_SYS) -lgcc
 
 export LIB_PATH_OPT LIB_NAMES LDFLAGS_OPT
 
-export PROG_NAME OBJ_NAMES STRIP_SECTIONS
+export PROG_NAME OBJ_NAMES STRIP_FLAGS STRIP_SECTIONS
 
 .PHONY : default help obj prog bin srec hex info clean mrproper
 

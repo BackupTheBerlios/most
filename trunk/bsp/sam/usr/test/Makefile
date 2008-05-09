@@ -3,8 +3,8 @@
 
 PROG_NAME := test
 
-ifneq ($(MOST_CPU),arm)
-$(error Wrong target defined!)
+ifneq ($(MOST_BOARD),sam)
+$(error Wrong board defined!)
 endif
 
 LIB_NAMES_SYS := 		 -l_cli\
@@ -30,6 +30,7 @@ makegoal = make $(1) -C ../../sys/src;\
 		   make $(1) -C src;
            
 
+STRIP_FLAGS:= --target=$(MOST_SYSTEM)$(MOST_BIT)-$(MOST_ENDIAN)$(MOST_CPU)
 STRIP_SECTIONS:= --strip-debug --strip-unneeded -s -R .stack -R .heap 
 
 -include $(MOST_ROOT)/etc/Makefile.prog

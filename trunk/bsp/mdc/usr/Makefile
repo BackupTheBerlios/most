@@ -1,7 +1,7 @@
 -include $(MOST_ROOT)/etc/Config
 
-ifneq ($(MOST_CPU),h8300)
-$(error Wrong target defined!)
+ifneq ($(MOST_BOARD),mdc)
+$(error Wrong board defined!)
 endif
 
 LIB_NAMES_SYS := -l_nap\
@@ -26,6 +26,7 @@ LIB_NAMES_OPT :=
 makegoal = make $(1) -C src;\
            make $(1) -C ../../sys/src;
 
+STRIP_FLAGS:= --target=$(MOST_SYSTEM)-$(MOST_CPU)
 STRIP_SECTIONS:= -s -R .noinit -R .stack -R .heap -R .eight 
 
 -include $(MOST_ROOT)/etc/Makefile.prog

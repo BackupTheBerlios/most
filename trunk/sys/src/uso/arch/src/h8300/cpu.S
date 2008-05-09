@@ -46,7 +46,7 @@ _USO_restore:
    .align   1
    .global  _USO_context_switch
 _USO_context_switch:       /* er0 &old_thread->cpu er1 &new_thread->cpu */  
-   mov.l    er2,@(er0)
+   mov.l    er2,@er0
    mov.l    er3,@(4,er0)
    mov.l    er4,@(8,er0)
    mov.l    er5,@(12,er0)
@@ -62,11 +62,11 @@ _USO_context_switch:       /* er0 &old_thread->cpu er1 &new_thread->cpu */
    mov.l    @(24,er1),er2  /* copy new_thread->cpu.pc to a temp register */
    push.l   er2            /* and push it on the stack, after rts we will run on it */
    mov.l    @(20,er1),sp   /* copy new_thread->cpu.sp to sp */
-   mov.l    @(er1),er2
-   mov.l    @(4,er1),er3
-   mov.l    @(8,er1),er4
-   mov.l    @(12,er1),er5
    mov.l    @(16,er1),er6  
+   mov.l    @(12,er1),er5
+   mov.l    @(8,er1),er4
+   mov.l    @(4,er1),er3
+   mov.l    @er1,er2
    rts                     /* run on the new thread */
     
    .END

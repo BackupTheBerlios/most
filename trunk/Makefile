@@ -4,18 +4,7 @@
 makegoal_lib = make $(1) -C sys/src;\
 	       	   make $(1) -C usr/src;
 
-ifeq ($(MOST_BOARD),mdc)
-makegoal_bsp = make $(1) -C bsp/mdc/usr/putboot;\
-	       	   make $(1) -C bsp/mdc/usr/boot;\
-			   make $(1) -C bsp/mdc/usr/frame;\
-			   make $(1) -C bsp/mdc/usr/test;
-else
-ifeq ($(MOST_BOARD),sam)
-makegoal_bsp = make $(1) -C bsp/sam/usr/test;
-else
-$(error No board defined!)
-endif 
-endif
+makegoal_bsp = make $(1) -C bsp/$(MOST_BOARD);
 
 .PHONY : default all clean mrproper
 
@@ -24,7 +13,7 @@ default:
 
 all :
 	@$(call makegoal_lib, libs)
-	@$(call makegoal_bsp, bin)
+	@$(call makegoal_bsp, all)
 
 clean :
 	@$(call makegoal_lib, clean)

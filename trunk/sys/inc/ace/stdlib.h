@@ -45,6 +45,9 @@ extern int atox (char c);
 extern int atoxc (char* s);
 
 
+#define ntohl(n) htonl(n)
+#define ntohs(n) htons(n)
+
 #ifdef ACE_BYTE_ORDER
 #if ACE_BYTE_ORDER == ACE_LITTLE_ENDIAN
 
