@@ -22,7 +22,7 @@
 /**
  * The Main Thread run function.
  */
-extern void MDC_init_run (void *);
+extern void MDC_start_run (void *);
 
 /** @}
  */

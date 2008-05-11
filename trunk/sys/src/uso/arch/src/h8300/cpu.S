@@ -46,23 +46,23 @@ _USO_restore:
    .align   1
    .global  _USO_context_switch
 _USO_context_switch:       /* er0 &old_thread->cpu er1 &new_thread->cpu */  
-   mov.l    er2,@er0
+   mov.l    er2,@er0	   /* save register */
    mov.l    er3,@(4,er0)
    mov.l    er4,@(8,er0)
    mov.l    er5,@(12,er0)
    mov.l    er6,@(16,er0) 
-   mov.l    sp,@(20,er0)   /* save the stack pointer to old_thread->cpu.sp */ 
-   pop.l    er2            /* pop the return address from the stack */
-   mov.l    er2,@(24,er0)  /* move it to old_thread->cpu.pc */
    stc.b    ccr,r2l        /* get the cpu status */
    mov.b    r2l,@(28,er0)  /* and store it in old_thread->cpu.ps */
+   pop.l    er2            /* pop the return address from the stack */
+   mov.l    er2,@(24,er0)  /* move it to old_thread->cpu.pc */
+   mov.l    sp,@(20,er0)   /* save the stack pointer to old_thread->cpu.sp */ 
 
-   mov.b    @(28,er1),r2l  /* get the new cpu status */
-   ldc.b    r2l,ccr        /* and restor it */
+   mov.l    @(20,er1),sp   /* copy new_thread->cpu.sp to sp */
    mov.l    @(24,er1),er2  /* copy new_thread->cpu.pc to a temp register */
    push.l   er2            /* and push it on the stack, after rts we will run on it */
-   mov.l    @(20,er1),sp   /* copy new_thread->cpu.sp to sp */
-   mov.l    @(16,er1),er6  
+   mov.b    @(28,er1),r2l  /* get the new cpu status */
+   ldc.b    r2l,ccr        /* and restor it */
+   mov.l    @(16,er1),er6  /* restore register */
    mov.l    @(12,er1),er5
    mov.l    @(8,er1),er4
    mov.l    @(4,er1),er3

@@ -41,7 +41,7 @@ run_led_run (void *nix)
 }
 
 extern void
-MDC_init_run (void *nix)
+MDC_start_run (void *nix)
 {
     USO_kputs (USO_LL_INFO, "Init run.\n");
 
@@ -53,7 +53,7 @@ MDC_init_run (void *nix)
     USO_kputs (USO_LL_INFO, "RunLed started.\n");
 	USO_yield();
 
-	MDC_eth_start();
+	//MDC_eth_start();
 
     CLI_setup (MDC_get_hostname ());
     CLI_interpreter_init (&cli0);
@@ -70,6 +70,5 @@ MDC_init_run (void *nix)
 	MDC_boot_install ();
 
     USO_kputs (USO_LL_INFO, "Main.\n");
-
     MDC_main ();
 }

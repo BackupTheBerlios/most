@@ -33,7 +33,7 @@
 #include "arch/digio.h"
 
 
-#define INIT_STACK_SIZE       0x400
+#define START_STACK_SIZE       0x400
 
 extern char data_start, data_end, code_end;   /* Defined in *.ld! */
 extern char bss_start, bss_end;               /* Defined in *.ld! */
@@ -47,7 +47,7 @@ static USO_heap_t heap;
 static void
 init (void)
 {
-    USO_thread_t *init_thread;
+    USO_thread_t *start_thread;
 
     DEV_timers_init ();
     DEV_clock_init ();
@@ -66,13 +66,13 @@ init (void)
          DEV_digout_set (&MDC_ctrl_led_1);
     }
 
-    USO_log_init (ser1, USO_LL_INFO);
-    USO_kputs (USO_LL_INFO, "Debug on ser1.\n");
+    USO_log_init (ser0, USO_LL_INFO);
+    USO_kputs (USO_LL_INFO, "Debug on ser0.\n");
 
     EE_93C46_init ();
     MDC_config_read ();
 
-    MDC_eth_init ();
+    //MDC_eth_init ();
 
     USO_enable ();
 
@@ -80,12 +80,12 @@ init (void)
 	DEV_cpudelay(ACE_USEC_2_LOOPS(50000));
     USO_kprintf (USO_LL_INFO, "Loop calib 50ms: %lu.\n", DEV_get_ticks_diff(loop_count));
 	
-    /* Why an init thread, the init thread has its own stack
+    /* Why an start thread? the start thread has its own stack
        and its stacksize can be changed here! */
        
-    init_thread = USO_thread_new (MDC_init_run, INIT_STACK_SIZE, USO_USER,
-    							  USO_ROUND_ROBIN, "init", TRUE);
-    USO_start (init_thread);
+    start_thread = USO_thread_new (MDC_start_run, START_STACK_SIZE, USO_USER,
+    							  USO_ROUND_ROBIN, "start", TRUE);
+    USO_start (start_thread);
 
     USO_kputs (USO_LL_INFO, "Turn to idle.\n");
 }
