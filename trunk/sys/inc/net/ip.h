@@ -134,14 +134,6 @@ extern NET_err_t NET_ip_output_if (NET_netbuf_t *,
                                    NET_ip_addr_t *,
                                    NET_ip_addr_t *, u8_t, u8_t, NET_netif_t *);
 
-
-#define IP_DEBUG 0
-
-
-#if IP_DEBUG
-void ip_debug_print (struct pbuf *p);
-#endif /* IP_DEBUG */
-
 /** @}
  */
 

@@ -22,66 +22,8 @@
 #include "net/stats.h"
 #include "net/opt.h"
 
-#define IP_FORWARD 0
-
-/*-----------------------------------------------------------------------------------*/
-/*
- * ip_init: Initializes the IP layer. 
- */
-/*-----------------------------------------------------------------------------------*/
-
-static MFS_descriptor_t *net_interfaces;
-
-extern void
-NET_ip_init (void)
-{
-    net_interfaces = MFS_sysfs_netif();
-}
-
-static NET_netif_t *
-find_route(NET_ip_addr_t *dest)
-{
-	MFS_descriptor_t *desc = NULL;
-	NET_netif_t *netif = NULL;
-	while ( (desc = MFS_next_entry(net_interfaces, desc)) != NULL) {
-		netif = (NET_netif_t *)desc->entry;
-    	if (NET_ip_addr_maskcmp (dest, &(netif->ip_addr), &(netif->netmask)))
-	    {
-   			break;	   	
-    	}
-  	}    
-	return netif;
-}
-
-/*-----------------------------------------------------------------------------------*/
-/*
- * ip_route: Finds the appropriate network interface for a given IP
- * address. It searches the list of network interfaces linearly. A match
- * is found if the masked IP address of the network interface equals the
- * masked IP address given to the function. 
- */
-/*-----------------------------------------------------------------------------------*/
-
-extern NET_netif_t *
-NET_ip_route (NET_ip_addr_t * dest)
-{
-    NET_netif_t *netif;
-
-    netif = find_route(dest);
-
-    return netif;
-
-#if 0
-    if (netif != NULL)
-        return netif;
-    else
-        return netif_default;
-#endif
-}
-
-
-
 #if NET_IP_HEAD_DEBUG
+#define IP_HEAD_DEBUG(iphdr)	ip_head_debug (iphdr)
 static void
 ip_head_debug (struct NET_ip_hdr *iphdr)
 {
@@ -120,18 +62,61 @@ ip_head_debug (struct NET_ip_hdr *iphdr)
              ntohl (iphdr->dest.addr) & 0xff));
     DEBUGF (NET_IP_HEAD_DEBUG, ("+-------------------------------+\n"));
 }
+#else
+#define IP_HEAD_DEBUG(iphdr)
 #endif
 
 /*-----------------------------------------------------------------------------------*/
 /*
- * ip_input: This function is called by the network interface device
- * driver when an IP packet is received. The function does the basic
- * checks of the IP header such as packet size being at least larger than
- * the header size etc. If the packet was not destined for us, the packet
- * is forwarded (using ip_forward). The IP checksum is always checked.
- * Finally, the packet is sent to the upper layer protocol input function. 
+ * ip_init: Initializes the IP layer. 
  */
 /*-----------------------------------------------------------------------------------*/
+
+static MFS_descriptor_t *net_interfaces;
+static NET_netif_t *netif_default = NULL;
+
+extern void
+NET_ip_init (void)
+{
+    net_interfaces = MFS_sysfs_netif();
+}
+
+static NET_netif_t *
+find_route(NET_ip_addr_t *dest)
+{
+	MFS_descriptor_t *desc = NULL;
+	NET_netif_t *netif = NULL;
+	while ( (desc = MFS_next_entry(net_interfaces, desc)) != NULL) {
+		netif = (NET_netif_t *)desc->entry;
+    	if (NET_ip_addr_maskcmp (dest, &(netif->ip_addr), &(netif->netmask)))
+	    {
+   			break;	   	
+    	}
+  	}    
+	return netif;
+}
+
+/*-----------------------------------------------------------------------------------*/
+/*
+ * ip_route: Finds the appropriate network interface for a given IP
+ * address. It searches the list of network interfaces linearly. A match
+ * is found if the masked IP address of the network interface equals the
+ * masked IP address given to the function. 
+ */
+/*-----------------------------------------------------------------------------------*/
+
+extern NET_netif_t *
+NET_ip_route (NET_ip_addr_t * dest)
+{
+    NET_netif_t *netif;
+
+    netif = find_route(dest);
+
+    if (netif != NULL)
+        return netif;
+    else
+    	return netif_default;
+}
 
 static NET_netif_t *
 find_netif(struct NET_ip_hdr *iphdr)
@@ -153,6 +138,17 @@ find_netif(struct NET_ip_hdr *iphdr)
 }
 
 
+/*-----------------------------------------------------------------------------------*/
+/*
+ * ip_input: This function is called by the network interface device
+ * driver when an IP packet is received. The function does the basic
+ * checks of the IP header such as packet size being at least larger than
+ * the header size etc. If the packet was not destined for us, the packet
+ * is forwarded (using ip_forward). The IP checksum is always checked.
+ * Finally, the packet is sent to the upper layer protocol input function. 
+ */
+/*-----------------------------------------------------------------------------------*/
+
 extern NET_err_t
 NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
 {
@@ -161,14 +157,9 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
     static u8_t hl;
 
     ++NET_stats.ip.rx;
-
     iphdr = (struct NET_ip_hdr *)p->index;
-
     DEBUGF (NET_IP_DEBUG, ("Ip: rx p->len %d p->size %d.\n", p->len, p->size));
-
-#if NET_IP_HEAD_DEBUG_RX
-    ip_head_debug (iphdr);
-#endif
+    IP_HEAD_DEBUG (iphdr);
 
     /*
      * identify the IP header 
@@ -179,6 +170,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
                 ("\nIp: packet dropped due to bad version number %d.",
                  NET_IPH_V (iphdr)));
         ++NET_stats.ip.rx_drop;
+        NET_netbuf_free (p);
         return NET_ERR_BAD;
     }
 
@@ -189,6 +181,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
         DEBUGF (NET_IP_DEBUG,
                 ("\nIp: packet dropped due to too short packet %d.", p->len));
         ++NET_stats.ip.rx_drop;
+        NET_netbuf_free (p);
         return NET_ERR_BAD;
     }
 
@@ -201,6 +194,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
                 ("\nIp: packet dropped due to failing checksum 0x%x.",
                  NET_inet_chksum (iphdr, hl * 4)));
         ++NET_stats.ip.rx_drop;
+        NET_netbuf_free (p);
         return NET_ERR_BAD;
     }
 
@@ -212,12 +206,12 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
          * packet not for us, route or discard 
          */
         DEBUGF (NET_IP_DEBUG, ("\nIp: packet not for us."));
-#if IP_FORWARD
-        if (!ip_addr_isbroadcast (&(iphdr->dest), &(inp->netmask)))
+
+        if (!NET_ip_addr_isbroadcast (&(iphdr->dest), &(inp->netmask)))
         {
-            ip_forward (p, iphdr, inp);
+        	//ip_forward (p, iphdr, inp);
         }
-#endif /* IP_FORWARD */
+        NET_netbuf_free (p);
         return NET_ERR_BAD;
     }
 
@@ -227,6 +221,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
                 ("\nIp: packet dropped since it was fragmented (0x%x).",
                  ntohs (NET_IPH_OFFSET (iphdr))));
         ++NET_stats.ip.rx_drop;
+        NET_netbuf_free (p);
         return NET_ERR_BAD;
     }
 
@@ -235,26 +230,21 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
         DEBUGF (NET_IP_DEBUG,
                 ("\nIp: packet dropped since there were IP options."));
         ++NET_stats.ip.rx_drop;
+        NET_netbuf_free (p);
         return NET_ERR_BAD;
     }
-
 
     /*
      * send to upper layers 
      */
-
     switch (NET_IPH_PROTO (iphdr))
     {
-#if NET_UDP > 0
     case NET_IP_PROTO_UDP:
         return NET_udp_input (inp, p);
-#endif
-#if NET_TCP > 0
     case NET_IP_PROTO_TCP:
         // tcp_input(p, inp);
         DEBUGF (NET_IP_DEBUG, ("\nIp: tcp not supported."));
         break;
-#endif
     case NET_IP_PROTO_ICMP:
         return NET_icmp_input (p, inp);
     default:
@@ -267,20 +257,16 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
         {
             NET_icmp_dest_unreach (p, NET_ICMP_DUR_PROTO);
         }
-
         DEBUGF (NET_IP_DEBUG,
                 ("\nIp: unsupported transportation protocol %d.",
                  NET_IPH_PROTO (iphdr)));
 
         ++NET_stats.ip.rx_drop;
-
         break;
     }
+	NET_netbuf_free (p);
     return NET_ERR_BAD;
 }
-
-
-
 
 /*-----------------------------------------------------------------------------------*/
 /*
@@ -299,7 +285,6 @@ NET_ip_output_if (NET_netbuf_t * p,
 {
     static struct NET_ip_hdr *iphdr;
     static u16_t ip_id = 0;
-
 
     if (dest != NET_IP_HDRINCL)
     {
@@ -334,17 +319,10 @@ NET_ip_output_if (NET_netbuf_t * p,
         iphdr = (struct NET_ip_hdr *)p->index;
         dest = &(iphdr->dest);
     }
-
     ++NET_stats.ip.tx;
-
    // DEBUGF (NET_IP_DEBUG, ("Ip: output if %s.\n", netif->name));
     DEBUGF (NET_IP_DEBUG, ("Ip: tx p->len %d p->size %d.\n", p->len, p->size));
-
-#if NET_IP_HEAD_DEBUG_TX
-    ip_head_debug (iphdr);
-#endif
-
-
+    IP_HEAD_DEBUG (iphdr);
     return netif->output (netif, p, dest);
 }
 

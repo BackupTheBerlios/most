@@ -61,9 +61,7 @@ extern NET_err_t NET_icmp_input (NET_netbuf_t *, NET_netif_t *);
  */
 extern void NET_icmp_dest_unreach (NET_netbuf_t *, enum NET_icmp_dur_type);
 
-#if 0                           // wer braucht das?
-extern void NET_icmp_time_exceeded (NET_netbuf_t *, enum NET_icmp_te_type);
-#endif
+//extern void NET_icmp_time_exceeded (NET_netbuf_t *, enum NET_icmp_te_type);
 
 /** ? */
 struct NET_icmp_echo_hdr

@@ -35,7 +35,7 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
         ++netif->rx;
         if (NET_ip_input (netif, p) < NET_ERR_OK)
         {
-            NET_netbuf_free (p);
+			// DEBUG ERROR
         }
         break;
     case NET_ETH_TYPE_ARP:
@@ -44,7 +44,6 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
         if (p != NULL)
         {
             if (ethif->transmit != NULL) {ethif->transmit(ethif->mac, p);}
-	        NET_netbuf_free (p);
         }
         break;
     default:
@@ -123,16 +122,21 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
         q = NET_arp_query (netif, ethif->eth_addr, queryaddr);
         if (q != NULL)
         {
-            if (ethif->transmit != NULL) { ethif->transmit(ethif->mac, q); }
-            if(arp_request_count--){
+            if (ethif->transmit != NULL) {
+            	ethif->transmit(ethif->mac, q);
+	        }
+	        NET_netbuf_free (q);
+	        if(arp_request_count--){
             	USO_sleep(ACE_MSEC_2_TICKS(100));
 		        dest = NET_arp_lookup (queryaddr);
             }else {
 			  	++netif->tx_drop;
-            	return NET_ERR_ARP;
+    		    NET_netbuf_free (p);
+	           	return NET_ERR_ARP;
             }
         } else {
 		  	++netif->tx_drop;
+		    NET_netbuf_free (p);
         	return NET_ERR_MEM;
         }
     }
@@ -145,6 +149,7 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
     ethhdr->type = htons (NET_ETH_TYPE_IP);
     if (ethif->transmit != NULL) { ethif->transmit (ethif->mac, p); }
   	++netif->tx;
+	NET_netbuf_free (p);
     return NET_ERR_OK;
 }
 
