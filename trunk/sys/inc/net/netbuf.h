@@ -28,20 +28,6 @@ enum NET_buf_type
 /** Networ buffer */
 typedef struct NET_netbuf NET_netbuf_t;
 
-/** private */
-struct NET_netbuf
-{
-    USO_node_t node;
-    NET_netbuf_t *next;
-    char *data;
-    long size;
-    char *index;
-    long len;
-    USO_buf_pool_t *pool;
-    enum NET_buf_type type;
-};
-
-
 extern void NET_netbuf_init (void);
 
 /**
@@ -65,7 +51,17 @@ extern void NET_netbuf_free (NET_netbuf_t *);
 /**
  * ?
  */
-extern NET_netbuf_t *NET_netbuf_chain (NET_netbuf_t *, NET_netbuf_t *);
+extern NET_netbuf_t* NET_netbuf_chain (NET_netbuf_t *, NET_netbuf_t *);
+
+/**
+ * ?
+ */
+extern NET_netbuf_t* NET_netbuf_next (NET_netbuf_t * buf);
+
+/**
+ * ?
+ */
+extern char * NET_netbuf_index (NET_netbuf_t * buf);
 
 /**
  * ?
@@ -75,7 +71,12 @@ extern bool_t NET_netbuf_index_inc (NET_netbuf_t *, long);
 /**
  * ?
  */
-extern bool_t NET_netbuf_len_adjust (NET_netbuf_t *, unsigned long);
+extern bool_t NET_netbuf_trim_len (NET_netbuf_t *, unsigned long);
+
+/**
+ * ?
+ */
+extern long NET_netbuf_len (NET_netbuf_t * buf);
 
 /**
  * ?

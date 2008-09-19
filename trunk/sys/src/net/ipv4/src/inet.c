@@ -57,14 +57,14 @@ chksum_buf (NET_netbuf_t * p)
 
     acc = 0;
     swapped = 0;
-    for (q = p; q != NULL; q = q->next)
+    for (q = p; q != NULL; q = NET_netbuf_next(q))
     {
-        acc += chksum ((u16_t *) (q->index), q->len);
+        acc += chksum ( (u16_t *)NET_netbuf_index(q), NET_netbuf_len(q) );
         while (acc >> 16)
         {
             acc = (acc & 0xffff) + (acc >> 16);
         }
-        if ( (q->len % 2) != 0)
+        if ( (NET_netbuf_len(q) % 2) != 0)
         {
             swapped = 1 - swapped;
             acc = (acc & 0xff << 8) | (acc & 0xff00 >> 8);

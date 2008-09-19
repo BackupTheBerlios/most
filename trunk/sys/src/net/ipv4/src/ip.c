@@ -90,10 +90,10 @@ find_route(NET_ip_addr_t *dest)
 		netif = (NET_netif_t *)desc->entry;
     	if (NET_ip_addr_maskcmp (dest, &(netif->ip_addr), &(netif->netmask)))
 	    {
-   			break;	   	
+   			return netif;	   	
     	}
   	}    
-	return netif;
+	return netif_default;
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -157,8 +157,8 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
     static u8_t hl;
 
     ++NET_stats.ip.rx;
-    iphdr = (struct NET_ip_hdr *)p->index;
-    DEBUGF (NET_IP_DEBUG, ("Ip: rx p->len %d p->size %d.\n", p->len, p->size));
+    iphdr = (struct NET_ip_hdr *)NET_netbuf_index(p);
+    DEBUGF (NET_IP_DEBUG, ("Ip: rx p->len %d.\n", NET_netbuf_len(p)));
     IP_HEAD_DEBUG (iphdr);
 
     /*
@@ -167,7 +167,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
     if (NET_IPH_V (iphdr) != 4)
     {
         DEBUGF (NET_IP_DEBUG,
-                ("\nIp: packet dropped due to bad version number %d.",
+                ("Ip: packet dropped due to bad version number %d.\n",
                  NET_IPH_V (iphdr)));
         ++NET_stats.ip.rx_drop;
         NET_netbuf_free (p);
@@ -176,10 +176,10 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
 
     hl = NET_IPH_HL (iphdr);
 
-    if (hl * 4 > p->len)
+    if (hl * 4 > NET_netbuf_len(p))
     {
         DEBUGF (NET_IP_DEBUG,
-                ("\nIp: packet dropped due to too short packet %d.", p->len));
+                ("Ip: packet dropped due to too short packet %d.\n", NET_netbuf_len(p)));
         ++NET_stats.ip.rx_drop;
         NET_netbuf_free (p);
         return NET_ERR_BAD;
@@ -191,21 +191,21 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
     if (NET_inet_chksum (iphdr, hl * 4) != 0)
     {
         DEBUGF (NET_IP_DEBUG,
-                ("\nIp: packet dropped due to failing checksum 0x%x.",
+                ("Ip: packet dropped due to failing checksum 0x%x.\n",
                  NET_inet_chksum (iphdr, hl * 4)));
         ++NET_stats.ip.rx_drop;
         NET_netbuf_free (p);
         return NET_ERR_BAD;
     }
 
-    netif = find_netif( iphdr);
+    netif = find_netif (iphdr);
 
     if (netif == NULL)
     {
         /*
          * packet not for us, route or discard 
          */
-        DEBUGF (NET_IP_DEBUG, ("\nIp: packet not for us."));
+        DEBUGF (NET_IP_DEBUG, ("Ip: packet not for us.\n"));
 
         if (!NET_ip_addr_isbroadcast (&(iphdr->dest), &(inp->netmask)))
         {
@@ -218,7 +218,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
     if ((NET_IPH_OFFSET (iphdr) & htons (NET_IP_OFFMASK | NET_IP_MF)) != 0)
     {
         DEBUGF (NET_IP_DEBUG,
-                ("\nIp: packet dropped since it was fragmented (0x%x).",
+                ("Ip: packet dropped since it was fragmented (0x%x).\n",
                  ntohs (NET_IPH_OFFSET (iphdr))));
         ++NET_stats.ip.rx_drop;
         NET_netbuf_free (p);
@@ -228,7 +228,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
     if (hl * 4 > NET_IP_HLEN)
     {
         DEBUGF (NET_IP_DEBUG,
-                ("\nIp: packet dropped since there were IP options."));
+                ("Ip: packet dropped since there were IP options.\n"));
         ++NET_stats.ip.rx_drop;
         NET_netbuf_free (p);
         return NET_ERR_BAD;
@@ -243,7 +243,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
         return NET_udp_input (inp, p);
     case NET_IP_PROTO_TCP:
         // tcp_input(p, inp);
-        DEBUGF (NET_IP_DEBUG, ("\nIp: tcp not supported."));
+        DEBUGF (NET_IP_DEBUG, ("Ip: tcp not supported.\n"));
         break;
     case NET_IP_PROTO_ICMP:
         return NET_icmp_input (p, inp);
@@ -258,7 +258,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
             NET_icmp_dest_unreach (p, NET_ICMP_DUR_PROTO);
         }
         DEBUGF (NET_IP_DEBUG,
-                ("\nIp: unsupported transportation protocol %d.",
+                ("Ip: unsupported transportation protocol %d.\n",
                  NET_IPH_PROTO (iphdr)));
 
         ++NET_stats.ip.rx_drop;
@@ -288,9 +288,8 @@ NET_ip_output_if (NET_netbuf_t * p,
 
     if (dest != NET_IP_HDRINCL)
     {
-
         NET_netbuf_index_inc (p, -sizeof (struct NET_ip_hdr));
-        iphdr = (struct NET_ip_hdr *)p->index;
+        iphdr = (struct NET_ip_hdr *)NET_netbuf_index(p);
 		
         NET_IPH_TTL_SET (iphdr, ttl);
         NET_IPH_PROTO_SET (iphdr, proto);
@@ -316,12 +315,12 @@ NET_ip_output_if (NET_netbuf_t * p,
     }
     else
     {
-        iphdr = (struct NET_ip_hdr *)p->index;
+        iphdr = (struct NET_ip_hdr *)NET_netbuf_index(p);
         dest = &(iphdr->dest);
     }
     ++NET_stats.ip.tx;
    // DEBUGF (NET_IP_DEBUG, ("Ip: output if %s.\n", netif->name));
-    DEBUGF (NET_IP_DEBUG, ("Ip: tx p->len %d p->size %d.\n", p->len, p->size));
+    DEBUGF (NET_IP_DEBUG, ("Ip: tx p->len %d.\n", NET_netbuf_len(p)));
     IP_HEAD_DEBUG (iphdr);
     return netif->output (netif, p, dest);
 }

@@ -43,8 +43,6 @@ extern bool_t CLI_cmd_info (CLI_interpreter_t *cli);
 
 extern bool_t CLI_cmd_list (CLI_interpreter_t *cli);
 
-extern bool_t CLI_cmd_history (CLI_interpreter_t *cli);
-
 extern bool_t CLI_cmd_exec (CLI_interpreter_t *cli);
 
 extern bool_t CLI_cmd_run (CLI_interpreter_t *cli);

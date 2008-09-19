@@ -72,7 +72,7 @@ init (void)
     EE_93C46_init ();
     MDC_config_read ();
 
-    //MDC_eth_init ();
+    MDC_eth_init ();
 
     USO_enable ();
 

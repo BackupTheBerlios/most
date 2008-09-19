@@ -23,7 +23,7 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
 
     ethif = netif->device;
 
-    ethhdr = (struct NET_eth_hdr *)p->data;
+    ethhdr = (struct NET_eth_hdr *)NET_netbuf_index(p);
 
     switch (htons (ethhdr->type))
     {
@@ -31,19 +31,30 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
         DEBUGF (NET_ETH_DEBUG, ("Eth: rx ip.\n"));
 
         NET_arp_ip_input (netif, p);
-        NET_netbuf_index_inc (p, sizeof (struct NET_eth_hdr));
+
         ++netif->rx;
+
+		if (NET_netbuf_index_inc (p, sizeof (struct NET_eth_hdr)) == FALSE){
+    	    DEBUGF (NET_ETH_DEBUG, ("Eth: ip packet to short.\n"));
+        	NET_netbuf_free (p);
+			return;
+		}
+
         if (NET_ip_input (netif, p) < NET_ERR_OK)
         {
-			// DEBUG ERROR
+	        DEBUGF (NET_ETH_DEBUG, ("Eth: ip error.\n"));
         }
         break;
     case NET_ETH_TYPE_ARP:
-        USO_kputs (USO_LL_INFO, "Eth: rx arp.\n");
+        DEBUGF (NET_ETH_DEBUG, ("Eth: rx arp.\n"));
         p = NET_arp_arp_input (netif, ethif->eth_addr, p);
         if (p != NULL)
         {
-            if (ethif->transmit != NULL) {ethif->transmit(ethif->mac, p);}
+            if (ethif->transmit != NULL) {
+            	ethif->transmit(ethif->mac, p);
+            } else {
+            	NET_netbuf_free (p);
+        	}
         }
         break;
     default:
@@ -140,7 +151,7 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
         	return NET_ERR_MEM;
         }
     }
-    ethhdr = (struct NET_eth_hdr *)p->index;
+    ethhdr = (struct NET_eth_hdr *)NET_netbuf_index(p);
     for (i = 0; i < 6; i++)
     {
         ethhdr->dest.addr[i] = dest->addr[i];

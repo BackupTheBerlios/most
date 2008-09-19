@@ -195,7 +195,16 @@ NET_arp_ip_input (NET_netif_t * netif, NET_netbuf_t * p)
 {
     struct ethip_hdr *hdr;
 
-    hdr = (struct ethip_hdr *)p->data;
+    if (NET_netbuf_len(p) < sizeof (struct ethip_hdr))
+    {
+        DEBUGF (NET_ARP_DEBUG,
+                ("Arp: ip packet too short (%d/%d).\n",
+                 NET_netbuf_len(p), sizeof (struct ethip_hdr)));
+        NET_netbuf_free (p);
+        return;
+    }
+
+    hdr = (struct ethip_hdr *)NET_netbuf_index(p);
 
     /*
      * Only insert/update an entry if the source IP address of the
@@ -223,16 +232,16 @@ NET_arp_arp_input (NET_netif_t * netif,
     struct arp_hdr *hdr;
     u8_t i;
 
-    if (p->size < sizeof (struct arp_hdr))
+    if (NET_netbuf_len(p) < sizeof (struct arp_hdr))
     {
         DEBUGF (NET_ARP_DEBUG,
                 ("Arp: arp packet too short (%d/%d).\n",
-                 p->size, sizeof (struct arp_hdr)));
+                 NET_netbuf_len(p), sizeof (struct arp_hdr)));
         NET_netbuf_free (p);
         return NULL;
     }
 
-    hdr = (struct arp_hdr *)p->data;
+    hdr = (struct arp_hdr *)NET_netbuf_index(p);
 
     switch (htons (hdr->opcode))
     {
@@ -322,7 +331,7 @@ NET_arp_query (NET_netif_t * netif,
     p = NET_netbuf_alloc_trans();
     if(p == NULL) { return NULL; }
 	if (NET_netbuf_index_inc (p, -sizeof(struct arp_hdr))){
-	    hdr = (struct arp_hdr *)(((NET_netbuf_t *) p)->index);
+	    hdr = (struct arp_hdr *)NET_netbuf_index(p);
 	    hdr->opcode = htons (ARP_REQUEST);
 	    for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
     	{

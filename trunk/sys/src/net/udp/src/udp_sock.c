@@ -11,14 +11,7 @@
 #include "net/opt.h"
 #include "net/udp.h"
 #include "net/udp_sock.h"
-
-static USO_list_t udp_socks;
-
-extern void
-NET_udp_sock_init (void)
-{
-    USO_list_init (&udp_socks);
-}
+#include "net/udp_socks.h"
 
 #define NET_UDP_RX_QUE_SIZE 10
 
@@ -42,91 +35,41 @@ NET_udp_socket_new (void)
     return sock;
 }
 
-extern NET_udp_socket_t *
-NET_find_exact_sock (NET_netif_t * inp,
-					 struct NET_ip_hdr *iphdr,
-		             u16_t src,
-			         u16_t dest)
-{
-	NET_udp_socket_t *sock = NULL;
-	
-	while ((sock = (NET_udp_socket_t *) USO_next_element (&udp_socks, (USO_node_t*)sock)) != NULL)
-	{
-        if (sock->remote_port == src &&
-            sock->local_port == dest &&
-            (NET_ip_addr_isbroadcast ((&sock->remote_ip), &(inp->netmask)) ||
-             NET_ip_addr_isany (&sock->remote_ip) ||
-             NET_ip_addr_cmp (&(sock->remote_ip), &(iphdr->src))) &&
-            (NET_ip_addr_isany (&sock->local_ip) ||
-             NET_ip_addr_cmp (&(sock->local_ip), &(iphdr->dest))))
-        {
-            DEBUGF (NET_UDP_DEBUG, ("\nUdp: found exact sock."));
-            break;
-        }
-    }
-    return sock;
-}
-
-extern NET_udp_socket_t *
-NET_find_sock (struct NET_ip_hdr *iphdr,
-			   u16_t src,
-			   u16_t dest)
-{
-	NET_udp_socket_t *sock = NULL;
-	
-    while ((sock = (NET_udp_socket_t *) USO_next_element (&udp_socks, (USO_node_t*)sock)) != NULL)
-    {
-    	if (sock->local_port == dest &&
-    	    (NET_ip_addr_isany (&sock->remote_ip) ||
-    	     NET_ip_addr_cmp (&(sock->remote_ip), &(iphdr->src))) &&
-    	    (NET_ip_addr_isany (&sock->local_ip) ||
-    	     NET_ip_addr_cmp (&(sock->local_ip), &(iphdr->dest))))
-        {
-        	DEBUGF (NET_UDP_DEBUG, ("\nUdp: found sock."));
-            break;
-        }
-    }
-	return sock;
-}
-
-static NET_udp_socket_t *
-find_sock (NET_udp_socket_t * sock)
-{
-	NET_udp_socket_t *isock = NULL;
-	while ( (isock = (NET_udp_socket_t*)USO_next_element(&udp_socks, (USO_node_t*)isock))
-			!= NULL){
-	    if (sock == isock){
-   			break;	   	
-    	}		   		
-	}    
-	return isock;
-}
 
 extern void
 NET_udp_socket_open (NET_udp_socket_t * sock)
 {
-    NET_udp_socket_t *isock;
-    isock = find_sock(sock);
-    if (isock == NULL)
+	if (sock != NULL)
+	{
+		NET_udp_socks_add(sock);
+	}
+}
+
+static NET_netbuf_t *
+udp_recv_netbuf (NET_udp_socket_t * sock)
+{
+    NET_netbuf_t *p;
+    if (sock->rx_timeout == TRUE)
+        DEV_timer_start (&sock->rx_timer);
+    p = (NET_netbuf_t *) USO_fetch (&sock->rx_que);
+    if (p != NULL)
     {
-        USO_enqueue (&udp_socks, (USO_node_t *) sock);
+        if (sock->rx_timeout == TRUE)
+            DEV_timer_stop (&sock->rx_timer);
     }
+	return p;
 }
 
 extern void
 NET_udp_socket_close (NET_udp_socket_t * sock)
 {
-    NET_udp_socket_t *isock;
-    //NET_netbuf_t *packet;
-    //NET_ip_addr_t addr;
-    //u16_t port;
-    isock = find_sock(sock);
-    if (isock != NULL)
+    NET_netbuf_t *p;
+    if (sock != NULL)
     {
-        USO_remove (&udp_socks, (USO_node_t *) sock);
+        NET_udp_socks_remove (sock);
         NET_udp_recv_timeout (sock, 1);
-       // while ((packet = NET_udp_recv (sock, &addr, &port, NULL, 0)) != NULL)
-       //     NET_netbuf_free (packet);
+       	while ((p = udp_recv_netbuf (sock)) != NULL)
+       	    NET_netbuf_free (p);
         NET_udp_recv_timeout (sock, 0);
     }
 }
@@ -136,7 +79,7 @@ NET_udp_bind (NET_udp_socket_t * sock, NET_ip_addr_t * ipaddr, u16_t port)
 {
     NET_ip_addr_set (&sock->local_ip, ipaddr);
     sock->local_port = port;
-    DEBUGF (NET_UDP_DEBUG, ("\nUdp: bind port %d.", port));
+    DEBUGF (NET_UDP_DEBUG, ("Udp: bind port %d.\n", port));
 }
 
 extern void
@@ -144,7 +87,7 @@ NET_udp_connect (NET_udp_socket_t * sock, NET_ip_addr_t * ipaddr, u16_t port)
 {
     NET_ip_addr_set (&sock->remote_ip, ipaddr);
     sock->remote_port = port;
-    DEBUGF (NET_UDP_DEBUG, ("\nUdp: connect port %d.", port));
+    DEBUGF (NET_UDP_DEBUG, ("Udp: connect port %d.\n", port));
 }
 
 static void
@@ -167,50 +110,62 @@ NET_udp_recv_timeout (NET_udp_socket_t * sock, unsigned long timeout)
     }
 }
 
-/*
- * timeout has to be implemented 
- */
+extern NET_netbuf_t *
+NET_udp_recv_netbuf (NET_udp_socket_t * sock,
+              		 NET_ip_addr_t * addr, u16_t * port)
+{
+	NET_netbuf_t *p;
+    struct NET_udp_hdr *udphdr;
+    struct NET_ip_hdr *iphdr;
+
+	p = udp_recv_netbuf (sock);
+	if (p != NULL){
+    	udphdr = (struct NET_udp_hdr *)NET_netbuf_index(p);
+		iphdr = (struct NET_ip_hdr *)((char*)udphdr - sizeof (struct NET_ip_hdr));
+    	NET_netbuf_index_inc (p, sizeof (struct NET_udp_hdr));
+    	if (addr != NULL)
+    		*addr = iphdr->src;
+    	if (port != NULL)
+       		*port = ntohs (udphdr->src);
+	}
+    return p; 
+}
+
 extern long
 NET_udp_recv (NET_udp_socket_t * sock,
               NET_ip_addr_t * addr, u16_t * port,
               char * buf, unsigned int len)
 {
-    NET_netbuf_t *p;
-    struct NET_udp_hdr *udphdr;
-    struct NET_ip_hdr *iphdr;
-    if (sock->rx_timeout == TRUE)
-        DEV_timer_start (&sock->rx_timer);
-    p = (NET_netbuf_t *) USO_fetch (&sock->rx_que);
-    if (p != NULL)
-    {
-        if (sock->rx_timeout == TRUE)
-            DEV_timer_stop (&sock->rx_timer);
-        iphdr = (struct NET_ip_hdr *)(p->index - sizeof (struct NET_ip_hdr));
-        udphdr = (struct NET_udp_hdr *)p->index;
-        NET_netbuf_index_inc (p, sizeof (struct NET_udp_hdr));
-        if (addr != NULL)
-            *addr = iphdr->src;
-        if (port != NULL)
-            *port = ntohs (udphdr->src);
-    }
-    int recv_len = MIN(p->len, len);
-    memcpy (buf, p->index, recv_len);
-    NET_netbuf_free (p); //????
+	NET_netbuf_t *p;
+	int recv_len = 0;
+
+	p = NET_udp_recv_netbuf (sock, addr, port);
+	if (p != NULL){
+    	recv_len = MIN(NET_netbuf_len(p), len);
+    	memcpy (buf, NET_netbuf_index(p), recv_len);
+   	 	NET_netbuf_free (p);
+	}
     return recv_len; 
+}
+
+NET_err_t
+NET_udp_send_netbuf (NET_udp_socket_t * sock, NET_netbuf_t *p)
+{
+    NET_netbuf_t *q;
+
+    q = NET_netbuf_alloc_trans ();
+    p = NET_netbuf_chain (q, p);
+
+	return NET_udp_output(sock, p);
 }
 
 NET_err_t
 NET_udp_send (NET_udp_socket_t * sock, char * data, unsigned int len)
 {
-    NET_err_t err;
-    NET_netbuf_t *p, *q;
+    NET_netbuf_t *p;
 
-	p = NET_netbuf_alloc_rom(data, len);
-    q = NET_netbuf_alloc_trans ();
-    p = NET_netbuf_chain (q, p);
-
-	err = NET_udp_output(sock, p);
+	p = NET_netbuf_alloc_ram(len);
+	memcpy (NET_netbuf_index(p), data, len);
 	
-	NET_netbuf_free (p);
-    return err;
+    return NET_udp_send_netbuf (sock, p);
 }

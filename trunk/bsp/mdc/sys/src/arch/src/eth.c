@@ -24,8 +24,12 @@
 NET_netif_t MDC_lo;
 NET_netif_t MDC_eth0;
 
-static NET_ip_addr_t local;
+static NET_ip_addr_t ip_lo;
 static NET_ip_addr_t netmask_lo;
+
+static NET_ip_addr_t ip_eth0;
+static NET_ip_addr_t netmask_eth0;
+static NET_ip_addr_t gateway_eth0;
 
 static NET_ethif_t ethif0;
 static NET_smc91c94_t smc;
@@ -49,13 +53,19 @@ MDC_eth_init (void)
     NET_udp_init ();
 
     NET_netif_init (&MDC_lo, "lo");
-    NET_ip4_addr (&local, 127, 0, 0, 1);
+    NET_ip4_addr (&ip_lo, 127, 0, 0, 1);
     NET_ip4_addr (&netmask_lo, 255, 0, 0, 0);
-	NET_netif_set_ipaddr (&MDC_lo, &local);
+	NET_netif_set_ipaddr (&MDC_lo, &ip_lo);
 	NET_netif_set_netmask (&MDC_lo, &netmask_lo);
     NET_loopif_init (&MDC_lo);
 
     NET_netif_init (&MDC_eth0, "eth0");
+    NET_ip4_addr (&ip_eth0, 192, 168, 2, 100);
+    NET_ip4_addr (&netmask_eth0, 255, 255, 255, 0);
+    NET_ip4_addr (&gateway_eth0, 192, 168, 2, 1);
+	NET_netif_set_ipaddr (&MDC_eth0, &ip_eth0);
+	NET_netif_set_netmask (&MDC_eth0, &netmask_eth0);
+	NET_netif_set_gateway (&MDC_eth0, &gateway_eth0);
     NET_ethif_init (&MDC_eth0, &ethif0,
     				MDC_get_eth0_mac_addr ());
     eth_reset ();

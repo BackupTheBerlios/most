@@ -32,11 +32,10 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
     ++NET_stats.icmp.rx;
     DEBUGF (NET_ICMP_DEBUG, ("Icmp: rx.\n"));
 
-
-    iphdr = (struct NET_ip_hdr *)p->index;
+    iphdr = (struct NET_ip_hdr *)NET_netbuf_index(p);
     hlen = NET_IPH_HL (iphdr) * 4 / sizeof (u8_t);
     NET_netbuf_index_inc (p, hlen);
-    type = *((unsigned char *)p->index);
+    type = *((unsigned char *)NET_netbuf_index(p));
 
     switch (type)
     {
@@ -58,7 +57,7 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
             NET_netbuf_free (p);
             return NET_ERR_BAD;
         }
-        iecho = (struct NET_icmp_echo_hdr *)p->index;
+        iecho = (struct NET_icmp_echo_hdr *)NET_netbuf_index(p);
         if (NET_inet_chksum_buf (p) != 0)
         {
             DEBUGF (NET_ICMP_DEBUG,
@@ -107,16 +106,21 @@ NET_icmp_dest_unreach (NET_netbuf_t * p, enum NET_icmp_dur_type t)
     DEBUGF (NET_ICMP_DEBUG, ("Icmp: dest_unreach.\n"));
 
     q = NET_netbuf_alloc_trans ();
-    NET_netbuf_index_inc (q, -sizeof(struct NET_icmp_dur_hdr));
-    iphdr = (struct NET_ip_hdr *)p->index;
-    idur = (struct NET_icmp_dur_hdr *)q->index;
-    NET_ICMPH_TYPE_SET (idur, NET_ICMP_DUR);
-    NET_ICMPH_CODE_SET (idur, t);
-    bcopy (p->index, (char*)q->index + 8, sizeof (struct NET_ip_hdr) + 8);
-    idur->chksum = 0;
-    idur->chksum = NET_inet_chksum (idur, q->len);
-    ++NET_stats.icmp.tx;
-    NET_ip_output (q, NULL, &(iphdr->src), NET_ICMP_TTL, NET_IP_PROTO_ICMP);
+    if (NET_netbuf_index_inc (q, -(sizeof(struct NET_ip_hdr))+8+8) == FALSE){
+	    DEBUGF (NET_ICMP_DEBUG, ("Icmp: trans buf size to small.\n"));
+        NET_netbuf_free (q);
+    } else {
+    	iphdr = (struct NET_ip_hdr *)NET_netbuf_index(p);
+    	idur = (struct NET_icmp_dur_hdr *)NET_netbuf_index(q);
+    	NET_ICMPH_TYPE_SET (idur, NET_ICMP_DUR);
+    	NET_ICMPH_CODE_SET (idur, t);
+    	bcopy (iphdr, (char*)idur + 8, sizeof (struct NET_ip_hdr) + 8);
+    	idur->chksum = 0;
+    	idur->chksum = NET_inet_chksum (idur, NET_netbuf_len(q));
+    	++NET_stats.icmp.tx;
+		NET_ip_output (q, NULL, &(iphdr->src), NET_ICMP_TTL, NET_IP_PROTO_ICMP);
+    }
+    NET_netbuf_free (p);
 }
 
 #if 0

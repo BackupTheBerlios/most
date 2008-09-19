@@ -420,7 +420,7 @@ smc_rx_read_data (NET_smc91c94_t * smc)
                 ++plen;
             if ((packet = NET_netbuf_alloc_ram (plen)) != NULL)
             {
-                data = (unsigned char *)packet->data;
+                data = (unsigned char *)NET_netbuf_index (packet);
                 DEV_in_nw (smc->io_addr + SMC_DATA1,
                            (unsigned long)data, ((plen + 1) >> 1));
                 if (plen & 1)
@@ -565,10 +565,11 @@ smc_tx_write_data (NET_smc91c94_t * smc, NET_netbuf_t * packet, bool_t wirq)
      * good idea to check which is optimal? But that could take . almost
      * as much time as is saved? 
      */
-    for (; packet != NULL; packet = packet->next)
+    for (; packet != NULL; packet = NET_netbuf_next(packet))
     {
-        DEV_out_nw (smc->io_addr + SMC_DATA1, (unsigned long)packet->index,
-                    packet->len >> 1);
+        DEV_out_nw (smc->io_addr + SMC_DATA1,
+        			(unsigned long)NET_netbuf_index (packet),
+                    NET_netbuf_len(packet) >> 1);
 
         /*
          * Send the last BYTE, if there is one.  
@@ -578,15 +579,15 @@ smc_tx_write_data (NET_smc91c94_t * smc, NET_netbuf_t * packet, bool_t wirq)
          * !!! think about the odd byte, work not finished !!!
          */
 
-        if ((packet->len & 1) == 0)
+        if ((NET_netbuf_len(packet) & 1) == 0)
         {
             // SMC_out_w(0, smc->io_addr + SMC_DATA1);
         }
         else
         {
             DEV_OUT_B (*
-                       ((unsigned char *)packet->index + packet->len -
-                        1), smc->io_addr + SMC_DATA1);
+                       ((unsigned char *)NET_netbuf_index(packet) + NET_netbuf_len(packet) -1),
+                       smc->io_addr + SMC_DATA1);
             DEV_OUT_B (0x00, smc->io_addr + SMC_DATA1);
         }
     }
@@ -627,6 +628,7 @@ smc_transmit_packet (NET_smc91c94_t *smc, NET_netbuf_t *packet)
         }
         smc_tx_write_data (smc, packet, FALSE);
     }
+    NET_netbuf_free (packet);
 }
 
 static void

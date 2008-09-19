@@ -49,11 +49,6 @@ struct NET_udp_socket
 /**
  * ?
  */
-extern void NET_udp_sock_init (void);
-
-/**
- * ?
- */
 extern void NET_udp_socket_init (NET_udp_socket_t *);
 
 /**
@@ -61,23 +56,6 @@ extern void NET_udp_socket_init (NET_udp_socket_t *);
  */
 extern NET_udp_socket_t *NET_udp_socket_new (void);
 
-/**
- * ?
- */
-extern NET_udp_socket_t *
-NET_find_exact_sock (NET_netif_t * inp,
-					 struct NET_ip_hdr *iphdr,
-		             u16_t src,
-				     u16_t dest);
-
-/**
- * ?
- */
-extern NET_udp_socket_t *
-NET_find_sock (struct NET_ip_hdr *iphdr,
-			   u16_t src,
-			   u16_t dest);
-					 
 /**
  * ?
  */
@@ -106,6 +84,13 @@ extern void NET_udp_recv_timeout (NET_udp_socket_t *, unsigned long);
 /**
  * ?
  */
+extern NET_netbuf_t *
+NET_udp_recv_netbuf (NET_udp_socket_t * sock,
+              		 NET_ip_addr_t * addr, u16_t * port);
+
+/**
+ * ?
+ */
 extern long NET_udp_recv (NET_udp_socket_t *,
                           NET_ip_addr_t *, u16_t *,
                           char * buf, unsigned int len);
@@ -113,7 +98,15 @@ extern long NET_udp_recv (NET_udp_socket_t *,
 /**
  * ?
  */
-extern NET_err_t NET_udp_send (NET_udp_socket_t * sock, char * data, unsigned int len);
+NET_err_t
+NET_udp_send_netbuf (NET_udp_socket_t * sock, NET_netbuf_t *p);
+
+/**
+ * ?
+ */
+extern NET_err_t NET_udp_send (NET_udp_socket_t * sock,
+							   char * data,
+							   unsigned int len);
 
 /** @}
  */

@@ -25,12 +25,8 @@
 #define NET_INET_DEBUG        1 /**< NET_DEBUGGING on */
 #define NET_IP_DEBUG          1 /**< NET_DEBUGGING on */
 #define NET_IP_HEAD_DEBUG     0 /**< NET_DEBUGGING on */
-#define NET_IP_HEAD_DEBUG_RX  0 /**< NET_DEBUGGING on */
-#define NET_IP_HEAD_DEBUG_TX  0 /**< NET_DEBUGGING on */
 #define NET_UDP_DEBUG         1 /**< NET_DEBUGGING on */
 #define NET_UDP_HEAD_DEBUG    0 /**< NET_DEBUGGING on */
-#define NET_UDP_HEAD_DEBUG_RX 0 /**< NET_DEBUGGING on */
-#define NET_UDP_HEAD_DEBUG_TX 0 /**< NET_DEBUGGING on */
 #define NET_TCP_DEBUG         0 /**< NET_DEBUGGING on */
 
 #else
@@ -43,12 +39,8 @@
 #define NET_INET_DEBUG        0 /**< NET_DEBUGGING off */
 #define NET_IP_DEBUG          0 /**< NET_DEBUGGING off */
 #define NET_IP_HEAD_DEBUG     0 /**< NET_DEBUGGING off */
-#define NET_IP_HEAD_DEBUG_RX  0 /**< NET_DEBUGGING off */
-#define NET_IP_HEAD_DEBUG_TX  0 /**< NET_DEBUGGING off */
 #define NET_UDP_DEBUG         0 /**< NET_DEBUGGING off */
 #define NET_UDP_HEAD_DEBUG    0 /**< NET_DEBUGGING off */
-#define NET_UDP_HEAD_DEBUG_RX 0 /**< NET_DEBUGGING off */
-#define NET_UDP_HEAD_DEBUG_TX 0 /**< NET_DEBUGGING off */
 #define NET_TCP_DEBUG         0 /**< NET_DEBUGGING off */
 
 #endif
