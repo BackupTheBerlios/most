@@ -46,10 +46,11 @@ eth_download_app_exec (char *file)
 	if (file){
 		prog_size = 0;
 		addr = (unsigned char*)(sector_size * APP_SECTOR_START);
-		NAP_tftp_open(NAP_bootp_ip_address(), NAP_bootp_server_address());
-		NAP_tftp_get(file, prog_data);
-		//NAP_tftp_close();
-		printf("Download done %ld\n", prog_size);
+		if (NAP_tftp_open(NAP_bootp_ip_address(), NAP_bootp_server()) >= 0){
+			NAP_tftp_get(file, prog_data);
+			NAP_tftp_close();
+			printf("Download done %ld\n", prog_size);
+		}
 	} else {
 		puts("Give file name as param\n");
 	}

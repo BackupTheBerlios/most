@@ -34,12 +34,12 @@ extern NET_ip_addr_t * NAP_bootp_ip_address (void);
 /**
  * @return Server IP address.
  */
-extern NET_ip_addr_t * NAP_bootp_server_address (void);
+extern NET_ip_addr_t * NAP_bootp_server (void);
 
 /**
- * @return Name of the server.
+ * @return Server IP address.
  */
-extern char const *NAP_bootp_servername (void);
+extern NET_ip_addr_t * NAP_bootp_gateway (void);
 
 /**
  * @return name of the bootfile.

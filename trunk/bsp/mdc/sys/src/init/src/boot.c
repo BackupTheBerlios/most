@@ -23,10 +23,9 @@ static CLI_exec_t bootp;
 static void
 bootp_exec (char *nix)
 {
-    NAP_bootp (MDC_get_eth0_mac_addr ());
+    NAP_bootp (&MDC_ee_config.mac);
     NET_netif_set_ipaddr (&MDC_eth0, NAP_bootp_ip_address ());
-    NET_netif_set_gateway (&MDC_eth0, NAP_bootp_server_address ());
-    //NET_netif_set_netmask (&MDC_eth0, NAP_bootp_subnetmask ());
+    NET_netif_set_gateway (&MDC_eth0, NAP_bootp_gateway ());
     USO_kputs (USO_LL_INFO, "NET initialized.\n");
 }
 

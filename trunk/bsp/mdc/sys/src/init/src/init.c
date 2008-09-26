@@ -70,7 +70,7 @@ init (void)
     USO_kputs (USO_LL_INFO, "Debug on ser0.\n");
 
     EE_93C46_init ();
-    MDC_config_read ();
+    MDC_ee_config_read ();
 
     MDC_eth_init ();
 

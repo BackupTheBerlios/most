@@ -41,12 +41,12 @@ ethif_info (NET_ethif_t *ethif)
 extern void
 NET_ethif_init (NET_netif_t *netif,
 				NET_ethif_t *ethif,
-                struct NET_eth_addr *eth_addr)
+                struct NET_eth_addr *addr)
 {
     netif->device = ethif;
     netif->output = NET_eth_output;
     netif->info = (void (*) (void*))ethif_info;
-    ethif->eth_addr = eth_addr;
+    ethif->eth_addr = addr;
     ethif->mac = NULL;
     ethif->start = NULL;
     ethif->receive = NULL;

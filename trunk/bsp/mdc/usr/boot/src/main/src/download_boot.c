@@ -51,10 +51,11 @@ eth_download_boot_exec (char *file)
 		boot_size = 0;
 		boot_base = addr;
 		if (addr){
-			NAP_tftp_open(NAP_bootp_ip_address(), NAP_bootp_server_address());
-			NAP_tftp_get(file, recv_data);
-			//NAP_tftp_close();
-			printf("Download done %lu\n", boot_size);
+			if (NAP_tftp_open(NAP_bootp_ip_address(), NAP_bootp_server()) >= 0){
+				NAP_tftp_get(file, recv_data);
+				NAP_tftp_close();
+				printf("Download done %lu\n", boot_size);
+			}
 		} else {
 			puts("Ram not available\n");
 		}

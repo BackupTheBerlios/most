@@ -10,7 +10,7 @@
 #include <uso/buf_pool.h>
 #include <uso/log.h>
 #include <uso/heap.h>
-#include <net/udp.h>
+#include <net/udp_sock.h>
 #include <net/ethif.h>
 #include <net/ethaddr.h>
 
@@ -34,13 +34,13 @@
 #define BOOTP_CLIENT_PORT 68
 #define BOOTP_SERVER_PORT 67
 
-#define TRANSACTION_ID 0x1cafe /* an arbitrary number */
+#define TRANSACTION_ID 0xaffe /* an arbitrary number */
 
 #define REPLY_TIMEOUT ACE_MSEC_2_TICKS(3000)     /* 3 sec */
 #define RETRY_TIME    ACE_MSEC_2_TICKS(2000)     /* 2 sec */
 #define RETRIES   5 
 
-struct bootp_packet_data
+struct bootp_packet
 {
     unsigned char op;         /* request or reply */
     unsigned char htype;      /* hardware type */
@@ -67,24 +67,48 @@ static struct
 {
     unsigned long ip_address;
     unsigned long server_address;
-    char servername[SERVER_NAME_SIZE];
+    unsigned long gateway_address;
     char filename[FILE_NAME_SIZE];
- } bootp_data;
+} bootp_data;
 
-static struct bootp_packet_data *request_data;
-static struct bootp_packet_data *reply_data;
-static unsigned char hw_address[NET_ETH_ADDR_SIZE];
+extern NET_ip_addr_t *
+NAP_bootp_ip_address (void)
+{
+    return (NET_ip_addr_t *) & bootp_data.ip_address;
+}
+
+extern NET_ip_addr_t *
+NAP_bootp_server (void)
+{
+    return (NET_ip_addr_t *) & bootp_data.server_address;
+}
+
+extern NET_ip_addr_t *
+NAP_bootp_gateway (void)
+{
+    return (NET_ip_addr_t *) & bootp_data.gateway_address;
+}
+
+extern char const *
+NAP_bootp_filename (void)
+{
+    return bootp_data.filename;
+}
+
+
+static struct bootp_packet *request_data;
+static struct bootp_packet *reply_data;
+static struct NET_eth_addr *hw_address;
 
 static void
 bootp_init_request (void)
 {
-    memset (request_data, 0, (sizeof(struct bootp_packet_data)));
+    memset (request_data, 0, sizeof(struct bootp_packet));
     request_data->op = REQUEST;
     request_data->htype = ETHHWTYPE;
     request_data->hlen = NET_ETH_ADDR_SIZE;
     request_data->xid = htonl (TRANSACTION_ID);
-    request_data->ciaddr = 0;
-    memcpy (request_data->chaddr, hw_address, NET_ETH_ADDR_SIZE);
+    memcpy (request_data->chaddr, hw_address->addr, NET_ETH_ADDR_SIZE);
 }
 
 static int
@@ -106,43 +130,17 @@ bootp_check_reply (void)
     {
         return -4;
     }
-    if (memcmp (reply_data->chaddr, hw_address, NET_ETH_ADDR_SIZE))
+    if (memcmp (reply_data->chaddr, hw_address->addr, NET_ETH_ADDR_SIZE))
     {
         return -6;
     }
     return 0;
 }
 
-extern NET_ip_addr_t *
-NAP_bootp_ip_address (void)
-{
-    return (NET_ip_addr_t *) & bootp_data.ip_address;
-}
-
-extern NET_ip_addr_t *
-NAP_bootp_server_address (void)
-{
-    return (NET_ip_addr_t *) & bootp_data.server_address;
-}
-
-extern char const *
-NAP_bootp_servername (void)
-{
-    return bootp_data.servername;
-}
-
-extern char const *
-NAP_bootp_filename (void)
-{
-    return bootp_data.filename;
-}
-
 /******************************************************************************** 
  * BOOTP
  ********************************************************************************/ 
-// static struct bootp_packet_data bootp_packets[1];  /* sollte allociert
-//                                                 * werden, mu noch prfen 
-//                                                 * ? */
+static struct bootp_packet* bootp_packets = NULL;
 
 extern void
 NAP_bootp (struct NET_eth_addr *hwaddr) 
@@ -152,7 +150,12 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
     static NET_ip_addr_t client_addr;
 	int i;
 	
-    memcpy (hw_address, hwaddr->addr, NET_ETH_ADDR_SIZE);
+	bootp_packets = malloc(sizeof(struct bootp_packet));
+	if (bootp_packets == NULL){
+    	USO_kputs (USO_LL_ERROR, "BOOTP mem error\n");
+    	return;
+	}
+    hw_address = hwaddr;
     NET_udp_socket_init (&sock);
     NET_ip4_addr (&server_addr, 255, 255, 255, 255);
     NET_ip4_addr (&client_addr, 0, 0, 0, 0);
@@ -162,40 +165,40 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
     NET_udp_recv_timeout (&sock, REPLY_TIMEOUT);
     for (i = 0; i < RETRIES; ++i)
     {
-        u16_t server_port;
         request_data = bootp_packets;
         bootp_init_request ();
-        if ((NET_udp_send (&sock, request_data, ) < 0) {
+        if ( NET_udp_send (&sock, (char*)request_data, sizeof(struct bootp_packet)) < 0) {
             USO_kputs (USO_LL_ERROR, "BOOTP send error\n");
-            NET_netbuf_free (request_packet);
             USO_sleep (RETRY_TIME);
         } else {
+        	long len; 
+        	u16_t server_port;
             DEBUGF(NAP_BOOTP_DEBUG, ("BOOTP request\n") );
-            reply_packet = NET_udp_recv (&sock, NULL, &server_port);
-            if (reply_packet != NULL)
-            {
-                if (server_port == BOOTP_SERVER_PORT)
-                {
-                    int check_reply_err;
-                    reply_data = (struct bootp_packet_data *)(reply_packet->index);
-                    check_reply_err = bootp_check_reply ();
-                    if (check_reply_err >= 0) {
-                        bootp_data.ip_address = reply_data->yiaddr;
-                        bootp_data.server_address = reply_data->siaddr;
-                        memcpy (bootp_data.filename, reply_data->file, FILE_NAME_SIZE);
-                        memcpy (bootp_data.servername, reply_data->sname, SERVER_NAME_SIZE);
-                        NET_netbuf_free (reply_packet);
-						USO_kputs (USO_LL_INFO, "BOOTP done\n");
-                        break;
-                    } else {
-                        USO_kprintf (USO_LL_ERROR, "BOOTP wrong data: %d\n", check_reply_err);
-                    }
-                } else {
-                    USO_kputs (USO_LL_ERROR, "BOOTP wrong server port\n");
-                }
-                NET_netbuf_free (reply_packet);
+        	reply_data = bootp_packets;
+            len = NET_udp_recv (&sock, NULL, &server_port, (char*)reply_data, sizeof(struct bootp_packet));
+			if (len >= sizeof(struct bootp_packet)){
+		        if (server_port == BOOTP_SERVER_PORT)
+		        {
+		            int check_reply_err;
+		            check_reply_err = bootp_check_reply ();
+		            if (check_reply_err >= 0) {
+		                bootp_data.ip_address = reply_data->yiaddr;
+		                bootp_data.server_address = reply_data->siaddr;
+		                bootp_data.gateway_address = reply_data->giaddr;
+		                memcpy (bootp_data.filename, reply_data->file, FILE_NAME_SIZE);
+		                USO_kputs (USO_LL_INFO, "BOOTP done\n");
+		                break;
+		            } else {
+		                USO_kprintf (USO_LL_WARNING, "BOOTP wrong data: %d\n", check_reply_err);
+		            }
+		        } else {
+		            USO_kputs (USO_LL_WARNING, "BOOTP wrong server port\n");
+		        }
             } else {
-                USO_kputs (USO_LL_ERROR, "BOOTP timeout\n");
+            	if (len == 0)
+                	USO_kputs (USO_LL_WARNING, "BOOTP timeout\n");
+                else
+                	USO_kputs (USO_LL_WARNING, "BOOTP invalid len\n");
             }
         }
     }
@@ -207,5 +210,5 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
          */ 
     NET_udp_socket_close (&sock);
 	DEBUGF(NAP_BOOTP_DEBUG, ("BOOTP sock closed\n") );
-
+	free (bootp_packets);
 }

@@ -39,7 +39,7 @@ typedef struct NET_ethif NET_ethif_t;
  */
 extern void NET_ethif_init (NET_netif_t *netif,
 							NET_ethif_t *ethif,
-                            struct NET_eth_addr *hwaddr);
+                            struct NET_eth_addr *addr);
 
 
 /**

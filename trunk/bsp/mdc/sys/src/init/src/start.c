@@ -56,7 +56,7 @@ MDC_start_run (void *nix)
 
 	MDC_eth_start();
 
-    CLI_setup (MDC_get_hostname ());
+    CLI_setup (MDC_ee_config.hostname);
     CLI_interpreter_init (&cli0);
     USO_thread_init (&cli0_thread,
                      CLI_interpreter_run,

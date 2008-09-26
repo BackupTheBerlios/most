@@ -27,10 +27,6 @@ NET_netif_t MDC_eth0;
 static NET_ip_addr_t ip_lo;
 static NET_ip_addr_t netmask_lo;
 
-static NET_ip_addr_t ip_eth0;
-static NET_ip_addr_t netmask_eth0;
-static NET_ip_addr_t gateway_eth0;
-
 static NET_ethif_t ethif0;
 static NET_smc91c94_t smc;
 
@@ -60,14 +56,10 @@ MDC_eth_init (void)
     NET_loopif_init (&MDC_lo);
 
     NET_netif_init (&MDC_eth0, "eth0");
-    NET_ip4_addr (&ip_eth0, 192, 168, 2, 100);
-    NET_ip4_addr (&netmask_eth0, 255, 255, 255, 0);
-    NET_ip4_addr (&gateway_eth0, 192, 168, 2, 1);
-	NET_netif_set_ipaddr (&MDC_eth0, &ip_eth0);
-	NET_netif_set_netmask (&MDC_eth0, &netmask_eth0);
-	NET_netif_set_gateway (&MDC_eth0, &gateway_eth0);
-    NET_ethif_init (&MDC_eth0, &ethif0,
-    				MDC_get_eth0_mac_addr ());
+	NET_netif_set_ipaddr (&MDC_eth0, &MDC_ee_config.ip_address);
+	NET_netif_set_netmask (&MDC_eth0, &MDC_ee_config.netmask);
+	NET_netif_set_gateway (&MDC_eth0, &MDC_ee_config.gateway);
+    NET_ethif_init (&MDC_eth0, &ethif0, &MDC_ee_config.mac);
     eth_reset ();
     NET_smc_init (&ethif0, &smc, SMC_IOADDR);
 }

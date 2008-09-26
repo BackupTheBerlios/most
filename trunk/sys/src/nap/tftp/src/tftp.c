@@ -1,7 +1,7 @@
 #include <ace/stddef.h>
 #include <ace/stdlib.h>
 #include <ace/string.h>
-#include <net/udp.h>
+#include <net/udp_sock.h>
 
 #include "nap/tftp.h"
 #include "nap/debug.h"
@@ -19,10 +19,10 @@
 #define ERROR 5
 
 static void init_read_request(void);
-//static void init_ack(void);
+static void init_ack(void);
 static void send(void);
-//static void wait_reply(void);
-//static void check_reply(void);
+static void wait_reply(void);
+static void check_reply(void);
 
 /********************************************************************************/
 /* Definitions ******************************************************************/
@@ -64,26 +64,35 @@ struct tftp_packet
 /* TFTP *************************************************************************/
 /********************************************************************************/
 static USO_buf_pool_t pool;
-static struct tftp_packet packets[3]; // sollte alloziert werden
-static NET_netbuf_t *send_packet; // *receive_packet;
+static struct tftp_packet *packets = NULL;
+static NET_netbuf_t *send_packet = NULL;
+static NET_netbuf_t *receive_packet = NULL;
 static NET_ip_addr_t *server_addr;
+static u16_t server_port;
 
 static const char *file_name;
 static bool_t (*callback)(char *data, size_t length);
 
 static NET_udp_socket_t sock;
 
-extern void
+extern int
 NAP_tftp_open(NET_ip_addr_t *client_addr, NET_ip_addr_t *_server_addr)
 {
-	server_addr = _server_addr;
-    USO_buf_pool_init (&pool, packets, 3,
-                         sizeof (struct tftp_packet));
-    NET_udp_socket_init (&sock);
-    NET_udp_bind (&sock, client_addr, 32798);
-	NET_udp_connect (&sock, server_addr, htons(NAP_TFTP_SERVER_PORT));
-    NET_udp_socket_open (&sock);
-    NET_udp_recv_timeout (&sock, ACE_MSEC_2_TICKS(4000));
+	packets = malloc(sizeof (struct tftp_packet));
+	if (packets != NULL){
+		server_addr = _server_addr;
+		USO_buf_pool_init (&pool, packets, 1,
+                         	sizeof (struct tftp_packet));
+    	NET_udp_socket_init (&sock);
+    	NET_udp_bind (&sock, client_addr, 32798);
+		NET_udp_connect (&sock, server_addr, htons(NAP_TFTP_SERVER_PORT));
+    	NET_udp_socket_open (&sock);
+    	NET_udp_recv_timeout (&sock, ACE_MSEC_2_TICKS(4000));
+	} else {
+		USO_kputs (USO_LL_ERROR, "TFTP mem error.\n");
+		return -1;
+	}
+	return 0;
 }
 
 extern void
@@ -105,6 +114,10 @@ void NAP_tftp_close(void)
 {
     NET_udp_socket_close (&sock);
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP sock closed\n") );
+   	if (packets != NULL){
+    	free (packets);
+    	packets = NULL;
+   	}
 }
 
 static void init_read_request(void)
@@ -113,7 +126,7 @@ static void init_read_request(void)
 	unsigned short temp;
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP init read request\n") );
 	send_packet = NET_netbuf_alloc_pool (&pool);
-	data = send_packet->index;
+	data = NET_netbuf_index(send_packet);
 	temp = htons(READ_REQUEST);
 	memcpy(data, &temp, sizeof(temp));
 	data += sizeof(temp);
@@ -121,36 +134,31 @@ static void init_read_request(void)
 	data += strlen(file_name) + 1;
 	strcpy(data, mode[1]); 
 	data += strlen(mode[1]) + 1;
-	NET_netbuf_len_adjust (send_packet, data - send_packet->index);
+	NET_netbuf_trim_len (send_packet, data - NET_netbuf_index(send_packet));
 	state.action = send;
 }  
 
-#if 0
 static void init_ack(void){
 	char* data;
 	unsigned short temp;
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP init ack\n") );
 	send_packet = NET_netbuf_alloc_pool (&pool);
-	data = send_packet->index;
+	data = NET_netbuf_index(send_packet);
 	temp = htons(ACK);
 	memcpy(data, &temp, sizeof(temp));
 	data += sizeof(temp);
 	temp = htons(state.block_nr);
 	memcpy(data, &temp, sizeof(temp));
 	data += sizeof(temp);
-	NET_netbuf_len_adjust (send_packet, data - send_packet->index);
+	NET_netbuf_trim_len (send_packet, data - NET_netbuf_index(send_packet));
 	state.action = send;
 }
-#endif
 
 static void send(void)
 {
-	return;
-
-#if 0
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP send\n") );
 	NET_err_t err;
-	err = NET_udp_send (&sock, send_packet);
+	err = NET_udp_send_netbuf (&sock, send_packet);
 	if (err == NET_ERR_OK){	
 		if (state.eof == 0){
 			state.action = wait_reply;
@@ -162,23 +170,22 @@ static void send(void)
 	    USO_kprintf (USO_LL_ERROR, "TFTP send error %d\n", err);
 		state.action = NULL;
 	}
-#endif
 }
 
-#if 0
 static void wait_reply(void)
 {
-    //u16_t server_port;
+    u16_t port;
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP wait reply\n") );
-	receive_packet = NET_udp_recv (&sock, NULL, &server_port);
+	receive_packet = NET_udp_recv_netbuf (&sock, NULL, &port);
 	if (receive_packet != NULL)	{
 		if (state.block_nr == 0){
+			server_port = port;
 			NET_udp_connect (&sock, server_addr, htons(server_port));
 			state.action = check_reply;
-		} else if ( TRUE /*server_port == servaddr.sin_port*/){
+		} else if ( server_port == port){
 			state.action = check_reply;
 		} else {
-			USO_kputs (USO_LL_INFO, "TFTP wrong port nr\n");
+			USO_kputs (USO_LL_WARNING, "TFTP wrong port nr\n");
 			NET_netbuf_free (receive_packet);
 		}
 	} else {
@@ -190,17 +197,15 @@ static void wait_reply(void)
 			}
 		}else {
 			state.action = NULL;
-			USO_kputs (USO_LL_ERROR, "TFTP recfrom failed \n");
+			USO_kputs (USO_LL_ERROR, "TFTP recf failed \n");
 		}
 	}
 } 
-#endif
 
-#if 0
 static void check_reply(void)
 {
-	char *data = receive_packet->index;
-	long length = receive_packet->len;
+	char *data = NET_netbuf_index(receive_packet);
+	long length = NET_netbuf_tot_len(receive_packet);
 	long header = sizeof(state.opcode) + sizeof(unsigned short);
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP check reply\n") );
 	if (length >= header) {
@@ -225,7 +230,7 @@ static void check_reply(void)
 				}
 			} else {
 				state.action = wait_reply;
-				USO_kprintf (USO_LL_ERROR, "TFTP inval block nr: %d\n", blocknr);
+				USO_kprintf (USO_LL_WARNING, "TFTP inval block nr: %d\n", blocknr);
 			}
 			break;
 		}
@@ -234,17 +239,14 @@ static void check_reply(void)
 		case ACK:
 		case ERROR:
 		default:
-			USO_kputs (USO_LL_ERROR, "TFTP inval op code\n");
+			USO_kputs (USO_LL_WARNING, "TFTP inval op code\n");
 			state.action = NULL;
 			break;
 			
 		} /* end switch opcode*/
 	} else {
-		USO_kputs (USO_LL_ERROR, "TFTP len < header\n");
+		USO_kputs (USO_LL_WARNING, "TFTP len < header\n");
 		state.action = init_read_request;
 	}
     NET_netbuf_free (receive_packet);
 }
-#endif
-
-/* eof */
