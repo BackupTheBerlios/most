@@ -28,19 +28,10 @@ extern DEV_digout_t MDC_run_led;
 extern DEV_digout_t MDC_eth_reset;
 
 /** Control Led 1 */
-extern DEV_digout_t MDC_ctrl_led_1;
+extern DEV_digout_t MDC_red_led;
 
 /** Control Led 2 */
-extern DEV_digout_t MDC_ctrl_led_2;
-
-/** Control Led 3 */
-extern DEV_digout_t MDC_ctrl_led_3;
-
-/** Control Led 4 */
-extern DEV_digout_t MDC_ctrl_led_4;
-
-/** Control Led 5 */
-extern DEV_digout_t MDC_ctrl_led_5;
+extern DEV_digout_t MDC_green_led;
 
 
 /** Button */
@@ -55,9 +46,8 @@ extern DEV_digin_t MDC_jumper_2;
 /** Jumper 3 */
 extern DEV_digin_t MDC_jumper_3;
 
-/** Jumper 4 */
-extern DEV_digin_t MDC_jumper_4;
-
+/** Switch */
+extern DEV_digin_t MDC_switch;
 
 /**
  * Initialize digital io.

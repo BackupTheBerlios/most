@@ -23,10 +23,10 @@ static CLI_exec_t bootp;
 static void
 bootp_exec (char *nix)
 {
-    NAP_bootp (&MDC_ee_config.mac);
-    NET_netif_set_ipaddr (&MDC_eth0, NAP_bootp_ip_address ());
-    NET_netif_set_gateway (&MDC_eth0, NAP_bootp_gateway ());
-    USO_kputs (USO_LL_INFO, "NET initialized.\n");
+    if (NAP_bootp (&MDC_ee_config.eth_addr) == 0){
+    	NET_netif_set_ipaddr (&MDC_eth0, &NAP_bootp_data.ip_addr);
+    	NET_netif_set_gateway (&MDC_eth0, &NAP_bootp_data.gateway);
+	}
 }
 
 static void
@@ -36,11 +36,17 @@ start_boot_exec (char *nix)
 	MDC_jump_boot();
 }
 
-static void
-start_app_exec (char *nix)
+void
+MDC_start_app(void)
 {
 	USO_disable();
 	MDC_jump_app();
+}
+
+static void
+start_app_exec (char *nix)
+{
+	MDC_start_app();
 }
 
 extern void

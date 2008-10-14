@@ -16,12 +16,8 @@
 
 static CLI_exec_t digio_test;
 
-static DEV_digout_t *runninglight[5] = {
-    &MDC_ctrl_led_1,
-    &MDC_ctrl_led_2,
-    &MDC_ctrl_led_3,
-    &MDC_ctrl_led_4,
-    &MDC_ctrl_led_5
+static DEV_digout_t *runninglight[1] = {
+    &MDC_red_led
 };
 
 static void

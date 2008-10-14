@@ -10,20 +10,23 @@
 #include <mfs/directory.h>
 
 #include "arch/93C46.h"
+#include "arch/eth.h"
 #include "init/config.h"
 
 struct MDC_ee_configuration MDC_ee_config;
 
-static unsigned char default_mac[NET_ETH_ADDR_SIZE] = {0xA0, 0xBA, 0xD0, 0xCA, 0xFE, 0x01};
+static unsigned char default_eth_addr[NET_ETH_ADDR_SIZE] = {0xA0, 0xBA, 0xD0, 0xCA, 0xFE, 0x00};
 
 static void ee_config_init(void)
 {
+	memset (MDC_ee_config.hostname, 0x0, sizeof(MDC_ee_config.hostname));
 	strcpy (MDC_ee_config.hostname, "nobody");
-	memcpy (MDC_ee_config.mac.addr, default_mac, sizeof(MDC_ee_config.mac.addr));
-	NET_ip4_addr (&MDC_ee_config.ip_address, 192, 168, 2, 100);
+	memcpy (MDC_ee_config.eth_addr.addr, default_eth_addr, sizeof(MDC_ee_config.eth_addr.addr));
+	NET_ip4_addr (&MDC_ee_config.ip_addr, 192, 168, 2, 100);
     NET_ip4_addr (&MDC_ee_config.netmask, 255, 255, 255, 0);
     NET_ip4_addr (&MDC_ee_config.gateway, 192, 168, 2, 1);
     NET_ip4_addr (&MDC_ee_config.server, 192, 168, 2, 1);
+	memset (MDC_ee_config.filename, 0x0, sizeof(MDC_ee_config.filename));
 	strcpy (MDC_ee_config.filename, "mdc.bin");
 	MDC_ee_config.flags = 0;
 	MDC_ee_config.state = MDC_EE_CONFIG_STATE_DEFAULT;
@@ -37,8 +40,6 @@ static void ee_config_init(void)
 extern void
 MDC_ee_config_read (void)
 {
-	if (MDC_ee_config.state == MDC_EE_CONFIG_STATE_ALTERED)
-		return;
     EE_93C46_read (0, sizeof (MDC_ee_config), &MDC_ee_config);
     if ( (NET_inet_chksum (&MDC_ee_config,
     	 (u16_t) (sizeof (MDC_ee_config))) != 0) ||
@@ -50,7 +51,7 @@ MDC_ee_config_read (void)
 static void
 ee_config_write (void)
 {
-	if (MDC_ee_config.state != MDC_EE_CONFIG_STATE_ALTERED)
+	if (MDC_ee_config.state == MDC_EE_CONFIG_STATE_SAVED)
 		return;
 	MDC_ee_config.state = MDC_EE_CONFIG_STATE_SAVED;
 	MDC_ee_config.checksum = NET_inet_chksum (&MDC_ee_config,
@@ -61,7 +62,7 @@ ee_config_write (void)
 static void
 ee_config_print_ip_addr(char * name, u32_t ip_addr)
 {
-    printf ("%s:  %3ld  |  %3ld  |  %3ld  |  %3ld\n", name,
+    printf ("%s: %3ld.%3ld.%3ld.%3ld\n", name,
              ip_addr >> 24 & 0xff,
              ip_addr >> 16 & 0xff,
              ip_addr >> 8 & 0xff,
@@ -73,16 +74,24 @@ ee_config_print (void)
 {
 	puts ("EE Config:\n");
     printf ("hostname: %s\n", MDC_ee_config.hostname);
-    printf ("mac: %02x %02x %02x %02x %02x %02x\n",
-        MDC_ee_config.mac.addr[0], MDC_ee_config.mac.addr[1], MDC_ee_config.mac.addr[2],
-		MDC_ee_config.mac.addr[3], MDC_ee_config.mac.addr[4], MDC_ee_config.mac.addr[5]);
-    ee_config_print_ip_addr("ip_addr", ntohl(MDC_ee_config.ip_address.addr));
+    printf ("eth_addr: %02x %02x %02x %02x %02x %02x\n",
+        MDC_ee_config.eth_addr.addr[0], MDC_ee_config.eth_addr.addr[1], MDC_ee_config.eth_addr.addr[2],
+		MDC_ee_config.eth_addr.addr[3], MDC_ee_config.eth_addr.addr[4], MDC_ee_config.eth_addr.addr[5]);
+    ee_config_print_ip_addr("ip_addr", ntohl(MDC_ee_config.ip_addr.addr));
     ee_config_print_ip_addr("netmask", ntohl(MDC_ee_config.netmask.addr));
     ee_config_print_ip_addr("gateway", ntohl(MDC_ee_config.gateway.addr));
-    ee_config_print_ip_addr("server", ntohl(MDC_ee_config.server.addr));
+    ee_config_print_ip_addr("server ", ntohl(MDC_ee_config.server.addr));
     printf ("filename: %s\n", MDC_ee_config.filename);
-    printf ("state: %04X\n", MDC_ee_config.flags);
-    printf ("state: %uh\n", MDC_ee_config.state);
+    printf ("flags: %04X\n", MDC_ee_config.flags);
+    printf ("state: %u\n", MDC_ee_config.state);
+}
+
+extern void
+MDC_ee_config_ip(void)
+{
+	NET_netif_set_ipaddr (&MDC_eth0, &MDC_ee_config.ip_addr);
+	NET_netif_set_netmask (&MDC_eth0, &MDC_ee_config.netmask);
+	NET_netif_set_gateway (&MDC_eth0, &MDC_ee_config.gateway);
 }
 
 static void
@@ -91,14 +100,14 @@ ee_config_set_hostname (char *name)
     if (name != NULL)
     {
         int len;
-        len = strnlen (name, MDC_HOSTNAME_SIZE - 1);
+        len = strnlen (name, MDC_CFG_HOSTNAME_SIZE - 1);
 	    memcpy (MDC_ee_config.hostname, name, len);
         MDC_ee_config.hostname[len] = '\0';
     }
 }
 
 static void
-ee_config_set_mac (char *addr)
+ee_config_set_eth_addr (char *addr)
 {
     if (addr != NULL)
     {
@@ -118,11 +127,28 @@ ee_config_set_mac (char *addr)
             }
         }
         if (err == FALSE) {
-            memcpy (MDC_ee_config.mac.addr, tmp, NET_ETH_ADDR_SIZE);
+            memcpy (MDC_ee_config.eth_addr.addr, tmp, NET_ETH_ADDR_SIZE);
         } else {
             puts ("give addr as A1A2A3A4A5A6.\n");
         }
     }
+}
+
+static void ee_config_set_ip_addr(char* param, NET_ip_addr_t* ipaddr)
+{
+	if (param != NULL)
+	{
+		int a,b,c,d;
+		param = strtok(param, ".");
+		a = atoi(param);
+		param = strtok(NULL, ".");
+		b = atoi(param);
+		param = strtok(NULL, ".");
+		c = atoi(param);
+		param = strtok(NULL, ".");
+		d = atoi(param);
+		NET_ip4_addr(ipaddr, a,b,c,d);
+	}
 }
 
 static void
@@ -131,10 +157,40 @@ ee_config_set_filename (char *name)
     if (name != NULL)
     {
         int len;
-        len = strnlen (name, MDC_FILENAME_SIZE - 1);
+        len = strnlen (name, MDC_CFG_FILENAME_SIZE - 1);
 	    memcpy (MDC_ee_config.filename, name, len);
         MDC_ee_config.filename[len] = '\0';
     }
+}
+
+static void
+ee_config_set_flags(char *param)
+{
+	if (param != NULL)
+	{
+		int hi, lo;
+		hi = atoxc(param);
+		lo = atoxc(param + 2);
+	    if (hi >= 0 && lo >= 0){
+			u16_t flags = hi << 8 || lo;
+			MDC_ee_config.flags |= flags;
+	    }
+	}
+}
+
+static void
+ee_config_clear_flags(char *param)
+{
+	if (param != NULL)
+	{
+		int hi, lo;
+		hi = atoxc(param);
+		lo = atoxc(param + 2);
+	    if (hi >= 0 && lo >= 0){
+			u16_t flags = hi << 8 || lo;
+			MDC_ee_config.flags &= ~flags;
+	    }
+	}
 }
 
 static MFS_descriptor_t *config;
@@ -158,8 +214,11 @@ conf_exec (char *param)
 			case 's':
 				ee_config_print();
 				break;
+			case 'i':
+				MDC_ee_config_ip();
+				break;
 			default:
-	            puts ("r read, w write, s show\n");
+	            puts ("r read, w write, s show, i conf ip.\n");
 				break;
 		}
 	}
@@ -169,27 +228,44 @@ static void
 set_exec (char *param)
 {
 	if (param != NULL){
+		MDC_ee_config.state = MDC_EE_CONFIG_STATE_ALTERED;
 		char a = *param;
 		param++;
 		switch (a)
 		{
+			case 'd':
+				ee_config_init();
+				break;
 			case 'h':
 				ee_config_set_hostname(param);
 				break;
-			case 'm':
-				ee_config_set_mac(param);
+			case 'e':
+				ee_config_set_eth_addr(param);
 				break;
 			case 'i':
+				ee_config_set_ip_addr(param, &MDC_ee_config.ip_addr);
 				break;
 			case 'n':
+				ee_config_set_ip_addr(param, &MDC_ee_config.netmask);
+				break;
+			case 'g':
+				ee_config_set_ip_addr(param, &MDC_ee_config.gateway);
 				break;
 			case 's':
+				ee_config_set_ip_addr(param, &MDC_ee_config.server);
 				break;
 			case 'f':
 				ee_config_set_filename(param);
 				break;
+			case 'z':
+				ee_config_set_flags(param);	
+				break;
+			case 'y':
+				ee_config_clear_flags(param);	
+				break;
 			default:
-	            puts ("h host, m mac, i ipaddr, n netmask, s server, f file\n");
+	            puts ("d default, h host, e eth_addr, i ip_addr, n netmask,\n"
+	            	  "g gateway, s server, f file z set flags y clear flags.\n");
 				break;
 		}
 	}
@@ -199,6 +275,6 @@ extern void
 MDC_config_install (void)
 {
 	config = MFS_create_dir(MFS_sysfs_root(), "config");
-    CLI_exec_init (config, &conf, "conf", "read, write conf to eeprom or show conf", conf_exec);
-    CLI_exec_init (config, &set, "set", "set config member", set_exec);
+    CLI_exec_init (config, &conf, "conf", "ee config", conf_exec);
+    CLI_exec_init (config, &set, "set", "set ee config field", set_exec);
 }

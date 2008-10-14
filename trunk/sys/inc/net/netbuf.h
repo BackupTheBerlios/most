@@ -22,7 +22,8 @@ enum NET_buf_type
     NET_BUF_ROM, /**< ROM */
     NET_BUF_RAM, /**< RAM */
     NET_BUF_POOL, /**< POOL */
-    NET_BUF_TRANS /**< Transport */
+    NET_BUF_TRANS, /**< Transport */
+	NET_BUF_FREE /** < netbuf is already free */
 };
 
 /** Networ buffer */

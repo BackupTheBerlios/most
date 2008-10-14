@@ -28,6 +28,7 @@
 /** Set WDT and refresh controller requests to high priority */
 
 #define MDC_SET_PRIORITY_WDT_RFSH() { h8_IPRA |=  H8_IPRA_IPRA3; }
+
 /**
  * Initializes the hardware and is called once in the startup.
  */
@@ -41,19 +42,6 @@ MDC_watchdog_trigger (void)
 {
     H8_BITNOT (H8_P45_WDI, h8_P4DR);
 }
-
-
-/**
- * Switch the SCI1 Rx and Tx lines of the CPU to the standard SS1 connection. 
- * 
- */
-_INLINE_ static void
-MDC_sci1_2_ss1 (void)
-{
-    H8_BITCLEAR (H8_P46_SEL0, h8_P4DR);
-    H8_BITCLEAR (H8_P47_SEL1, h8_P4DR);
-}
-
 
 /** @}
  */

@@ -3,11 +3,15 @@
  *
  */
 
-#include <uso/heap.h>
-
 #include "dev/digin.h"
 
 USO_list_t inputs;
+
+extern void
+DEV_digin_list_init (void)
+{
+	USO_list_init(&inputs);
+}
 
 extern void
 DEV_digin_init (DEV_digin_t * in,
@@ -16,17 +20,20 @@ DEV_digin_init (DEV_digin_t * in,
 {
     in->logig = logig;
     in->sample = sample;
-    if (debounce_time < 1)
+    if (debounce_time < 0)
         debounce_time = 1;
     in->debounce_time = debounce_time;
     in->debounce_count = 0;
     if (sample ())
         in->state = DEV_DIGIO_HIGH;
+ 	else
+        in->state = DEV_DIGIO_LOW;
     in->pos_edge_count = 0;
     in->neg_edge_count = 0;
     USO_semaphore_init (&in->pos_edge_sem, 0);
     USO_semaphore_init (&in->neg_edge_sem, 0);
-    USO_enqueue (&inputs, (USO_node_t *) in);
+    if (debounce_time > 0)
+    	USO_enqueue (&inputs, (USO_node_t *) in);
 }
 
 static void
@@ -97,6 +104,12 @@ DEV_digin_sample (void)
 extern bool_t
 DEV_digin_isset (DEV_digin_t * in)
 {
+    if (in->debounce_time == 0){
+		if(in->sample())
+			in->state = DEV_DIGIO_HIGH;
+		else	
+			in->state = DEV_DIGIO_LOW;
+    }
     if (in->logig == DEV_DIGIO_POS)
     {
         if (in->state == DEV_DIGIO_HIGH)
@@ -116,6 +129,8 @@ DEV_digin_isset (DEV_digin_t * in)
 extern void
 DEV_digin_wait (DEV_digin_t * in, enum DEV_digio_state state, bool_t level)
 {
+    if (in->debounce_time == 0)
+		return;
     if (level == TRUE)
     {
         if (in->logig == DEV_DIGIO_POS)

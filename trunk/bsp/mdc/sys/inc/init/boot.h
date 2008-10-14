@@ -20,6 +20,8 @@
 
 extern MFS_descriptor_t *boot;
 
+extern void MDC_start_app(void);
+
 /**
  * Install jump commands.
  */

@@ -51,7 +51,7 @@ eth_download_boot_exec (char *file)
 		boot_size = 0;
 		boot_base = addr;
 		if (addr){
-			if (NAP_tftp_open(NAP_bootp_ip_address(), NAP_bootp_server()) >= 0){
+			if (NAP_tftp_open(&NAP_bootp_data.ip_addr, &NAP_bootp_data.server) >= 0){
 				NAP_tftp_get(file, recv_data);
 				NAP_tftp_close();
 				printf("Download done %lu\n", boot_size);
@@ -114,7 +114,7 @@ extern void
 MDC_download_boot_install (void)
 {
 	sector_size = FLASH_29F040_segment_size();
-    CLI_exec_init (boot, &eth_download_boot, "edldb", "Eth download boot", eth_download_boot_exec);
-    CLI_exec_init (boot, &serial_download_boot, "sdldb", "Serial download boot", serial_download_boot_exec);
+    CLI_exec_init (boot, &eth_download_boot, "edlb", "Eth download boot", eth_download_boot_exec);
+    CLI_exec_init (boot, &serial_download_boot, "sdlb", "Serial download boot", serial_download_boot_exec);
     CLI_exec_init (boot, &prog_flash_boot, "pflb", "Prog flash boot", prog_flash_boot_exec);
 }

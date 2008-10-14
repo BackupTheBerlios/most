@@ -17,7 +17,8 @@
 
 #if NET_DEBUGGING
 
-#define NET_SMC_DEBUG         0 /**< NET_DEBUGGING on */
+#define NET_NETBUF_DEBUG      1 /**< NET_DEBUGGING on */
+#define NET_SMC_DEBUG         1 /**< NET_DEBUGGING on */
 #define NET_ETH_DEBUG         1 /**< NET_DEBUGGING on */
 #define NET_ARP_DEBUG         1 /**< NET_DEBUGGING on */
 #define NET_NETIF_DEBUG       1 /**< NET_DEBUGGING on */
@@ -31,6 +32,7 @@
 
 #else
 
+#define NET_NETBUF_DEBUG      0 /**< NET_DEBUGGING on */
 #define NET_SMC_DEBUG         0 /**< NET_DEBUGGING off */
 #define NET_ETH_DEBUG         0 /**< NET_DEBUGGING off */
 #define NET_ARP_DEBUG         0 /**< NET_DEBUGGING off */

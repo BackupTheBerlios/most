@@ -56,14 +56,13 @@ init (void)
     MDC_sci_init_0 ();
     ser0 = MFS_get_stream (MFS_open(MFS_sysfs_serial(), "0"));
     if (ser0 == NULL){
-         DEV_digout_set (&MDC_ctrl_led_1);
+         DEV_digout_set (&MDC_red_led);
     }
 
-    MDC_sci1_2_ss1 ();
     MDC_sci_init_1 ();
     ser1 = MFS_get_stream (MFS_open(MFS_sysfs_serial(), "1"));
     if (ser1 == NULL){
-         DEV_digout_set (&MDC_ctrl_led_1);
+         DEV_digout_set (&MDC_red_led);
     }
 
     USO_log_init (ser0, USO_LL_INFO);
@@ -71,7 +70,6 @@ init (void)
 
     EE_93C46_init ();
     MDC_ee_config_read ();
-
     MDC_eth_init ();
 
     USO_enable ();
@@ -101,12 +99,12 @@ MDC_init (void)
     MDC_digio_init ();
     
     if (USO_heap_init (&heap, &heap_start, &heap_end) == FALSE){
-         DEV_digout_set (&MDC_ctrl_led_1);
+         DEV_digout_set (&MDC_red_led);
     }
     ACE_stdlib_init(&heap);
     
  	if (MFS_sysfs_init() == FALSE){
-         DEV_digout_set (&MDC_ctrl_led_1);
+         DEV_digout_set (&MDC_red_led);
     }
  	USO_heap_install(&heap, "0");
  		

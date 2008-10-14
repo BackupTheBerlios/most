@@ -73,7 +73,7 @@ ip_head_debug (struct NET_ip_hdr *iphdr)
 /*-----------------------------------------------------------------------------------*/
 
 static MFS_descriptor_t *net_interfaces;
-static NET_netif_t *netif_default = NULL;
+//static NET_netif_t *netif_default = NULL;
 
 extern void
 NET_ip_init (void)
@@ -93,7 +93,7 @@ find_route(NET_ip_addr_t *dest)
    			return netif;	   	
     	}
   	}    
-	return netif_default;
+	return NULL;
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -115,7 +115,7 @@ NET_ip_route (NET_ip_addr_t * dest)
     if (netif != NULL)
         return netif;
     else
-    	return netif_default;
+    	return NET_netif_default;
 }
 
 static NET_netif_t *
@@ -158,7 +158,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
 
     ++NET_stats.ip.rx;
     iphdr = (struct NET_ip_hdr *)NET_netbuf_index(p);
-    DEBUGF (NET_IP_DEBUG, ("Ip: rx p->len %d.\n", NET_netbuf_len(p)));
+    DEBUGF (NET_IP_DEBUG, ("Ip: rx len %d.\n", NET_netbuf_tot_len(p)));
     IP_HEAD_DEBUG (iphdr);
 
     /*
@@ -320,7 +320,7 @@ NET_ip_output_if (NET_netbuf_t * p,
     }
     ++NET_stats.ip.tx;
    // DEBUGF (NET_IP_DEBUG, ("Ip: output if %s.\n", netif->name));
-    DEBUGF (NET_IP_DEBUG, ("Ip: tx p->len %d.\n", NET_netbuf_len(p)));
+    DEBUGF (NET_IP_DEBUG, ("Ip: tx len %d.\n", NET_netbuf_tot_len(p)));
     IP_HEAD_DEBUG (iphdr);
     return netif->output (netif, p, dest);
 }

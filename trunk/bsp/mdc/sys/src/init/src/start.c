@@ -36,7 +36,7 @@ run_led_run (void *nix)
     {
 		MDC_watchdog_trigger ();
         DEV_digout_toggle (&MDC_run_led);
-        DEV_digout_toggle (&MDC_ctrl_led_2);
+        DEV_digout_toggle (&MDC_green_led);
         USO_sleep (ACE_MSEC_2_TICKS(200));
     }
 }

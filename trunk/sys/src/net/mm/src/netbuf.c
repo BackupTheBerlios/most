@@ -9,6 +9,7 @@
 #include "net/ethif.h"
 #include "net/ip.h"
 #include "net/udp.h"
+#include "net/debug.h"
 
 #define NET_BUF_COUNT 20
 #define NET_TRANSBUF_COUNT 10
@@ -134,9 +135,10 @@ NET_netbuf_free (NET_netbuf_t * buf)
 		        USO_buf_free (&net_pool, buf);
 		        break;
 			default:
-				// error
+			    USO_kprintf (USO_LL_WARNING, "netbuf inval\n");
 		        break;
         }
+		buf->type = NET_BUF_FREE;
         buf = next;
     }
 }
@@ -153,11 +155,10 @@ NET_netbuf_chain (NET_netbuf_t * a, NET_netbuf_t * b)
 extern NET_netbuf_t *
 NET_netbuf_next (NET_netbuf_t * buf)
 {
-    NET_netbuf_t *next = NULL;
 	if (buf != NULL){
-		next = buf->next;
+		return buf->next;
 	}
-    return buf;
+    return NULL;
 }
 
 extern char *

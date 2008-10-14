@@ -19,32 +19,25 @@
 /******************************************************************************** 
  * Interface
  ********************************************************************************/ 
+
+#define NAP_BOOTP_FILE_NAME_SIZE   32
+
+typedef struct 
+{
+    NET_ip_addr_t ip_addr;
+    NET_ip_addr_t server;
+    NET_ip_addr_t gateway;
+    char filename[NAP_BOOTP_FILE_NAME_SIZE];
+}NAP_bootp_data_t;
+
+extern NAP_bootp_data_t NAP_bootp_data;
     
 /**
  * Do a bootp request.
  * @param hwaddr eth mac address.
  */
-extern void NAP_bootp (struct NET_eth_addr *hwaddr);
+extern int NAP_bootp (struct NET_eth_addr *hwaddr);
 
-/**
- * @return IP address.
- */
-extern NET_ip_addr_t * NAP_bootp_ip_address (void);
-
-/**
- * @return Server IP address.
- */
-extern NET_ip_addr_t * NAP_bootp_server (void);
-
-/**
- * @return Server IP address.
- */
-extern NET_ip_addr_t * NAP_bootp_gateway (void);
-
-/**
- * @return name of the bootfile.
- */
-extern char const *NAP_bootp_filename (void);
 
 /** @}
  */

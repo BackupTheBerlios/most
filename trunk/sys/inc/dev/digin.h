@@ -43,6 +43,8 @@ typedef struct DEV_digin DEV_digin_t;
 
 /*-------------- Interface -----------------------------------------------*/
 
+extern void DEV_digin_list_init (void);
+
 /**
  * Initialize digital input.
  *

@@ -46,7 +46,7 @@ eth_download_app_exec (char *file)
 	if (file){
 		prog_size = 0;
 		addr = (unsigned char*)(sector_size * APP_SECTOR_START);
-		if (NAP_tftp_open(NAP_bootp_ip_address(), NAP_bootp_server()) >= 0){
+		if (NAP_tftp_open(&NAP_bootp_data.ip_addr, &NAP_bootp_data.server) >= 0){
 			NAP_tftp_get(file, prog_data);
 			NAP_tftp_close();
 			printf("Download done %ld\n", prog_size);
@@ -104,7 +104,7 @@ extern void
 MDC_download_app_install (void)
 {
 	sector_size = FLASH_29F040_segment_size();
-    CLI_exec_init (boot, &eth_download_app, "edlda", "Eth download app", eth_download_app_exec);
-    CLI_exec_init (boot, &serial_download_app, "sdlda", "Serial download app", serial_download_app_exec);
+    CLI_exec_init (boot, &eth_download_app, "edla", "Eth download app", eth_download_app_exec);
+    CLI_exec_init (boot, &serial_download_app, "sdla", "Serial download app", serial_download_app_exec);
     CLI_exec_init (boot, &erase_flash_app, "efla", "Erase flash app", erase_flash_app_exec);
 }

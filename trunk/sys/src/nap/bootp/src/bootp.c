@@ -27,8 +27,8 @@
 #define ETHHWTYPE      1
     
 #define HW_ADDRESS_SIZE  16
-#define SERVER_NAME_SIZE 64
 #define FILE_NAME_SIZE   128
+#define SERVER_NAME_SIZE 64
 #define VEND_SIZE	     64
     
 #define BOOTP_CLIENT_PORT 68
@@ -63,38 +63,7 @@ struct bootp_packet
  * Definitions
  ********************************************************************************/ 
 
-static struct
-{
-    unsigned long ip_address;
-    unsigned long server_address;
-    unsigned long gateway_address;
-    char filename[FILE_NAME_SIZE];
-} bootp_data;
-
-extern NET_ip_addr_t *
-NAP_bootp_ip_address (void)
-{
-    return (NET_ip_addr_t *) & bootp_data.ip_address;
-}
-
-extern NET_ip_addr_t *
-NAP_bootp_server (void)
-{
-    return (NET_ip_addr_t *) & bootp_data.server_address;
-}
-
-extern NET_ip_addr_t *
-NAP_bootp_gateway (void)
-{
-    return (NET_ip_addr_t *) & bootp_data.gateway_address;
-}
-
-extern char const *
-NAP_bootp_filename (void)
-{
-    return bootp_data.filename;
-}
-
+NAP_bootp_data_t NAP_bootp_data;
 
 static struct bootp_packet *request_data;
 static struct bootp_packet *reply_data;
@@ -142,9 +111,10 @@ bootp_check_reply (void)
  ********************************************************************************/ 
 static struct bootp_packet* bootp_packets = NULL;
 
-extern void
+extern int
 NAP_bootp (struct NET_eth_addr *hwaddr) 
 {
+	int err = -1;
     static NET_udp_socket_t sock;
     static NET_ip_addr_t server_addr;
     static NET_ip_addr_t client_addr;
@@ -153,7 +123,7 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
 	bootp_packets = malloc(sizeof(struct bootp_packet));
 	if (bootp_packets == NULL){
     	USO_kputs (USO_LL_ERROR, "BOOTP mem error\n");
-    	return;
+    	return err;
 	}
     hw_address = hwaddr;
     NET_udp_socket_init (&sock);
@@ -182,11 +152,13 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
 		            int check_reply_err;
 		            check_reply_err = bootp_check_reply ();
 		            if (check_reply_err >= 0) {
-		                bootp_data.ip_address = reply_data->yiaddr;
-		                bootp_data.server_address = reply_data->siaddr;
-		                bootp_data.gateway_address = reply_data->giaddr;
-		                memcpy (bootp_data.filename, reply_data->file, FILE_NAME_SIZE);
+		                NAP_bootp_data.ip_addr.addr = reply_data->yiaddr;
+		                NAP_bootp_data.server.addr = reply_data->siaddr;
+		                NAP_bootp_data.gateway.addr = reply_data->giaddr;
+		                memcpy (NAP_bootp_data.filename, reply_data->file, sizeof(NAP_bootp_data.filename));
+		                NAP_bootp_data.filename[sizeof(NAP_bootp_data.filename) -1] = '\0';
 		                USO_kputs (USO_LL_INFO, "BOOTP done\n");
+		                err = 0;
 		                break;
 		            } else {
 		                USO_kprintf (USO_LL_WARNING, "BOOTP wrong data: %d\n", check_reply_err);
@@ -203,12 +175,8 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
         }
     }
     
-        /*
-         * wenn das zu sendende packet durch einen receive interrupt
-         * unterbrochen wird kommen wir  nicht hier her !!! error !!! es
-         * passiert jedenfalls das wir nicht da sind 
-         */ 
     NET_udp_socket_close (&sock);
 	DEBUGF(NAP_BOOTP_DEBUG, ("BOOTP sock closed\n") );
 	free (bootp_packets);
+	return err;
 }

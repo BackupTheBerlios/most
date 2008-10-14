@@ -18,16 +18,16 @@
 #include "arch/93C46.h"
 
 #define CS_PORT   h8_P6DR
-#define CS_PIN    H8_P60_CS
+#define CS_PIN    H8_P60_EE_CS
 
 #define CLK_PORT  h8_P6DR
-#define CLK_PIN   H8_P62_CLK
+#define CLK_PIN   H8_P62_EE_CLK
 
 #define DI_PORT   h8_P7DR
-#define DI_PIN    H8_P77_DATA
+#define DI_PIN    H8_P77_EE_DI
 
 #define DO_PORT   h8_P6DR
-#define DO_PIN    H8_P61_DATA
+#define DO_PIN    H8_P61_EE_DO
 
 
 /*

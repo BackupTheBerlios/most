@@ -56,10 +56,9 @@ MDC_eth_init (void)
     NET_loopif_init (&MDC_lo);
 
     NET_netif_init (&MDC_eth0, "eth0");
-	NET_netif_set_ipaddr (&MDC_eth0, &MDC_ee_config.ip_address);
-	NET_netif_set_netmask (&MDC_eth0, &MDC_ee_config.netmask);
-	NET_netif_set_gateway (&MDC_eth0, &MDC_ee_config.gateway);
-    NET_ethif_init (&MDC_eth0, &ethif0, &MDC_ee_config.mac);
+	MDC_ee_config_ip();
+	NET_netif_set_default (&MDC_eth0);
+    NET_ethif_init (&MDC_eth0, &ethif0, &MDC_ee_config.eth_addr);
     eth_reset ();
     NET_smc_init (&ethif0, &smc, SMC_IOADDR);
 }

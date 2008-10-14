@@ -158,9 +158,12 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
         ethhdr->src.addr[i] = ethif->eth_addr->addr[i];
     }
     ethhdr->type = htons (NET_ETH_TYPE_IP);
-    if (ethif->transmit != NULL) { ethif->transmit (ethif->mac, p); }
-  	++netif->tx;
-	NET_netbuf_free (p);
+    if (ethif->transmit != NULL) {
+    	 ethif->transmit (ethif->mac, p);
+	  	++netif->tx;
+    } else {
+		NET_netbuf_free (p);
+    }
     return NET_ERR_OK;
 }
 

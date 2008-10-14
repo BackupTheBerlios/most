@@ -517,6 +517,7 @@ smc_tx_write_data (NET_smc91c94_t * smc, NET_netbuf_t * packet, bool_t wirq)
     unsigned char packet_no;
     long p_len;
     p_len = NET_netbuf_tot_len (packet);
+
     if (p_len < 64)
         p_len = 64;
     if (p_len & 1)
