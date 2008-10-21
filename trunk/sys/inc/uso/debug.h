@@ -30,7 +30,7 @@
 #define USO_DEBUGGING        1
 #define DEV_DEBUGGING        0
 #define NET_DEBUGGING        1
-#define NAP_DEBUGGING        0
+#define NAP_DEBUGGING        1
 #define CLI_DEBUGGING        0
 #define BSP_DEBUGGING        0
 #define USR_DEBUGGING        0

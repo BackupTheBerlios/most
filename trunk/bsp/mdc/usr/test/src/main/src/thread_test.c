@@ -45,6 +45,6 @@ scheduler_test_exec (char *text)
 extern void
 thread_test_install(MFS_descriptor_t *test)
 {
-    CLI_exec_init (test, &thread_test, "threadt", "Thread Test", thread_test_exec);
-    CLI_exec_init (test, &scheduler_test, "schedt", "Scheduler Test", scheduler_test_exec);
+    CLI_exec_init (test, &thread_test, "threadT", "Thread Test", thread_test_exec);
+    CLI_exec_init (test, &scheduler_test, "schedT", "Scheduler Test", scheduler_test_exec);
 }

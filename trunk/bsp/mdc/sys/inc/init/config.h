@@ -33,6 +33,8 @@
 #define MDC_EE_CONFIG_STATE_SAVED     2
 #define MDC_EE_CONFIG_STATE_ALTERED   3
 
+#define MDC_EE_CONFIG_FLAG_BOOTP   0x0001
+#define MDC_EE_CONFIG_FLAG_TFTP    0x0002
 
 struct MDC_ee_configuration
 {

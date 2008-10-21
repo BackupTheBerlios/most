@@ -85,7 +85,7 @@ init (void)
     							  USO_ROUND_ROBIN, "start", TRUE);
     USO_start (start_thread);
 
-    USO_kputs (USO_LL_INFO, "Turn to idle.\n");
+    USO_kputs (USO_LL_DEBUG, "Turn to idle.\n");
 }
 
 extern void

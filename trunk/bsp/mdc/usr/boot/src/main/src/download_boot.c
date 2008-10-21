@@ -16,6 +16,7 @@
 #include <arch/reset.h>
 
 #include "init/boot.h"
+#include "init/config.h"
 #include "download_boot.h"
 
 /* Sector 0: putboot, Sector 1: boot Sector 2-7: app */
@@ -48,13 +49,20 @@ eth_download_boot_exec (char *file)
 {
 	if (file){
 		addr = malloc(sector_size);
-		boot_size = 0;
-		boot_base = addr;
 		if (addr){
-			if (NAP_tftp_open(&NAP_bootp_data.ip_addr, &NAP_bootp_data.server) >= 0){
-				NAP_tftp_get(file, recv_data);
+			boot_size = 0;
+			boot_base = addr;
+			if (NAP_tftp_open(&MDC_ee_config.ip_addr, &MDC_ee_config.server) >= 0){
+				if (NAP_tftp_get(file, recv_data) >= 0){
+					printf("Download done %lu\n", boot_size);
+				} else {
+					puts("Tftp get failed\n");
+					free(addr);
+				}
 				NAP_tftp_close();
-				printf("Download done %lu\n", boot_size);
+			} else {
+				puts("Tftp open failed\n");
+				free(addr);
 			}
 		} else {
 			puts("Ram not available\n");
@@ -95,6 +103,8 @@ static void prog_flash(void)
 	if (error == FLASH_29F040_ok){
 		error =  FLASH_29F040_programm_ns (addr, boot_base, boot_size);
 		if (error == FLASH_29F040_ok){
+			long i;
+			for(i = 1; i < 100000; ++i);
 			MDC_jump_boot();
 		}
 	}

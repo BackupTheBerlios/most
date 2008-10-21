@@ -77,7 +77,7 @@ smc_check_ios (NET_smc91c94_t * smc)
     unsigned char smc_io;
     SMC_SELECT_BANK (3);
     smc_io = (DEV_in_w (smc->io_addr + SMC_MGMT) & 0x0700) >> 8;
-    DEBUGF (NET_SMC_DEBUG, ("\nSmc: io %02x.", smc_io));
+    DEBUGF (NET_SMC_DEBUG, ("Smc: io %02x.\n", smc_io));
 }
 
 /*
@@ -167,14 +167,14 @@ receive_int (NET_smc91c94_t * smc)
 static void
 rx_overrun_int (NET_smc91c94_t * smc)
 {
-    DEBUGF (NET_SMC_DEBUG, ("\nSmc: rx overrun int."));
+    DEBUGF (NET_SMC_DEBUG, ("Smc: rx overrun int.\n"));
     ++smc->rx_overruns;
 }
 
 static void
 early_rx_int (NET_smc91c94_t * smc)
 {
-    DEBUGF (NET_SMC_DEBUG, ("\nSmc: early rx int."));
+    DEBUGF (NET_SMC_DEBUG, ("Smc: early rx int.\n"));
     ++smc->ercv_ints;
 }
 
@@ -232,21 +232,21 @@ smc_tx_error (NET_smc91c94_t * smc)
 static void
 transmit_int (NET_smc91c94_t * smc)
 {
-    DEBUGF (NET_SMC_DEBUG, ("\nSmc: tx int."));
+    DEBUGF (NET_SMC_DEBUG, ("Smc: tx int.\n"));
     smc_tx_error (smc);
 }
 
 static void
 tx_empty_int (NET_smc91c94_t * smc)
 {
-    DEBUGF (NET_SMC_DEBUG, ("\nSmc: tx empty int."));
+    DEBUGF (NET_SMC_DEBUG, ("Smc: tx empty int.\n"));
     ++smc->ercv_ints;
 }
 
 static void
 alloc_int (NET_smc91c94_t * smc)
 {
-    DEBUGF (NET_SMC_DEBUG, ("\nSmc: alloc int."));
+    DEBUGF (NET_SMC_DEBUG, ("Smc: alloc int.\n"));
     ++smc->alloc_ints;
 }
 
@@ -254,7 +254,7 @@ static void
 eph_int (NET_smc91c94_t * smc)
 {
     unsigned short tmp;
-    DEBUGF (NET_SMC_DEBUG, ("\nSmc: eph int."));
+    DEBUGF (NET_SMC_DEBUG, ("Smc: eph int.\n"));
 
     ++smc->eph_ints;
     
@@ -272,12 +272,12 @@ eph_int (NET_smc91c94_t * smc)
     {
         smc->link_is_up = FALSE;
         ++smc->link_down_count;
-        DEBUGF (NET_SMC_DEBUG, ("\nSmc: link is down."));
+        DEBUGF (NET_SMC_DEBUG, ("Smc: link is down.\n"));
     }
     else
     {
         smc->link_is_up = TRUE;
-        DEBUGF (NET_SMC_DEBUG, ("\nSmc: link is up."));
+        DEBUGF (NET_SMC_DEBUG, ("Smc: link is up.\n"));
     }
 
     // do MAC statistic
@@ -391,7 +391,7 @@ smc_rx_read_data (NET_smc91c94_t * smc)
         /*
          * don't need to restore anything 
          */
-        DEBUGF (NET_SMC_DEBUG, ("\nSmc: no p on rx fifo."));
+        DEBUGF (NET_SMC_DEBUG, ("Smc: no p on rx fifo.\n"));
         return packet;
     }
 
@@ -412,7 +412,7 @@ smc_rx_read_data (NET_smc91c94_t * smc)
         if (pnr & SMC_RFS_ERRORS)
         {
             ++smc->rx_error;
-            DEBUGF (NET_SMC_DEBUG, ("\nSmc: smc rx error."));
+            DEBUGF (NET_SMC_DEBUG, ("Smc: smc rx error.\n"));
         }
         else
         {
@@ -431,14 +431,14 @@ smc_rx_read_data (NET_smc91c94_t * smc)
             }
             else
             {
-                DEBUGF (NET_SMC_DEBUG, ("\nSmc: alloc error."));
+                DEBUGF (NET_SMC_DEBUG, ("Smc: alloc error.\n"));
                 ++smc->rx_dropped;
             }
         }
     }
     else
     {
-        DEBUGF (NET_SMC_DEBUG, ("\nSmc: wrong p len."));
+        DEBUGF (NET_SMC_DEBUG, ("Smc: wrong p len.\n"));
         ++smc->rx_badlen;
     }
     /*

@@ -54,13 +54,13 @@ readEE_exec (char *nix)
 
 extern void
 ee_test_install(MFS_descriptor_t *test){
-    CLI_exec_init (test, &eraseEE, "eraseEE", "Erase EEprom", eraseEE_exec);
+    CLI_exec_init (test, &eraseEE, "eraseE", "Erase EEprom", eraseEE_exec);
 
-    CLI_exec_init (test, &write1EE, "write1EE", "Write String 1 to EEprom",
+    CLI_exec_init (test, &write1EE, "write1E", "Write String 1 to EEprom",
                       write1EE_exec);
 
-    CLI_exec_init (test, &write2EE, "write2EE", "Write String 2 to EEprom",
+    CLI_exec_init (test, &write2EE, "write2E", "Write String 2 to EEprom",
                       write2EE_exec);
 
-    CLI_exec_init (test, &readEE, "readEE", "Read EEprom", readEE_exec);
+    CLI_exec_init (test, &readEE, "readE", "Read EEprom", readEE_exec);
 }

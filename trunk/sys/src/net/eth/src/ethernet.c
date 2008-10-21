@@ -135,8 +135,9 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
         {
             if (ethif->transmit != NULL) {
             	ethif->transmit(ethif->mac, q);
-	        }
-	        NET_netbuf_free (q);
+	        } else {
+	        	NET_netbuf_free (q);
+            }
 	        if(arp_request_count--){
             	USO_sleep(ACE_MSEC_2_TICKS(100));
 		        dest = NET_arp_lookup (queryaddr);

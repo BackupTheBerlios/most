@@ -13,6 +13,7 @@
 #include <arch/reset.h>
 
 #include "init/boot.h"
+#include "init/config.h"
 #include "download_app.h"
 
 /* Sector 0: save, Sector 1: boot Sector 2-7: app */
@@ -46,10 +47,15 @@ eth_download_app_exec (char *file)
 	if (file){
 		prog_size = 0;
 		addr = (unsigned char*)(sector_size * APP_SECTOR_START);
-		if (NAP_tftp_open(&NAP_bootp_data.ip_addr, &NAP_bootp_data.server) >= 0){
-			NAP_tftp_get(file, prog_data);
+		if (NAP_tftp_open(&MDC_ee_config.ip_addr, &MDC_ee_config.server) >= 0){
+			if (NAP_tftp_get(file, prog_data) >= 0){
+				printf("Download done %ld\n", prog_size);
+			} else {
+				puts("Tftp get failed\n");
+			}
 			NAP_tftp_close();
-			printf("Download done %ld\n", prog_size);
+		} else {
+			puts("Tftp open failed\n");
 		}
 	} else {
 		puts("Give file name as param\n");

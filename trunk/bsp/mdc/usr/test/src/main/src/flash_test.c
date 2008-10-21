@@ -55,9 +55,9 @@ writefl_exec (char *nix)
 extern void
 flash_test_install(MFS_descriptor_t *test)
 {
-    CLI_exec_init (test, &erasefl, "erasefl", "Erase Flash", erasefl_exec);
+    CLI_exec_init (test, &erasefl, "eraseF", "Erase Flash", erasefl_exec);
 
-    CLI_exec_init (test, &printfl, "printfl", "Print Flash", printfl_exec);
+    CLI_exec_init (test, &printfl, "printF", "Print Flash", printfl_exec);
 
-    CLI_exec_init (test, &writefl, "writefl", "Write Flash", writefl_exec);
+    CLI_exec_init (test, &writefl, "writeF", "Write Flash", writefl_exec);
 }

@@ -12,6 +12,7 @@ reset:
 	mov.l	#_stack_end,er7      
 	jmp	    _MDC_init
 
+    .section  .ramcode
 	.global _MDC_jump_app	
 	.global _MDC_jump_boot	
 

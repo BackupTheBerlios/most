@@ -16,7 +16,8 @@
 
 static CLI_exec_t digio_test;
 
-static DEV_digout_t *runninglight[1] = {
+static DEV_digout_t *runninglight[] = {
+    &MDC_green_led,
     &MDC_red_led
 };
 
@@ -60,5 +61,5 @@ digio_test_exec (char *nix)
 extern void
 digio_test_install(MFS_descriptor_t *test)
 {
-    CLI_exec_init (test, &digio_test, "digiot", "Digio Test", digio_test_exec);
+    CLI_exec_init (test, &digio_test, "digioT", "Digio Test", digio_test_exec);
 }

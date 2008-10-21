@@ -21,5 +21,5 @@ ser_test_exec (char *nix)
 extern void
 ser_test_install(MFS_descriptor_t *test)
 {
-    CLI_exec_init (test, &sert, "sert", "Serial Test", ser_test_exec);
+    CLI_exec_init (test, &sert, "serT", "Serial Test", ser_test_exec);
 }

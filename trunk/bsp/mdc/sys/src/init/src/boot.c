@@ -4,6 +4,7 @@
  */
 
 #include <uso/arch/cpu.h>
+#include <uso/sleep.h>
 #include <cli/commands.h>
 #include <nap/bootp.h>
 #include <mfs/sysfs.h>
@@ -20,25 +21,42 @@ static CLI_exec_t start_boot;
 static CLI_exec_t start_app;
 static CLI_exec_t bootp;
 
-static void
-bootp_exec (char *nix)
+extern void
+MDC_bootp(void)
 {
     if (NAP_bootp (&MDC_ee_config.eth_addr) == 0){
     	NET_netif_set_ipaddr (&MDC_eth0, &NAP_bootp_data.ip_addr);
     	NET_netif_set_gateway (&MDC_eth0, &NAP_bootp_data.gateway);
+    	MDC_ee_config.ip_addr = NAP_bootp_data.ip_addr;
+    	MDC_ee_config.gateway = NAP_bootp_data.gateway;
+    	MDC_ee_config.server = NAP_bootp_data.server;
 	}
+}
+
+static void
+bootp_exec (char *nix)
+{
+	MDC_bootp();
+}
+
+extern void
+MDC_start_boot(void)
+{
+	USO_sleep(ACE_MSEC_2_TICKS(200));
+	USO_disable();
+	MDC_jump_boot();
 }
 
 static void
 start_boot_exec (char *nix)
 {
-	USO_disable();
-	MDC_jump_boot();
+	MDC_start_boot();
 }
 
-void
+extern void
 MDC_start_app(void)
 {
+	USO_sleep(ACE_MSEC_2_TICKS(200));
 	USO_disable();
 	MDC_jump_app();
 }

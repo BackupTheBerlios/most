@@ -16,7 +16,8 @@
 .ENDM
 
     .section   .text
-    .globl     std_vector
+    .global    std_vector
+    
 std_vector:
 	rte
 	

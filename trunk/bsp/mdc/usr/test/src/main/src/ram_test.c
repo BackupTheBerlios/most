@@ -30,5 +30,5 @@ ram_test_exec (char *nix)
 extern void
 ram_test_install(MFS_descriptor_t *test)
 {
-    CLI_exec_init (test, &ramt, "ramt", "Ram Test", ram_test_exec);
+    CLI_exec_init (test, &ramt, "ramT", "Ram Test", ram_test_exec);
 }

@@ -107,8 +107,8 @@ MDC_digio_init (void)
 
 	DEV_digin_list_init ();
     DEV_digin_init (&MDC_button, DEV_DIGIO_NEG, sample_button, 0);
-    DEV_digin_init (&MDC_jumper_1, DEV_DIGIO_NEG, sample_jumper_1, 0);
-    DEV_digin_init (&MDC_jumper_2, DEV_DIGIO_NEG, sample_jumper_2, 0);
-    DEV_digin_init (&MDC_jumper_3, DEV_DIGIO_NEG, sample_jumper_3, 0);
+    DEV_digin_init (&MDC_jumper_1, DEV_DIGIO_NEG, sample_jumper_1, 10);
+    DEV_digin_init (&MDC_jumper_2, DEV_DIGIO_NEG, sample_jumper_2, 10);
+    DEV_digin_init (&MDC_jumper_3, DEV_DIGIO_NEG, sample_jumper_3, 10);
     DEV_digin_init (&MDC_switch, DEV_DIGIO_NEG, sample_switch, 0);
 }

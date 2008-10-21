@@ -134,8 +134,11 @@ NET_netbuf_free (NET_netbuf_t * buf)
 			case NET_BUF_POOL:
 		        USO_buf_free (&net_pool, buf);
 		        break;
+			case NET_BUF_FREE:
+			    USO_kprintf (USO_LL_ERROR, "netbuf free\n");
+				break;
 			default:
-			    USO_kprintf (USO_LL_WARNING, "netbuf inval\n");
+			    USO_kprintf (USO_LL_ERROR, "netbuf inval\n");
 		        break;
         }
 		buf->type = NET_BUF_FREE;

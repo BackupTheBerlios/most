@@ -55,7 +55,7 @@ NET_ethif_init (NET_netif_t *netif,
     USO_thread_init (&ethif->rx_thread,
                      ethif_run,
                      ethif->rx_stack, ARRAYSIZE (ethif->rx_stack),
-                     USO_INTERRUPT, USO_FIFO, "ethif");
+                     USO_INTERRUPT, USO_FIFO, "Eth0");
     USO_thread_arg_init(&ethif->rx_thread, netif, FALSE);
 }
 

@@ -36,7 +36,6 @@ run_led_run (void *nix)
     {
 		MDC_watchdog_trigger ();
         DEV_digout_toggle (&MDC_run_led);
-        DEV_digout_toggle (&MDC_green_led);
         USO_sleep (ACE_MSEC_2_TICKS(200));
     }
 }
@@ -67,9 +66,13 @@ MDC_start_run (void *nix)
     USO_start (&cli0_thread);
     USO_kputs (USO_LL_INFO, "Cli0 on ser0.\n");
 
+	if (MDC_ee_config.flags & MDC_EE_CONFIG_FLAG_BOOTP)
+		MDC_bootp ();
+		
     MDC_config_install ();
 	MDC_boot_install ();
 
     USO_kputs (USO_LL_INFO, "Main.\n");
+    DEV_digout_set (&MDC_green_led);
     MDC_main ();
 }

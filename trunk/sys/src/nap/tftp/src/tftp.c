@@ -36,7 +36,7 @@ static struct {
 	unsigned short error_code;
 	char *error_message;
 	int eof;
-   int sendcount;
+   	int sendcount;
 } state; 
 
 static const char* mode[] = { "netascii", "octet", "mail", };
@@ -84,10 +84,11 @@ NAP_tftp_open(NET_ip_addr_t *client_addr, NET_ip_addr_t *_server_addr)
 		USO_buf_pool_init (&pool, packets, 1,
                          	sizeof (struct tftp_packet));
     	NET_udp_socket_init (&sock);
-    	NET_udp_bind (&sock, client_addr, 32798);
+    	NET_udp_bind (&sock, client_addr, 3279);
 		NET_udp_connect (&sock, server_addr, htons(NAP_TFTP_SERVER_PORT));
     	NET_udp_socket_open (&sock);
     	NET_udp_recv_timeout (&sock, ACE_MSEC_2_TICKS(4000));
+	    DEBUGF(NAP_TFTP_DEBUG, ("TFTP sock open\n") );
 	} else {
 		USO_kputs (USO_LL_ERROR, "TFTP mem error.\n");
 		return -1;
@@ -95,7 +96,7 @@ NAP_tftp_open(NET_ip_addr_t *client_addr, NET_ip_addr_t *_server_addr)
 	return 0;
 }
 
-extern void
+extern int
 NAP_tftp_get(const char* filename, bool_t (*f)(char *, size_t))
 {
     file_name = filename;
@@ -107,7 +108,13 @@ NAP_tftp_get(const char* filename, bool_t (*f)(char *, size_t))
 	while(state.action != NULL){
 		state.action();
 	}
-    USO_kputs (USO_LL_INFO, "TFTP done\n");
+	if (state.eof == 1){
+    	USO_kputs (USO_LL_INFO, "TFTP done\n");
+		return 0;
+	} else {
+    	USO_kputs (USO_LL_WARNING, "TFTP failed\n");
+	}
+	return -1;
 }
 
 void NAP_tftp_close(void)
