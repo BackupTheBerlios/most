@@ -16,10 +16,11 @@
 extern void
 MDC_main (void)
 {
-    DEV_digout_set (&MDC_red_led);
     USO_kputs (USO_LL_INFO, VERSION"\n");
-    if (DEV_digin_isset(&MDC_switch) == FALSE)
+    if (DEV_digin_isset(&MDC_switch) == FALSE){
     	MDC_start_app();
+    }
+    DEV_digout_set (&MDC_red_led);
 	MDC_download_app_install();
 	MDC_download_boot_install();
 }

@@ -42,7 +42,7 @@ bootp_exec (char *nix)
 extern void
 MDC_start_boot(void)
 {
-	USO_sleep(ACE_MSEC_2_TICKS(200));
+	USO_sleep(ACE_MSEC_2_TICKS(100));
 	USO_disable();
 	MDC_jump_boot();
 }
@@ -56,7 +56,7 @@ start_boot_exec (char *nix)
 extern void
 MDC_start_app(void)
 {
-	USO_sleep(ACE_MSEC_2_TICKS(200));
+	USO_sleep(ACE_MSEC_2_TICKS(100));
 	USO_disable();
 	MDC_jump_app();
 }

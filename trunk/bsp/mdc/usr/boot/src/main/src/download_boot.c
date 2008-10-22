@@ -103,8 +103,8 @@ static void prog_flash(void)
 	if (error == FLASH_29F040_ok){
 		error =  FLASH_29F040_programm_ns (addr, boot_base, boot_size);
 		if (error == FLASH_29F040_ok){
-			long i;
-			for(i = 1; i < 100000; ++i);
+			int i;
+			for(i = 1; i < 10000; ++i);
 			MDC_jump_boot();
 		}
 	}

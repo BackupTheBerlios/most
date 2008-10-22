@@ -97,16 +97,16 @@ MDC_init (void)
     memset(&bss_start, 0, &bss_end - &bss_start); 
 
     MDC_digio_init ();
-    
+
     if (USO_heap_init (&heap, &heap_start, &heap_end) == FALSE){
          DEV_digout_set (&MDC_red_led);
     }
     ACE_stdlib_init(&heap);
-    
+
  	if (MFS_sysfs_init() == FALSE){
          DEV_digout_set (&MDC_red_led);
     }
  	USO_heap_install(&heap, "0");
- 		
+
     USO_transform (init);
 }

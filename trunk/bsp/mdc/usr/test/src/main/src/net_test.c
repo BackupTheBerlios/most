@@ -36,7 +36,7 @@ static struct test_packet test_packets[PACK_BUF_MAX];
 static void
 test_packet_init (void)
 {
-	USO_kputs (USO_LL_INFO, "USER init.\n");
+	USO_kputs (USO_LL_INFO, "NT init.\n");
     USO_buf_pool_init (&test_pool, test_packets,
                        PACK_BUF_MAX, sizeof (struct test_packet));
 }
@@ -50,7 +50,7 @@ net_test_exec (char *nix)
     NET_udp_bind (&udp_sock, &MDC_ee_config.ip_addr, LOCAL_PORT);
     NET_udp_connect (&udp_sock, &MDC_ee_config.server, REMOTE_PORT);
     NET_udp_socket_open (&udp_sock);
-	USO_kputs (USO_LL_INFO, "USER sock open.\n");
+	USO_kputs (USO_LL_INFO, "NT sock open.\n");
     for (i = 0; i < 10; ++i)
     {
         struct test_packet* data;
@@ -64,22 +64,22 @@ net_test_exec (char *nix)
         data->trans_nr = i;
         if ((NET_udp_send_netbuf (&udp_sock, p)) < 0)
         {
-            USO_kputs (USO_LL_INFO, "USER send error.\n");
+            USO_kputs (USO_LL_INFO, "NT send error.\n");
         } else {
-            USO_kputs (USO_LL_INFO, "USER send udp.\n");
+            USO_kputs (USO_LL_INFO, "NT send udp.\n");
         }
 
 		NET_udp_recv_timeout (&udp_sock, 1000);	
         p = NET_udp_recv_netbuf (&udp_sock, NULL, &port);
         if (p != NULL){
-        	USO_kputs (USO_LL_INFO, "USER receive udp.\n");
+        	USO_kputs (USO_LL_INFO, "NT receive udp.\n");
         	NET_netbuf_free (p);
         } else {
-        	USO_kputs (USO_LL_INFO, "USER receive error.\n");
+        	USO_kputs (USO_LL_INFO, "NT receive error.\n");
         }
     }
     NET_udp_socket_close (&udp_sock);
-    USO_kputs (USO_LL_INFO, "USER sock closed.\n");
+    USO_kputs (USO_LL_INFO, "NT sock closed.\n");
 }
 
 extern void

@@ -12,14 +12,13 @@ reset:
 	mov.l	#_stack_end,er7      
 	jmp	    _MDC_init
 
-    .section  .ramcode
 	.global _MDC_jump_app	
-	.global _MDC_jump_boot	
 
 _MDC_jump_app:		
 	jmp	    0x20000
 
-	.section   .ramcode
+	.section	.ramcode
+	.global _MDC_jump_boot	
 
 _MDC_jump_boot:		
 	jmp	    0x10000
