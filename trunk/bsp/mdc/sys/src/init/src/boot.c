@@ -10,6 +10,7 @@
 #include <mfs/sysfs.h>
 #include <mfs/directory.h>
 
+#include "arch/cpu.h"
 #include "arch/reset.h"
 #include "arch/eth.h"
 #include "init/boot.h"
@@ -44,6 +45,7 @@ MDC_start_boot(void)
 {
 	USO_sleep(ACE_MSEC_2_TICKS(100));
 	USO_disable();
+	MDC_watchdog_trigger ();
 	MDC_jump_boot();
 }
 
@@ -58,6 +60,7 @@ MDC_start_app(void)
 {
 	USO_sleep(ACE_MSEC_2_TICKS(100));
 	USO_disable();
+	MDC_watchdog_trigger ();
 	MDC_jump_app();
 }
 

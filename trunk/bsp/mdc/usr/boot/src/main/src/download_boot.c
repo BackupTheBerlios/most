@@ -15,6 +15,7 @@
 #include <arch/29F040.h>
 #include <arch/reset.h>
 
+#include "arch/cpu.h"
 #include "init/boot.h"
 #include "init/config.h"
 #include "download_boot.h"
@@ -103,8 +104,7 @@ static void prog_flash(void)
 	if (error == FLASH_29F040_ok){
 		error =  FLASH_29F040_programm_ns (addr, boot_base, boot_size);
 		if (error == FLASH_29F040_ok){
-			int i;
-			for(i = 1; i < 10000; ++i);
+			MDC_watchdog_trigger ();
 			MDC_jump_boot();
 		}
 	}
