@@ -2,10 +2,8 @@ OUTPUT_FORMAT("elf32-littlearm")
 OUTPUT_ARCH(arm)
 ENTRY(reset_handler)
 
-/*#include "project.h"*/
-
 sram_size	= 64K;
-stack_size	= 4K;
+stack_size	= 2K;
 
 MEMORY
 {
@@ -32,6 +30,7 @@ SECTIONS
 		sram_start = . ;
 		data_start = .;
 		*(.vectors)
+		*(.ramcode)
 		*(.data)
 		data_end = .;
 	} > sram

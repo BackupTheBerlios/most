@@ -3,8 +3,8 @@
 MOST_HOST:=linux
 #MOST_HOST:=cygwin
 
-MOST_BOARD:=mdc
-#MOST_BOARD:=sam
+#MOST_BOARD:=mdc
+MOST_BOARD:=sam
 
 # Don't make changes after this line
 

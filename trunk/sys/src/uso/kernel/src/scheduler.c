@@ -87,7 +87,7 @@ USO_schedule (USO_thread_t * new_thread)
     }
     old_thread = current_thread;
     old_thread->ticks += DEV_get_ticks_diff(schedule_time);
-	preemption = PREEMPTION;
+    preemption = PREEMPTION;
     schedule_time = DEV_get_ticks();
     new_thread->state = USO_RUNNING;
     current_thread = new_thread;
@@ -130,16 +130,16 @@ USO_ready (USO_thread_t * thread)
 extern void
 USO_preempt(void)
 {
-	if ( (current_thread->scheduling == USO_ROUND_ROBIN) && (--preemption <= 0) ){
+    if ( (current_thread->scheduling == USO_ROUND_ROBIN) && (--preemption <= 0) ){
         USO_ready (current_thread);
         USO_schedule (USO_next2run ());
-	}
+    }
 }
 
 extern USO_thread_t * 
 USO_current(void)
 {
-	return current_thread;
+    return current_thread;
 }
 
 /*------------------------------------------------------------------------*/

@@ -1,18 +1,69 @@
-Enter SAM-BA:
+Sam_I_Am Howto:
+===============
 
+Sam_I_Am is an open Samba tool for linux.
+Connect at91sam7x256 board to usb.
+
+Sam_I_Am supports only at91sam7s256.
+This means that after erasing the flash with the erase jumper the gpnvm bit 2 is cleared ->
+Samba mode. Sam_I_am cannot set this flag after programming the flash, but you can jump to the
+flash adddress.
+
+For at91sam7x256 the gpnvm bit 2 can be set with the atmel windows samba tool
+or with openOCD.
+
+Enter SAM-BA:
 set ERASE jumper fo 1 sec and reset the board
 
-
 Installing usb serial device:
-
-modprobe usbserial vendor=0x03EB product=0x6124
-
+sudo modprobe usbserial vendor=0x03EB product=0x6124
 
 Download to SRAM(after reset you stay in SAM-BA):
-
-Sam_I_Am open /dev/ttyUSB0 , send test.hex , go 0x202000
-
+Sam_I_Am open /dev/ttyUSB0 , send test.hex , go 0x202000(depends of your linker script)
 
 Download to FLASH (after reset you have to enter SAM-BA again):
-
 Sam_I_Am open /dev/ttyUSB0 , flash test.hex , go 0x100000
+
+
+OpenOCD Howto:
+==============
+
+Support for parallel(wiggler) and usb(olimex-arm-usb-ocd) interface.
+
+compile OpenOCD:
+--enable-parport
+--enable-parport-ppdev
+--enable-ft2232_ftd2xx
+--with-ftd2xx=/path/to/ftdd2xx
+
+the ftd2xx library is used, this library must also be installed to /usr/lib.
+
+configuration files are placed in MOST_ROOT/ocd
+correct the Makefile to your needed configuration.
+
+use make ocd-start for startting ocd
+use make ocd-stop for stopping ocd
+use make debug-telnet
+use make debug-gdb
+
+in emacs use  "ALT-x gdb" for running gdb.
+correct name to your arm-gdb instead of the linux gdb
+
+gdb version 6.8 must be used to load the memmory map for:
+programming the flash with the load command (load test.elf)
+and to use hardware breakpoints.
+
+as gdb file the test.unstripped file is used as the test.elf file does not contain debug information.
+
+the flash can also be programmed with:
+telnet:
+flash write_image erase test.bin 0x100000 bin
+flash write_bank 0 test.bin 0x110000 (for example) the flash is erased automatically)
+gdb:
+monitor flash write_image erase test.bin 0x100000 bin
+monitor flash write_bank 0 test.bin 0x110000 (for example) the flash is erased automatically)
+
+see also .gdbinit
+
+For debuging in the flash only 2 hardware breakpoints can be used!
+Better place the code for debugging in the ramcode section!

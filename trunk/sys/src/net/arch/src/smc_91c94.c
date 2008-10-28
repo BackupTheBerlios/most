@@ -24,11 +24,19 @@
 
 #define SMC_SELECT_BANK(x)  { DEV_out_w( x , smc->io_addr + SMC_BANK_SELECT ); }
 
+#if MOST_CPU == H8300
 
 #define ETHIRQ_ON()   H8_BITSET( H8_IER_IRQ7E, h8_IER)
 #define ETHIRQ_OFF()  H8_BITCLEAR( H8_IER_IRQ7E, h8_IER)
 #define ETHIRQ_QUIT() H8_BITCLEAR(H8_ISR_IRQ7F, h8_ISR)
 
+#else
+
+#define ETHIRQ_ON()
+#define ETHIRQ_OFF()
+#define ETHIRQ_QUIT()
+
+#endif
 
 /*
  * enables an interrupt in the interrupt mask register 

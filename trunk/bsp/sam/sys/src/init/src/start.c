@@ -46,7 +46,6 @@ SAM_start_run (void *nix)
 {
     //USO_kputs (USO_LL_INFO, "Init run.\n");
 
-#if 1
     USO_thread_init (&run_led_thread,
                      run_led_run,
                      run_led_stack, ARRAYSIZE (run_led_stack),
@@ -54,8 +53,6 @@ SAM_start_run (void *nix)
     USO_start (&run_led_thread);
     //USO_kputs (USO_LL_INFO, "RunLed started.\n");
 	USO_yield();
-#endif
-
 
 #if 0
     CLI_setup (MDC_get_hostname ());

@@ -74,8 +74,8 @@ init (void)
 
     USO_enable ();
 
-	unsigned long loop_count = DEV_get_ticks();
-	DEV_cpudelay(ACE_USEC_2_LOOPS(50000));
+    unsigned long loop_count = DEV_get_ticks();
+    DEV_cpudelay(ACE_USEC_2_LOOPS(50000));
     USO_kprintf (USO_LL_INFO, "Loop calib 50ms: %lu.\n", DEV_get_ticks_diff(loop_count));
 	
     /* Why an start thread? the start thread has its own stack
@@ -91,9 +91,9 @@ init (void)
 extern void
 MDC_init (void)
 {
-	MDC_cpu_init ();
-
-	memcpy(&data_start, &code_end, &data_end - &data_start);
+    MDC_cpu_init ();
+    
+    memcpy(&data_start, &code_end, &data_end - &data_start);
     memset(&bss_start, 0, &bss_end - &bss_start); 
 
     MDC_digio_init ();

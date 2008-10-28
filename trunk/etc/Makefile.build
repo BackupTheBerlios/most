@@ -48,7 +48,7 @@ ifeq ($(MOST_BUILD_LOG),off)
 BUILD_LOG :=@
 endif
 
-EXECPREF 	:= $(MOST_ROOT)/gcc/$(MOST_GCC)/bin/$(MOST_TARGET)-
+EXECPREF:=$(MOST_ROOT)/gcc/$(MOST_GCC)/bin/$(MOST_TARGET)-
 
 CC			:= $(EXECPREF)gcc
 LD			:= $(EXECPREF)ld
@@ -72,12 +72,21 @@ LIB_PATH 	:=$ -L$(LIB_PATH_OPT)\
 LDFLAGS		:= --sort-common --warn-common $(TARGET_LDFLAGS) -T$(PROG_NAME).ld $(LDFLAGS_OPT)\
 			   --cref -Map $(PROG_NAME).map
 
-SOURCES  		:= $(wildcard src/*.c)
-OBJECTS  		:= $(subst src,o/$(MOST_TARGET),$(subst .c,.o,$(SOURCES)))
-ASMFILES 		:= $(subst src,s/$(MOST_CPU),$(subst .c,.s,$(SOURCES)))
-SUBMAKES 		:= $(subst src,d/$(MOST_TARGET),$(subst .c,.d,$(SOURCES)))
-ASM_SOURCES 	:= $(wildcard src/$(MOST_CPU)/*.S)
-ASM_OBJECTS 	:= $(subst src/$(MOST_CPU),o/$(MOST_TARGET),$(subst .S,.o,$(ASM_SOURCES)))
+WORKING_DIR:=$(shell pwd)/
+
+LOCAL_SOURCES  		:= $(wildcard src/*.c)
+LOCAL_OBJECTS  		:= $(subst src,o/$(MOST_TARGET),$(subst .c,.o,$(LOCAL_SOURCES)))
+LOCAL_ASMFILES 		:= $(subst src,s/$(MOST_CPU),$(subst .c,.s,$(LOCAL_SOURCES)))
+LOCAL_SUBMAKES 		:= $(subst src,d/$(MOST_TARGET),$(subst .c,.d,$(LOCAL_SOURCES)))
+LOCAL_ASM_SOURCES 	:= $(wildcard src/$(MOST_CPU)/*.S)
+LOCAL_ASM_OBJECTS 	:= $(subst src/$(MOST_CPU),o/$(MOST_TARGET),$(subst .S,.o,$(LOCAL_ASM_SOURCES)))
+
+SOURCES:=$(foreach ENTRY, $(LOCAL_SOURCES), $(WORKING_DIR)$(ENTRY))
+OBJECTS:=$(foreach ENTRY, $(LOCAL_OBJECTS), $(WORKING_DIR)$(ENTRY))
+ASMFILES:=$(foreach ENTRY, $(LOCAL_ASMFILES), $(WORKING_DIR)$(ENTRY))
+SUBMAKES:=$(foreach ENTRY, $(LOCAL_SUBMAKES), $(WORKING_DIR)$(ENTRY))
+ASM_SOURCES:=$(foreach ENTRY, $(LOCAL_ASM_SOURCES), $(WORKING_DIR)$(ENTRY))
+ASM_OBJECTS:=$(foreach ENTRY, $(LOCAL_ASM_OBJECTS), $(WORKING_DIR)$(ENTRY))
 
 .PHONY : default help init asm obj lib prog bin srec hex info clean date
 
@@ -130,7 +139,7 @@ bin : $(BUILD_ERR_FILE)
 	$(BUILD_LOG)$(OBJCOPY) -O binary -j .data $(PROG_NAME).$(MOST_SYSTEM) $(PROG_NAME).data $(BUILD_ERR)
 	$(BUILD_LOG)cat $(PROG_NAME).code $(PROG_NAME).data > $(PROG_NAME).bin $(BUILD_ERR)
 	$(SHOW_BUILD_ERR)
-	
+
 srec :
 	@$(ECHO) "generate $(PROG_NAME).srec"
 	@$(OBJCOPY) -O srec $(PROG_NAME).$(MOST_SYSTEM) $(PROG_NAME).srec
@@ -144,15 +153,15 @@ info :
 	@$(OBJDUMP) -h $(PROG_NAME).unstripped
 
 
-o/$(MOST_TARGET)/%.o: src/%.c
+$(WORKING_DIR)o/$(MOST_TARGET)/%.o: $(WORKING_DIR)src/%.c
 	@$(ECHO) "compile $<"
 	$(BUILD_LOG)$(CC) -c $(CCFLAGS) $(INC_PATH) $(DEFINES) -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.c,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
 
-o/$(MOST_TARGET)/%.o: src/$(MOST_CPU)/%.S
+$(WORKING_DIR)o/$(MOST_TARGET)/%.o: $(WORKING_DIR)src/$(MOST_CPU)/%.S
 	@$(ECHO) "compile $<"
 	$(BUILD_LOG)$(CC) -c $(CCFLAGS) $(INC_PATH) $(DEFINES) -D__ASSEMBLY__ -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.S,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
 
-s/$(MOST_CPU)/%.s : src/%.c
+$(WORKING_DIR)s/$(MOST_CPU)/%.s : $(WORKING_DIR)src/%.c
 	@$(ECHO) "compile $<"
 	$(BUILD_LOG)$(CC) -S $(CCFLAGS) $(INC_PATH) $(DEFINES) -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.c,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
 
