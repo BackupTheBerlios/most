@@ -32,7 +32,7 @@ typedef struct CLI_hisentry CLI_hisentry_t;
 struct CLI_history
 {
 	USO_list_t list;
-	CLI_hisentry_t* actual;
+	CLI_hisentry_t* current;
 	CLI_hisentry_t* last;
 	int size;
 	int count;
