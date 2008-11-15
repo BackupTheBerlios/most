@@ -121,6 +121,10 @@ CLI_cmd_list (CLI_interpreter_t *cli)
        			info = TRUE;
        			desc = MFS_sysfs_cli();
        			break;
+       		case 's' :
+       			info = TRUE;
+       			desc = MFS_sysfs_serial();
+       			break;
        		default :
        			break;
        	}

@@ -102,7 +102,8 @@ Network Byte Order is also "Big Endian"
 #define ACE_MSEC_2_TICKS(ACE_msec) ( (ACE_TICKS_PER_SEC * (ACE_msec)) / 1000L  )
 #define ACE_TICKS_2_MSEC(ACE_ticks) ( (1000L * (ACE_ticks)) / ACE_TICKS_PER_SEC )
 
-#define ACE_LOOPS_PER_MSEC 765L
+// #define ACE_LOOPS_PER_MSEC 765L
+#define ACE_LOOPS_PER_MSEC 2250L
 
 #define ACE_USEC_2_LOOPS(ACE_usec) ( (ACE_LOOPS_PER_MSEC * (ACE_usec)) / 1000L  )
  

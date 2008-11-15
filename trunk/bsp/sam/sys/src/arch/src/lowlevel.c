@@ -43,6 +43,7 @@
 
 #include "arch/OLIMEX_SAM7_EX256.h"
 #include "arch/ticks.h"
+#include "arch/uart.h"
 
 /*-----------------------------------------------------------------------------
  * Function Name       : pabt_handler
@@ -104,15 +105,23 @@ static void default_irq_handler(void)
  *-----------------------------------------------------------------------------*/
 static void sys_interrupt(void)
 {
-	if (AT91C_BASE_PITC->PITC_PISR)
+	if (AT91C_BASE_AIC->AIC_IPR & (1 << AT91C_ID_SYS) ){
+		AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_SYS);
 		SAM_ticks_interrupt();
+	}
+	
+	if (AT91C_BASE_AIC->AIC_IPR & (1 << AT91C_ID_US0) ) {
+		AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_US0);
+		SAM_uart_interrupt_0();
+	}
 }
 
 void SAM_sys_interrupt_init(void)
 {
-    SAM_ticks_init ();
-	AIC_ConfigureIT(1, 0, sys_interrupt);
-	AIC_EnableIT(1);
+	AIC_ConfigureIT(AT91C_ID_SYS, (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 0x3 ), sys_interrupt);
+	AIC_ConfigureIT(AT91C_ID_US0, (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 0x4 ), sys_interrupt);
+	AIC_EnableIT(AT91C_ID_SYS);
+	AIC_EnableIT(AT91C_ID_US0);
 }
 
 /*-----------------------------------------------------------------------------
@@ -202,6 +211,16 @@ void SAM_cpu_init(void)
 
 void SAM_io_init (void)
 {
+	// for RunLED
+	AT91C_BASE_PIOA->PIO_OER = (AT91C_PIO_PA3);		// set to output
+	AT91C_BASE_PIOA->PIO_PER = (AT91C_PIO_PA3);		// set to PIO mode
+	AT91C_BASE_PIOA->PIO_PPUDR = (AT91C_PIO_PA3);	// disable pull up
+
+	// for RedLED
+	AT91C_BASE_PIOA->PIO_OER = (AT91C_PIO_PA4);		// set to output
+	AT91C_BASE_PIOA->PIO_PER = (AT91C_PIO_PA4);		// set to PIO mode
+	AT91C_BASE_PIOA->PIO_PPUDR = (AT91C_PIO_PA4);	// disable pull up
+
 	// for LCD Backlight
 	AT91C_BASE_PIOB->PIO_OER = (AT91B_LCD_BL);		// set to output
 	AT91C_BASE_PIOB->PIO_PER = (AT91B_LCD_BL);		// set to PIO mode

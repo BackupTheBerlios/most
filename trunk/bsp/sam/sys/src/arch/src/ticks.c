@@ -27,9 +27,12 @@ SAM_ticks_init (void)
 extern void SAM_ticks_interrupt (void)
 {
 	unsigned int pivr;
-    USO_preempt ();
-    USO_wakeup ();
-    DEV_timer_fire ();
-	DEV_clock_tick ();
-	pivr = AT91C_BASE_PITC->PITC_PIVR;
+	if (AT91C_BASE_PITC->PITC_PISR)
+	{
+    	USO_preempt ();
+    	USO_wakeup ();
+    	DEV_timer_fire ();
+		DEV_clock_tick ();
+		pivr = AT91C_BASE_PITC->PITC_PIVR;
+	}
 }

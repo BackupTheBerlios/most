@@ -1,28 +1,14 @@
+#include <uso/log.h>
 #include <uso/thread.h>
 #include <uso/sleep.h>
-#include <dev/arch/at91/debug.h>
+#include <dev/arch/cpu.h>
 
 #include "arch/OLIMEX_SAM7_EX256.h"
+#include "arch/digio.h"
 #include "init/init.h"
 #include "init/main.h"
 
 static void debug_test(int cycle) _SECTION_ (".ramcode");
-
-void SAM_main(void)
-{
-    int cycle;
-    cycle = 1;
-    for (;;)
-    {
-        dbgu_print_ascii("Test 0.1.0 ");
-        dbgu_print_hex8(cycle);
-        dbgu_print_ascii("\n");
-        debug_test(cycle);
-        cycle++;
-        USO_sleep(1000);    
-    }
-}
-
 static void debug_test(int cycle)
 {
     int a, b;
@@ -31,3 +17,21 @@ static void debug_test(int cycle)
     b = cycle;
     a += b;
 }
+
+void SAM_main(void)
+{
+    int cycle;
+    USO_kputs (USO_LL_INFO, "Test 0.1.0\n");
+    DEV_digout_set (&SAM_lcd_light);
+ 
+    cycle = 1;
+    for (;;)
+    {
+        //USO_kprintf (USO_LL_INFO, "cycle : %d\n", cycle);
+		//DEV_cpudelay(ACE_USEC_2_LOOPS(500000));
+        debug_test(cycle);
+        cycle++;
+        USO_sleep(1000);    
+    }
+}
+

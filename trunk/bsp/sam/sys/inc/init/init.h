@@ -19,6 +19,11 @@
  */
 
 /**
+ * Serial communication Interface.
+ */
+extern FILE *ser0;
+
+/**
  * This function is called from the cpu reset vector routine after the stack is initialized.
  * This is the right place to initialize your system.
  */
