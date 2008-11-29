@@ -61,7 +61,7 @@ MDC_start_run (void *nix)
                      CLI_interpreter_run,
                      cli0_stack, ARRAYSIZE (cli0_stack),
                       USO_USER, USO_ROUND_ROBIN, "Cli0");
-    USO_thread_arg_init (&cli0_thread, &cli0, FALSE);
+    USO_thread_arg_init (&cli0_thread, &cli0);
     USO_thread_ios_init (&cli0_thread, ser0, ser0);
     USO_start (&cli0_thread);
     USO_kputs (USO_LL_INFO, "Cli0 on ser0.\n");

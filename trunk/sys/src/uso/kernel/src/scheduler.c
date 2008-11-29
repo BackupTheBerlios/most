@@ -9,6 +9,7 @@
 #include "uso/thread.h"
 #include "uso/scheduler.h"
 #include "uso/sleep.h"
+#include "uso/stack.h"
 
 #include <dev/clock.h>
 
@@ -35,12 +36,12 @@ idle (void)
 }
 
 extern void
-USO_transform (void (*init) (void))
+USO_transform (void (*init) (void), USO_stack_t* stack, int stack_size)
 {
     USO_list_init (&interrupt_threads);
     USO_list_init (&system_threads);
     USO_list_init (&user_threads);
-    USO_thread_init (&idle_thread, NULL, NULL, 0, USO_IDLE, USO_FIFO, "Idle");
+    USO_thread_init (&idle_thread, NULL, stack, stack_size, USO_IDLE, USO_FIFO, "Idle");
     USO_thread_ios_init (&idle_thread, NULL, NULL);
     current_thread = &idle_thread;
     old_thread = &idle_thread;
@@ -79,16 +80,24 @@ USO_schedule (USO_thread_t * new_thread)
         USO_thread_terminate (new_thread);
         new_thread = USO_next2run();
     }
-    /* Idle thread does not call schedule, so the old thread is terminared 
+    /* Idle thread does not call schedule, so the old thread is terminated 
        at the next schedule call and not after the context switch! */
     if (old_thread->state == USO_EXIT)
     {
         USO_thread_terminate (old_thread);
     }
+    if (USO_stack_check_overrun(new_thread->stack_top, new_thread->cpu.sp) == TRUE)
+    {
+    	USO_panic (__FILE__, __LINE__);
+    }
+    if (USO_stack_check_overrun(new_thread->stack_max, new_thread->cpu.sp) == TRUE)
+    {
+		new_thread->stack_max = (USO_stack_t*)new_thread->cpu.sp;
+    }
     old_thread = current_thread;
     old_thread->ticks += DEV_get_ticks_diff(schedule_time);
-    preemption = PREEMPTION;
     schedule_time = DEV_get_ticks();
+    preemption = PREEMPTION;
     new_thread->state = USO_RUNNING;
     current_thread = new_thread;
     USO_context_switch (&old_thread->cpu, &new_thread->cpu);

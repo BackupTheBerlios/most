@@ -21,6 +21,12 @@ USO_stack_end (USO_stack_t stack[], int size)
     return &stack[0];
 }
 
+extern bool_t 
+USO_stack_check_overrun(USO_stack_t *end, USO_cpu_register_t act)
+{
+	return (USO_stack_t*)act < end ? TRUE : FALSE; 
+}
+
 #elif USO_STACK==USO_LOW2HI
 
 extern USO_stack_t *
@@ -33,6 +39,12 @@ extern USO_stack_t *
 USO_stack_end (USO_stack_t stack[], int size)
 {
     return &stack[size - 1];
+}
+
+extern bool_t 
+USO_stack_check(USO_stack_t *end, USO_cpu_register_t act)
+{
+	return (USO_stack_t*)act > end ? TRUE : FALSE; 
 }
 
 #endif

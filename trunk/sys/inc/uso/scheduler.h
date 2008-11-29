@@ -40,7 +40,8 @@ extern USO_thread_t *USO_current(void);
  *
  * @param init : Callback function.
  */
-extern void USO_transform (void (*init) (void));
+extern void USO_transform (void (*init) (void),
+	USO_stack_t* stack, int stack_size);
 
 /**
  * Determine the next thread which is ready to run. 

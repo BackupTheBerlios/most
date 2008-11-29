@@ -49,6 +49,9 @@ extern DEV_digin_t MDC_jumper_3;
 /** Switch */
 extern DEV_digin_t MDC_switch;
 
+/** Control inputs */
+extern DEV_diginputs_t MDC_control_in;
+
 /**
  * Initialize digital io.
  */

@@ -18,7 +18,7 @@ rx_char (DEV_serial_t *serial, char c)
 	if (USO_pipe_write_ns (&serial->rx_buf, &c, sizeof(c)) == 0){
 		serial->error.rx_buf_overrun++;
 	} else if (serial->block == TRUE){
-		USO_go(&serial->rx_barrier, FALSE);
+		USO_go(&serial->rx_barrier);
 	}
 }
 

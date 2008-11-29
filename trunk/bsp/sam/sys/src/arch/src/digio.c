@@ -103,6 +103,8 @@ sample_joystick_center (void)
     return 0;
 }
 
+DEV_diginputs_t SAM_control_in;
+
 extern void
 SAM_digio_init (void)
 {
@@ -110,12 +112,12 @@ SAM_digio_init (void)
     DEV_digout_init (&SAM_red_led, DEV_DIGIO_HIGH, DEV_DIGIO_NEG, set_red_led, clear_red_led);
     DEV_digout_init (&SAM_lcd_light, DEV_DIGIO_LOW, DEV_DIGIO_POS, set_lcd_light, clear_lcd_light);
 
-	DEV_digin_list_init ();
-    DEV_digin_init (&SAM_switch_1, DEV_DIGIO_NEG, sample_switch_1, 0);
-    DEV_digin_init (&SAM_switch_2, DEV_DIGIO_NEG, sample_switch_2, 0);
-    DEV_digin_init (&SAM_joystick_up, DEV_DIGIO_NEG, sample_joystick_up, 0);
-    DEV_digin_init (&SAM_joystick_down, DEV_DIGIO_NEG, sample_joystick_down, 0);
-    DEV_digin_init (&SAM_joystick_left, DEV_DIGIO_NEG, sample_joystick_left, 0);
-    DEV_digin_init (&SAM_joystick_right, DEV_DIGIO_NEG, sample_joystick_right, 0);
-    DEV_digin_init (&SAM_joystick_center, DEV_DIGIO_NEG, sample_joystick_center, 0);
+	DEV_diginputs_init (&SAM_control_in);
+    DEV_digin_init (&SAM_control_in, &SAM_switch_1, DEV_DIGIO_NEG, sample_switch_1, 0);
+    DEV_digin_init (&SAM_control_in, &SAM_switch_2, DEV_DIGIO_NEG, sample_switch_2, 0);
+    DEV_digin_init (&SAM_control_in, &SAM_joystick_up, DEV_DIGIO_NEG, sample_joystick_up, 0);
+    DEV_digin_init (&SAM_control_in, &SAM_joystick_down, DEV_DIGIO_NEG, sample_joystick_down, 0);
+    DEV_digin_init (&SAM_control_in, &SAM_joystick_left, DEV_DIGIO_NEG, sample_joystick_left, 0);
+    DEV_digin_init (&SAM_control_in, &SAM_joystick_right, DEV_DIGIO_NEG, sample_joystick_right, 0);
+    DEV_digin_init (&SAM_control_in, &SAM_joystick_center, DEV_DIGIO_NEG, sample_joystick_center, 0);
 }

@@ -47,13 +47,16 @@ USO_thread_init (USO_thread_t * thread,
     thread->arg = NULL;
     thread->priority = priority;
     thread->scheduling = scheduling;
-    thread->detach = FALSE;
-    thread->free_arg = FALSE;
     thread->stop = FALSE;
+    thread->flags = 0;
+    thread->signals = 0;
     thread->in = USO_current()->in;
     thread->out = USO_current()->out;
     thread->state = USO_INIT;
     thread->stack = stack;
+    thread->stack_bot = USO_stack_beginn (stack, stack_size);
+    thread->stack_top = USO_stack_end (stack, stack_size);
+    thread->stack_max = USO_stack_beginn (stack, stack_size);
     thread->ticks = 0;
 	thread->desc = MFS_create_desc(MFS_sysfs_threads(), name,
 				 (MFS_entry_t*) thread, MFS_DESC, &thread_descriptor_op);
@@ -64,8 +67,7 @@ USO_thread_new (void (*enter) (void *),
                 int stack_size,
                 enum USO_thread_priority priority,
                 enum USO_thread_scheduling scheduling,
-                char *name,
-                bool_t detach)
+                char *name)
 {
     USO_thread_t *thread = malloc (sizeof (USO_thread_t));
     if (thread){
@@ -73,7 +75,6 @@ USO_thread_new (void (*enter) (void *),
             malloc (stack_size * sizeof (USO_stack_t));
         if (stack) {
             USO_thread_init (thread, enter, stack, stack_size, priority, scheduling, name);
-            thread->detach = detach;
         } else {
             free (thread);
             thread = NULL;        
@@ -85,12 +86,13 @@ USO_thread_new (void (*enter) (void *),
 extern void
 USO_thread_terminate (USO_thread_t * thread)
 {
-    thread->state = USO_TERMINATED;
+    thread->state = USO_DEAD;
     if (thread->cleanup != NULL) { thread->cleanup(); }
-    if (thread->free_arg == TRUE) {
+    if ( (thread->flags & (1 << USO_FLAG_FREE_ARG)) == (1 << USO_FLAG_FREE_ARG))
+    {
         free (thread->arg);
     }
-    if (thread->detach == TRUE)
+    if ( (thread->flags & (1 << USO_FLAG_DETACH)) == (1 << USO_FLAG_DETACH))
     {
 		MFS_remove_desc(MFS_sysfs_threads(), thread->desc);
         free (thread->stack);
@@ -107,10 +109,15 @@ USO_thread_ios_init (USO_thread_t * thread,
 }
 
 extern void
-USO_thread_arg_init (USO_thread_t * thread, void * arg, bool_t free_arg)
+USO_thread_arg_init (USO_thread_t * thread, void * arg)
 {
     thread->arg = arg;
-    thread->free_arg = free_arg;
+}
+
+extern void
+USO_thread_flags_set(USO_thread_t * thread, u32_t flags)
+{
+	thread->flags |= flags;
 }
 
 extern void
@@ -123,9 +130,10 @@ extern void
 USO_start (USO_thread_t * thread)
 {
     USO_cpu_status_t ps = USO_disable ();
-    if ( (thread->state == USO_INIT) || (thread->state == USO_TERMINATED) ){
+    if ( (thread->state == USO_INIT) || (thread->state == USO_DEAD) ){
 		thread->stop = FALSE;
 		thread->ticks = 0;
+	    thread->signals = 0;
     	USO_ready (thread);
     }
     USO_restore (ps);
@@ -137,8 +145,41 @@ USO_stop (USO_thread_t * thread)
     USO_cpu_status_t ps = USO_disable ();
     if (thread->priority != USO_IDLE){
     	thread->stop = TRUE;
+		if (thread->state == USO_BLOCKED_CATCH)
+		{
+			USO_ready (thread);
+		}
     }
     USO_restore (ps);
+}
+
+extern void
+USO_raise(USO_thread_t * thread, u32_t signals)
+{
+    USO_cpu_status_t ps = USO_disable ();
+	thread->signals |= signals;
+	if (thread->state == USO_BLOCKED_CATCH)
+	{
+		USO_ready (thread);
+	}
+    USO_restore (ps);
+}
+
+extern u32_t
+USO_catch(void)
+{
+	u32_t signals;
+    USO_cpu_status_t ps = USO_disable ();
+	USO_thread_t * current = USO_current();
+	while (current->signals == 0)
+	{
+	    current->state = USO_BLOCKED_CATCH;
+	    USO_schedule (USO_next2run ());
+	}
+	signals = current->signals;
+	current->signals = 0;
+    USO_restore (ps);
+    return signals;
 }
 
 extern void
@@ -223,8 +264,11 @@ info(MFS_entry_t *entry)
     case USO_BLOCKED_WAIT:
         state = "b_wait";
         break;
-    case USO_BLOCKED_MONITOR:
-        state = "b_monitor";
+    case USO_BLOCKED_BLOCK:
+        state = "b_block";
+        break;
+    case USO_BLOCKED_LOCK:
+        state = "b_lock";
         break;
     case USO_BLOCKED_SLEEP:
         state = "b_sleep";
@@ -238,18 +282,29 @@ info(MFS_entry_t *entry)
     case USO_BLOCKED_REPLY:
         state = "b_reply";
         break;
+    case USO_BLOCKED_CATCH:
+        state = "b_catch";
+        break;
     case USO_EXIT:
         state = "exit";
         break;
-    case USO_TERMINATED:
-        state = "terminated";
+    case USO_DEAD:
+        state = "dead";
         break;
     default:
         state = error;
         break;
     }
     
-    printf ("%s\t%s\t%s\t%lu\n", priority, scheduling, state, thread->ticks);
+    printf ("%s\t%s\t%s\t%lu\t%p %p %p %p\n",
+    	priority,
+    	scheduling,
+    	state,
+    	thread->ticks,
+    	(void*)thread->stack_top,
+    	(void*)thread->stack_max,
+    	(void*)thread->cpu.sp,
+    	(void*)thread->stack_bot);
 }
 
 /*------------------------------------------------------------------------*/

@@ -46,6 +46,7 @@
 
 FILE *ser0 = NULL;
 
+extern char stack_start, stack_end;           /* Defined in *.ld! */
 extern char heap_start, heap_end;             /* Defined in *.ld! */
 
 static USO_heap_t heap;
@@ -81,10 +82,13 @@ init (void)
     /* The start thread has its own stack
        and its stacksize can be changed here! */
     start_thread = USO_thread_new (SAM_start_run, START_STACK_SIZE, USO_USER,
-                                  USO_ROUND_ROBIN, "start", TRUE);
-    USO_start (start_thread);
-
-    USO_kputs (USO_LL_INFO, "Idle.\n");
+                                  USO_ROUND_ROBIN, "Start");
+	if (start_thread != NULL)
+	{
+		USO_thread_flags_set(start_thread, (1 << USO_FLAG_DETACH));
+    	USO_start (start_thread);
+	}
+    USO_kputs (USO_LL_DEBUG, "Idle.\n");
 }
 
 extern void SAM_init(void)
@@ -108,5 +112,5 @@ extern void SAM_init(void)
     }
     USO_heap_install(&heap, "0");
    
-    USO_transform (init);
+    USO_transform (init, (USO_stack_t*)&stack_start, 1024 / sizeof(USO_stack_t) );
 }

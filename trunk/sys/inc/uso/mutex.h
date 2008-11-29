@@ -6,7 +6,7 @@
 #ifndef USO_MUTEX_H
 #define USO_MUTEX_H
 
-#include "uso/semaphore.h"
+#include "uso/thread.h"
 
 /** @defgroup mutex mutex.h
  *
@@ -17,25 +17,41 @@
 
 /*------------- Representation ------------------------------------------*/
 
-/** Lock a Mutex */
-#define USO_lock USO_wait
-/** Unlock a Mutex */
-#define USO_unlock USO_signal
+/*
+ * Mutex struct.
+ *
+ * Private
+ */
+struct USO_mutex
+{
+    /*
+     * thread which owns the mutex 
+     */
+    USO_thread_t* lock;
 
-/** Mutex is a semaphore initialized with 1 */
-typedef USO_semaphore_t USO_mutex_t;
+    /*
+     * List of blocked threads 
+     */
+    USO_list_t threads;
+};
 
-/*------------------------------------------------------------------------*/
+typedef struct USO_mutex USO_mutex_t;
 
 /*-------------- Interface -----------------------------------------------*/
 
 /**
  * Initialize a mutex.
  *
- * A mutex is a semaphor initialized with 1
+ * A mutex is owned by a thread which can enter the mutex again.
  * @param mutex : Pointer to mutex.
  */
 extern void USO_mutex_init (USO_mutex_t * mutex);
+
+/** Lock a Mutex */
+extern void USO_lock (USO_mutex_t * mutex);
+
+/** Unlock a Mutex */
+extern void USO_unlock (USO_mutex_t * mutex);
 
 /*------------------------------------------------------------------------*/
 

@@ -97,6 +97,8 @@ sample_switch (void)
     return h8_P4DR & H8_P44_SWITCH;
 }
 
+DEV_diginputs_t MDC_control_in;
+
 extern void
 MDC_digio_init (void)
 {
@@ -105,10 +107,10 @@ MDC_digio_init (void)
     DEV_digout_init (&MDC_red_led, DEV_DIGIO_LOW, DEV_DIGIO_NEG, set_red_led, clear_red_led);
     DEV_digout_init (&MDC_green_led, DEV_DIGIO_LOW, DEV_DIGIO_NEG, set_green_led, clear_green_led);
 
-	DEV_digin_list_init ();
-    DEV_digin_init (&MDC_button, DEV_DIGIO_NEG, sample_button, 0);
-    DEV_digin_init (&MDC_jumper_1, DEV_DIGIO_NEG, sample_jumper_1, 10);
-    DEV_digin_init (&MDC_jumper_2, DEV_DIGIO_NEG, sample_jumper_2, 10);
-    DEV_digin_init (&MDC_jumper_3, DEV_DIGIO_NEG, sample_jumper_3, 10);
-    DEV_digin_init (&MDC_switch, DEV_DIGIO_NEG, sample_switch, 0);
+	DEV_diginputs_init (&MDC_control_in);
+    DEV_digin_init (&MDC_control_in, &MDC_button, DEV_DIGIO_NEG, sample_button, 0);
+    DEV_digin_init (&MDC_control_in, &MDC_jumper_1, DEV_DIGIO_NEG, sample_jumper_1, 0);
+    DEV_digin_init (&MDC_control_in, &MDC_jumper_2, DEV_DIGIO_NEG, sample_jumper_2, 0);
+    DEV_digin_init (&MDC_control_in, &MDC_jumper_3, DEV_DIGIO_NEG, sample_jumper_3, 0);
+    DEV_digin_init (&MDC_control_in, &MDC_switch, DEV_DIGIO_NEG, sample_switch, 0);
 }

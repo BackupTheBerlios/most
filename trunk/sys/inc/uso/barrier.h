@@ -48,7 +48,8 @@ typedef struct USO_barrier USO_barrier_t;
 extern void USO_barrier_init (USO_barrier_t * barrier);
 
 extern void USO_block (USO_barrier_t * barrier);
-extern void USO_go (USO_barrier_t * barrier, bool_t all);
+extern void USO_go (USO_barrier_t * barrier);
+extern void USO_go_all (USO_barrier_t * barrier);
 
 
 /*------------------------------------------------------------------------*/

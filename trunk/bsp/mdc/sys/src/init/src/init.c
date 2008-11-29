@@ -38,6 +38,7 @@
 extern char data_start, data_end, code_end;   /* Defined in *.ld! */
 extern char bss_start, bss_end;               /* Defined in *.ld! */
 extern char heap_start, heap_end;             /* Defined in *.ld! */
+extern char stack_start, stack_end;           /* Defined in *.ld! */
 
 FILE *ser0 = NULL;
 static FILE *ser1 = NULL;
@@ -82,9 +83,12 @@ init (void)
        and its stacksize can be changed here! */
        
     start_thread = USO_thread_new (MDC_start_run, START_STACK_SIZE, USO_USER,
-    							  USO_ROUND_ROBIN, "start", TRUE);
-    USO_start (start_thread);
-
+    							  USO_ROUND_ROBIN, "start");
+	if (start_thread != NULL)
+	{
+		USO_thread_flags_set(start_thread, (1 << USO_FLAG_DETACH));
+    	USO_start (start_thread);
+	}
     USO_kputs (USO_LL_DEBUG, "Turn to idle.\n");
 }
 
@@ -108,5 +112,5 @@ MDC_init (void)
     }
  	USO_heap_install(&heap, "0");
 
-    USO_transform (init);
+    USO_transform (init, (USO_stack_t*)&stack_start, 1024 / sizeof(USO_stack_t));
 }

@@ -53,6 +53,9 @@ extern DEV_digin_t SAM_joystick_right;
 /** Joystick button */
 extern DEV_digin_t SAM_joystick_center;
 
+/** Control panel inputs */
+extern DEV_diginputs_t SAM_control_in;
+
 /**
  * Initialize digital io.
  */

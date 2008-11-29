@@ -56,7 +56,7 @@ NET_ethif_init (NET_netif_t *netif,
                      ethif_run,
                      ethif->rx_stack, ARRAYSIZE (ethif->rx_stack),
                      USO_INTERRUPT, USO_FIFO, "Eth0");
-    USO_thread_arg_init(&ethif->rx_thread, netif, FALSE);
+    USO_thread_arg_init(&ethif->rx_thread, netif);
 }
 
 extern void

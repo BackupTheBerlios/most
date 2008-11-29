@@ -37,7 +37,8 @@ digio_test_exec (char *nix)
     USO_cleanup_install(cleanup);
     for (;;)
     {
-        DEV_digin_wait (&MDC_jumper_1, DEV_DIGIO_LOW, TRUE);
+        while (DEV_digin_isset (&MDC_jumper_1) == FALSE)
+        	USO_sleep(ACE_MSEC_2_TICKS(100));
         for (;;)
         {
             for (i = 0; i < ARRAYSIZE (runninglight); ++i)

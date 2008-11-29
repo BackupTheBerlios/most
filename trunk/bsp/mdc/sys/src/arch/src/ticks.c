@@ -38,7 +38,6 @@ extern void _INTERRUPT_ MDC_CMI_ISR (void)
     USO_preempt ();
     USO_wakeup ();
     DEV_timer_fire ();
-    DEV_digin_sample ();
 	DEV_clock_tick ();
     // Clear the timer compare flag.
     H8_BITCLEAR (H8_RTMCSR_CMF, h8_RTMCSR);

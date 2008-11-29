@@ -34,8 +34,9 @@ extern void
 USO_sleep (long ticks)
 {
     USO_cpu_status_t ps = USO_disable ();
-    USO_current()->state = USO_BLOCKED_SLEEP;
-    USO_delta_insert (&sleepingThreads, (USO_node_t *) USO_current(),
+    USO_thread_t* current = USO_current();
+    current->state = USO_BLOCKED_SLEEP;
+    USO_delta_insert (&sleepingThreads, (USO_node_t *) current,
                       ticks);
     USO_schedule (USO_next2run ());
     USO_restore (ps);

@@ -190,14 +190,16 @@ CLI_cmd_run (CLI_interpreter_t *cli)
         	return done;
         }
        	USO_thread_t *t = USO_thread_new ((void (*)(void*))exec->f,
-       				 CLI_RUN_STACK_SIZE, prio, sched, cli->desc->name, TRUE);
+       				 CLI_RUN_STACK_SIZE, prio, sched, cli->desc->name);
         if (t != NULL) {
+       	    USO_thread_flags_set(t, 1 << USO_FLAG_DETACH);
 	        if (cli->argc >= 2) {
     	        size_t len = strlen(cli->argv[1]) +1;
         	    arg = malloc(len);
             	if (arg) {
                 	memcpy(arg, cli->argv[1], len);
-            	    USO_thread_arg_init(t, arg, TRUE);
+            	    USO_thread_arg_init(t, arg);
+            	    USO_thread_flags_set(t, 1 << USO_FLAG_FREE_ARG);
             	}
         	}
         	USO_start (t);

@@ -38,13 +38,15 @@ enum USO_thread_state
     USO_READY,
     USO_RUNNING,
     USO_BLOCKED_WAIT,
-    USO_BLOCKED_MONITOR,
     USO_BLOCKED_SLEEP,
     USO_BLOCKED_SEND,
     USO_BLOCKED_RECEIVE,
     USO_BLOCKED_REPLY,
+    USO_BLOCKED_BLOCK,
+    USO_BLOCKED_LOCK,
+    USO_BLOCKED_CATCH,
     USO_EXIT,
-    USO_TERMINATED
+    USO_DEAD
 };
 
 /** 
@@ -94,6 +96,13 @@ enum USO_thread_scheduling
     USO_ROUND_ROBIN
 };
 
+
+enum USO_thread_flags
+{
+    USO_FLAG_DETACH,
+    USO_FLAG_FREE_ARG
+};
+
 /*
  * Thread struct.
  *
@@ -110,12 +119,15 @@ struct USO_thread
     void (*enter) (void *);
     void (*cleanup) (void);
     void *arg;
-    bool_t free_arg;
-    bool_t detach;
     bool_t stop;
+	u32_t flags;
+	u32_t signals;
     FILE *in;
     FILE *out;
     USO_stack_t *stack;
+    USO_stack_t *stack_bot;
+    USO_stack_t *stack_top;
+    USO_stack_t *stack_max;
     void * message;
 	unsigned long ticks;
 	MFS_descriptor_t *desc;
@@ -174,8 +186,7 @@ extern USO_thread_t *USO_thread_new (void (*enter) (void *),
                                      int stack_size,
                                      enum USO_thread_priority priority,
 		                             enum USO_thread_scheduling scheduling,
-                                     char *name,
-                                     bool_t detach);
+                                     char *name);
 
 /**
  * Terminate thread, called by scheduler.
@@ -205,8 +216,9 @@ extern void USO_thread_ios_init (USO_thread_t * thread,
  * @param arg : argument.
  * @param free_arg : Free argument wenn thread is deleted.
  */
-extern void USO_thread_arg_init (USO_thread_t * thread, void * arg, bool_t free_arg);
+extern void USO_thread_arg_init (USO_thread_t * thread, void * arg);
 
+extern void USO_thread_flags_set(USO_thread_t * thread, u32_t flags);
 
 extern void USO_cleanup_install(void (*cleanup) (void));
 
@@ -223,6 +235,10 @@ extern void USO_start (USO_thread_t * thread);
  * @param thread : Pointer to thread.
  */
 extern void USO_stop (USO_thread_t * thread);
+
+extern void USO_raise(USO_thread_t * thread, u32_t signals);
+
+extern u32_t USO_catch(void);
 
 extern void USO_exit (void);
 
