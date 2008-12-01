@@ -9,6 +9,7 @@
 DEV_digout_t SAM_run_led;
 DEV_digout_t SAM_red_led;
 DEV_digout_t SAM_lcd_light;
+DEV_digout_t SAM_lcd_reset;
 
 static void
 set_run_led (void)
@@ -44,6 +45,18 @@ static void
 clear_lcd_light (void)
 {
     AT91C_BASE_PIOB->PIO_CODR = AT91B_LCD_BL;
+}
+
+static void
+set_lcd_reset (void)
+{
+	AT91C_BASE_PIOB->PIO_SODR = AT91B_LCD_RST;
+}
+
+static void
+clear_lcd_reset (void)
+{
+    AT91C_BASE_PIOB->PIO_CODR = AT91B_LCD_RST;
 }
 
 DEV_digin_t SAM_switch_1;
@@ -111,6 +124,7 @@ SAM_digio_init (void)
     DEV_digout_init (&SAM_run_led, DEV_DIGIO_HIGH, DEV_DIGIO_NEG, set_run_led, clear_run_led);
     DEV_digout_init (&SAM_red_led, DEV_DIGIO_HIGH, DEV_DIGIO_NEG, set_red_led, clear_red_led);
     DEV_digout_init (&SAM_lcd_light, DEV_DIGIO_LOW, DEV_DIGIO_POS, set_lcd_light, clear_lcd_light);
+	DEV_digout_init (&SAM_lcd_reset, DEV_DIGIO_HIGH, DEV_DIGIO_POS, set_lcd_reset, clear_lcd_reset);
 
 	DEV_diginputs_init (&SAM_control_in);
     DEV_digin_init (&SAM_control_in, &SAM_switch_1, DEV_DIGIO_NEG, sample_switch_1, 0);

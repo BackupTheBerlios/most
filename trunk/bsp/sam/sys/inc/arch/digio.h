@@ -30,6 +30,8 @@ extern DEV_digout_t SAM_red_led;
 /** LCD background light */
 extern DEV_digout_t SAM_lcd_light;
 
+/** LCD background reset */
+extern DEV_digout_t SAM_lcd_reset;
 
 
 /** Button left */

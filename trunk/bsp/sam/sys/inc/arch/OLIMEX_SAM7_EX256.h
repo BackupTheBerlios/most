@@ -11,6 +11,7 @@ extern void dbgu_print_hex8(unsigned long);
 #define AT91A_RUN_LED       AT91C_PIO_PA3   // Run LED
 #define AT91A_RED_LED       AT91C_PIO_PA4   // Red LED
 #define AT91B_LCD_BL		AT91C_PIO_PB20	// LCD Backlight
+#define AT91B_LCD_RST		AT91C_PIO_PA2	// LCD Reset
 
 #define AT91B_SW1           AT91C_PIO_PB24  // Switch 1
 #define AT91B_SW2           AT91C_PIO_PB25  // Switch 2

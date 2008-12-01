@@ -226,6 +226,11 @@ void SAM_io_init (void)
 	AT91C_BASE_PIOB->PIO_PER = (AT91B_LCD_BL);		// set to PIO mode
 	AT91C_BASE_PIOB->PIO_PPUDR = (AT91B_LCD_BL);	// disable pull up
 
+	// for LCD Reset
+	AT91C_BASE_PIOA->PIO_OER = (AT91B_LCD_RST);		// set to output
+	AT91C_BASE_PIOA->PIO_PER = (AT91B_LCD_RST);		// set to PIO mode
+	AT91C_BASE_PIOA->PIO_SODR = (AT91B_LCD_RST);		// set to high
+	
 	AT91C_BASE_PMC->PMC_PCER = (1 << AT91C_ID_PIOA);	// enable periph clock for PIO controller
 	AT91C_BASE_PIOA->PIO_ODR = (AT91A_JS_ALL);			// set PIO line to input
 }
