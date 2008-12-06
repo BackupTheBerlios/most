@@ -22,7 +22,7 @@ void SAM_main(void)
 {
     int cycle;
     USO_kputs (USO_LL_INFO, "Test 0.1.0\n");
-    DEV_digout_set (&SAM_lcd_light);
+    DEV_digout_set (&SAM_green_led);
  
     cycle = 1;
     for (;;)

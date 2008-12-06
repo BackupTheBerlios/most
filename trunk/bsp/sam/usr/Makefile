@@ -8,6 +8,7 @@ endif
 
 LIB_NAMES_SYS := 		 -l_cli\
 		 -l_mfs\
+		 -l_net\
 		 -l_dev\
 		 -l_uso\
 		 -l_ace\

@@ -7,20 +7,34 @@
 #include "arch/digio.h"
 
 DEV_digout_t SAM_run_led;
+DEV_digout_t SAM_green_led;
 DEV_digout_t SAM_red_led;
 DEV_digout_t SAM_lcd_light;
 DEV_digout_t SAM_lcd_reset;
+DEV_digout_t SAM_phy_power_down;
 
 static void
 set_run_led (void)
 {
-	AT91C_BASE_PIOA->PIO_SODR = AT91A_RUN_LED;
+	AT91C_BASE_PIOB->PIO_SODR = AT91B_RUN_LED;
 }
 
 static void
 clear_run_led (void)
 {
-    AT91C_BASE_PIOA->PIO_CODR = AT91A_RUN_LED;
+    AT91C_BASE_PIOB->PIO_CODR = AT91B_RUN_LED;
+}
+
+static void
+set_green_led (void)
+{
+	AT91C_BASE_PIOA->PIO_SODR = AT91A_GREEN_LED;
+}
+
+static void
+clear_green_led (void)
+{
+    AT91C_BASE_PIOA->PIO_CODR = AT91A_GREEN_LED;
 }
 
 static void
@@ -57,6 +71,18 @@ static void
 clear_lcd_reset (void)
 {
     AT91C_BASE_PIOB->PIO_CODR = AT91B_LCD_RST;
+}
+
+static void
+set_phy_power_down (void)
+{
+	AT91C_BASE_PIOB->PIO_SODR = AT91B_PHY_POWER_DOWN;
+}
+
+static void
+clear_phy_power_down (void)
+{
+    AT91C_BASE_PIOB->PIO_CODR = AT91B_PHY_POWER_DOWN;
 }
 
 DEV_digin_t SAM_switch_1;
@@ -121,9 +147,12 @@ DEV_diginputs_t SAM_control_in;
 extern void
 SAM_digio_init (void)
 {
-    DEV_digout_init (&SAM_run_led, DEV_DIGIO_HIGH, DEV_DIGIO_NEG, set_run_led, clear_run_led);
-    DEV_digout_init (&SAM_red_led, DEV_DIGIO_HIGH, DEV_DIGIO_NEG, set_red_led, clear_red_led);
+    DEV_digout_init (&SAM_run_led, DEV_DIGIO_LOW, DEV_DIGIO_NEG, set_run_led, clear_run_led);
+    DEV_digout_init (&SAM_green_led, DEV_DIGIO_LOW, DEV_DIGIO_NEG, set_green_led, clear_green_led);
+    DEV_digout_init (&SAM_red_led, DEV_DIGIO_LOW, DEV_DIGIO_NEG, set_red_led, clear_red_led);
     DEV_digout_init (&SAM_lcd_light, DEV_DIGIO_LOW, DEV_DIGIO_POS, set_lcd_light, clear_lcd_light);
+	DEV_digout_init (&SAM_lcd_reset, DEV_DIGIO_HIGH, DEV_DIGIO_POS, set_lcd_reset, clear_lcd_reset);
+    DEV_digout_init (&SAM_phy_power_down, DEV_DIGIO_HIGH, DEV_DIGIO_NEG, set_phy_power_down, clear_phy_power_down);
 	DEV_digout_init (&SAM_lcd_reset, DEV_DIGIO_HIGH, DEV_DIGIO_POS, set_lcd_reset, clear_lcd_reset);
 
 	DEV_diginputs_init (&SAM_control_in);

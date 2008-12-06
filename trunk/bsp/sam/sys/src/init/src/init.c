@@ -36,6 +36,7 @@
 #include "arch/OLIMEX_SAM7_EX256.h"
 #include "arch/lowlevel.h"
 #include "arch/uart.h"
+#include "arch/eth.h"
 #include "arch/ticks.h"
 #include "arch/digio.h"
 #include "init/main.h"
@@ -61,6 +62,7 @@ init (void)
 
     SAM_ticks_init ();
     SAM_uart_init_0 ();
+	SAM_eth_init ();
     SAM_sys_interrupt_init();
  
     USO_enable ();
@@ -70,7 +72,7 @@ init (void)
 		dbgu_print_ascii("open ser0 failed\n");
     }
 
-    USO_log_init (ser0, USO_LL_INFO);
+    USO_log_init (ser0, USO_LL_DEBUG);
 
     USO_kputs (USO_LL_INFO, "Debug on ser0.\n");
 
@@ -112,5 +114,5 @@ extern void SAM_init(void)
     }
     USO_heap_install(&heap, "0");
    
-    USO_transform (init, (USO_stack_t*)&stack_start, 1024 / sizeof(USO_stack_t) );
+    USO_transform (init, (USO_stack_t*)&stack_start, 2048 / sizeof(USO_stack_t) );
 }

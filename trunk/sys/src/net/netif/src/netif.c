@@ -72,6 +72,7 @@ NET_netif_init (NET_netif_t * netif, char *name)
 	netif->tx_drop = 0;
 	netif->rx_drop = 0;
     netif->device = NULL;
+    netif->info = NULL;
     NET_ip_addr_set (&(netif->ip_addr), &NET_ip_addr_any);
     NET_ip_addr_set (&(netif->netmask), &NET_ip_addr_any);
     NET_ip_addr_set (&(netif->gateway), &NET_ip_addr_any);

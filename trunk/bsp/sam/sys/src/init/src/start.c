@@ -19,6 +19,7 @@
 
 #include "arch/OLIMEX_SAM7_EX256.h"
 #include "arch/digio.h"
+#include "arch/eth.h"
 #include "init/init.h"
 #include "init/start.h"
 #include "init/main.h"
@@ -56,6 +57,8 @@ SAM_start_run (void *nix)
     USO_start (&run_led_thread);
     USO_kputs (USO_LL_INFO, "RunLed started.\n");
 	USO_yield();
+
+	SAM_eth_start();
 
     CLI_setup ("samy");
     CLI_interpreter_init (&cli0);

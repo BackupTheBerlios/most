@@ -24,14 +24,20 @@
 /** Run Led */
 extern DEV_digout_t SAM_run_led;
 
+/** Green Led */
+extern DEV_digout_t SAM_green_led;
+
 /** Red Led */
 extern DEV_digout_t SAM_red_led;
 
 /** LCD background light */
 extern DEV_digout_t SAM_lcd_light;
 
-/** LCD background reset */
+/** LCD reset */
 extern DEV_digout_t SAM_lcd_reset;
+
+/** Ethernet PHY power down */
+extern DEV_digout_t SAM_phy_power_down;
 
 
 /** Button left */

@@ -3,7 +3,7 @@ OUTPUT_ARCH(arm)
 ENTRY(reset_handler)
 
 sram_size	= 64K;
-stack_size	= 1K;
+stack_size	= 2K;
 
 MEMORY
 {
