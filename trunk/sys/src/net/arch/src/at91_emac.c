@@ -86,7 +86,7 @@ static void setup_descriptors(void)
 	AT91C_BASE_EMAC->EMAC_NCR |= ( AT91C_EMAC_TE | AT91C_EMAC_RE | AT91C_EMAC_WESTAT );
 }	
 
-static void setup_mac_address( void )
+static void setup_mac_address(void)
 {
 	/* Must be written SA1L then SA1H. */
 	AT91C_BASE_EMAC->EMAC_SA1L =	( ( unsigned long ) mac_address[ 3 ] << 24 ) |
@@ -268,12 +268,12 @@ at91_emac_start(NET_at91_emac_t* mac)
 	/* Wait for hardware reset end. */
 	while( !( AT91C_BASE_RSTC->RSTC_RSR & AT91C_RSTC_NRSTL ) );
   	
-	/* EMAC IO init for EMAC-PHY com. Remove EF100 config. */
+	/* EMAC IO init for EMAC-PHY com.*/
 	AT91F_EMAC_CfgPIO();
 
-	/* Enable com between EMAC PHY.
+	/* Enable com between EMAC PHY. */
 
-	Enable management port. */
+	/* Enable management port. */
 	AT91C_BASE_EMAC->EMAC_NCR |= AT91C_EMAC_MPE;	
 
 	/* MDC = MCK/32. */
@@ -301,7 +301,7 @@ at91_emac_start(NET_at91_emac_t* mac)
 	
 	setup_mac_address();
 
-	if( probe_phy() >= 0)
+	if( probe_phy() == 0)
 	{
 	    AT91C_BASE_EMAC->EMAC_IER = AT91C_EMAC_RCOMP;
 	    DEBUGF (NET_MAC_DEBUG, ("Mac: phy probe done.\n"));
@@ -318,6 +318,8 @@ at91_emac_send(NET_at91_emac_t* mac, NET_netbuf_t* packet)
 	int wait_cycles = 0;
 	long ret = 0;
 	char* buffer;
+
+	++mac->tx_packets;
 
 	/* Is a buffer available? */
 	while( !( tx_descriptors[tx_buffer_index].U_Status.status & AT91C_TRANSMIT_OK ) )
@@ -367,6 +369,8 @@ at91_emac_send(NET_at91_emac_t* mac, NET_netbuf_t* packet)
 			AT91C_BASE_EMAC->EMAC_NCR |= AT91C_EMAC_TSTART;
 		}
 		USO_unlock(&mac->lock);
+	} else {
+		++mac->tx_alloc_failed;
 	}
 	NET_netbuf_free(packet);
 }
@@ -445,11 +449,17 @@ at91_emac_poll(NET_at91_emac_t* mac)
 					if( section_length > length_so_far )
 					{
 						memcpy( data, source, (section_length - length_so_far) );
+
+						/* Is this the last buffer for the frame?  If not why? */
+						eof = rx_descriptors[next_rx_buffer].U_Status.status & AT91C_EOF;
+
+					} else {
+					    ++mac->rx_badlen;
 					}	
+				} else {
+				    ++mac->rx_badlen;
 				}			
 
-				/* Is this the last buffer for the frame?  If not why? */
-				eof = rx_descriptors[next_rx_buffer].U_Status.status & AT91C_EOF;
 			}
 
 			/* Mark the buffer as free again. */
@@ -462,13 +472,16 @@ at91_emac_poll(NET_at91_emac_t* mac)
 				next_rx_buffer = 0;
 			}
 		}
+		if (!eof){
+		    ++mac->rx_dropped;
+			NET_netbuf_free(packet);
+			packet = NULL;
+		}
+	} else {
+	    ++mac->rx_overruns;
 	}
-	
-	if (!eof){
-		NET_netbuf_free(packet);
-		packet = NULL;
-	}
-	
+
+	++mac->rx_packets;		
 	return packet;
 }
 
@@ -487,17 +500,14 @@ static void
 at91_emac_info (NET_at91_emac_t* mac)
 {
 	printf("\tAT91 EMAC\n"
-		   "\tRX: %lu, ovr %u, drop %u, err %u, bad %u\n"
-		   "\tTX: %lu, err %u, empty %u, alloc fail %u\n"
+		   "\tRX: %lu, ovr %u, drop %u, bad %u\n"
+		   "\tTX: %lu, alloc fail %u\n"
 		   "\tLINK: %s, down cnt %u\n",  
 		    mac->rx_packets,
     		mac->rx_overruns,
     		mac->rx_dropped,
-    		mac->rx_error,
     		mac->rx_badlen,
     		mac->tx_packets,
-    		mac->tx_errors,
-    		mac->tx_empty,
     		mac->tx_alloc_failed,
 		    mac->link_is_up ? "up" : "down",
     		mac->link_down_count);	
@@ -516,11 +526,8 @@ NET_at91_emac_init (NET_ethif_t* ethif,
     mac->rx_packets = 0;
     mac->rx_overruns = 0;
     mac->rx_dropped = 0;
-    mac->rx_error = 0;
     mac->rx_badlen = 0;
     mac->tx_packets = 0;
-    mac->tx_errors = 0;
-    mac->tx_empty = 0;
     mac->tx_alloc_failed = 0;
     mac->link_down_count = 0;
     mac->link_is_up = FALSE;

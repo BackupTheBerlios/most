@@ -53,6 +53,9 @@ init (void)
     DEV_timers_init ();
     DEV_clock_init ();
     MDC_ticks_init ();
+    EE_93C46_init ();
+    MDC_ee_config_read ();
+    MDC_eth_init ();
 
     MDC_sci_init_0 ();
     ser0 = MFS_get_stream (MFS_open(MFS_sysfs_serial(), "0"));
@@ -67,13 +70,8 @@ init (void)
     }
 
     USO_log_init (ser0, USO_LL_INFO);
-    USO_kputs (USO_LL_INFO, "Debug on ser0.\n");
-
-    EE_93C46_init ();
-    MDC_ee_config_read ();
-    MDC_eth_init ();
-
     USO_enable ();
+    USO_kputs (USO_LL_INFO, "Debug on ser0.\n");
 
     unsigned long loop_count = DEV_get_ticks();
     DEV_cpudelay(ACE_USEC_2_LOOPS(50000));

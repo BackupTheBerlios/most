@@ -39,7 +39,7 @@
  * Object              : This function is used to send a string through the
  *                       DBGU channel (Very low level debugging)
  *----------------------------------------------------------------------------*/
-void dbgu_print_ascii(const char *buffer)
+void DEV_at91_dbgu_print_ascii(const char *buffer)
 {
     while (*buffer != '\0') {
         while (!(AT91C_BASE_DBGU->DBGU_CSR & AT91C_US_TXRDY));
@@ -51,12 +51,12 @@ void dbgu_print_ascii(const char *buffer)
  * Function Name       : dbgu_print_hex8
  * Object              : This function is used to print a 32-bit value in hexa
  *----------------------------------------------------------------------------*/
-void dbgu_print_hex8(unsigned long value)
+void DEV_at91_dbgu_print_hex8(unsigned long value)
 {
     char c = 0;
     char shift = sizeof(unsigned long) * 8;
 
-    dbgu_print_ascii("0x");
+    DEV_at91_dbgu_print_ascii("0x");
     do {
         shift -= 4;
         while (!(AT91C_BASE_DBGU->DBGU_CSR & AT91C_US_TXRDY));
@@ -72,7 +72,7 @@ void dbgu_print_hex8(unsigned long value)
  * Function Name       : configure_dbgu
  * Object              : Configure DBGU
  *-----------------------------------------------------------------------------*/
-void configure_dbgu (void)
+void DEV_at91_configure_dbgu (void)
 {
     /* Reset and disable receiver */
     AT91C_BASE_DBGU->DBGU_CR = AT91C_US_RSTRX | AT91C_US_RSTTX;

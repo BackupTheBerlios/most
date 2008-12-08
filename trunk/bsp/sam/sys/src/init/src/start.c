@@ -17,7 +17,6 @@
 #include <mfs/stream.h>
 #include <mfs/sysfs.h>
 
-#include "arch/OLIMEX_SAM7_EX256.h"
 #include "arch/digio.h"
 #include "arch/eth.h"
 #include "init/init.h"

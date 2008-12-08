@@ -11,11 +11,8 @@ struct NET_at91_emac
     unsigned long rx_packets;
     unsigned short rx_overruns;
     unsigned short rx_dropped;
-    unsigned short rx_error;
     unsigned short rx_badlen;
     unsigned long tx_packets;
-    unsigned short tx_errors;
-    unsigned short tx_empty;
     unsigned short tx_alloc_failed;
     unsigned short link_down_count;
     bool_t link_is_up;

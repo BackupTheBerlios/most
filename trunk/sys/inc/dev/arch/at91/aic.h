@@ -44,20 +44,20 @@
 ///    AIC_EnableIT and AIC_DisableIT.
 //------------------------------------------------------------------------------
 
-#ifndef AIC_H
-#define AIC_H
+#ifndef DEV_AT91_AIC_H
+#define DEV_AT91_AIC_H
 
 //------------------------------------------------------------------------------
 //         Exported functions
 //------------------------------------------------------------------------------
 
-extern void AIC_ConfigureIT(unsigned int source,
-                                   unsigned int mode,
-                                   void (*handler)( void ));
+extern void DEV_at91_aic_configure_IT(unsigned int source,
+                                      unsigned int mode,
+                                      void (*handler)( void ));
 
-extern void AIC_EnableIT(unsigned int source);
+extern void DEV_at91_aic_enable_IT(unsigned int source);
 
-extern void AIC_DisableIT(unsigned int source);
+extern void DEV_at91_aic_disable_IT(unsigned int source);
 
-#endif //#ifndef AIC_H
+#endif
 

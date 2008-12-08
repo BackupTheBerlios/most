@@ -33,8 +33,8 @@
 #include <mfs/stream.h>
 #include <mfs/sysfs.h>
 
-#include "arch/OLIMEX_SAM7_EX256.h"
-#include "arch/lowlevel.h"
+#include "arch/pins.h"
+#include "arch/exceptions.h"
 #include "arch/uart.h"
 #include "arch/eth.h"
 #include "arch/ticks.h"
@@ -46,7 +46,10 @@
 #define START_STACK_SIZE       0x400
 
 FILE *ser0 = NULL;
+static FILE *ser1 = NULL;
 
+extern char data_start, data_end, text_end;   /* Defined in *.ld! */
+extern char bss_start, bss_end;               /* Defined in *.ld! */
 extern char stack_start, stack_end;           /* Defined in *.ld! */
 extern char heap_start, heap_end;             /* Defined in *.ld! */
 
@@ -61,24 +64,29 @@ init (void)
     DEV_clock_init ();
 
     SAM_ticks_init ();
-    SAM_uart_init_0 ();
 	SAM_eth_init ();
     SAM_sys_interrupt_init();
  
-    USO_enable ();
- 
+    SAM_uart_init_0 ();
     ser0 = MFS_get_stream (MFS_open(MFS_sysfs_serial(), "0"));
     if (ser0 == NULL){
-		dbgu_print_ascii("open ser0 failed\n");
+    	DEV_digout_set (&SAM_red_led);
+		DEV_at91_dbgu_print_ascii("open ser0 failed\n");
+    }
+
+    SAM_uart_init_1 ();
+    ser1 = MFS_get_stream (MFS_open(MFS_sysfs_serial(), "1"));
+    if (ser0 == NULL){
+    	DEV_digout_set (&SAM_red_led);
+		DEV_at91_dbgu_print_ascii("open ser1 failed\n");
     }
 
     USO_log_init (ser0, USO_LL_DEBUG);
-
+    USO_enable ();
     USO_kputs (USO_LL_INFO, "Debug on ser0.\n");
 
     unsigned long loop_count = DEV_get_ticks();
     DEV_cpudelay(ACE_USEC_2_LOOPS(50000));
-
     USO_kprintf (USO_LL_INFO, "Loop calib 50ms: %lu.\n", DEV_get_ticks_diff(loop_count));
     
     /* The start thread has its own stack
@@ -95,22 +103,27 @@ init (void)
 
 extern void SAM_init(void)
 {
-    configure_dbgu();
-    SAM_io_init();
+    memcpy(&data_start, &text_end, &data_end - &data_start);
+    memset(&bss_start, 0, &bss_end - &bss_start); 
 
-    dbgu_print_ascii("AT91SAM7X chip ID : ");
-    dbgu_print_hex8(AT91C_BASE_DBGU->DBGU_CIDR);
-    dbgu_print_ascii("\n");
+    SAM_pins_init();
+
+    DEV_at91_configure_dbgu();
+    DEV_at91_dbgu_print_ascii("AT91SAM7X chip ID : ");
+    DEV_at91_dbgu_print_hex8(AT91C_BASE_DBGU->DBGU_CIDR);
+    DEV_at91_dbgu_print_ascii("\n");
 
     SAM_digio_init();	    
     
     if (USO_heap_init (&heap, &heap_start, &heap_end) == FALSE){
-        dbgu_print_ascii("heap_init failed\n");
+    	DEV_digout_set (&SAM_red_led);
+        DEV_at91_dbgu_print_ascii("heap_init failed\n");
     }
     ACE_stdlib_init(&heap);
     
     if (MFS_sysfs_init() == FALSE){
-        dbgu_print_ascii("sysfs_init failed\n");
+    	DEV_digout_set (&SAM_red_led);
+        DEV_at91_dbgu_print_ascii("sysfs_init failed\n");
     }
     USO_heap_install(&heap, "0");
    

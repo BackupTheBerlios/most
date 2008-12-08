@@ -3,7 +3,7 @@
  *
  */
 
-#include "arch/OLIMEX_SAM7_EX256.h"
+#include "arch/pins.h"
 #include "arch/digio.h"
 
 DEV_digout_t SAM_run_led;

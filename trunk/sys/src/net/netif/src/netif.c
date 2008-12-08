@@ -40,12 +40,13 @@ NET_netif_set_default (NET_netif_t * netif)
 static void
 print_ipaddr(char* name, NET_ip_addr_t ipaddr)
 {
+	long addr = ntohl(ipaddr.addr);
  	printf("\n\t%s: %3ld.%3ld.%3ld.%3ld", 
 			 name,
-             ipaddr.addr >> 24 & 0xff,
-             ipaddr.addr >> 16 & 0xff,
-             ipaddr.addr >> 8 & 0xff,
-             ipaddr.addr & 0xff);
+             addr >> 24 & 0xff,
+             addr >> 16 & 0xff,
+             addr >> 8 & 0xff,
+             addr & 0xff);
 }
 
 static void

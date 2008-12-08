@@ -10,7 +10,7 @@
 #include <dev/timer.h>
 #include <dev/clock.h>
 
-#include "arch/OLIMEX_SAM7_EX256.h"
+#include "dev/arch/at91/AT91SAM7X256.h"
 #include "init/init.h"
 #include "arch/ticks.h"
 

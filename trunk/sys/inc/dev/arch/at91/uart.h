@@ -29,23 +29,26 @@
 
 /*-------------- Interface -----------------------------------------------*/
 
+extern void DEV_at91_uart0_init (void);
+
+extern void DEV_at91_uart1_init (void);
+
 /**
  * Low level function to open serial port.
  *
  * @param port : 0 or 1
  * @param settings : initialized serial settings struct.
  */
-extern void DEV_at91_uart_open (
-	const struct DEV_serial_settings *settings
-/*	void (*f) (void) */
-	);
+extern void DEV_at91_uart_open (int port,
+								const struct DEV_serial_settings *settings
+								);
 
 /**
  * Low level function to close serial port.
  *
  * @param port : 0 or 1
  */
-extern void DEV_at91_uart_close (void);
+extern void DEV_at91_uart_close (int port);
 
 /**
  * Low level function to start serial transmission.
@@ -53,7 +56,7 @@ extern void DEV_at91_uart_close (void);
  * @param port : 0 or 1
  * @param serial : Serial devive
  */
-extern void DEV_at91_uart_start (DEV_serial_t * serial);
+extern void DEV_at91_uart_start (int port, DEV_serial_t * serial);
 
 /**
  * Low level function transmit end interrupt.
@@ -61,7 +64,7 @@ extern void DEV_at91_uart_start (DEV_serial_t * serial);
  * @param port : 0 or 1
  * @param serial : Serial device
  */
-extern void DEV_at91_uart_interrupt (DEV_serial_t * serial);
+extern void DEV_at91_uart_interrupt (int port, DEV_serial_t * serial);
 
 /*------------------------------------------------------------------------*/
 

@@ -3,7 +3,6 @@
 #include <uso/sleep.h>
 #include <dev/arch/cpu.h>
 
-#include "arch/OLIMEX_SAM7_EX256.h"
 #include "arch/digio.h"
 #include "init/init.h"
 #include "init/main.h"

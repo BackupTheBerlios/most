@@ -3,9 +3,6 @@
 #include "dev/arch/at91/uart.h"
 #include "dev/arch/at91/AT91SAM7X256.h"
 
-#include <dev/digout.h>
-#include <dev/digin.h>
-
 // *********************************************************************************************************
 // Set up USART0 (peripheral ID = 6) 9600 baud, 8 data bits, 1 stop bit, no parity
 //
@@ -49,68 +46,120 @@
 // This calculation is taken from : James P Lynch June 22, 2008
 // *********************************************************************************************************
 
+static AT91PS_USART const ports[] = {
+	AT91C_BASE_US0,
+	AT91C_BASE_US1
+};
+
+static unsigned int const baudratetable[] = {
+    2503,      // /< 1200 baud
+    1251,      // /< 2400 baud
+    626,       // /< 4800 baud
+    313,       // /< 9600 baud
+    156,       // /< 19200 baud
+    78         // /< 38400 baud
+};
+
+static const unsigned int paritytable[] = {
+    AT91C_US_PAR_NONE,               // /< No parity
+    AT91C_US_PAR_EVEN,               // /< Even parity
+    AT91C_US_PAR_ODD                 // /< Odd parity
+};
+
+static const unsigned int databittable[] = {
+    AT91C_US_CHRL_7_BITS,               // /< characterlenght is 7 bits 
+    AT91C_US_CHRL_8_BITS                // /< characterlenght is 8 bits 
+};
+
+static const unsigned int stopbittable[] = {
+    AT91C_US_NBSTOP_1_BIT,               // /< One stopbit added
+    AT91C_US_NBSTOP_2_BIT                // /< Two stopbit added
+};
+
+
 extern void
-DEV_at91_uart_open (const struct DEV_serial_settings *settings /*, void (*f) (void) */ )
+DEV_at91_uart0_init (void)
 {
 	// enable the usart0 peripheral clock
-	volatile AT91PS_PMC pPMC = AT91C_BASE_PMC; // pointer to PMC data structure
-	pPMC->PMC_PCER = (1<<AT91C_ID_US0); // enable usart0 peripheral clock
+	volatile AT91PS_PMC pmc = AT91C_BASE_PMC; // pointer to PMC data structure
+	pmc->PMC_PCER = (1<<AT91C_ID_US0); // enable usart0 peripheral clock
 
 	// set up PIO to enable USART0 peripheral control of pins
-	volatile AT91PS_PIO pPIO = AT91C_BASE_PIOA;
-	pPIO->PIO_PDR = AT91C_PA0_RXD0 | AT91C_PA1_TXD0; // enable peripheral control of PA0,PA1 (RXD0 and TXD0)
-	pPIO->PIO_ASR = AT91C_PIO_PA0 | AT91C_PIO_PA1; // assigns the 2 I/O lines to peripheral A function
-	pPIO->PIO_BSR = 0; // peripheral B function set to "no effect"
-	
+	volatile AT91PS_PIO pio = AT91C_BASE_PIOA;
+	pio->PIO_PDR = AT91C_PA0_RXD0 | AT91C_PA1_TXD0; // enable peripheral control of PA0,PA1 (RXD0 and TXD0)
+	pio->PIO_ASR = AT91C_PIO_PA0 | AT91C_PIO_PA1; // assigns the 2 I/O lines to peripheral A function
+	pio->PIO_BSR = 0; // peripheral B function set to "no effect"
+}
+
+extern void
+DEV_at91_uart1_init (void)
+{
+	// enable the usart0 peripheral clock
+	volatile AT91PS_PMC pmc = AT91C_BASE_PMC; // pointer to PMC data structure
+	pmc->PMC_PCER = (1<<AT91C_ID_US1); // enable usart1 peripheral clock
+
+	// set up PIO to enable USART0 peripheral control of pins
+	volatile AT91PS_PIO pio = AT91C_BASE_PIOA;
+	pio->PIO_PDR = AT91C_PA5_RXD1 | AT91C_PA6_TXD1; // enable peripheral control of PA5,PA6 (RXD1 and TXD1)
+	pio->PIO_ASR = AT91C_PIO_PA5 | AT91C_PIO_PA6; // assigns the 2 I/O lines to peripheral A function
+	pio->PIO_BSR = 0; // peripheral B function set to "no effect"
+}
+
+extern void
+DEV_at91_uart_open (int port,
+					const struct DEV_serial_settings *settings)
+{
 	// set up the USART0 registers
-	volatile AT91PS_USART pUSART0 = AT91C_BASE_US0;
-	pUSART0->US_MR = AT91C_US_PAR_NONE | 0x3 << 6; // 8-bit, no parity
+	volatile AT91PS_USART uart = ports[port];
+	uart->US_MR = paritytable[settings->parity] |
+				  databittable[settings->data] |
+				  stopbittable[settings->stop];
 
-	pUSART0->US_IER = 0x00; // no usart0 interrupts enabled (no effect)
-	pUSART0->US_IDR = 0xFFFF; // disable all USART0 interrupts
+	uart->US_IER = 0x00; // no usart0 interrupts enabled (no effect)
+	uart->US_IDR = 0xFFFF; // disable all USART0 interrupts
 
-	pUSART0->US_BRGR = 0x139; // CD = 0x139 (313 from above calculation) FP=0 (not used)
+	uart->US_BRGR = baudratetable[settings->baud];
 
-	pUSART0->US_RTOR = 0; // receiver time-out (disabled)
-	pUSART0->US_TTGR = 0; // transmitter timeguard (disabled)
+	uart->US_RTOR = 0; // receiver time-out (disabled)
+	uart->US_TTGR = 0; // transmitter timeguard (disabled)
 
 	// enable the USART0 receiver and transmitter
-	pUSART0->US_CR = AT91C_US_RXEN;
+	uart->US_CR = AT91C_US_RXEN;
 
 	// enable the USART0 receive interrupt
-	pUSART0->US_IDR = ~0; // disable all interrupts
-	pUSART0->US_IER = AT91C_US_RXRDY |
+	uart->US_IDR = ~0; // disable all interrupts
+	uart->US_IER = AT91C_US_RXRDY |
 		              AT91C_US_OVRE |
 		              AT91C_US_FRAME |
 		              AT91C_US_PARE;
 }
 
 extern void
-DEV_at91_uart_close (void)
+DEV_at91_uart_close (int port)
 {
-	volatile AT91PS_USART pUsart0 = AT91C_BASE_US0;
-	pUsart0->US_IDR = ~0; // disable all interrupts
+	volatile AT91PS_USART uart = ports[port];
+	uart->US_IDR = ~0; // disable all interrupts
 }
 
 
 static void
-tx_write (char c)
+tx_write (int port, char c)
 {
-	volatile AT91PS_USART pUsart0 = AT91C_BASE_US0;
-	pUsart0->US_THR = c;	
+	volatile AT91PS_USART uart = ports[port];
+	uart->US_THR = c;	
 }
 
 extern void
-DEV_at91_uart_start (DEV_serial_t * serial)
+DEV_at91_uart_start (int port, DEV_serial_t * serial)
 {
     int c;
-	volatile AT91PS_USART pUsart0 = AT91C_BASE_US0;
+	volatile AT91PS_USART uart = ports[port];
 
     if ((c = serial->int_interface->tx_char (serial)) != EOF)
     {
-		pUsart0->US_IER = AT91C_US_TXRDY | AT91C_US_TXEMPTY;
-		pUsart0->US_CR = AT91C_US_TXEN;
-        tx_write ((char)c);
+		uart->US_IER = AT91C_US_TXRDY | AT91C_US_TXEMPTY;
+		uart->US_CR = AT91C_US_TXEN;
+        tx_write (port, (char)c);
     }
     else
     {
@@ -119,63 +168,63 @@ DEV_at91_uart_start (DEV_serial_t * serial)
 }
 
 extern void
-DEV_at91_uart_interrupt (DEV_serial_t * serial)
+DEV_at91_uart_interrupt (int port, DEV_serial_t * serial)
 {
-	volatile AT91PS_USART pUsart0 = AT91C_BASE_US0;
+	volatile AT91PS_USART uart = ports[port];
 
-	if ((pUsart0->US_CSR & AT91C_US_RXRDY) == AT91C_US_RXRDY)
+	if ((uart->US_CSR & AT91C_US_RXRDY) == AT91C_US_RXRDY)
 	{
 		char c;
 
-		c = pUsart0->US_RHR;
+		c = uart->US_RHR;
 	    serial->int_interface->rx_char (serial, c);
 	}
 	else
 	{
-		if ((pUsart0->US_CSR & AT91C_US_OVRE) == AT91C_US_OVRE)
+		if ((uart->US_CSR & AT91C_US_OVRE) == AT91C_US_OVRE)
 		{
 			serial->int_interface->rx_error (serial, DEV_SER_RX_OVERRUN);
-			pUsart0->US_CR = AT91C_US_RSTSTA; 
+			uart->US_CR = AT91C_US_RSTSTA; 
 		}	
-		else if ((pUsart0->US_CSR & AT91C_US_FRAME) == AT91C_US_FRAME)
+		else if ((uart->US_CSR & AT91C_US_FRAME) == AT91C_US_FRAME)
 		{
 	        serial->int_interface->rx_error (serial, DEV_SER_RX_FRAMING);
-			pUsart0->US_CR = AT91C_US_RSTSTA; 
+			uart->US_CR = AT91C_US_RSTSTA; 
 		}	
-		else if ((pUsart0->US_CSR & AT91C_US_PARE) == AT91C_US_PARE)
+		else if ((uart->US_CSR & AT91C_US_PARE) == AT91C_US_PARE)
 		{
 	        serial->int_interface->rx_error (serial, DEV_SER_RX_PARITY);
-			pUsart0->US_CR = AT91C_US_RSTSTA; 
+			uart->US_CR = AT91C_US_RSTSTA; 
 		}
 	}
 
-	if ((pUsart0->US_CSR & AT91C_US_TXEMPTY) == AT91C_US_TXEMPTY)
+	if ((uart->US_CSR & AT91C_US_TXEMPTY) == AT91C_US_TXEMPTY)
 	{
 	    int c;
 
 	    if ((c = serial->int_interface->tx_char (serial)) == EOF)
 	    {
-			pUsart0->US_CR = AT91C_US_TXDIS;
-        	pUsart0->US_IDR = AT91C_US_TXEMPTY;
+			uart->US_CR = AT91C_US_TXDIS;
+        	uart->US_IDR = AT91C_US_TXEMPTY;
         	serial->int_interface->tx_finished (serial);
     	}
     	else
     	{
-			pUsart0->US_IER = AT91C_US_TXRDY;
-        	tx_write ((char)c);
+			uart->US_IER = AT91C_US_TXRDY;
+        	tx_write (port, (char)c);
     	}
 	} 
-	else if ((pUsart0->US_CSR & AT91C_US_TXRDY) == AT91C_US_TXRDY)
+	else if ((uart->US_CSR & AT91C_US_TXRDY) == AT91C_US_TXRDY)
 	{
 	    int c;
 
 	    if ((c = serial->int_interface->tx_char (serial)) == EOF)
     	{
-			pUsart0->US_IDR = AT91C_US_TXRDY;
+			uart->US_IDR = AT91C_US_TXRDY;
     	}
     	else
     	{
-        	tx_write ((char)c);
+        	tx_write (port, (char)c);
     	}
 	}
 }

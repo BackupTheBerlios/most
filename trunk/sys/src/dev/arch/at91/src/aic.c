@@ -49,9 +49,9 @@
 /// \param mode  Triggering mode of the interrupt.
 /// \param handler  Interrupt handler function.
 //------------------------------------------------------------------------------
-void AIC_ConfigureIT(unsigned int source,
-                            unsigned int mode,
-                            void (*handler)( void ))
+extern void DEV_at91_aic_configure_IT(unsigned int source,
+                                      unsigned int mode,
+                                      void (*handler)( void ))
 {
     // Disable the interrupt first
     AT91C_BASE_AIC->AIC_IDCR = 1 << source;
@@ -68,7 +68,7 @@ void AIC_ConfigureIT(unsigned int source,
 /// Enables interrupts coming from the given (unique) source.
 /// \param source  Interrupt source to enable.
 //------------------------------------------------------------------------------
-void AIC_EnableIT(unsigned int source)
+extern void DEV_at91_aic_enable_IT(unsigned int source)
 {
     AT91C_BASE_AIC->AIC_IECR = 1 << source;
 }
@@ -77,7 +77,7 @@ void AIC_EnableIT(unsigned int source)
 /// Disables interrupts coming from the given (unique) source.
 /// \param source  Interrupt source to enable.
 //------------------------------------------------------------------------------
-void AIC_DisableIT(unsigned int source)
+extern void DEV_at91_aic_disable_IT(unsigned int source)
 {
     AT91C_BASE_AIC->AIC_IDCR = 1 << source;
 }
