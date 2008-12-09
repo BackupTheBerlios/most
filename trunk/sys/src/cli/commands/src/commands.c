@@ -34,7 +34,7 @@ extern void
 command_info(MFS_entry_t *entry)
 {
 	CLI_command_t * command = (CLI_command_t *) entry;
-	printf("[ %s ].\n", command->description);
+	ACE_printf("[ %s ].\n", command->description);
 }
 
 static struct MFS_descriptor_op command_descriptor_op = {.open = NULL,
@@ -43,7 +43,7 @@ static struct MFS_descriptor_op command_descriptor_op = {.open = NULL,
 
 extern void
 CLI_command_init (CLI_command_t * command,
-                  char *name, char *description, bool_t (*f) (CLI_interpreter_t *) )
+                  char *name, char *description, ACE_bool_t (*f) (CLI_interpreter_t *) )
 {
     command->description = description;
     command->f = f;
@@ -70,7 +70,7 @@ extern void
 exec_info(MFS_entry_t *entry)
 {
 	CLI_exec_t * exec = (CLI_exec_t *) entry;
-	printf("[ %s ].\n", exec->description);
+	ACE_printf("[ %s ].\n", exec->description);
 }
 
 static struct MFS_descriptor_op exec_descriptor_op = {.open = NULL,

@@ -53,7 +53,7 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
     struct NET_ip_hdr *iphdr;
     struct NET_udp_hdr *udphdr;
     NET_udp_socket_t *sock = NULL;
-    u16_t src, dest;
+    ACE_u16_t src, dest;
 
     ++NET_stats.udp.rx;
 
@@ -64,8 +64,8 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
     DEBUGF (NET_UDP_DEBUG, ("Udp: rx datagram of length %d.\n",
                             NET_netbuf_len(p) - sizeof (struct NET_udp_hdr)));
 
-    src = ntohs (udphdr->src);
-    dest = ntohs (udphdr->dest);
+    src = ACE_ntohs (udphdr->src);
+    dest = ACE_ntohs (udphdr->dest);
 
     UDP_HEAD_DEBUG (udphdr);
 
@@ -90,8 +90,8 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
             /*
              * deconvert from host to network byte order 
              */
-            udphdr->src = htons (udphdr->src);
-            udphdr->dest = htons (udphdr->dest);
+            udphdr->src = ACE_htons (udphdr->src);
+            udphdr->dest = ACE_htons (udphdr->dest);
 
             /*
              * adjust pbuf pointer 
@@ -113,7 +113,7 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
         if (NET_inet_chksum_pseudo
             (p, (NET_ip_addr_t *) & (iphdr->src),
              (NET_ip_addr_t *) & (iphdr->dest), NET_IP_PROTO_UDPLITE,
-             ntohs (udphdr->len)) != 0)
+             ACE_ntohs (udphdr->len)) != 0)
         {
             DEBUGF (NET_UDP_DEBUG,
                     ("Udp: udp lite datagram discarded due to failing checksum.\n"));
@@ -161,8 +161,8 @@ NET_udp_output (NET_udp_socket_t * sock, NET_netbuf_t * p)
     tot_len = (unsigned short)NET_netbuf_tot_len (p);
 
     udphdr = (struct NET_udp_hdr *)NET_netbuf_index(p);
-    udphdr->src = htons (sock->local_port);
-    udphdr->dest = htons (sock->remote_port);
+    udphdr->src = ACE_htons (sock->local_port);
+    udphdr->dest = ACE_htons (sock->remote_port);
     udphdr->chksum = 0x0000;
 
     if ((netif = NET_ip_route (&(sock->remote_ip))) == NULL)
@@ -188,7 +188,7 @@ NET_udp_output (NET_udp_socket_t * sock, NET_netbuf_t * p)
 
     if (sock->flags & NET_UDP_FLAGS_UDPLITE)
     {
-        udphdr->len = htons (sock->chksum_len);
+        udphdr->len = ACE_htons (sock->chksum_len);
         /*
          * calculate checksum 
          */
@@ -208,7 +208,7 @@ NET_udp_output (NET_udp_socket_t * sock, NET_netbuf_t * p)
     }
     else
     {
-        udphdr->len = htons (tot_len);
+        udphdr->len = ACE_htons (tot_len);
         /*
          * calculate checksum 
          */

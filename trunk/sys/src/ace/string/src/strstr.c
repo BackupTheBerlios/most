@@ -6,14 +6,14 @@
 #include "ace/string.h"
 
 extern char *
-strstr (const char *cs, const char *ct)
+ACE_strstr (const char *cs, const char *ct)
 {
     int l1, l2;
 
-    l2 = strlen (ct);
+    l2 = ACE_strlen (ct);
     if (!l2)
         return (char *)cs;
-    l1 = strlen (cs);
+    l1 = ACE_strlen (cs);
     while (l1 >= l2)
     {
         l1--;

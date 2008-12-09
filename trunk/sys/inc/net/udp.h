@@ -27,11 +27,11 @@
 /** UDP Header */
 struct NET_udp_hdr
 {
-    u16_t src; /**< src UDP port */
-    u16_t dest; /**< dest UDP port */
-    u16_t len; /**< length */
-    u16_t chksum; /**< checksum */
-} _PACKED_;
+    ACE_u16_t src; /**< src UDP port */
+    ACE_u16_t dest; /**< dest UDP port */
+    ACE_u16_t len; /**< length */
+    ACE_u16_t chksum; /**< checksum */
+} ACE_PACKED_;
 
 /**
  * ?

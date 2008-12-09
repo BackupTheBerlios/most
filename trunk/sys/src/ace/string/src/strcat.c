@@ -6,7 +6,7 @@
 #include "ace/string.h"
 
 extern char *
-strcat (char *s, const char *ct)
+ACE_strcat (char *s, const char *ct)
 {
     char *temp = s;
 

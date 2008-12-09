@@ -71,42 +71,42 @@ MDC_sci_init_1 (void)
 }
 
 
-extern void _INTERRUPT_ MDC_TXE0_ISR (void)
+extern void ACE_INTERRUPT_ MDC_TXE0_ISR (void)
 {
     DEV_h8300_sci_txe (0, & ser0);
 }
 
-extern void _INTERRUPT_ MDC_TXI0_ISR (void)
+extern void ACE_INTERRUPT_ MDC_TXI0_ISR (void)
 {
     DEV_h8300_sci_txi (0, & ser0);
 }
 
-extern void _INTERRUPT_ MDC_RXI0_ISR (void)
+extern void ACE_INTERRUPT_ MDC_RXI0_ISR (void)
 {
     DEV_h8300_sci_rxi (0, & ser0);
 }
 
-extern void _INTERRUPT_ MDC_ERI0_ISR (void)
+extern void ACE_INTERRUPT_ MDC_ERI0_ISR (void)
 {
     DEV_h8300_sci_eri (0, & ser0);
 }
 
-extern void _INTERRUPT_ MDC_TXE1_ISR (void)
+extern void ACE_INTERRUPT_ MDC_TXE1_ISR (void)
 {
     DEV_h8300_sci_txe (1, & ser1);
 }
 
-extern void _INTERRUPT_ MDC_TXI1_ISR (void)
+extern void ACE_INTERRUPT_ MDC_TXI1_ISR (void)
 {
     DEV_h8300_sci_txi (1, & ser1);
 }
 
-extern void _INTERRUPT_ MDC_RXI1_ISR (void)
+extern void ACE_INTERRUPT_ MDC_RXI1_ISR (void)
 {
     DEV_h8300_sci_rxi (1, & ser1);
 }
 
-extern void _INTERRUPT_ MDC_ERI1_ISR (void)
+extern void ACE_INTERRUPT_ MDC_ERI1_ISR (void)
 {
     DEV_h8300_sci_eri (1, & ser1);
 }

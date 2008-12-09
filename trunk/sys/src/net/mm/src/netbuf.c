@@ -63,7 +63,7 @@ extern NET_netbuf_t *
 NET_netbuf_alloc_trans (void)
 {
 	char *data;
-	size_t size;
+	ACE_size_t size;
     NET_netbuf_t *buf = USO_buf_alloc (&trans_pool);
     buf->type = NET_BUF_TRANS;
     buf->pool = NULL;
@@ -87,7 +87,7 @@ NET_netbuf_alloc_pool (USO_buf_pool_t * pool)
 extern NET_netbuf_t *
 NET_netbuf_alloc_ram (long size)
 {
-	char *data = malloc (size);
+	char *data = ACE_malloc (size);
     if (data == NULL){ return NULL; }
     NET_netbuf_t *buf = USO_buf_alloc (&net_pool);
     buf->type = NET_BUF_RAM;
@@ -116,7 +116,7 @@ NET_netbuf_free (NET_netbuf_t * buf)
         switch (buf->type)
         {
         	case NET_BUF_RAM:
-            	free (buf->data);
+            	ACE_free (buf->data);
             	break;
             case NET_BUF_POOL:
 		        USO_buf_free (buf->pool, buf->data);
@@ -170,10 +170,10 @@ NET_netbuf_index (NET_netbuf_t * buf)
 	return buf->index;
 }
 
-extern bool_t
+extern ACE_bool_t
 NET_netbuf_index_inc (NET_netbuf_t * buf, long inc)
 {
-	bool_t ok = FALSE;
+	ACE_bool_t ok = FALSE;
 	if ( (buf->index + inc) >= buf->data &&
 	     (buf->index + inc) <= (buf->data + buf->size) ){
     	buf->index += inc;
@@ -183,10 +183,10 @@ NET_netbuf_index_inc (NET_netbuf_t * buf, long inc)
 	return ok;
 }
 
-extern bool_t
+extern ACE_bool_t
 NET_netbuf_trim_len (NET_netbuf_t * buf, unsigned long len)
 {
-	bool_t ok = FALSE;
+	ACE_bool_t ok = FALSE;
     if (len <= buf->len)
     {
         buf->len = len;

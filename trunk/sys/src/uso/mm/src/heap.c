@@ -187,7 +187,7 @@ info (MFS_entry_t *entry)
     print_heap_list (heap);
 #endif
 
-    printf ("\n\tTotal mem: %lu\n"
+    ACE_printf ("\n\tTotal mem: %lu\n"
               "\tFree mem: %lu\n"
               "\tAverage search: %lu\n",
               heap->total_mem, heap->free_mem, heap->search_average);
@@ -205,7 +205,7 @@ USO_heap_install(USO_heap_t* heap, char *name)
 				 (MFS_entry_t*) heap, MFS_DESC, &heap_descriptor_op);
 }
 
-extern bool_t
+extern ACE_bool_t
 USO_heap_init (USO_heap_t* heap, void *start, void *end)
 {
 	heap->mem_blocks = NULL;
@@ -233,7 +233,7 @@ USO_heap_init (USO_heap_t* heap, void *start, void *end)
 }
 
 extern void *
-USO_mem_alloc (USO_heap_t* heap, size_t size)
+USO_mem_alloc (USO_heap_t* heap, ACE_size_t size)
 {
     USO_fblock_t *free;
     USO_mblock_t *used;
@@ -290,14 +290,14 @@ USO_mem_alloc (USO_heap_t* heap, size_t size)
     return NULL;
 }
 
-static bool_t
+static ACE_bool_t
 prev_block_free (USO_mblock_t * block)
 {
     return ((block->prevm != NULL) &&
             (!(block->prevm->tag_size & USED_TAG))) ? TRUE : FALSE;
 }
 
-static bool_t
+static ACE_bool_t
 next_block_free (USO_mblock_t * block)
 {
     return ((block->nextm != NULL) &&

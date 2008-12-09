@@ -52,7 +52,7 @@ enum USO_log_level
  * @param ios : IO Stream for output.
  * @param level : default log level.
  */
-extern void USO_log_init (FILE * ios, enum USO_log_level level);
+extern void USO_log_init (ACE_FILE * ios, enum USO_log_level level);
 
 /**
  * Show log level.

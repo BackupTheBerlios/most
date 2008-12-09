@@ -17,7 +17,7 @@
 struct CLI_command
 {
     char *description;
-    bool_t (*f) (CLI_interpreter_t *);
+    ACE_bool_t (*f) (CLI_interpreter_t *);
 };
 
 /** Command type */
@@ -32,7 +32,7 @@ typedef struct CLI_command CLI_command_t;
  *  @param f  function is executed if you run the command 
  */
 extern void CLI_command_init (CLI_command_t * command,
-	 	              char *name, char *desc, bool_t (*f) (CLI_interpreter_t *));
+	 	              char *name, char *desc, ACE_bool_t (*f) (CLI_interpreter_t *));
 
 /**
  *  Initialize and install some basic commands

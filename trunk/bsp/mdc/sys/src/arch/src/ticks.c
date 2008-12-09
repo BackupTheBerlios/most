@@ -33,7 +33,7 @@ MDC_ticks_init (void)
 }
 
 
-extern void _INTERRUPT_ MDC_CMI_ISR (void)
+extern void ACE_INTERRUPT_ MDC_CMI_ISR (void)
 {
     USO_preempt ();
     USO_wakeup ();

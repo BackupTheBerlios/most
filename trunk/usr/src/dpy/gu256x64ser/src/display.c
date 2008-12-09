@@ -7,7 +7,7 @@
 #include "dpy/gu256x64ser/private.h"
 
 extern void
-DPY_gu256x64ser_WriteArray2Display (const unsigned char *data, size_t len)
+DPY_gu256x64ser_WriteArray2Display (const unsigned char *data, ACE_size_t len)
 {
     while (len--)
         DPY_gu256x64ser_WriteChar2Display (*data++);
@@ -183,7 +183,7 @@ DPY_gu256x64ser_RAMMacroDefinition (unsigned short length, unsigned char *data)
     RAMMacroDefinitionData[3] = (unsigned char)(length >> 8);
     DPY_gu256x64ser_WriteArray2Display (RAMMacroDefinitionData,
                         sizeof (RAMMacroDefinitionData));
-    DPY_gu256x64ser_WriteArray2Display (data, (size_t) length);
+    DPY_gu256x64ser_WriteArray2Display (data, (ACE_size_t) length);
 }
 
 static unsigned char MacroExecutionData[] = { US, '^', _n, _t1, _t2 };

@@ -69,14 +69,14 @@ USO_thread_new (void (*enter) (void *),
                 enum USO_thread_scheduling scheduling,
                 char *name)
 {
-    USO_thread_t *thread = malloc (sizeof (USO_thread_t));
+    USO_thread_t *thread = ACE_malloc (sizeof (USO_thread_t));
     if (thread){
         USO_stack_t *stack =
-            malloc (stack_size * sizeof (USO_stack_t));
+            ACE_malloc (stack_size * sizeof (USO_stack_t));
         if (stack) {
             USO_thread_init (thread, enter, stack, stack_size, priority, scheduling, name);
         } else {
-            free (thread);
+            ACE_free (thread);
             thread = NULL;        
         } 
     }
@@ -90,19 +90,19 @@ USO_thread_terminate (USO_thread_t * thread)
     if (thread->cleanup != NULL) { thread->cleanup(); }
     if ( (thread->flags & (1 << USO_FLAG_FREE_ARG)) == (1 << USO_FLAG_FREE_ARG))
     {
-        free (thread->arg);
+        ACE_free (thread->arg);
     }
     if ( (thread->flags & (1 << USO_FLAG_DETACH)) == (1 << USO_FLAG_DETACH))
     {
 		MFS_remove_desc(MFS_sysfs_threads(), thread->desc);
-        free (thread->stack);
-        free (thread);
+        ACE_free (thread->stack);
+        ACE_free (thread);
     }
 }
 
 extern void
 USO_thread_ios_init (USO_thread_t * thread,
-                     FILE * in, FILE * out)
+                     ACE_FILE * in, ACE_FILE * out)
 {
     thread->in = in;
     thread->out = out;
@@ -115,7 +115,7 @@ USO_thread_arg_init (USO_thread_t * thread, void * arg)
 }
 
 extern void
-USO_thread_flags_set(USO_thread_t * thread, u32_t flags)
+USO_thread_flags_set(USO_thread_t * thread, ACE_u32_t flags)
 {
 	thread->flags |= flags;
 }
@@ -154,7 +154,7 @@ USO_stop (USO_thread_t * thread)
 }
 
 extern void
-USO_raise(USO_thread_t * thread, u32_t signals)
+USO_raise(USO_thread_t * thread, ACE_u32_t signals)
 {
     USO_cpu_status_t ps = USO_disable ();
 	thread->signals |= signals;
@@ -165,10 +165,10 @@ USO_raise(USO_thread_t * thread, u32_t signals)
     USO_restore (ps);
 }
 
-extern u32_t
+extern ACE_u32_t
 USO_catch(void)
 {
-	u32_t signals;
+	ACE_u32_t signals;
     USO_cpu_status_t ps = USO_disable ();
 	USO_thread_t * current = USO_current();
 	while (current->signals == 0)
@@ -296,7 +296,7 @@ info(MFS_entry_t *entry)
         break;
     }
     
-    printf ("%s\t%s\t%s\t%lu\t%p %p %p %p\n",
+    ACE_printf ("%s\t%s\t%s\t%lu\t%p %p %p %p\n",
     	priority,
     	scheduling,
     	state,

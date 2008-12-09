@@ -57,7 +57,7 @@ static const char* error[] = {
 struct tftp_packet
 {
     unsigned char data[NAP_TFTP_MAXSIZE];
-} _PACKED_;
+} ACE_PACKED_;
 
 
 /********************************************************************************/
@@ -68,24 +68,24 @@ static struct tftp_packet *packets = NULL;
 static NET_netbuf_t *send_packet = NULL;
 static NET_netbuf_t *receive_packet = NULL;
 static NET_ip_addr_t *server_addr;
-static u16_t server_port;
+static ACE_u16_t server_port;
 
 static const char *file_name;
-static bool_t (*callback)(char *data, size_t length);
+static ACE_bool_t (*callback)(char *data, ACE_size_t length);
 
 static NET_udp_socket_t sock;
 
 extern int
 NAP_tftp_open(NET_ip_addr_t *client_addr, NET_ip_addr_t *_server_addr)
 {
-	packets = malloc(sizeof (struct tftp_packet));
+	packets = ACE_malloc(sizeof (struct tftp_packet));
 	if (packets != NULL){
 		server_addr = _server_addr;
 		USO_buf_pool_init (&pool, packets, 1,
                          	sizeof (struct tftp_packet));
     	NET_udp_socket_init (&sock);
     	NET_udp_bind (&sock, client_addr, 3279);
-		NET_udp_connect (&sock, server_addr, htons(NAP_TFTP_SERVER_PORT));
+		NET_udp_connect (&sock, server_addr, ACE_htons(NAP_TFTP_SERVER_PORT));
     	NET_udp_socket_open (&sock);
     	NET_udp_recv_timeout (&sock, ACE_MSEC_2_TICKS(4000));
 	    DEBUGF(NAP_TFTP_DEBUG, ("TFTP sock open\n") );
@@ -97,7 +97,7 @@ NAP_tftp_open(NET_ip_addr_t *client_addr, NET_ip_addr_t *_server_addr)
 }
 
 extern int
-NAP_tftp_get(const char* filename, bool_t (*f)(char *, size_t))
+NAP_tftp_get(const char* filename, ACE_bool_t (*f)(char *, ACE_size_t))
 {
     file_name = filename;
 	callback = f;
@@ -122,7 +122,7 @@ void NAP_tftp_close(void)
     NET_udp_socket_close (&sock);
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP sock closed\n") );
    	if (packets != NULL){
-    	free (packets);
+    	ACE_free (packets);
     	packets = NULL;
    	}
 }
@@ -134,13 +134,13 @@ static void init_read_request(void)
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP init read request\n") );
 	send_packet = NET_netbuf_alloc_pool (&pool);
 	data = NET_netbuf_index(send_packet);
-	temp = htons(READ_REQUEST);
+	temp = ACE_htons(READ_REQUEST);
 	memcpy(data, &temp, sizeof(temp));
 	data += sizeof(temp);
-	strcpy(data, file_name);
-	data += strlen(file_name) + 1;
-	strcpy(data, mode[1]); 
-	data += strlen(mode[1]) + 1;
+	ACE_strcpy(data, file_name);
+	data += ACE_strlen(file_name) + 1;
+	ACE_strcpy(data, mode[1]); 
+	data += ACE_strlen(mode[1]) + 1;
 	NET_netbuf_trim_len (send_packet, data - NET_netbuf_index(send_packet));
 	state.action = send;
 }  
@@ -151,10 +151,10 @@ static void init_ack(void){
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP init ack\n") );
 	send_packet = NET_netbuf_alloc_pool (&pool);
 	data = NET_netbuf_index(send_packet);
-	temp = htons(ACK);
+	temp = ACE_htons(ACK);
 	memcpy(data, &temp, sizeof(temp));
 	data += sizeof(temp);
-	temp = htons(state.block_nr);
+	temp = ACE_htons(state.block_nr);
 	memcpy(data, &temp, sizeof(temp));
 	data += sizeof(temp);
 	NET_netbuf_trim_len (send_packet, data - NET_netbuf_index(send_packet));
@@ -181,13 +181,13 @@ static void send(void)
 
 static void wait_reply(void)
 {
-    u16_t port;
+    ACE_u16_t port;
     DEBUGF(NAP_TFTP_DEBUG, ("TFTP wait reply\n") );
 	receive_packet = NET_udp_recv_netbuf (&sock, NULL, &port);
 	if (receive_packet != NULL)	{
 		if (state.block_nr == 0){
 			server_port = port;
-			NET_udp_connect (&sock, server_addr, htons(server_port));
+			NET_udp_connect (&sock, server_addr, ACE_htons(server_port));
 			state.action = check_reply;
 		} else if ( server_port == port){
 			state.action = check_reply;
@@ -218,11 +218,11 @@ static void check_reply(void)
 	if (length >= header) {
 		state.sendcount = 0;
 		length -= header;
-		state.opcode = ntohs(*(unsigned short*)data);
+		state.opcode = ACE_ntohs(*(unsigned short*)data);
 		data += sizeof(unsigned short);
 		switch (state.opcode){
 		case DATA:{
-			unsigned short blocknr = (ntohs(*(unsigned short*)data));
+			unsigned short blocknr = (ACE_ntohs(*(unsigned short*)data));
 			if ( (state.block_nr + 1) == blocknr){
 				state.block_nr++;
 				data += sizeof(unsigned short);

@@ -69,7 +69,7 @@ MDC_eth_start (void)
     NET_ethif_start (&ethif0);
 }
 
-extern _INTERRUPT_
+extern ACE_INTERRUPT_
 void MDC_IRQ7_ISR (void)
 {
     NET_smc_interrupt (&smc);

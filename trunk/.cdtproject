@@ -101,7 +101,9 @@
     
     
     
+    
 
+    
     
     
     
@@ -292,7 +294,9 @@
       
       
       
+      
 
+      
       
       
       
@@ -483,7 +487,9 @@
       
       
       
+      
 
+      
       
       
       
@@ -674,7 +680,9 @@
         
         
         
+        
 
+        
         
         
         
@@ -865,7 +873,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -1056,7 +1066,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -1247,7 +1259,9 @@
           
           
           
+          
 
+        
         
         
         
@@ -1438,7 +1452,9 @@
         
         
         
+        
 
+        
         
         
         
@@ -1629,7 +1645,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -1820,7 +1838,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -2011,7 +2031,9 @@
           
           
           
+          
 
+        
         
         
         
@@ -2202,7 +2224,9 @@
         
         
         
+        
 
+      
       
       
       
@@ -2393,7 +2417,9 @@
       
       
       
+      
 
+      
       
       
       
@@ -2584,7 +2610,9 @@
         
         
         
+        
 
+        
         
         
         
@@ -2775,7 +2803,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -2966,7 +2996,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -3157,7 +3189,9 @@
           
           
           
+          
 
+        
         
         
         
@@ -3348,7 +3382,9 @@
         
         
         
+        
 
+        
         
         
         
@@ -3539,7 +3575,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -3730,7 +3768,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -3921,7 +3961,9 @@
           
           
           
+          
 
+        
         
         
         
@@ -4112,7 +4154,9 @@
         
         
         
+        
 
+      
       
       
       
@@ -4303,7 +4347,9 @@
       
       
       
+      
 
+      
       
       
       
@@ -4494,7 +4540,9 @@
         
         
         
+        
 
+        
         
         
         
@@ -4685,7 +4733,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -4876,7 +4926,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -5067,7 +5119,9 @@
           
           
           
+          
 
+        
         
         
         
@@ -5258,7 +5312,9 @@
         
         
         
+        
 
+        
         
         
         
@@ -5449,7 +5505,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -5640,7 +5698,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -5831,7 +5891,9 @@
           
           
           
+          
 
+        
         
         
         
@@ -6022,7 +6084,9 @@
         
         
         
+        
 
+      
       
       
       
@@ -6213,7 +6277,9 @@
       
       
       
+      
 
+      
       
       
       
@@ -6404,7 +6470,9 @@
         
         
         
+        
 
+        
         
         
         
@@ -6595,7 +6663,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -6786,7 +6856,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -6977,7 +7049,9 @@
           
           
           
+          
 
+        
         
         
         
@@ -7168,7 +7242,9 @@
         
         
         
+        
 
+        
         
         
         
@@ -7359,7 +7435,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -7550,7 +7628,9 @@
           
           
           
+          
 
+          
           
           
           
@@ -7741,7 +7821,9 @@
           
           
           
+          
 
+        
         
         
         
@@ -7932,7 +8014,9 @@
         
         
         
+        
 
+      
       
       
       
@@ -8123,7 +8207,9 @@
       
       
       
+      
 
+    
     
     
     
@@ -8314,7 +8400,9 @@
     
     
     
+    
 
+    
     
     
     
@@ -8410,681 +8498,9 @@
     
     
     <item id="org.eclipse.cdt.core.pathentry">
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       <pathentry kind="src" path=""/>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       <pathentry kind="out" path=""/>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       <pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     </item>
     
     
@@ -9181,9 +8597,11 @@
     
     
     
+    
 
 
 
+    
     
     
     
@@ -9279,330 +8697,980 @@
     
     
     <item id="org.eclipse.cdt.make.core.buildtargets">
+      
+      
       <buildTargets>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/mdc/sys/inc/doc">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="doc" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/mdc/sys/inc/doc">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>doc</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="wiz" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/mdc/sys/inc/doc">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>wiz</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/cli">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>lib</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/cli">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="wiz" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/inc/uso/doc">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>wiz</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="wiz" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/inc/cli/doc">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>wiz</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="bin" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/mdc/usr/putboot">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>bin</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/mdc/usr/putboot">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/dev">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>lib</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/dev">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/mfs">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>lib</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/mfs">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="all" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/sam">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>all</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="bin" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/sam/usr/test">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>bin</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/sam/usr/test">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="hex" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/sam/usr/test">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>hex</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/ace">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>lib</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/ace">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="bin" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/mdc/usr/test">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>bin</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/mdc/usr/test">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="all" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>all</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="mrproper" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>mrproper</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="bin" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/mdc/usr/boot">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>bin</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/mdc/usr/boot">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="doc" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/inc">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>doc</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/inc">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/nap">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>lib</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/nap">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="wiz" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/inc/dev/doc">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>wiz</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="libs" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>libs</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="wiz" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/inc/net/doc">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>wiz</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="usr/src/dpy">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>lib</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="usr/src/dpy">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/uso">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>lib</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/uso">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="lib" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/net">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>lib</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/src/net">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="bin" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/mdc/usr/frame">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>bin</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="bsp/mdc/usr/frame">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="wiz" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/inc/nap/doc">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>wiz</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="libs" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="usr/src">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>libs</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="clean" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="usr/src">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>clean</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+        
         <target name="wiz" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="sys/inc/ace/doc">
+          
+          
           <buildCommand>make</buildCommand>
-          <buildArguments></buildArguments>
+          
+          
+          <buildArguments/>
+          
+          
           <buildTarget>wiz</buildTarget>
+          
+          
           <stopOnError>false</stopOnError>
+          
+          
           <useDefaultCommand>true</useDefaultCommand>
+          
+        
         </target>
+        
+      
       </buildTargets>
+      
+    
     </item>
     
     
@@ -9699,7 +9767,9 @@
     
     
     
+    
 
+  
   
   
   

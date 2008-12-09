@@ -7,20 +7,20 @@
 #include "ace/ctype.h"
 
 extern int
-atox (char c)
+ACE_atox (char c)
 {
     int x;
-    if (isdigit (c))
+    if (ACE_isdigit (c))
     {
         x = c - '0';
     }
-    else if (isxdigit (c))
+    else if (ACE_isxdigit (c))
     {
-        if (isupper (c))
+        if (ACE_isupper (c))
         {
             x = 10 + c - 'A';
         }
-        else if (islower (c))
+        else if (ACE_islower (c))
         {
             x = 10 + c - 'a';
         }
@@ -37,11 +37,11 @@ atox (char c)
 }
 
 extern int
-atoxc (char* s)
+ACE_atoxc (char* s)
 {
     int x, x1, x2;
-    x1 = atox (*s);
-    x2 = atox (*(s+1));
+    x1 = ACE_atox (*s);
+    x2 = ACE_atox (*(s+1));
     if ((x1 >= 0) && (x2 >= 0)) {
         x = (x1 << 4) | x2;
     } else {

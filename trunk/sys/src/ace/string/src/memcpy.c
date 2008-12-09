@@ -6,7 +6,7 @@
 #include "ace/string.h"
 
 extern void *
-memcpy (void *s, const void *ct, size_t n)
+memcpy (void *s, const void *ct, ACE_size_t n)
 {
     char *p1 = (char *)s, *p2 = (char *)ct;
 

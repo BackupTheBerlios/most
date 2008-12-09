@@ -6,7 +6,7 @@
 #include "ace/string.h"
 
 extern int
-strncmp (const char *cs, const char *ct, size_t n)
+ACE_strncmp (const char *cs, const char *ct, ACE_size_t n)
 {
     int ret = 0;
 

@@ -28,8 +28,8 @@ static unsigned long sector_size;
 static unsigned char *addr;
 static unsigned long prog_size; 
 
-static bool_t
-prog_data(char* data, size_t len)
+static ACE_bool_t
+prog_data(char* data, ACE_size_t len)
 {
 	enum FLASH_29F040_err_code error;
 	error =  FLASH_29F040_programm_s (addr, (unsigned char*)data, len);
@@ -49,16 +49,16 @@ eth_download_app_exec (char *file)
 		addr = (unsigned char*)(sector_size * APP_SECTOR_START);
 		if (NAP_tftp_open(&MDC_ee_config.ip_addr, &MDC_ee_config.server) >= 0){
 			if (NAP_tftp_get(file, prog_data) >= 0){
-				printf("Download done %ld\n", prog_size);
+				ACE_printf("Download done %ld\n", prog_size);
 			} else {
-				puts("Tftp get failed\n");
+				ACE_puts("Tftp get failed\n");
 			}
 			NAP_tftp_close();
 		} else {
-			puts("Tftp open failed\n");
+			ACE_puts("Tftp open failed\n");
 		}
 	} else {
-		puts("Give file name as param\n");
+		ACE_puts("Give file name as param\n");
 	}
 }
 
@@ -67,29 +67,29 @@ serial_download_app_exec(char* file_size)
 {
 	if (file_size){
 		char *state = "done";
-		unsigned long app_size = atol(file_size);
+		unsigned long app_size = ACE_atol(file_size);
 		prog_size = 0;
 		addr = (unsigned char*)(sector_size * APP_SECTOR_START);
-		printf("Send file len %ld\n", app_size);
+		ACE_printf("Send file len %ld\n", app_size);
 		unsigned long data;
 		while ( (prog_size + sizeof(data)) <= app_size){
-			read((char*)&data, sizeof(data));
+			ACE_read((char*)&data, sizeof(data));
 			if (prog_data((char*)&data, sizeof(data)) == FALSE){
 				app_size = prog_size;
 				state = "fail";
 				break;
 			}
 		}
-		size_t left_over = app_size - prog_size;
+		ACE_size_t left_over = app_size - prog_size;
 		if (left_over){
-			read((char*)(&data), left_over);
+			ACE_read((char*)(&data), left_over);
 			if (prog_data((char*)&data, left_over) == FALSE){
 				state = "fail";
 			}
 		}
-		printf("Download %s %ld\n", state, prog_size);
+		ACE_printf("Download %s %ld\n", state, prog_size);
 	} else {
-		puts("Give boot size as param\n");
+		ACE_puts("Give boot size as param\n");
 	}
 }
 
@@ -99,7 +99,7 @@ erase_flash_app_exec (char *nix)
 	for (int i = APP_SECTOR_START; i <= APP_SECTOR_END; ++i){
 		enum FLASH_29F040_err_code error;
 		error =	FLASH_29F040_sector_erase_s ((unsigned char*)(i * sector_size));
-		printf("Erase flash sector %d error %d\n", i, error);
+		ACE_printf("Erase flash sector %d error %d\n", i, error);
 		if (error){
 			break;
 		}

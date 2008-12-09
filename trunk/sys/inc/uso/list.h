@@ -130,7 +130,7 @@ extern void USO_delta_dec (USO_list_t * list);
  * @param list : Pointer to delta list.
  * @return TRUE when delta of head <= 0 else FALSE.
  */
-extern bool_t USO_delta_null (USO_list_t * list);
+extern ACE_bool_t USO_delta_null (USO_list_t * list);
 
 /**
  * Is the list empty.
@@ -138,7 +138,7 @@ extern bool_t USO_delta_null (USO_list_t * list);
  * @param list : Pointer to list.
  * @return TRUE if empty else FALSE..
  */
-extern bool_t USO_isempty (USO_list_t * list);
+extern ACE_bool_t USO_isempty (USO_list_t * list);
 
 /**
  * Get the next element in the list.

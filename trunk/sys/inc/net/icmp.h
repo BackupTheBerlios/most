@@ -66,39 +66,39 @@ extern void NET_icmp_dest_unreach (NET_netbuf_t *, enum NET_icmp_dur_type);
 /** ? */
 struct NET_icmp_echo_hdr
 {
-    u16_t type_code;  /**<  */
-    u16_t chksum;   /**<  */
-    u16_t id;  /**<  */
-    u16_t seqno; /**<  */
-} _PACKED_;
+    ACE_u16_t type_code;  /**<  */
+    ACE_u16_t chksum;   /**<  */
+    ACE_u16_t id;  /**<  */
+    ACE_u16_t seqno; /**<  */
+} ACE_PACKED_;
 
 /** ? */
 struct NET_icmp_dur_hdr
 {
-    u16_t type_code; /**< ?. */
-    u16_t chksum;  /**< ?. */
-    u32_t unused; /**< ?. */
-} _PACKED_;
+    ACE_u16_t type_code; /**< ?. */
+    ACE_u16_t chksum;  /**< ?. */
+    ACE_u32_t unused; /**< ?. */
+} ACE_PACKED_;
 
 /*
 #if 0
 struct NET_icmp_te_hdr
 {
-    u16_t type_code;
-    u16_t chksum;
-    u32_t unused;
-} _PACKED_;
+    ACE_u16_t type_code;
+    ACE_u16_t chksum;
+    ACE_u32_t unused;
+} ACE_PACKED_;
 #endif
 */
 
-#define NET_ICMPH_TYPE(hdr) (ntohs((hdr)->type_code) >> 8)   /**< ?. */
-#define NET_ICMPH_CODE(hdr) (ntohs((hdr)->type_code) & 0xff)  /**< ?. */
+#define NET_ICMPH_TYPE(hdr) (ACE_ntohs((hdr)->type_code) >> 8)   /**< ?. */
+#define NET_ICMPH_CODE(hdr) (ACE_ntohs((hdr)->type_code) & 0xff)  /**< ?. */
 
 /** ?. */
-#define NET_ICMPH_TYPE_SET(hdr, type) ((hdr)->type_code = htons(NET_ICMPH_CODE(hdr) | ((type) << 8)))
+#define NET_ICMPH_TYPE_SET(hdr, type) ((hdr)->type_code = ACE_htons(NET_ICMPH_CODE(hdr) | ((type) << 8)))
 
 /** ?. */
-#define NET_ICMPH_CODE_SET(hdr, code) ((hdr)->type_code = htons((code) | (NET_ICMPH_TYPE(hdr) << 8)))
+#define NET_ICMPH_CODE_SET(hdr, code) ((hdr)->type_code = ACE_htons((code) | (NET_ICMPH_TYPE(hdr) << 8)))
 
 /** @}
  */

@@ -154,7 +154,7 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
 {
     static struct NET_ip_hdr *iphdr;
     static NET_netif_t *netif;
-    static u8_t hl;
+    static ACE_u8_t hl;
 
     ++NET_stats.ip.rx;
     iphdr = (struct NET_ip_hdr *)NET_netbuf_index(p);
@@ -215,11 +215,11 @@ NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p)
         return NET_ERR_BAD;
     }
 
-    if ((NET_IPH_OFFSET (iphdr) & htons (NET_IP_OFFMASK | NET_IP_MF)) != 0)
+    if ((NET_IPH_OFFSET (iphdr) & ACE_htons (NET_IP_OFFMASK | NET_IP_MF)) != 0)
     {
         DEBUGF (NET_IP_DEBUG,
                 ("Ip: packet dropped since it was fragmented (0x%x).\n",
-                 ntohs (NET_IPH_OFFSET (iphdr))));
+                 ACE_ntohs (NET_IPH_OFFSET (iphdr))));
         ++NET_stats.ip.rx_drop;
         NET_netbuf_free (p);
         return NET_ERR_BAD;
@@ -281,10 +281,10 @@ extern NET_err_t
 NET_ip_output_if (NET_netbuf_t * p,
                   NET_ip_addr_t * src,
                   NET_ip_addr_t * dest,
-                  u8_t ttl, u8_t proto, NET_netif_t * netif)
+                  ACE_u8_t ttl, ACE_u8_t proto, NET_netif_t * netif)
 {
     static struct NET_ip_hdr *iphdr;
-    static u16_t ip_id = 0;
+    static ACE_u16_t ip_id = 0;
 
     if (dest != NET_IP_HDRINCL)
     {
@@ -297,9 +297,9 @@ NET_ip_output_if (NET_netbuf_t * p,
         NET_ip_addr_set (&(iphdr->dest), dest);
 
         NET_IPH_VHLTOS_SET (iphdr, 4, NET_IP_HLEN / 4, 0);
-        NET_IPH_LEN_SET (iphdr, htons ((unsigned short)NET_netbuf_tot_len (p)));
-        NET_IPH_OFFSET_SET (iphdr, htons (NET_IP_DF));
-        NET_IPH_ID_SET (iphdr, htons (++ip_id));
+        NET_IPH_LEN_SET (iphdr, ACE_htons ((unsigned short)NET_netbuf_tot_len (p)));
+        NET_IPH_OFFSET_SET (iphdr, ACE_htons (NET_IP_DF));
+        NET_IPH_ID_SET (iphdr, ACE_htons (++ip_id));
 
         if (NET_ip_addr_isany (src))
         {
@@ -334,7 +334,7 @@ NET_ip_output_if (NET_netbuf_t * p,
 
 NET_err_t
 NET_ip_output (NET_netbuf_t * p,
-               NET_ip_addr_t * src, NET_ip_addr_t * dest, u8_t ttl, u8_t proto)
+               NET_ip_addr_t * src, NET_ip_addr_t * dest, ACE_u8_t ttl, ACE_u8_t proto)
 {
     static NET_netif_t *netif;
 

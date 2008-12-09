@@ -34,7 +34,7 @@ static void stream_info(MFS_entry_t *entry)
 			pos_rx = "pos";
 			break;
 	}		
-	printf("%s %s: %lu %s: %lu\n", type, size_tx, stream->size_tx, pos_rx, stream->pos_rx);
+	ACE_printf("%s %s: %lu %s: %lu\n", type, size_tx, stream->size_tx, pos_rx, stream->pos_rx);
 	if (stream->operations->info != NULL) {stream->operations->info(stream);}
 }
 
@@ -46,20 +46,20 @@ struct MFS_descriptor_op MFS_stream_descriptor_op = {.open = stream_open,
 
 
 
-extern size_t
-MFS_read(MFS_stream_t *stream, char *buf, size_t len)
+extern ACE_size_t
+MFS_read(MFS_stream_t *stream, char *buf, ACE_size_t len)
 {
 	return stream->operations->read(stream, buf, len);
 }
 
-extern size_t
-MFS_write(MFS_stream_t *stream, char *buf, size_t len)
+extern ACE_size_t
+MFS_write(MFS_stream_t *stream, char *buf, ACE_size_t len)
 {
 	return stream->operations->write(stream, buf, len);
 }
 
 extern int
-MFS_seek(MFS_stream_t *stream, ssize_t off, size_t pos)
+MFS_seek(MFS_stream_t *stream, ACE_ssize_t off, ACE_size_t pos)
 {
 	return (stream->operations->seek != NULL) ? stream->operations->seek(stream, off, pos) : 0;
 }
@@ -95,14 +95,14 @@ MFS_stream_init(MFS_stream_t *stream,
 	stream->represent = represent;
 }
 
-extern size_t
-MFS_empty_read(MFS_stream_t *stream, char *buf, size_t len)
+extern ACE_size_t
+MFS_empty_read(MFS_stream_t *stream, char *buf, ACE_size_t len)
 {
-	return EOF;
+	return ACE_EOF;
 }
 
-extern size_t
-MFS_empty_write(MFS_stream_t *stream, const char *buf, size_t len)
+extern ACE_size_t
+MFS_empty_write(MFS_stream_t *stream, const char *buf, ACE_size_t len)
 {
-	return EOF;
+	return ACE_EOF;
 }

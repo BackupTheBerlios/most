@@ -86,7 +86,7 @@ DEV_serial_settings_print (const struct DEV_serial_settings *settings)
         parity = error;
         break;
     }
-    printf ("\tSettings:\n"
+    ACE_printf ("\tSettings:\n"
                 "\t\tBaud\t%s\n"
                 "\t\tData\t%s\n"
                 "\t\tStop\t%s\n"

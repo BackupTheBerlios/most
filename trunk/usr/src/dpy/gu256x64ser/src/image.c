@@ -26,7 +26,7 @@ DPY_gu256x64ser_RAMImageDefinition (unsigned long address,
     RAMImageDefinitionData[9] = (unsigned char)(length >> 16);
     DPY_gu256x64ser_WriteArray2Display (RAMImageDefinitionData,
                         sizeof (RAMImageDefinitionData));
-    DPY_gu256x64ser_WriteArray2Display (data, (size_t) length);
+    DPY_gu256x64ser_WriteArray2Display (data, (ACE_size_t) length);
 }
 
 static unsigned char DownloadImageDisplayData[] =
@@ -67,5 +67,5 @@ DPY_gu256x64ser_RealTimeImageDisplay (unsigned short x,
     RealTimeImageDisplayData[7] = (unsigned char)(y >> 8);
     DPY_gu256x64ser_WriteArray2Display (RealTimeImageDisplayData,
                         sizeof (RealTimeImageDisplayData));
-    DPY_gu256x64ser_WriteArray2Display (data, (size_t) (x * y));
+    DPY_gu256x64ser_WriteArray2Display (data, (ACE_size_t) (x * y));
 }

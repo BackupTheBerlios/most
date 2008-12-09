@@ -36,8 +36,8 @@ NET_udp_socks_unlock (void)
 static NET_udp_socket_t *
 udp_find_exact_sock (NET_netif_t * inp,
 					 struct NET_ip_hdr *iphdr,
-		             u16_t src,
-			         u16_t dest)
+		             ACE_u16_t src,
+			         ACE_u16_t dest)
 {
 	NET_udp_socket_t *sock = NULL;
 	
@@ -60,8 +60,8 @@ udp_find_exact_sock (NET_netif_t * inp,
 
 static NET_udp_socket_t *
 udp_find_sock (struct NET_ip_hdr *iphdr,
-			   u16_t src,
-			   u16_t dest)
+			   ACE_u16_t src,
+			   ACE_u16_t dest)
 {
 	NET_udp_socket_t *sock = NULL;
 	
@@ -83,8 +83,8 @@ udp_find_sock (struct NET_ip_hdr *iphdr,
 extern NET_udp_socket_t *
 NET_udp_find_sock (NET_netif_t * inp,
 					 struct NET_ip_hdr *iphdr,
-		             u16_t src,
-			         u16_t dest)
+		             ACE_u16_t src,
+			         ACE_u16_t dest)
 {
 	NET_udp_socket_t *sock = NULL;
 

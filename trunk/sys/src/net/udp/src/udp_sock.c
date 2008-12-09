@@ -18,7 +18,7 @@
 extern void
 NET_udp_socket_init (NET_udp_socket_t * sock)
 {
-    bzero (sock, sizeof (NET_udp_socket_t));
+    ACE_bzero (sock, sizeof (NET_udp_socket_t));
     USO_mailbox_init (&sock->rx_que, NET_UDP_RX_QUE_SIZE);
     sock->rx_timeout = FALSE;
 }
@@ -27,7 +27,7 @@ extern NET_udp_socket_t *
 NET_udp_socket_new (void)
 {
     NET_udp_socket_t *sock;
-    sock = malloc (sizeof (NET_udp_socket_t));
+    sock = ACE_malloc (sizeof (NET_udp_socket_t));
     if (sock != NULL)
     {
         NET_udp_socket_init (sock);
@@ -75,7 +75,7 @@ NET_udp_socket_close (NET_udp_socket_t * sock)
 }
 
 extern void
-NET_udp_bind (NET_udp_socket_t * sock, NET_ip_addr_t * ipaddr, u16_t port)
+NET_udp_bind (NET_udp_socket_t * sock, NET_ip_addr_t * ipaddr, ACE_u16_t port)
 {
     NET_ip_addr_set (&sock->local_ip, ipaddr);
     sock->local_port = port;
@@ -83,7 +83,7 @@ NET_udp_bind (NET_udp_socket_t * sock, NET_ip_addr_t * ipaddr, u16_t port)
 }
 
 extern void
-NET_udp_connect (NET_udp_socket_t * sock, NET_ip_addr_t * ipaddr, u16_t port)
+NET_udp_connect (NET_udp_socket_t * sock, NET_ip_addr_t * ipaddr, ACE_u16_t port)
 {
     NET_ip_addr_set (&sock->remote_ip, ipaddr);
     sock->remote_port = port;
@@ -112,7 +112,7 @@ NET_udp_recv_timeout (NET_udp_socket_t * sock, unsigned long timeout)
 
 extern NET_netbuf_t *
 NET_udp_recv_netbuf (NET_udp_socket_t * sock,
-              		 NET_ip_addr_t * addr, u16_t * port)
+              		 NET_ip_addr_t * addr, ACE_u16_t * port)
 {
 	NET_netbuf_t *p;
     struct NET_udp_hdr *udphdr;
@@ -126,14 +126,14 @@ NET_udp_recv_netbuf (NET_udp_socket_t * sock,
     	if (addr != NULL)
     		*addr = iphdr->src;
     	if (port != NULL)
-       		*port = ntohs (udphdr->src);
+       		*port = ACE_ntohs (udphdr->src);
 	}
     return p; 
 }
 
 extern long
 NET_udp_recv (NET_udp_socket_t * sock,
-              NET_ip_addr_t * addr, u16_t * port,
+              NET_ip_addr_t * addr, ACE_u16_t * port,
               char * buf, unsigned int len)
 {
 	NET_netbuf_t *p;
@@ -141,7 +141,7 @@ NET_udp_recv (NET_udp_socket_t * sock,
 
 	p = NET_udp_recv_netbuf (sock, addr, port);
 	if (p != NULL){
-    	recv_len = MIN(NET_netbuf_len(p), len);
+    	recv_len = ACE_MIN(NET_netbuf_len(p), len);
     	memcpy (buf, NET_netbuf_index(p), recv_len);
    	 	NET_netbuf_free (p);
 	}

@@ -112,18 +112,18 @@ enum USO_thread_flags
 struct USO_thread
 {
     USO_node_t node;
-    USO_cpu_t cpu _PACKED_;
+    USO_cpu_t cpu ACE_PACKED_;
     enum USO_thread_state state;
     enum USO_thread_priority priority;
     enum USO_thread_scheduling scheduling;
     void (*enter) (void *);
     void (*cleanup) (void);
     void *arg;
-    bool_t stop;
-	u32_t flags;
-	u32_t signals;
-    FILE *in;
-    FILE *out;
+    ACE_bool_t stop;
+	ACE_u32_t flags;
+	ACE_u32_t signals;
+    ACE_FILE *in;
+    ACE_FILE *out;
     USO_stack_t *stack;
     USO_stack_t *stack_bot;
     USO_stack_t *stack_top;
@@ -206,7 +206,7 @@ extern void USO_thread_terminate (USO_thread_t * thread);
  * @param out : Output stream.
  */
 extern void USO_thread_ios_init (USO_thread_t * thread,
-                                 FILE * in, FILE * out);
+                                 ACE_FILE * in, ACE_FILE * out);
 
 
 /**
@@ -218,7 +218,7 @@ extern void USO_thread_ios_init (USO_thread_t * thread,
  */
 extern void USO_thread_arg_init (USO_thread_t * thread, void * arg);
 
-extern void USO_thread_flags_set(USO_thread_t * thread, u32_t flags);
+extern void USO_thread_flags_set(USO_thread_t * thread, ACE_u32_t flags);
 
 extern void USO_cleanup_install(void (*cleanup) (void));
 
@@ -236,9 +236,9 @@ extern void USO_start (USO_thread_t * thread);
  */
 extern void USO_stop (USO_thread_t * thread);
 
-extern void USO_raise(USO_thread_t * thread, u32_t signals);
+extern void USO_raise(USO_thread_t * thread, ACE_u32_t signals);
 
-extern u32_t USO_catch(void);
+extern ACE_u32_t USO_catch(void);
 
 extern void USO_exit (void);
 

@@ -67,12 +67,12 @@ extern char * NET_netbuf_index (NET_netbuf_t * buf);
 /**
  * ?
  */
-extern bool_t NET_netbuf_index_inc (NET_netbuf_t *, long);
+extern ACE_bool_t NET_netbuf_index_inc (NET_netbuf_t *, long);
 
 /**
  * ?
  */
-extern bool_t NET_netbuf_trim_len (NET_netbuf_t *, unsigned long);
+extern ACE_bool_t NET_netbuf_trim_len (NET_netbuf_t *, unsigned long);
 
 /**
  * ?

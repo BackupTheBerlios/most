@@ -5,8 +5,8 @@
 
 #include "ace/string.h"
 
-extern size_t
-strnlen (const char *cs, size_t n)
+extern ACE_size_t
+ACE_strnlen (const char *cs, ACE_size_t n)
 {
     const char *p;
 

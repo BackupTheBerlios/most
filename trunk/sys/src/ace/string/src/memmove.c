@@ -6,7 +6,7 @@
 #include "ace/string.h"
 
 extern void *
-memmove (void *s, const void *ct, size_t n)
+memmove (void *s, const void *ct, ACE_size_t n)
 {
     char *p1, *p2;
 

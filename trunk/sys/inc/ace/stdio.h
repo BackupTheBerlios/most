@@ -21,9 +21,9 @@
 /*---------------- Definitions ------------------------------------------*/
 
 /** End of file */
-#define EOF (-1)
+#define ACE_EOF (-1)
 
-typedef MFS_stream_t FILE;
+typedef MFS_stream_t ACE_FILE;
 
 /*------------------------------------------------------------------------*/
 
@@ -36,7 +36,7 @@ typedef MFS_stream_t FILE;
  *  @param fmt Format Zeichenkette
  *  @return Anzahl der geschriebenen Zeichen, negativ wenn Fehler
  */
-extern int sprintf (char *buf, const char *fmt, ...);
+extern int ACE_sprintf (char *buf, const char *fmt, ...);
 
 /** vsprintf quivalent zu sprintf, jedoch wird die variable Argumentliste
  *  duch arg ersetzt.
@@ -44,7 +44,7 @@ extern int sprintf (char *buf, const char *fmt, ...);
  *  von va_arg initialisiert.
  *  Siehe dazu Beschreibung von <stdarg.h> K/R B.7
  */
-extern int vsprintf (char *buf, const char *fmt, va_list_t args);
+extern int ACE_vsprintf (char *buf, const char *fmt, ACE_va_list_t args);
 
 
  
@@ -62,7 +62,7 @@ extern void ACE_stdio_init (void);
  *
  * @return How many Bytes are written to the buffer.
  */
-extern size_t fread (FILE * in, char *buf, size_t len);
+extern ACE_size_t ACE_fread (ACE_FILE * in, char *buf, ACE_size_t len);
 
 /**
  * Write to IO stream.
@@ -71,7 +71,7 @@ extern size_t fread (FILE * in, char *buf, size_t len);
  * @param buf : Pointer to buffer which will be written.
  * @param len : Length of the buffer.
  */
-extern size_t fwrite (FILE * out, char *buf, size_t len);
+extern ACE_size_t ACE_fwrite (ACE_FILE * out, char *buf, ACE_size_t len);
 
 /**
  * Get character from IO stream.
@@ -80,7 +80,7 @@ extern size_t fwrite (FILE * out, char *buf, size_t len);
  *
  * @return Character or EOF.
  */
-extern int fgetc (FILE * in);
+extern int ACE_fgetc (ACE_FILE * in);
 
 /**
  * Put character to IO stream.
@@ -88,7 +88,7 @@ extern int fgetc (FILE * in);
  * @param out : Output Stream or NULL.
  * @param c : Character.
  */
-extern int fputc (FILE * out, char c);
+extern int ACE_fputc (ACE_FILE * out, char c);
 
 /**
  * Put sting to IO stream.
@@ -96,7 +96,7 @@ extern int fputc (FILE * out, char c);
  * @param out : Output Stream or NULL.
  * @param string : Pointer to String.
  */
-extern int fputs (FILE * out, char *string);
+extern int ACE_fputs (ACE_FILE * out, char *string);
 
 /**
  * Formated print to IO stream.
@@ -104,7 +104,7 @@ extern int fputs (FILE * out, char *string);
  * @param out : Output Stream or NULL.
  * @param fmt : Format string.
  */
-extern int fprintf (FILE * out, const char *fmt, ...);
+extern int ACE_fprintf (ACE_FILE * out, const char *fmt, ...);
 
 
 
@@ -116,7 +116,7 @@ extern int fprintf (FILE * out, const char *fmt, ...);
  *
  * @return How many Bytes are written to the buffer.
  */
-extern size_t read (char *buf, size_t len);
+extern ACE_size_t ACE_read (char *buf, ACE_size_t len);
 
 /**
  * Write to standard IO.
@@ -124,35 +124,35 @@ extern size_t read (char *buf, size_t len);
  * @param buf : Pointer to buffer which will be written.
  * @param len : Length of the buffer.
  */
-extern size_t write (char *buf, size_t len);
+extern ACE_size_t ACE_write (char *buf, ACE_size_t len);
 
 /**
  * Get character from standard IO.
  *
  * @return Character or EOF.
  */
-extern int getc (void);
+extern int ACE_getc (void);
 
 /**
  * Put character to standard IO.
  *
  * @param c : Character.
  */
-extern int putc (char c);
+extern int ACE_putc (char c);
 
 /**
  * Put string to standard IO.
  *
  * @param string : Pointer to String.
  */
-extern int puts (char *string);
+extern int ACE_puts (char *string);
 
 /**
  * Formated print to standard IO.
  *
  * @param fmt : Format string.
  */
-extern int printf (const char *fmt, ...);
+extern int ACE_printf (const char *fmt, ...);
 
 /*------------------------------------------------------------------------*/
 

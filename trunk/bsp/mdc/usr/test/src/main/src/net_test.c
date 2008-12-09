@@ -24,7 +24,7 @@ struct test_packet
 {
     char name[16];
     long trans_nr;
-} _PACKED_;
+} ACE_PACKED_;
 
 static const char* name = "Maik Threads";
 
@@ -55,12 +55,12 @@ net_test_exec (char *nix)
     {
         struct test_packet* data;
         NET_netbuf_t *p;
-	    u16_t port;
+	    ACE_u16_t port;
         p = NET_netbuf_alloc_pool (&test_pool);
       	data = (struct test_packet*)NET_netbuf_index(p);
       	memset (data->name, 0x0, sizeof(data->name));
       	memcpy (data->name, name,
-      		MIN(sizeof(data->name) - 1, strlen(name)) );
+      		ACE_MIN(sizeof(data->name) - 1, ACE_strlen(name)) );
         data->trans_nr = i;
         if ((NET_udp_send_netbuf (&udp_sock, p)) < 0)
         {

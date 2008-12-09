@@ -21,7 +21,7 @@ DEV_serial_error_init (struct DEV_serial_error *error)
 extern void
 DEV_serial_error_print (struct DEV_serial_error *error)
 {
-    printf ("\tError:\n"
+    ACE_printf ("\tError:\n"
                 "\t\tOverrun\t%lu\n"
                 "\t\tFraming\t%lu\n"
                 "\t\tParity\t%lu\n"

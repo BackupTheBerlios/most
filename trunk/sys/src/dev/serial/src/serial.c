@@ -33,7 +33,7 @@ tx_char (DEV_serial_t *serial)
 {
  	char c;
 	if ( USO_pipe_read_ns (&serial->tx_buf, &c, sizeof(c)) == 0){
-		return EOF;
+		return ACE_EOF;
 	}
     return (unsigned char)c;
 }
@@ -63,7 +63,7 @@ tx_start(DEV_serial_t *serial)
 
 
 static void
-serial_open (FILE *stream)
+serial_open (ACE_FILE *stream)
 {
 	DEV_serial_t * serial = (DEV_serial_t *)stream->represent; 
     USO_cpu_status_t ps = USO_disable ();
@@ -84,7 +84,7 @@ serial_open (FILE *stream)
 }
 
 static void
-serial_close (FILE *stream)
+serial_close (ACE_FILE *stream)
 {
 	DEV_serial_t * serial = (DEV_serial_t *)stream->represent; 
     USO_cpu_status_t ps = USO_disable ();
@@ -93,20 +93,20 @@ serial_close (FILE *stream)
 }
 
 static void
-serial_info (FILE *stream)
+serial_info (ACE_FILE *stream)
 {
 	DEV_serial_t * serial = (DEV_serial_t *)stream->represent; 
-    printf ("\tSerial %sblocking IO:\n", serial->block ? "" : "non " );
+    ACE_printf ("\tSerial %sblocking IO:\n", serial->block ? "" : "non " );
     DEV_serial_settings_print (serial->settings);
     DEV_serial_error_print (&serial->error);
 }
 
 
-static size_t
-serial_nb_read (FILE *stream, char *buf, size_t len)
+static ACE_size_t
+serial_nb_read (ACE_FILE *stream, char *buf, ACE_size_t len)
 {
 	DEV_serial_t * serial = (DEV_serial_t *)stream->represent; 
-	size_t ret;
+	ACE_size_t ret;
     USO_cpu_status_t ps = USO_disable ();
 	ret = USO_pipe_read_ns (&serial->rx_buf, buf, len);
 	stream->pos_rx += ret;
@@ -114,11 +114,11 @@ serial_nb_read (FILE *stream, char *buf, size_t len)
 	return ret;
 }
 
-static size_t
-serial_nb_write (FILE *stream, const char *buf, size_t len)
+static ACE_size_t
+serial_nb_write (ACE_FILE *stream, const char *buf, ACE_size_t len)
 {
 	DEV_serial_t * serial = (DEV_serial_t *)stream->represent; 
-	size_t ret;
+	ACE_size_t ret;
     USO_cpu_status_t ps = USO_disable ();
 	ret = USO_pipe_write_ns (&serial->tx_buf, buf, len);
 	if (ret > 0) {
@@ -131,12 +131,12 @@ serial_nb_write (FILE *stream, const char *buf, size_t len)
 }
 
 
-static size_t
-serial_b_read (FILE *stream, char *buf, size_t len)
+static ACE_size_t
+serial_b_read (ACE_FILE *stream, char *buf, ACE_size_t len)
 {
 	DEV_serial_t * serial = (DEV_serial_t *)stream->represent; 
-	size_t ret = len;
-	size_t readed;
+	ACE_size_t ret = len;
+	ACE_size_t readed;
     USO_lock (&serial->rx_mutex);
 	while(len){
 	    USO_cpu_status_t ps = USO_disable ();
@@ -154,12 +154,12 @@ serial_b_read (FILE *stream, char *buf, size_t len)
 	return ret;
 }
 
-static size_t
-serial_b_write (FILE *stream, const char *buf, size_t len)
+static ACE_size_t
+serial_b_write (ACE_FILE *stream, const char *buf, ACE_size_t len)
 {
 	DEV_serial_t * serial = (DEV_serial_t *)stream->represent; 
-	size_t ret = len;
-	size_t written;
+	ACE_size_t ret = len;
+	ACE_size_t written;
     USO_lock (&serial->tx_mutex);
 	while(len){
 	    USO_cpu_status_t ps = USO_disable ();
@@ -201,7 +201,7 @@ DEV_serial_init (DEV_serial_t * serial,
                    void (*open) (const struct DEV_serial_settings *),
                    void (*close) (void),
                    void (*tx_start) (void),
-                   bool_t block,
+                   ACE_bool_t block,
                    char *name)
 {
     serial->settings = settings;

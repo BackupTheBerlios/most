@@ -29,7 +29,7 @@ gu256x64ser_Center (const char *text, int hide)
 {
     int space, rest;
     int maxSize = 32;
-    int size = strlen (text);
+    int size = ACE_strlen (text);
     if (size > maxSize)
         size = maxSize;
     space = (maxSize - size) / 2;

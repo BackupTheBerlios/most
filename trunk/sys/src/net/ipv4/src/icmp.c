@@ -33,7 +33,7 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
     DEBUGF (NET_ICMP_DEBUG, ("Icmp: rx.\n"));
 
     iphdr = (struct NET_ip_hdr *)NET_netbuf_index(p);
-    hlen = NET_IPH_HL (iphdr) * 4 / sizeof (u8_t);
+    hlen = NET_IPH_HL (iphdr) * 4 / sizeof (ACE_u8_t);
     NET_netbuf_index_inc (p, hlen);
     type = *((unsigned char *)NET_netbuf_index(p));
 
@@ -73,13 +73,13 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
         /*
          * adjust the checksum 
          */
-        if (iecho->chksum >= htons (0xffff - (NET_ICMP_ECHO << 8)))
+        if (iecho->chksum >= ACE_htons (0xffff - (NET_ICMP_ECHO << 8)))
         {
-            iecho->chksum += htons (NET_ICMP_ECHO << 8) + 1;
+            iecho->chksum += ACE_htons (NET_ICMP_ECHO << 8) + 1;
         }
         else
         {
-            iecho->chksum += htons (NET_ICMP_ECHO << 8);
+            iecho->chksum += ACE_htons (NET_ICMP_ECHO << 8);
         }
         ++NET_stats.icmp.tx;
 
@@ -114,7 +114,7 @@ NET_icmp_dest_unreach (NET_netbuf_t * p, enum NET_icmp_dur_type t)
     	idur = (struct NET_icmp_dur_hdr *)NET_netbuf_index(q);
     	NET_ICMPH_TYPE_SET (idur, NET_ICMP_DUR);
     	NET_ICMPH_CODE_SET (idur, t);
-    	bcopy (iphdr, (char*)idur + 8, sizeof (struct NET_ip_hdr) + 8);
+    	ACE_bcopy (iphdr, (char*)idur + 8, sizeof (struct NET_ip_hdr) + 8);
     	idur->chksum = 0;
     	idur->chksum = NET_inet_chksum (idur, NET_netbuf_len(q));
     	++NET_stats.icmp.tx;

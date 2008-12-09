@@ -225,7 +225,7 @@ USO_delta_dec (USO_list_t * list)
     }
 }
 
-extern bool_t
+extern ACE_bool_t
 USO_delta_null (USO_list_t * list)
 {
     if (USO_isempty (list) == FALSE)
@@ -236,7 +236,7 @@ USO_delta_null (USO_list_t * list)
     return FALSE;
 }
 
-extern bool_t
+extern ACE_bool_t
 USO_isempty (USO_list_t * list)
 {
     if (list->head == NULL)

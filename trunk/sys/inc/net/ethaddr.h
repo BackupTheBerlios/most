@@ -21,16 +21,16 @@
 /** Ethernet address type. */
 struct NET_eth_addr
 {
-    u8_t addr[NET_ETH_ADDR_SIZE]; /**< Ethernet address */
-} _PACKED_;
+    ACE_u8_t addr[NET_ETH_ADDR_SIZE]; /**< Ethernet address */
+} ACE_PACKED_;
 
 /** Ethernet Protocol Header. */
 struct NET_eth_hdr
 {
     struct NET_eth_addr dest; /**< Destination Address */
     struct NET_eth_addr src;  /**< Source Address */
-    u16_t type;               /**< Protocoll Type */
-} _PACKED_;
+    ACE_u16_t type;               /**< Protocoll Type */
+} ACE_PACKED_;
 
 /** @}
  */

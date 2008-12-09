@@ -8,7 +8,7 @@
 static char *___strtok = NULL;
 
 extern char *
-strtok (char *s, const char *ct)
+ACE_strtok (char *s, const char *ct)
 {
     char *begin, *end;
 
@@ -17,13 +17,13 @@ strtok (char *s, const char *ct)
     {
         return (NULL);
     }
-    begin += strspn (begin, ct);
+    begin += ACE_strspn (begin, ct);
     if (*begin == '\0')
     {
         ___strtok = NULL;
         return NULL;
     }
-    end = strpbrk (begin, ct);
+    end = ACE_strpbrk (begin, ct);
     if (end && *end != '\0')
         *end++ = '\0';
     ___strtok = end;

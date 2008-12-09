@@ -43,7 +43,7 @@ typedef struct USO_heap USO_heap_t;
  * @param start : Pointer to start of the heap.
  * @param end : Pointer to the end of the heap.
  */
-extern bool_t USO_heap_init (USO_heap_t* heap, void *start, void *end);
+extern ACE_bool_t USO_heap_init (USO_heap_t* heap, void *start, void *end);
 
 extern void USO_heap_install(USO_heap_t* heap, char *name);
 
@@ -55,7 +55,7 @@ extern void USO_heap_install(USO_heap_t* heap, char *name);
  *
  * @return Pointer to memory block or NULL if no memory avilable.
  */
-extern void *USO_mem_alloc (USO_heap_t* heap, size_t size);
+extern void *USO_mem_alloc (USO_heap_t* heap, ACE_size_t size);
 
 /** 
  * Fremm memory block.

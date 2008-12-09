@@ -25,7 +25,7 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
 
     ethhdr = (struct NET_eth_hdr *)NET_netbuf_index(p);
 
-    switch (htons (ethhdr->type))
+    switch (ACE_htons (ethhdr->type))
     {
     case NET_ETH_TYPE_IP:
         DEBUGF (NET_ETH_DEBUG, ("Eth: rx ip.\n"));
@@ -73,7 +73,7 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
     struct NET_eth_hdr *ethhdr;
     struct NET_eth_addr *dest, mcastaddr;
     NET_ip_addr_t *queryaddr;
-    u8_t i;
+    ACE_u8_t i;
 
     ethif = netif->device;
     NET_netbuf_index_inc (p, -sizeof (struct NET_eth_hdr));
@@ -158,7 +158,7 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
         ethhdr->dest.addr[i] = dest->addr[i];
         ethhdr->src.addr[i] = ethif->eth_addr->addr[i];
     }
-    ethhdr->type = htons (NET_ETH_TYPE_IP);
+    ethhdr->type = ACE_htons (NET_ETH_TYPE_IP);
     if (ethif->transmit != NULL) {
     	 ethif->transmit (ethif->mac, p);
 	  	++netif->tx;

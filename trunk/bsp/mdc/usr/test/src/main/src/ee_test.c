@@ -48,7 +48,7 @@ readEE_exec (char *nix)
 {
     EE_93C46_read (0, 14, name);
     name[31] = 0;
-    printf ("%s.\n", name);
+    ACE_printf ("%s.\n", name);
 
 }
 

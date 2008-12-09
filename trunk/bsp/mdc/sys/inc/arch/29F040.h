@@ -45,7 +45,7 @@ extern enum FLASH_29F040_err_code FLASH_29F040_sector_erase_s (volatile unsigned
  */
 extern enum FLASH_29F040_err_code FLASH_29F040_sector_erase_ns (volatile unsigned char
 							     *sector_addr)
-      _SECTION_ (".ramcode");
+      ACE_SECTION_ (".ramcode");
 
 /**
  * @param addr
@@ -66,7 +66,7 @@ extern enum FLASH_29F040_err_code FLASH_29F040_programm_s (volatile unsigned cha
 extern enum FLASH_29F040_err_code FLASH_29F040_programm_ns (volatile unsigned char *addr,
 							 unsigned char *data,
 							 unsigned long len)
-      _SECTION_ (".ramcode");
+      ACE_SECTION_ (".ramcode");
 
 /** @}
  */

@@ -18,7 +18,7 @@ erasefl_exec (char *nix)
 {
     enum FLASH_29F040_err_code err;
     err = FLASH_29F040_sector_erase_s (sector);
-    printf ("Flash erased = %d.\n", err);
+    ACE_printf ("Flash erased = %d.\n", err);
 }
 
 static CLI_exec_t printfl;
@@ -30,7 +30,7 @@ printfl_exec (char *nix)
     volatile unsigned char *data;
     for (i = 8, data = sector; i; --i, data += 8)
     {
-        printf
+        ACE_printf
             ("%2x %02x %02x %02x %02x %02x %02x %02x %c%c%c%c%c%c%c%c.\n",
              *data, *(data + 1), *(data + 2), *(data + 3), *(data + 4),
              *(data + 5), *(data + 6), *(data + 7), *data, *(data + 1),
@@ -49,7 +49,7 @@ writefl_exec (char *nix)
 {
     enum FLASH_29F040_err_code err;
     err = FLASH_29F040_programm_s (sector, fldata, sizeof (fldata));
-    printf ("Flash programmed = %d.\n", err);
+    ACE_printf ("Flash programmed = %d.\n", err);
 }
 
 extern void

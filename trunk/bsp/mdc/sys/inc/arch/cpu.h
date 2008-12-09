@@ -37,7 +37,7 @@ void MDC_cpu_init (void);
 /**
  * Triggers the external watchdog which should happen at least once every 1.6 sec.
  */
-_INLINE_ static void
+ACE_INLINE_ static void
 MDC_watchdog_trigger (void)
 {
     H8_BITNOT (H8_P45_WDI, h8_P4DR);

@@ -34,13 +34,13 @@ struct NET_udp_socket
     USO_node_t node;
     NET_ip_addr_t local_ip;
     NET_ip_addr_t remote_ip;
-    u16_t local_port;
-    u16_t remote_port;
-    u8_t flags;
-    u16_t chksum_len;
+    ACE_u16_t local_port;
+    ACE_u16_t remote_port;
+    ACE_u8_t flags;
+    ACE_u16_t chksum_len;
     USO_mailbox_t rx_que;
     DEV_timer_t rx_timer;
-    bool_t rx_timeout;
+    ACE_bool_t rx_timeout;
 };
 
 #define NET_udp_flags(sock)  ((sock)->flags) /**< ? */
@@ -69,12 +69,12 @@ extern void NET_udp_socket_close (NET_udp_socket_t *);
 /**
  * ?
  */
-extern void NET_udp_bind (NET_udp_socket_t *, NET_ip_addr_t *, u16_t);
+extern void NET_udp_bind (NET_udp_socket_t *, NET_ip_addr_t *, ACE_u16_t);
 
 /**
  * ?
  */
-extern void NET_udp_connect (NET_udp_socket_t *, NET_ip_addr_t *, u16_t);
+extern void NET_udp_connect (NET_udp_socket_t *, NET_ip_addr_t *, ACE_u16_t);
 
 /**
  * ?
@@ -86,13 +86,13 @@ extern void NET_udp_recv_timeout (NET_udp_socket_t *, unsigned long);
  */
 extern NET_netbuf_t *
 NET_udp_recv_netbuf (NET_udp_socket_t * sock,
-              		 NET_ip_addr_t * addr, u16_t * port);
+              		 NET_ip_addr_t * addr, ACE_u16_t * port);
 
 /**
  * ?
  */
 extern long NET_udp_recv (NET_udp_socket_t *,
-                          NET_ip_addr_t *, u16_t *,
+                          NET_ip_addr_t *, ACE_u16_t *,
                           char * buf, unsigned int len);
 
 /**

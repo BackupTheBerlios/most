@@ -38,10 +38,10 @@ static struct MFS_vfs_op MFS_sysfs_vfs_op = { .super_op = &MFS_sysfs_super_op,
 
 static void info (void)
 {
-	puts("sysfs\n");
+	ACE_puts("sysfs\n");
 }
 
-extern bool_t
+extern ACE_bool_t
 MFS_sysfs_init(void)
 {
 	MFS_descriptor_t *dir;

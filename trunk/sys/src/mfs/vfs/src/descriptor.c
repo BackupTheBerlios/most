@@ -69,7 +69,7 @@ MFS_descriptor_info(MFS_descriptor_t *desc)
 			type = "desc";
 			break;
 	}
-	printf("%s \t%s\t", type, desc->name );
+	ACE_printf("%s \t%s\t", type, desc->name );
 }
 
 
@@ -83,7 +83,7 @@ MFS_descriptor_init(MFS_descriptor_t *desc,
 {
 	desc->entry = entry;
 	desc->operations = operations;
-	strncpy(desc->name, name, sizeof(desc->name) - 1);
+	ACE_strncpy(desc->name, name, sizeof(desc->name) - 1);
 	desc->name[sizeof(desc->name) - 1] = 0;
 	desc->type = type;
 	desc->parent = parent;
@@ -96,7 +96,7 @@ MFS_descriptor_new(MFS_entry_t *entry,
 					enum MFS_entry_type type,
 					MFS_descriptor_t *parent)
 {
-	MFS_descriptor_t *desc = malloc( sizeof(MFS_descriptor_t));
+	MFS_descriptor_t *desc = ACE_malloc( sizeof(MFS_descriptor_t));
 	if (desc != NULL){
         MFS_descriptor_init(desc, entry, operations, name, type, parent);
     }

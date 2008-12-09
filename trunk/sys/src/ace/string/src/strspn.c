@@ -5,12 +5,12 @@
 
 #include "ace/string.h"
 
-extern size_t
-strspn (const char *cs, const char *ct)
+extern ACE_size_t
+ACE_strspn (const char *cs, const char *ct)
 {
     const char *p1;
     const char *p2;
-    size_t n = 0;
+    ACE_size_t n = 0;
 
     for (p1 = cs; *p1 != '\0'; ++p1)
     {

@@ -14,7 +14,7 @@ skip_atoi (const char **s)
 {
     int i = 0;
 
-    while (isdigit (**s))
+    while (ACE_isdigit (**s))
         i = i * 10 + *((*s)++) - '0';
     return (i);
 }
@@ -114,7 +114,7 @@ number (char *str, long num, int base, int size, int precision, int type)
 }
 
 extern int
-vsprintf (char *buf, const char *fmt, va_list_t args)
+ACE_vsprintf (char *buf, const char *fmt, ACE_va_list_t args)
 {
     int len;
     unsigned long num;
@@ -166,7 +166,7 @@ vsprintf (char *buf, const char *fmt, va_list_t args)
          * get field width 
          */
         field_width = -1;
-        if (isdigit (*fmt))
+        if (ACE_isdigit (*fmt))
             field_width = skip_atoi (&fmt);
         else if (*fmt == '*')
         {
@@ -174,7 +174,7 @@ vsprintf (char *buf, const char *fmt, va_list_t args)
             /*
              * it's the next argument 
              */
-            field_width = va_arg (args, int);
+            field_width = ACE_va_arg (args, int);
             if (field_width < 0)
             {
                 field_width = -field_width;
@@ -189,7 +189,7 @@ vsprintf (char *buf, const char *fmt, va_list_t args)
         if (*fmt == '.')
         {
             ++fmt;
-            if (isdigit (*fmt))
+            if (ACE_isdigit (*fmt))
                 precision = skip_atoi (&fmt);
             else if (*fmt == '*')
             {
@@ -197,7 +197,7 @@ vsprintf (char *buf, const char *fmt, va_list_t args)
                 /*
                  * it's the next argument 
                  */
-                precision = va_arg (args, int);
+                precision = ACE_va_arg (args, int);
             }
             if (precision < 0)
                 precision = 0;
@@ -224,7 +224,7 @@ vsprintf (char *buf, const char *fmt, va_list_t args)
             if (!(flags & LEFT))
                 while (--field_width > 0)
                     add2str (&str, ' ');        /* *str++ = ' '; */
-            add2str (&str, (unsigned char)va_arg (args, int));  /* *str++
+            add2str (&str, (unsigned char)ACE_va_arg (args, int));  /* *str++
                                                                  * =
                                                                  * (unsigned 
                                                                  * char)
@@ -235,11 +235,11 @@ vsprintf (char *buf, const char *fmt, va_list_t args)
             continue;
 
         case 's':
-            s = va_arg (args, char *);
+            s = ACE_va_arg (args, char *);
             if (!s)
                 s = "<NULL>";
 
-            len = strnlen (s, precision);
+            len = ACE_strnlen (s, precision);
 
             if (!(flags & LEFT))
                 while (len < field_width--)
@@ -256,7 +256,7 @@ vsprintf (char *buf, const char *fmt, va_list_t args)
                 field_width = 2 * sizeof (void *);
                 flags |= ZEROPAD;
             }
-            str = number (str, (unsigned long)va_arg (args, void *),
+            str = number (str, (unsigned long)ACE_va_arg (args, void *),
                           16, field_width, precision, flags);
             continue;
 
@@ -264,12 +264,12 @@ vsprintf (char *buf, const char *fmt, va_list_t args)
         case 'n':
             if (qualifier == 'l')
             {
-                long *ip = va_arg (args, long *);
+                long *ip = ACE_va_arg (args, long *);
                 *ip = (str - buf);
             }
             else
             {
-                int *ip = va_arg (args, int *);
+                int *ip = ACE_va_arg (args, int *);
                 *ip = (str - buf);
             }
             continue;
@@ -306,26 +306,26 @@ vsprintf (char *buf, const char *fmt, va_list_t args)
         }
         if (qualifier == 'l')
         {
-            num = va_arg (args, unsigned long);
+            num = ACE_va_arg (args, unsigned long);
         }
         else if (qualifier == 'h')
         {
             if (flags & SIGN)
             {
-                num = va_arg (args, int);
+                num = ACE_va_arg (args, int);
             }
             else
             {
-                num = va_arg (args, unsigned int);
+                num = ACE_va_arg (args, unsigned int);
             }
         }
         else if (flags & SIGN)
         {
-            num = va_arg (args, int);
+            num = ACE_va_arg (args, int);
         }
         else
         {
-            num = va_arg (args, unsigned int);
+            num = ACE_va_arg (args, unsigned int);
         }
         str = number (str, num, base, field_width, precision, flags);
     }

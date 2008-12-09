@@ -36,16 +36,16 @@
  * @note accumulator size limits summable length to 64k
  * @note host endianess is irrelevant (p3 RFC1071)
  */
-static u16_t
-chksum(void *dataptr, u16_t len)
+static ACE_u16_t
+chksum(void *dataptr, ACE_u16_t len)
 {
-  u32_t acc;
-  u16_t src;
-  u8_t *octetptr;
+  ACE_u32_t acc;
+  ACE_u16_t src;
+  ACE_u8_t *octetptr;
 
   acc = 0;
   /* dataptr may be at odd or even addresses */
-  octetptr = (u8_t*)dataptr;
+  octetptr = (ACE_u8_t*)dataptr;
   while (len > 1) {
     /* declare first octet as most significant
        thus assume network order, ignoring host order */
@@ -70,7 +70,7 @@ chksum(void *dataptr, u16_t len)
   /* This maybe a little confusing: reorder sum using htons()
      instead of ntohs() since it has a little less call overhead.
      The caller must invert bits for Internet sum ! */
-  return htons((u16_t)acc);
+  return ACE_htons((ACE_u16_t)acc);
 }
 #endif
 
@@ -90,13 +90,13 @@ chksum(void *dataptr, u16_t len)
  * @return host order (!) lwip checksum (non-inverted Internet sum) 
  */
 
-static u16_t
+static ACE_u16_t
 chksum(void *dataptr, int len)
 {
-  u8_t *pb = dataptr;
-  u16_t *ps, t = 0;
-  u32_t sum = 0;
-  int odd = ((u32_t)pb & 1);
+  ACE_u8_t *pb = dataptr;
+  ACE_u16_t *ps, t = 0;
+  ACE_u32_t sum = 0;
+  int odd = ((ACE_u32_t)pb & 1);
 
   /* Get aligned to u16_t */
   if (odd && len > 0) {
@@ -105,7 +105,7 @@ chksum(void *dataptr, int len)
   }
 
   /* Add the bulk of the data */
-  ps = (u16_t *)pb;
+  ps = (ACE_u16_t *)pb;
   while (len > 1) {
     sum += *ps++;
     len -= 2;
@@ -113,7 +113,7 @@ chksum(void *dataptr, int len)
 
   /* Consume left-over byte, if any */
   if (len > 0) {
-    ((u8_t *)&t)[0] = *(u8_t *)ps;;
+    ((ACE_u8_t *)&t)[0] = *(ACE_u8_t *)ps;;
   }
 
   /* Add end bytes */
@@ -146,29 +146,29 @@ chksum(void *dataptr, int len)
  * by Curt McDowell, Broadcom Corp. December 8th, 2005
  */
 
-static u16_t
+static ACE_u16_t
 chksum(void *dataptr, int len)
 {
-  u8_t *pb = dataptr;
-  u16_t *ps, t = 0;
-  u32_t *pl;
-  u32_t sum = 0, tmp;
+  ACE_u8_t *pb = dataptr;
+  ACE_u16_t *ps, t = 0;
+  ACE_u32_t *pl;
+  ACE_u32_t sum = 0, tmp;
   /* starts at odd byte address? */
-  int odd = ((u32_t)pb & 1);
+  int odd = ((ACE_u32_t)pb & 1);
 
   if (odd && len > 0) {
-    ((u8_t *)&t)[1] = *pb++;
+    ((ACE_u8_t *)&t)[1] = *pb++;
     len--;
   }
 
-  ps = (u16_t *)pb;
+  ps = (ACE_u16_t *)pb;
 
-  if (((u32_t)ps & 3) && len > 1) {
+  if (((ACE_u32_t)ps & 3) && len > 1) {
     sum += *ps++;
     len -= 2;
   }
 
-  pl = (u32_t *)ps;
+  pl = (ACE_u32_t *)ps;
 
   while (len > 7)  {
     tmp = sum + *pl++;          /* ping */
@@ -187,7 +187,7 @@ chksum(void *dataptr, int len)
   /* make room in upper bits */
   sum = FOLD_U32T(sum);
 
-  ps = (u16_t *)pl;
+  ps = (ACE_u16_t *)pl;
 
   /* 16-bit aligned word remaining? */
   while (len > 1) {
@@ -197,7 +197,7 @@ chksum(void *dataptr, int len)
 
   /* dangling tail byte remaining? */
   if (len > 0) {                /* include odd byte */
-    ((u8_t *)&t)[0] = *(u8_t *)ps;
+    ((ACE_u8_t *)&t)[0] = *(ACE_u8_t *)ps;
   }
 
   sum += t;                     /* add end bytes */
@@ -223,8 +223,8 @@ chksum(void *dataptr, int len)
  */
 /*-----------------------------------------------------------------------------------*/
 
-extern u16_t
-NET_inet_chksum (void *dataptr, u16_t len)
+extern ACE_u16_t
+NET_inet_chksum (void *dataptr, ACE_u16_t len)
 {
 	return ~chksum(dataptr, len);
 }
@@ -238,19 +238,19 @@ NET_inet_chksum (void *dataptr, u16_t len)
  * @return checksum (as u16_t) to be saved directly in the protocol header
  */
 
-static u16_t
+static ACE_u16_t
 chksum_buf(NET_netbuf_t* p)
 {
-	u32_t acc;
+	ACE_u32_t acc;
   	NET_netbuf_t *q;
-  	u8_t swapped;
+  	ACE_u8_t swapped;
 
 	acc = 0;
   	swapped = 0;
     for (q = p; q != NULL; q = NET_netbuf_next(q))
     {
     	int len = NET_netbuf_len(q);
-	    acc += chksum((u16_t *)NET_netbuf_index(q), len);
+	    acc += chksum((ACE_u16_t *)NET_netbuf_index(q), len);
     	acc = FOLD_U32T(acc);
    		if ( len % 2 != 0) {
       		swapped = 1 - swapped;
@@ -261,11 +261,11 @@ chksum_buf(NET_netbuf_t* p)
   	if (swapped) {
     	acc = SWAP_BYTES_IN_WORD(acc);
   	}
-  	return (u16_t) (acc & 0xffffUL);
+  	return (ACE_u16_t) (acc & 0xffffUL);
 }
 
 
-extern u16_t
+extern ACE_u16_t
 NET_inet_chksum_buf(NET_netbuf_t* p)
 {
 	return ~chksum_buf(p);
@@ -284,23 +284,23 @@ NET_inet_chksum_buf(NET_netbuf_t* p)
  * @return checksum (as u16_t) to be saved directly in the protocol header
  */
 
-extern u16_t
+extern ACE_u16_t
 NET_inet_chksum_pseudo (NET_netbuf_t * p,
                         NET_ip_addr_t * src,
                         NET_ip_addr_t * dest,
-                        u8_t proto, u16_t proto_len)
+                        ACE_u8_t proto, ACE_u16_t proto_len)
 {
-	u32_t acc;
+	ACE_u32_t acc;
   	acc = chksum_buf(p);
 
   	acc += (src->addr & 0xffffUL);
   	acc += ((src->addr >> 16) & 0xffffUL);
   	acc += (dest->addr & 0xffffUL);
   	acc += ((dest->addr >> 16) & 0xffffUL);
-  	acc += (u32_t)htons((u16_t)proto);
-  	acc += (u32_t)htons(proto_len);
+  	acc += (ACE_u32_t)ACE_htons((ACE_u16_t)proto);
+  	acc += (ACE_u32_t)ACE_htons(proto_len);
 
   	acc = FOLD_U32T(acc);
   	acc = FOLD_U32T(acc);
-  	return (u16_t)~(acc & 0xffffUL);
+  	return (ACE_u16_t)~(acc & 0xffffUL);
 }

@@ -25,105 +25,105 @@ ACE_stdio_init (void)
 }
 
 
-extern size_t
-fread (FILE * in, char *buf, size_t len){
+extern ACE_size_t
+ACE_fread (ACE_FILE * in, char *buf, ACE_size_t len){
     if (in == NULL) {return 0;}
 	return MFS_read(in, buf, len);
 }
 
-extern size_t
-fwrite (FILE * out, char *buf, size_t len){
+extern ACE_size_t
+ACE_fwrite (ACE_FILE * out, char *buf, ACE_size_t len){
     if (out == NULL) {return 0;}
 	return MFS_write(out, buf, len);
 }
 
 extern int
-fgetc (FILE * in)
+ACE_fgetc (ACE_FILE * in)
 {
 	char c;
-	if (fread(in, &c, sizeof(c)) >= sizeof(c)){
+	if (ACE_fread(in, &c, sizeof(c)) >= sizeof(c)){
 		 return (unsigned char)c;
 	}
-    return EOF;
+    return ACE_EOF;
 }
 
 extern int
-fputc (FILE * out, char c)
+ACE_fputc (ACE_FILE * out, char c)
 {
-	int ret = fwrite (out, &c, sizeof(c));
-    if (ret < sizeof(c)) {ret = EOF;}
+	int ret = ACE_fwrite (out, &c, sizeof(c));
+    if (ret < sizeof(c)) {ret = ACE_EOF;}
     return ret;
 }
 
 extern int
-fputs (FILE * out, char *string)
+ACE_fputs (ACE_FILE * out, char *string)
 {
-    int len = strlen(string);
-	int ret = fwrite (out, string, len);
-    return (ret < len) ? EOF : ret;
+    int len = ACE_strlen(string);
+	int ret = ACE_fwrite (out, string, len);
+    return (ret < len) ? ACE_EOF : ret;
 }
 
 extern int
-fprintf (FILE * out, const char *fmt, ...)
+ACE_fprintf (ACE_FILE * out, const char *fmt, ...)
 {
     int len;
 	int ret;
-    va_list_t args;
+    ACE_va_list_t args;
     char *buf;
     buf = USO_buf_alloc (&ios_buf_pool);
-    va_start (args, fmt);
-    len = vsprintf (buf, fmt, args);
-    va_end (args);
-    ret = fwrite (out, buf, len);
+    ACE_va_start (args, fmt);
+    len = ACE_vsprintf (buf, fmt, args);
+    ACE_va_end (args);
+    ret = ACE_fwrite (out, buf, len);
     USO_buf_free (&ios_buf_pool, buf);
-    return (ret < len) ? EOF : ret;
+    return (ret < len) ? ACE_EOF : ret;
 }
 
 
-extern size_t
-read (char *buf, size_t len)
+extern ACE_size_t
+ACE_read (char *buf, ACE_size_t len)
 {
-    return fread (USO_current()->in, buf, len);
+    return ACE_fread (USO_current()->in, buf, len);
 }
 
-extern size_t
-write (char *buf, size_t len)
+extern ACE_size_t
+ACE_write (char *buf, ACE_size_t len)
 {
-    return fwrite (USO_current()->out, buf, len);
+    return ACE_fwrite (USO_current()->out, buf, len);
 }
 
 extern int
-getc (void)
+ACE_getc (void)
 {
-    return fgetc (USO_current()->in);
+    return ACE_fgetc (USO_current()->in);
 }
 
 extern int
-putc (char c)
+ACE_putc (char c)
 {
-    return fputc (USO_current()->out, c);
+    return ACE_fputc (USO_current()->out, c);
 }
 
 extern int
-puts (char *string)
+ACE_puts (char *string)
 {
-    return fputs (USO_current()->out, string);
+    return ACE_fputs (USO_current()->out, string);
 }
 
 extern int
-printf (const char *fmt, ...)
+ACE_printf (const char *fmt, ...)
 {
     int len;
 	int ret;
-    va_list_t args;
+    ACE_va_list_t args;
     char *buf;
     buf = USO_buf_alloc (&ios_buf_pool);
-    va_start (args, fmt);
-    len = vsprintf (buf, fmt, args);
-    va_end (args);
-    ret = fwrite (USO_current()->out, buf, len);
+    ACE_va_start (args, fmt);
+    len = ACE_vsprintf (buf, fmt, args);
+    ACE_va_end (args);
+    ret = ACE_fwrite (USO_current()->out, buf, len);
     USO_buf_free (&ios_buf_pool, buf);
-    return (ret < len) ? EOF : ret;
+    return (ret < len) ? ACE_EOF : ret;
 }
 
 /*------------------------------------------------------------------------*/

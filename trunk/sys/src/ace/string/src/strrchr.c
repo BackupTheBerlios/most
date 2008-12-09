@@ -6,9 +6,9 @@
 #include "ace/string.h"
 
 extern char *
-strrchr (const char *cs, int c)
+ACE_strrchr (const char *cs, int c)
 {
-    const char *p = cs + strlen (cs);
+    const char *p = cs + ACE_strlen (cs);
     do
     {
         if (*p == (char)c)

@@ -27,38 +27,38 @@
 struct arp_hdr
 {
     struct NET_eth_hdr ethhdr;
-    u16_t hwtype;
-    u16_t proto;
-    u16_t hwlen_protolen;
-    u16_t opcode;
+    ACE_u16_t hwtype;
+    ACE_u16_t proto;
+    ACE_u16_t hwlen_protolen;
+    ACE_u16_t opcode;
     struct NET_eth_addr shwaddr;
     NET_ip_addr_t sipaddr;
     struct NET_eth_addr dhwaddr;
     NET_ip_addr_t dipaddr;
-} _PACKED_;
+} ACE_PACKED_;
 
-#define ARPH_HWLEN(hdr) (ntohs((hdr)->hwlen_protolen) >> 8)
-#define ARPH_PROTOLEN(hdr) (ntohs((hdr)->hwlen_protolen) & 0xff)
+#define ARPH_HWLEN(hdr) (ACE_ntohs((hdr)->hwlen_protolen) >> 8)
+#define ARPH_PROTOLEN(hdr) (ACE_ntohs((hdr)->hwlen_protolen) & 0xff)
 
 
-#define ARPH_HWLEN_SET(hdr, len) (hdr)->hwlen_protolen = htons(ARPH_PROTOLEN(hdr) | ((len) << 8))
-#define ARPH_PROTOLEN_SET(hdr, len) (hdr)->hwlen_protolen = htons((len) | (ARPH_HWLEN(hdr) << 8))
+#define ARPH_HWLEN_SET(hdr, len) (hdr)->hwlen_protolen = ACE_htons(ARPH_PROTOLEN(hdr) | ((len) << 8))
+#define ARPH_PROTOLEN_SET(hdr, len) (hdr)->hwlen_protolen = ACE_htons((len) | (ARPH_HWLEN(hdr) << 8))
 
 struct ethip_hdr
 {
     struct NET_eth_hdr eth;
     struct NET_ip_hdr ip;
-} _PACKED_;
+} ACE_PACKED_;
 
 struct arp_entry
 {
     NET_ip_addr_t ipaddr;
     struct NET_eth_addr ethaddr;
-    u8_t ctime;
+    ACE_u8_t ctime;
 };
 
 static struct arp_entry arp_table[ARP_TABLE_SIZE];
-static u8_t ctime;
+static ACE_u8_t ctime;
 static DEV_timer_t clear_entry;
 
 /*
@@ -69,7 +69,7 @@ static DEV_timer_t clear_entry;
 static void
 arp_tmr (void *nix)
 {
-    u8_t i;
+    ACE_u8_t i;
 
     ++ctime;
     for (i = 0; i < ARP_TABLE_SIZE; ++i)
@@ -87,7 +87,7 @@ arp_tmr (void *nix)
 extern void
 NET_arp_init (void)
 {
-    u8_t i;
+    ACE_u8_t i;
 
     for (i = 0; i < ARP_TABLE_SIZE; ++i)
     {
@@ -101,8 +101,8 @@ NET_arp_init (void)
 static void
 add_arp_entry (NET_ip_addr_t * ipaddr, struct NET_eth_addr *ethaddr)
 {
-    u8_t i, j, k;
-    u8_t maxtime;
+    ACE_u8_t i, j, k;
+    ACE_u8_t maxtime;
 
     /*
      * Walk through the ARP mapping table and try to find an entry to
@@ -230,7 +230,7 @@ NET_arp_arp_input (NET_netif_t * netif,
                    struct NET_eth_addr *ethaddr, NET_netbuf_t * p)
 {
     struct arp_hdr *hdr;
-    u8_t i;
+    ACE_u8_t i;
 
     if (NET_netbuf_len(p) < sizeof (struct arp_hdr))
     {
@@ -243,7 +243,7 @@ NET_arp_arp_input (NET_netif_t * netif,
 
     hdr = (struct arp_hdr *)NET_netbuf_index(p);
 
-    switch (htons (hdr->opcode))
+    switch (ACE_htons (hdr->opcode))
     {
     case ARP_REQUEST:
         /*
@@ -252,7 +252,7 @@ NET_arp_arp_input (NET_netif_t * netif,
         DEBUGF (NET_ARP_DEBUG, ("Arp: arp request.\n"));
         if (NET_ip_addr_cmp (&(hdr->dipaddr), &(netif->ip_addr)))
         {
-            hdr->opcode = htons (ARP_REPLY);
+            hdr->opcode = ACE_htons (ARP_REPLY);
 
             NET_ip_addr_set (&(hdr->dipaddr), &(hdr->sipaddr));
             NET_ip_addr_set (&(hdr->sipaddr), &(netif->ip_addr));
@@ -265,13 +265,13 @@ NET_arp_arp_input (NET_netif_t * netif,
                 hdr->ethhdr.src.addr[i] = ethaddr->addr[i];
             }
 
-            hdr->hwtype = htons (HWTYPE_ETHERNET);
+            hdr->hwtype = ACE_htons (HWTYPE_ETHERNET);
             ARPH_HWLEN_SET (hdr, 6);
 
-            hdr->proto = htons (NET_ETH_TYPE_IP);
+            hdr->proto = ACE_htons (NET_ETH_TYPE_IP);
             ARPH_PROTOLEN_SET (hdr, sizeof (NET_ip_addr_t));
 
-            hdr->ethhdr.type = htons (NET_ETH_TYPE_ARP);
+            hdr->ethhdr.type = ACE_htons (NET_ETH_TYPE_ARP);
             return p;
         }
         break;
@@ -287,7 +287,7 @@ NET_arp_arp_input (NET_netif_t * netif,
         break;
     default:
         DEBUGF (NET_ARP_DEBUG,
-                ("Arp: unknown type %d.\n", htons (hdr->opcode)));
+                ("Arp: unknown type %d.\n", ACE_htons (hdr->opcode)));
         break;
     }
 
@@ -303,7 +303,7 @@ NET_arp_arp_input (NET_netif_t * netif,
 extern struct NET_eth_addr *
 NET_arp_lookup (NET_ip_addr_t * ipaddr)
 {
-    u8_t i;
+    ACE_u8_t i;
 
     for (i = 0; i < ARP_TABLE_SIZE; ++i)
     {
@@ -326,13 +326,13 @@ NET_arp_query (NET_netif_t * netif,
 {
     struct arp_hdr *hdr;
     NET_netbuf_t *p;
-    u8_t i;
+    ACE_u8_t i;
 
     p = NET_netbuf_alloc_trans();
     if(p == NULL) { return NULL; }
 	if (NET_netbuf_index_inc (p, -sizeof(struct arp_hdr))){
 	    hdr = (struct arp_hdr *)NET_netbuf_index(p);
-	    hdr->opcode = htons (ARP_REQUEST);
+	    hdr->opcode = ACE_htons (ARP_REQUEST);
 	    for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
     	{
         	hdr->dhwaddr.addr[i] = 0x00;
@@ -340,9 +340,9 @@ NET_arp_query (NET_netif_t * netif,
     	}
 	    NET_ip_addr_set (&(hdr->dipaddr), ipaddr);
     	NET_ip_addr_set (&(hdr->sipaddr), &(netif->ip_addr));
-	    hdr->hwtype = htons (HWTYPE_ETHERNET);
+	    hdr->hwtype = ACE_htons (HWTYPE_ETHERNET);
 	    ARPH_HWLEN_SET (hdr, NET_ETH_ADDR_SIZE);
-	    hdr->proto = htons (NET_ETH_TYPE_IP);
+	    hdr->proto = ACE_htons (NET_ETH_TYPE_IP);
     	ARPH_PROTOLEN_SET (hdr, sizeof (NET_ip_addr_t));
 
     	for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
@@ -351,7 +351,7 @@ NET_arp_query (NET_netif_t * netif,
         	hdr->ethhdr.src.addr[i] = ethaddr->addr[i];
     	}
 
-    	hdr->ethhdr.type = htons (NET_ETH_TYPE_ARP);
+    	hdr->ethhdr.type = ACE_htons (NET_ETH_TYPE_ARP);
 	} else {
 		NET_netbuf_free(p);
 		p = NULL;

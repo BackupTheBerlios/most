@@ -57,7 +57,7 @@ struct bootp_packet
     unsigned char sname[SERVER_NAME_SIZE];    /* server host name */
     unsigned char file[FILE_NAME_SIZE];       /* boot file name */
     unsigned char vend[VEND_SIZE];
-} _PACKED_;
+} ACE_PACKED_;
 
 /********************************************************************************
  * Definitions
@@ -76,7 +76,7 @@ bootp_init_request (void)
     request_data->op = REQUEST;
     request_data->htype = ETHHWTYPE;
     request_data->hlen = NET_ETH_ADDR_SIZE;
-    request_data->xid = htonl (TRANSACTION_ID);
+    request_data->xid = ACE_htonl (TRANSACTION_ID);
     memcpy (request_data->chaddr, hw_address->addr, NET_ETH_ADDR_SIZE);
 }
 
@@ -87,7 +87,7 @@ bootp_check_reply (void)
     {
         return -1;
     }
-    if (reply_data->xid != htonl (TRANSACTION_ID))
+    if (reply_data->xid != ACE_htonl (TRANSACTION_ID))
     {
         return -2;
     }
@@ -120,7 +120,7 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
     static NET_ip_addr_t client_addr;
 	int i;
 	
-	bootp_packets = malloc(sizeof(struct bootp_packet));
+	bootp_packets = ACE_malloc(sizeof(struct bootp_packet));
 	if (bootp_packets == NULL){
     	USO_kputs (USO_LL_ERROR, "BOOTP mem error\n");
     	return err;
@@ -142,7 +142,7 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
             USO_sleep (RETRY_TIME);
         } else {
         	long len; 
-        	u16_t server_port;
+        	ACE_u16_t server_port;
             DEBUGF(NAP_BOOTP_DEBUG, ("BOOTP request\n") );
         	reply_data = bootp_packets;
             len = NET_udp_recv (&sock, NULL, &server_port, (char*)reply_data, sizeof(struct bootp_packet));
@@ -177,6 +177,6 @@ NAP_bootp (struct NET_eth_addr *hwaddr)
     
     NET_udp_socket_close (&sock);
 	DEBUGF(NAP_BOOTP_DEBUG, ("BOOTP sock closed\n") );
-	free (bootp_packets);
+	ACE_free (bootp_packets);
 	return err;
 }

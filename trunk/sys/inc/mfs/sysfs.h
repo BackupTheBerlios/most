@@ -11,7 +11,7 @@
 #include "mfs/vfs.h"
 #include "cli/commands.h"
 
-extern bool_t MFS_sysfs_init(void);
+extern ACE_bool_t MFS_sysfs_init(void);
 extern MFS_descriptor_t *MFS_sysfs_root(void);
 extern MFS_descriptor_t *MFS_sysfs_serial(void);
 extern MFS_descriptor_t *MFS_sysfs_threads(void);

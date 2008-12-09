@@ -6,7 +6,7 @@
 #include "ace/string.h"
 
 extern char *
-strcpy (char *s, const char *ct)
+ACE_strcpy (char *s, const char *ct)
 {
     char *temp = s;
 

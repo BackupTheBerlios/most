@@ -474,7 +474,7 @@ smc_receive_packet (NET_smc91c94_t *smc)
  *------------------------------------------------------------------------
  */
  
-static bool_t
+static ACE_bool_t
 smc_tx_alloc_mem (NET_netbuf_t * packet, NET_smc91c94_t * smc)
 {
     unsigned short numPages;
@@ -520,7 +520,7 @@ smc_tx_alloc_mem (NET_netbuf_t * packet, NET_smc91c94_t * smc)
  * if I actually sent it. 
  */
 static unsigned char
-smc_tx_write_data (NET_smc91c94_t * smc, NET_netbuf_t * packet, bool_t wirq)
+smc_tx_write_data (NET_smc91c94_t * smc, NET_netbuf_t * packet, ACE_bool_t wirq)
 {
     unsigned char packet_no;
     long p_len;
@@ -643,7 +643,7 @@ smc_transmit_packet (NET_smc91c94_t *smc, NET_netbuf_t *packet)
 static void
 smc_info (NET_smc91c94_t *smc)
 {
-	printf("\tSMC91C94 io_addr: %0lx\n"
+	ACE_printf("\tSMC91C94 io_addr: %0lx\n"
 		   "\tRX: %lu, ovr %u, drop %u, err %u, bad %u\n"
 		   "\tTX: %lu, err %u, empty %u, alloc fail %u\n"
 		   "\tINT: early rx %u, eph %u, alloc %u\n"

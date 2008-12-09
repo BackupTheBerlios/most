@@ -48,9 +48,9 @@ struct MFS_stream_op
 	void (*open)(MFS_stream_t *stream);
 	void (*close)(MFS_stream_t *stream);
 	void (*info)(MFS_stream_t *stream);
-	size_t (*read)(MFS_stream_t *stream, char *buf, size_t len);
-	size_t (*write)(MFS_stream_t *stream, const char *buf, size_t len);
-	int (*seek)(MFS_stream_t *stream, ssize_t off, size_t pos);
+	ACE_size_t (*read)(MFS_stream_t *stream, char *buf, ACE_size_t len);
+	ACE_size_t (*write)(MFS_stream_t *stream, const char *buf, ACE_size_t len);
+	int (*seek)(MFS_stream_t *stream, ACE_ssize_t off, ACE_size_t pos);
 	void (*flush)(MFS_stream_t *stream);
 };
 

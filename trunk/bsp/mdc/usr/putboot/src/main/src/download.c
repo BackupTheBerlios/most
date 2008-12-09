@@ -25,22 +25,22 @@ static void
 serial_download_boot_exec(char* file_size)
 {
 	if (file_size){
-    	long len = atol(file_size);
-    	char* buffer = malloc(len);
+    	long len = ACE_atol(file_size);
+    	char* buffer = ACE_malloc(len);
     	if (buffer){
     		unsigned char *addr;
-            printf("Send file len %ld\n", len);
-    		read(buffer, len);
+            ACE_printf("Send file len %ld\n", len);
+    		ACE_read(buffer, len);
     		enum FLASH_29F040_err_code error;
     		addr = (unsigned char*)(sector_size * BOOT_SECTOR);
     		error =  FLASH_29F040_programm_s (addr, (unsigned char*)buffer, len);
-    		printf("Programm flash addr %p len %ld error %d\n", addr, len, error);
-    		free(buffer);
+    		ACE_printf("Programm flash addr %p len %ld error %d\n", addr, len, error);
+    		ACE_free(buffer);
     	} else {
-    		printf("Not enough ram %ld\n", len);
+    		ACE_printf("Not enough ram %ld\n", len);
     	}
 	} else {
-		puts("Give boot size as param\n");
+		ACE_puts("Give boot size as param\n");
 	}
 }
 
@@ -50,7 +50,7 @@ erase_flash_boot_exec (char *nix)
 	for (int i = BOOT_SECTOR; i <= BOOT_SECTOR; ++i){
 		enum FLASH_29F040_err_code error;
 		error =	FLASH_29F040_sector_erase_s ((unsigned char*)(i * sector_size));
-		printf("Erase flash sector %d error %d\n", i, error);
+		ACE_printf("Erase flash sector %d error %d\n", i, error);
 		if (error){
 			break;
 		}

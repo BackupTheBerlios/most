@@ -21,7 +21,7 @@
 /**
  * Serial communication Interface.
  */
-extern FILE *ser0;
+extern ACE_FILE *ser0;
 
 /**
  * This function is called from the cpu reset vector routine after the stack is initialized.

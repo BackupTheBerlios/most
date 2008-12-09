@@ -17,10 +17,10 @@
 
 #define CLI_RUN_STACK_SIZE 0x400
 
-extern bool_t
+extern ACE_bool_t
 CLI_cmd_open (CLI_interpreter_t *cli)
 {
-	bool_t done = FALSE;
+	ACE_bool_t done = FALSE;
     MFS_descriptor_t *desc = cli->desc;
 	if (cli->argc >= 1){
 		desc = MFS_open(desc, cli->argv[0]);
@@ -32,10 +32,10 @@ CLI_cmd_open (CLI_interpreter_t *cli)
 	return done;
 }
 
-extern bool_t
+extern ACE_bool_t
 CLI_cmd_close (CLI_interpreter_t *cli)
 {
-	bool_t done = FALSE;
+	ACE_bool_t done = FALSE;
 	MFS_descriptor_t *desc;
 	desc = MFS_close_desc(cli->desc);
 	if (desc != NULL) {
@@ -45,10 +45,10 @@ CLI_cmd_close (CLI_interpreter_t *cli)
 	return done;
 }
 
-extern bool_t
+extern ACE_bool_t
 CLI_cmd_start (CLI_interpreter_t *cli)
 {
-	bool_t done = FALSE;
+	ACE_bool_t done = FALSE;
     MFS_descriptor_t *desc = MFS_sysfs_threads();
 	if (cli->argc >= 1){
 		desc = MFS_lookup(desc, cli->argv[0]);
@@ -60,10 +60,10 @@ CLI_cmd_start (CLI_interpreter_t *cli)
 	return done;
 }
 
-extern bool_t
+extern ACE_bool_t
 CLI_cmd_stop (CLI_interpreter_t *cli)
 {
-	bool_t done = FALSE;
+	ACE_bool_t done = FALSE;
     MFS_descriptor_t *desc = MFS_sysfs_threads();
 	if (cli->argc >= 1){
 		desc = MFS_lookup(desc, cli->argv[0]);
@@ -75,7 +75,7 @@ CLI_cmd_stop (CLI_interpreter_t *cli)
 	return done;
 }
 
-extern bool_t
+extern ACE_bool_t
 CLI_cmd_info (CLI_interpreter_t *cli)
 {
     MFS_descriptor_t *desc = cli->desc;
@@ -99,10 +99,10 @@ CLI_cmd_info (CLI_interpreter_t *cli)
 }
 
 
-extern bool_t
+extern ACE_bool_t
 CLI_cmd_list (CLI_interpreter_t *cli)
 {
-	bool_t info = FALSE;
+	ACE_bool_t info = FALSE;
     MFS_descriptor_t *desc = cli->desc;
     if (cli->argc >= 1) {
 	   	switch (cli->argv[0][0]){
@@ -133,15 +133,15 @@ CLI_cmd_list (CLI_interpreter_t *cli)
 	while ( (iterator = MFS_next_entry(desc, iterator)) != NULL) {
 		MFS_descriptor_info(iterator);
 		if (info == TRUE) {MFS_info_desc(iterator); }
-		else { putc('\n'); }
+		else { ACE_putc('\n'); }
 	}
 	return TRUE;
 }
 
-extern bool_t
+extern ACE_bool_t
 CLI_cmd_exec (CLI_interpreter_t *cli)
 {
-	bool_t done = FALSE;
+	ACE_bool_t done = FALSE;
 	if (cli->desc->type == MFS_EXEC){
 		CLI_exec_t *exec = (CLI_exec_t *)cli->desc->entry;
 		char *arg = NULL;
@@ -152,10 +152,10 @@ CLI_cmd_exec (CLI_interpreter_t *cli)
 	return done;
 }
 
-extern bool_t
+extern ACE_bool_t
 CLI_cmd_run (CLI_interpreter_t *cli)
 {
-	bool_t done = FALSE;
+	ACE_bool_t done = FALSE;
     if (cli->desc->type == MFS_EXEC){
         CLI_exec_t *exec = (CLI_exec_t *)cli->desc->entry;
         char *arg = NULL;
@@ -186,7 +186,7 @@ CLI_cmd_run (CLI_interpreter_t *cli)
         			break;
         	}
         } else {
-        	puts("param: <prio:u|s|i><sched:f|r> arg_opt.\n"); 
+        	ACE_puts("param: <prio:u|s|i><sched:f|r> arg_opt.\n"); 
         	return done;
         }
        	USO_thread_t *t = USO_thread_new ((void (*)(void*))exec->f,
@@ -194,8 +194,8 @@ CLI_cmd_run (CLI_interpreter_t *cli)
         if (t != NULL) {
        	    USO_thread_flags_set(t, 1 << USO_FLAG_DETACH);
 	        if (cli->argc >= 2) {
-    	        size_t len = strlen(cli->argv[1]) +1;
-        	    arg = malloc(len);
+    	        ACE_size_t len = ACE_strlen(cli->argv[1]) +1;
+        	    arg = ACE_malloc(len);
             	if (arg) {
                 	memcpy(arg, cli->argv[1], len);
             	    USO_thread_arg_init(t, arg);
@@ -209,11 +209,11 @@ CLI_cmd_run (CLI_interpreter_t *cli)
 	return done;
 }
 
-extern bool_t
+extern ACE_bool_t
 CLI_cmd_klog (CLI_interpreter_t *cli)
 {
     if (cli->argc <= 0) {
-        puts ("param: <ll:+|-|s>.\n");
+        ACE_puts ("param: <ll:+|-|s>.\n");
         return FALSE;
     }
     switch (cli->argv[0][0]){

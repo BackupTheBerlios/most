@@ -45,10 +45,10 @@ struct MDC_ee_configuration
 	NET_ip_addr_t gateway;
 	NET_ip_addr_t server;
 	char filename[MDC_CFG_FILENAME_SIZE];
-	u16_t flags;
-	u16_t state;
-	u16_t checksum;
-} _PACKED_;
+	ACE_u16_t flags;
+	ACE_u16_t state;
+	ACE_u16_t checksum;
+} ACE_PACKED_;
 
 extern struct MDC_ee_configuration MDC_ee_config;
 

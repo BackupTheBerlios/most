@@ -24,7 +24,7 @@ static DEV_digout_t *runninglight[] = {
 static void
 cleanup(void)
 {
-    for (int i = 0; i < ARRAYSIZE (runninglight); ++i)
+    for (int i = 0; i < ACE_ARRAYSIZE (runninglight); ++i)
     {
 	    DEV_digout_clear (runninglight[i]);
     }
@@ -41,7 +41,7 @@ digio_test_exec (char *nix)
         	USO_sleep(ACE_MSEC_2_TICKS(100));
         for (;;)
         {
-            for (i = 0; i < ARRAYSIZE (runninglight); ++i)
+            for (i = 0; i < ACE_ARRAYSIZE (runninglight); ++i)
             {
                 DEV_digout_set (runninglight[i]);
                 USO_sleep (ACE_MSEC_2_TICKS(50));

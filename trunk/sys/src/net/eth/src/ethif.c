@@ -28,7 +28,7 @@ ethif_run (void *netif)
 static void
 ethif_info (NET_ethif_t *ethif)
 {
-	printf("\teth_addr: %02X %02X %02X %02X %02X %02X\n",
+	ACE_printf("\teth_addr: %02X %02X %02X %02X %02X %02X\n",
 			ethif->eth_addr->addr[0],  
 			ethif->eth_addr->addr[1],  
 			ethif->eth_addr->addr[2],  
@@ -54,7 +54,7 @@ NET_ethif_init (NET_netif_t *netif,
     ethif->info = NULL;
     USO_thread_init (&ethif->rx_thread,
                      ethif_run,
-                     ethif->rx_stack, ARRAYSIZE (ethif->rx_stack),
+                     ethif->rx_stack, ACE_ARRAYSIZE (ethif->rx_stack),
                      USO_INTERRUPT, USO_FIFO, "Eth0");
     USO_thread_arg_init(&ethif->rx_thread, netif);
 }

@@ -23,7 +23,7 @@
 /**
  * Serial communication Interface.
  */
-extern FILE *ser0;
+extern ACE_FILE *ser0;
 
 
 /**

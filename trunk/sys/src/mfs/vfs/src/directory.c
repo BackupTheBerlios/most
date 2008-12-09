@@ -25,7 +25,7 @@ static void dir_info(MFS_entry_t *entry)
 {
 	MFS_directory_t *dir = (MFS_directory_t*)entry;
 	if (dir->info != NULL) { dir->info();}
-	else { putc('\n');}
+	else { ACE_putc('\n');}
 }
 
 
@@ -54,7 +54,7 @@ MFS_lookup(MFS_descriptor_t *dir_desc, char* name)
 		while ( (desc = (MFS_descriptor_t*)USO_next_element(&dir->descriptors,
 												 (USO_node_t*)desc)) != NULL)
 		{
-			if ( strncmp(desc->name, name, sizeof(desc->name)) == 0){ 
+			if ( ACE_strncmp(desc->name, name, sizeof(desc->name)) == 0){ 
 				break;
 			}
 		}
@@ -78,7 +78,7 @@ MFS_create_dir(MFS_descriptor_t *dir_desc, char *name)
 	MFS_descriptor_t *desc = NULL;
 	if ( (dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER) ){
 		MFS_directory_t *dir = (MFS_directory_t *)dir_desc->entry;
-		MFS_directory_t *new_dir = malloc( sizeof(MFS_directory_t));
+		MFS_directory_t *new_dir = ACE_malloc( sizeof(MFS_directory_t));
 		if (new_dir != NULL) {
             MFS_directory_init(new_dir, dir->vfs_op);
 		    desc = MFS_descriptor_new((MFS_entry_t*)new_dir, &MFS_dir_descriptor_op,
@@ -86,7 +86,7 @@ MFS_create_dir(MFS_descriptor_t *dir_desc, char *name)
 		    if (desc != NULL){
                 create_desc(dir_desc, desc);
             } else {
-                free(new_dir);
+                ACE_free(new_dir);
             }
         }
 	}
@@ -99,7 +99,7 @@ MFS_create_file(MFS_descriptor_t *dir_desc, char *name)
 	MFS_descriptor_t *desc = NULL;
 	if ( (dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER) ){
 		MFS_directory_t *dir = (MFS_directory_t *)dir_desc->entry;
-		MFS_stream_t *file = malloc( sizeof(MFS_stream_t));
+		MFS_stream_t *file = ACE_malloc( sizeof(MFS_stream_t));
 		if (file != NULL){
             MFS_stream_init(file, MFS_FILE, dir->vfs_op->stream_op, NULL);
 		    desc = MFS_descriptor_new((MFS_entry_t*)file, &MFS_stream_descriptor_op,
@@ -107,7 +107,7 @@ MFS_create_file(MFS_descriptor_t *dir_desc, char *name)
 		    if (desc != NULL){
                 create_desc(dir_desc, desc);
             } else {
-                free(file);            
+                ACE_free(file);            
             }
         }
 	}
@@ -120,7 +120,7 @@ MFS_create_io(MFS_descriptor_t *dir_desc, char *name, struct MFS_stream_op *io_o
 {
 	MFS_descriptor_t *desc = NULL;
 	if ( (dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER) ){
-		MFS_stream_t *io = malloc( sizeof(MFS_stream_t));
+		MFS_stream_t *io = ACE_malloc( sizeof(MFS_stream_t));
 		if (io != NULL) {
             MFS_stream_init(io, MFS_IO, io_op, represent);
 		    desc = MFS_descriptor_new((MFS_entry_t*)io, &MFS_stream_descriptor_op,
@@ -128,7 +128,7 @@ MFS_create_io(MFS_descriptor_t *dir_desc, char *name, struct MFS_stream_op *io_o
 		    if (desc != NULL) {  
                 create_desc(dir_desc, desc);
             } else {
-                free(io);
+                ACE_free(io);
             }
         }
 	}
@@ -159,10 +159,10 @@ MFS_remove_desc(MFS_descriptor_t *dir_desc, MFS_descriptor_t *desc)
 		if (dir->operations->remove != NULL) {dir->operations->remove(desc);}
 		USO_remove(&dir->descriptors, (USO_node_t*)desc);
 		if ( (desc->type == MFS_STREAM) || (desc->type == MFS_DIRECTORY) ) {
-			free(desc->entry);
-			free(desc);
+			ACE_free(desc->entry);
+			ACE_free(desc);
 		} else if (desc->type != MFS_SUPER){
-			free(desc);
+			ACE_free(desc);
 		}
 	}
 }

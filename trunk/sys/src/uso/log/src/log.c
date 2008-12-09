@@ -12,7 +12,7 @@
 
 /*------------- Implementation ------------------------------------------*/
 
-static FILE *out = NULL;
+static ACE_FILE *out = NULL;
 static char buf[LOG_BUFFER_SIZE];
 static enum USO_log_level log_level = USO_LL_PANIC;
 static USO_mutex_t ll_sync;
@@ -46,7 +46,7 @@ print_ll ()
         level = "WRONG";
         break;
     }
-  	printf ("LOG LEVEL = %s\n", level);
+  	ACE_printf ("LOG LEVEL = %s\n", level);
 }
 
 extern void
@@ -78,7 +78,7 @@ USO_log_show (void)
 }
 
 extern void
-USO_log_init (FILE * ios, enum USO_log_level level)
+USO_log_init (ACE_FILE * ios, enum USO_log_level level)
 {
     out = ios;
 	USO_mutex_init(&ll_sync);
@@ -93,20 +93,20 @@ extern void
 USO_kputs (enum USO_log_level level, char *string)
 {
     if (level > log_level) { return; }
-    fputs (out, string);
+    ACE_fputs (out, string);
 }
 
 extern void
 USO_kprintf (enum USO_log_level level, const char *fmt, ...)
 {
     int len;
-    va_list_t args;
+    ACE_va_list_t args;
     if (level > log_level) {return;}
     USO_lock(&buf_sync);
-    va_start (args, fmt);
-    len = vsprintf (buf, fmt, args);
-    va_end (args);
-	fwrite (out, buf, len);
+    ACE_va_start (args, fmt);
+    len = ACE_vsprintf (buf, fmt, args);
+    ACE_va_end (args);
+	ACE_fwrite (out, buf, len);
     USO_unlock(&buf_sync);
 }
 
@@ -114,13 +114,13 @@ extern void
 USO_debug (const char *fmt, ...)
 {
     int len;
-    va_list_t args;
+    ACE_va_list_t args;
     if (USO_LL_DEBUG > log_level) {return;}
     USO_lock(&buf_sync);
-    va_start (args, fmt);
-    len = vsprintf (buf, fmt, args);
-    va_end (args);
-    fwrite (out, buf, len);
+    ACE_va_start (args, fmt);
+    len = ACE_vsprintf (buf, fmt, args);
+    ACE_va_end (args);
+    ACE_fwrite (out, buf, len);
     USO_unlock(&buf_sync);
 }
 

@@ -21,7 +21,7 @@ USO_stack_end (USO_stack_t stack[], int size)
     return &stack[0];
 }
 
-extern bool_t 
+extern ACE_bool_t 
 USO_stack_check_overrun(USO_stack_t *end, USO_cpu_register_t act)
 {
 	return (USO_stack_t*)act < end ? TRUE : FALSE; 

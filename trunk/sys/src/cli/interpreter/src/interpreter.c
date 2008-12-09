@@ -38,7 +38,7 @@ CLI_interpreter_init (CLI_interpreter_t *cli)
 static void
 promt (CLI_interpreter_t *cli)
 {
-    printf ("%s:%s> ", hostname, cli->desc->name);
+    ACE_printf ("%s:%s> ", hostname, cli->desc->name);
 }
 
 static CLI_command_t *
@@ -56,27 +56,27 @@ parse (CLI_interpreter_t *cli, char* buf)
     char *token = buf;
     ++cli->argc;
     for (;;) {
-        int c = getc ();
-        if (c == EOF) {
+        int c = ACE_getc ();
+        if (c == ACE_EOF) {
             USO_sleep (CLI_RX_POLLING_TIME);
         } else {
-            if (isprint (c)) {
-                putc ((unsigned char)c);
+            if (ACE_isprint (c)) {
+                ACE_putc ((unsigned char)c);
 			}
 			if (c == '\n') {
                 *token = '\0';
                 return (token - buf);
 			} else if (c == '\b') {
 				if (token > buf) {
-					putc ((unsigned char)c);
-					putc ((unsigned char)' ');
-					putc ((unsigned char)c);	
+					ACE_putc ((unsigned char)c);
+					ACE_putc ((unsigned char)' ');
+					ACE_putc ((unsigned char)c);	
 					token--;
 				} else if (cli->argc > 1) {
 					cli->argc--;
 					return (-1);
 				}
-			} else if (isgraph (c)) {
+			} else if (ACE_isgraph (c)) {
                 if (token < buf + CLI_TOKEN_SIZE - 1) {
                     *token++ = c;
                 }
@@ -84,7 +84,7 @@ parse (CLI_interpreter_t *cli, char* buf)
                 *token = '\0';
 		        if (cli->argc < CLI_TOKEN_COUNTER) { 
 		        	if (parse (cli, cli->token_buffer[cli->argc]) < 0)
-		        		putc ((unsigned char)'\b');
+		        		ACE_putc ((unsigned char)'\b');
 		        	else
 		        		return (token - buf);		
 		        } else
@@ -111,7 +111,7 @@ CLI_interpreter_run (void *param)
 	CLI_interpreter_t *cli = (CLI_interpreter_t *)param; 
     CLI_command_t *command;
     int idx;
-    puts ("\nCLI:\n");
+    ACE_puts ("\nCLI:\n");
     for (;;)
     {
         for (int i = 0; i < CLI_TOKEN_COUNTER; ++i){ 
@@ -123,12 +123,12 @@ CLI_interpreter_run (void *param)
 
         promt (cli);
         (void) parse (cli, cli->token_buffer[cli->argc]);
-        putc ('\n');
+        ACE_putc ('\n');
 
 		if (cli->argv[0][0] == '/'){
    	    	cli->argv[0] = &cli->token_buffer[0][1];
        	    if (CLI_cmd_open(cli) == FALSE){
-            	puts ("error\n");
+            	ACE_puts ("error\n");
             	continue;
            	}
            	idx = inc_argv(cli, idx);
@@ -138,10 +138,10 @@ CLI_interpreter_run (void *param)
         if (command != NULL) {
 	       	idx = inc_argv(cli, idx);       	
             if (command->f (cli) == FALSE){
-	            puts ("error\n");
+	            ACE_puts ("error\n");
             }
-        } else if (strlen(cli->argv[0])) {
-            printf ("? %s\n", cli->argv[0]);
+        } else if (ACE_strlen(cli->argv[0])) {
+            ACE_printf ("? %s\n", cli->argv[0]);
         }
 
 		if (idx >= 2){

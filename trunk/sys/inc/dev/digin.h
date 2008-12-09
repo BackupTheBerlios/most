@@ -76,7 +76,7 @@ extern void DEV_diginputs_sample (DEV_diginputs_t* inputs);
  *
  * @return TRUE if logical set elde FALSE.
  */
-extern bool_t DEV_digin_isset (DEV_digin_t * in);
+extern ACE_bool_t DEV_digin_isset (DEV_digin_t * in);
 
 /*------------------------------------------------------------------------*/
 

@@ -17,7 +17,7 @@ ram_test_exec (char *nix)
 {
     for (;;)
     {
-        if (malloc (1000) != NULL){
+        if (ACE_malloc (1000) != NULL){
         	USO_kputs (USO_LL_INFO, "1000 B ram allocated.\n");
         	USO_sleep (ACE_MSEC_2_TICKS(100));
         } else {

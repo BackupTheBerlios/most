@@ -63,7 +63,7 @@
 
 static enum FLASH_29F040_err_code poll (volatile unsigned char *addr,
 					unsigned char data)
-      _SECTION_ (".ramcode");
+      ACE_SECTION_ (".ramcode");
 
 extern unsigned long
 FLASH_29F040_segment_size (void)
@@ -71,19 +71,19 @@ FLASH_29F040_segment_size (void)
     return SECTOR_SIZE;
 }
 
-_INLINE_ static unsigned char
+ACE_INLINE_ static unsigned char
 read (volatile unsigned char *addr)
 {
     return *addr;
 }
 
-_INLINE_ static void
+ACE_INLINE_ static void
 write (volatile unsigned char *addr, unsigned char data)
 {
     *addr = data;
 }
 
-_INLINE_ static void
+ACE_INLINE_ static void
 write_command (volatile unsigned char *addr, unsigned char cmd)
 {
     write (BASE_ADDR + H555, CMD_AAH);
@@ -91,60 +91,60 @@ write_command (volatile unsigned char *addr, unsigned char cmd)
     write (addr, cmd);
 }
 
-_INLINE_ static void
+ACE_INLINE_ static void
 reset (void)
 {
     write (BASE_ADDR + HXXX, CMD_RESET);
 }
 
-_INLINE_ static unsigned char
+ACE_INLINE_ static unsigned char
 silicon_id (int adi)
 {
     write_command (BASE_ADDR + H555, CMD_INFO);
     return read (BASE_ADDR + adi);
 }
 
-_INLINE_ static unsigned char
+ACE_INLINE_ static unsigned char
 protect_verify (volatile unsigned char *sector_addr)
 {
     write_command (BASE_ADDR + H555, CMD_INFO);
     return read (sector_addr + NOT_ADI);
 }
 
-_INLINE_ static void
+ACE_INLINE_ static void
 program (volatile unsigned char *addr, unsigned char data)
 {
     write_command (BASE_ADDR + H555, CMD_PROGRAM);
     write (addr, data);
 }
 
-_INLINE_ static void
+ACE_INLINE_ static void
 chip_erase (void)
 {
     write_command (BASE_ADDR + H555, CMD_ERASE);
     write_command (BASE_ADDR + H555, CMD_CHIP);
 }
 
-_INLINE_ static void
+ACE_INLINE_ static void
 sector_erase (volatile unsigned char *sector_addr)
 {
     write_command (BASE_ADDR + H555, CMD_ERASE);
     write_command (sector_addr, CMD_SECTOR);
 }
 
-_INLINE_ static void
+ACE_INLINE_ static void
 suspend (void)
 {
     write (BASE_ADDR + HXXX, CMD_SUSPEND);
 }
 
-_INLINE_ static void
+ACE_INLINE_ static void
 resume (void)
 {
     write (BASE_ADDR + HXXX, CMD_SECTOR);
 }
 
-_INLINE_ static void
+ACE_INLINE_ static void
 un_lock (void)
 {
     write_command (BASE_ADDR + H555, CMD_ERASE);

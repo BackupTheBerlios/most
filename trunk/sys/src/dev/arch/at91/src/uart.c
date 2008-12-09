@@ -155,7 +155,7 @@ DEV_at91_uart_start (int port, DEV_serial_t * serial)
     int c;
 	volatile AT91PS_USART uart = ports[port];
 
-    if ((c = serial->int_interface->tx_char (serial)) != EOF)
+    if ((c = serial->int_interface->tx_char (serial)) != ACE_EOF)
     {
 		uart->US_IER = AT91C_US_TXRDY | AT91C_US_TXEMPTY;
 		uart->US_CR = AT91C_US_TXEN;
@@ -202,7 +202,7 @@ DEV_at91_uart_interrupt (int port, DEV_serial_t * serial)
 	{
 	    int c;
 
-	    if ((c = serial->int_interface->tx_char (serial)) == EOF)
+	    if ((c = serial->int_interface->tx_char (serial)) == ACE_EOF)
 	    {
 			uart->US_CR = AT91C_US_TXDIS;
         	uart->US_IDR = AT91C_US_TXEMPTY;
@@ -218,7 +218,7 @@ DEV_at91_uart_interrupt (int port, DEV_serial_t * serial)
 	{
 	    int c;
 
-	    if ((c = serial->int_interface->tx_char (serial)) == EOF)
+	    if ((c = serial->int_interface->tx_char (serial)) == ACE_EOF)
     	{
 			uart->US_IDR = AT91C_US_TXRDY;
     	}

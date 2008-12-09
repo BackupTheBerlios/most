@@ -45,8 +45,8 @@
 
 #define START_STACK_SIZE       0x400
 
-FILE *ser0 = NULL;
-static FILE *ser1 = NULL;
+ACE_FILE *ser0 = NULL;
+static ACE_FILE *ser1 = NULL;
 
 extern char data_start, data_end, text_end;   /* Defined in *.ld! */
 extern char bss_start, bss_end;               /* Defined in *.ld! */

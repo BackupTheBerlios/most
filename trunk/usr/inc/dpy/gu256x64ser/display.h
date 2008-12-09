@@ -30,7 +30,7 @@ extern void DPY_gu256x64ser_WriteChar2Display (const unsigned char data);
 /**
  * .
  */
-extern void DPY_gu256x64ser_WriteArray2Display (const unsigned char *data, size_t len);
+extern void DPY_gu256x64ser_WriteArray2Display (const unsigned char *data, ACE_size_t len);
 
 /**
  * .

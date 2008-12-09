@@ -37,7 +37,7 @@ extern USO_stack_t *USO_stack_beginn (USO_stack_t stack[], int size);
  */
 extern USO_stack_t *USO_stack_end (USO_stack_t stack[], int size);
 
-extern bool_t USO_stack_check_overrun(USO_stack_t *end, USO_cpu_register_t act);
+extern ACE_bool_t USO_stack_check_overrun(USO_stack_t *end, USO_cpu_register_t act);
 
 /*------------------------------------------------------------------------*/
 

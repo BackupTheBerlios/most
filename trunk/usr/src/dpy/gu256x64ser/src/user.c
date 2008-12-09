@@ -64,7 +64,7 @@ DPY_gu256x64ser_FROMImageDefinition (unsigned long address,
     FROMImageDefinitionData[9] = (unsigned char)(length >> 16);
     DPY_gu256x64ser_WriteArray2Display (FROMImageDefinitionData,
                         sizeof (FROMImageDefinitionData));
-    DPY_gu256x64ser_WriteArray2Display (data, (size_t) length);
+    DPY_gu256x64ser_WriteArray2Display (data, (ACE_size_t) length);
 }
 
 static unsigned char SaveDownloadedCharData[] = { US, '(', 'e', '\x11', _a };
@@ -93,7 +93,7 @@ DPY_gu256x64ser_FROMMacroDefinition (unsigned char registration,
     FROMMacroDefinitionData[8] = idleTime;
     DPY_gu256x64ser_WriteArray2Display (FROMMacroDefinitionData,
                         sizeof (FROMMacroDefinitionData));
-    DPY_gu256x64ser_WriteArray2Display (data, (size_t) length);
+    DPY_gu256x64ser_WriteArray2Display (data, (ACE_size_t) length);
 }
 
 static unsigned char DownloadCharTransferData[] = { US, '(', 'e', '\x21', _a };

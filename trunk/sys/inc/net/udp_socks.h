@@ -36,8 +36,8 @@ NET_udp_socks_unlock (void);
 extern NET_udp_socket_t *
 NET_udp_find_sock (NET_netif_t * inp,
 					 struct NET_ip_hdr *iphdr,
-		             u16_t src,
-				     u16_t dest);
+		             ACE_u16_t src,
+				     ACE_u16_t dest);
 
 /**
  * ?

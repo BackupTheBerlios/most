@@ -6,7 +6,7 @@
 #include "ace/string.h"
 
 extern char *
-strpbrk (const char *cs, const char *ct)
+ACE_strpbrk (const char *cs, const char *ct)
 {
     const char *p1;
     const char *p2;

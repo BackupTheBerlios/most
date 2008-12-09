@@ -51,7 +51,7 @@ SAM_start_run (void *nix)
 
     USO_thread_init (&run_led_thread,
                      run_led_run,
-                     run_led_stack, ARRAYSIZE (run_led_stack),
+                     run_led_stack, ACE_ARRAYSIZE (run_led_stack),
                      USO_USER, USO_FIFO, "RunLed");
     USO_start (&run_led_thread);
     USO_kputs (USO_LL_INFO, "RunLed started.\n");
@@ -63,7 +63,7 @@ SAM_start_run (void *nix)
     CLI_interpreter_init (&cli0);
     USO_thread_init (&cli0_thread,
                      CLI_interpreter_run,
-                     cli0_stack, ARRAYSIZE (cli0_stack),
+                     cli0_stack, ACE_ARRAYSIZE (cli0_stack),
                      USO_USER, USO_ROUND_ROBIN, "Cli0");
     USO_thread_arg_init (&cli0_thread, &cli0);
     USO_thread_ios_init (&cli0_thread, ser0, ser0);

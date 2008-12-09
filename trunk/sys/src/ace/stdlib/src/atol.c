@@ -7,9 +7,9 @@
 #include "ace/ctype.h"
 
 extern long
-atol (const char *s)
+ACE_atol (const char *s)
 {
     long l;
-    for (l = 0; (isdigit (*s)); l = (l * 10) + ((*s++) - '0'));
+    for (l = 0; (ACE_isdigit (*s)); l = (l * 10) + ((*s++) - '0'));
     return (l);
 }

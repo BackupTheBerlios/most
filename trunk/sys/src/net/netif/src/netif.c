@@ -40,8 +40,8 @@ NET_netif_set_default (NET_netif_t * netif)
 static void
 print_ipaddr(char* name, NET_ip_addr_t ipaddr)
 {
-	long addr = ntohl(ipaddr.addr);
- 	printf("\n\t%s: %3ld.%3ld.%3ld.%3ld", 
+	long addr = ACE_ntohl(ipaddr.addr);
+ 	ACE_printf("\n\t%s: %3ld.%3ld.%3ld.%3ld", 
 			 name,
              addr >> 24 & 0xff,
              addr >> 16 & 0xff,
@@ -57,7 +57,7 @@ info (MFS_entry_t *entry)
 	print_ipaddr("ip_addr", netif->ip_addr);	
 	print_ipaddr("netmask", netif->netmask);	
 	print_ipaddr("gateway", netif->gateway);
-	printf("\n\tTX: %lu drop %u RX: %lu drop %u\n", netif->tx, netif->tx_drop, netif->rx, netif->rx_drop);	
+	ACE_printf("\n\tTX: %lu drop %u RX: %lu drop %u\n", netif->tx, netif->tx_drop, netif->rx, netif->rx_drop);	
 	if (netif->info != NULL) { netif->info(netif->device); }
 }
 

@@ -7,9 +7,9 @@
 #include "ace/ctype.h"
 
 extern int
-atoi (const char *s)
+ACE_atoi (const char *s)
 {
     int l;
-    for (l = 0; (isdigit (*s)); l = (l * 10) + ((*s++) - '0'));
+    for (l = 0; (ACE_isdigit (*s)); l = (l * 10) + ((*s++) - '0'));
     return (l);
 }

@@ -5,7 +5,7 @@
 
 #include <ace/stddef.h>
 #include <dev/arch/cpu.h>
-#include <net/arch/at91_emac.h>
+#include <dev/arch/at91/emac.h>
 #include <net/netif.h>
 #include <net/err.h>
 #include <net/ethernet.h>
@@ -29,9 +29,9 @@ static NET_ip_addr_t netmask_eth0;
 static NET_ip_addr_t gateway_eth0;
 
 static NET_ethif_t ethif0;
-static NET_at91_emac_t mac;
+static DEV_at91_emac_t mac;
 
-struct NET_eth_addr SAM_eth_addr = {{0xa0, 0xba, 0xd0, 0xca, 0xfe, 0x02}};
+struct NET_eth_addr SAM_eth_addr = {{0x00, 0x00, 0xca, 0xfe, 0x01, 0x02}};
 
 static void
 eth_power_on (void)
@@ -67,7 +67,7 @@ SAM_eth_init (void)
 
 	NET_netif_set_default (&SAM_eth0);
     eth_power_on ();
-    NET_at91_emac_init (&ethif0, &mac);
+    DEV_at91_emac_init (&ethif0, &mac);
 }
 
 extern void
@@ -79,5 +79,5 @@ SAM_eth_start (void)
 extern void
 SAM_eth_interrupt (void)
 {
-   	NET_at91_emac_interrupt (&mac);
+   	DEV_at91_emac_interrupt (&mac);
 }

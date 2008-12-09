@@ -7,7 +7,7 @@
 #include "init/init.h"
 #include "init/main.h"
 
-static void debug_test(int cycle) _SECTION_ (".ramcode");
+static void debug_test(int cycle) ACE_SECTION_ (".ramcode");
 static void debug_test(int cycle)
 {
     int a, b;
@@ -26,8 +26,6 @@ void SAM_main(void)
     cycle = 1;
     for (;;)
     {
-        //USO_kprintf (USO_LL_INFO, "cycle : %d\n", cycle);
-		//DEV_cpudelay(ACE_USEC_2_LOOPS(500000));
         debug_test(cycle);
         cycle++;
         USO_sleep(1000);    

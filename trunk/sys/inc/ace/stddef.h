@@ -9,55 +9,56 @@
 /** @defgroup stddef stddef.h
  *
  * Standard definitions.
- *
+ * NULL, TRUE, FALSE without ACE prefix (syntax highligting)
  * @{
  */
 
 /*------------- Definitions ------------------------------------------*/
 
-#define _INLINE_          __inline__
-#define _PACKED_          __attribute__ ((packed))
-#define _SECTION_(name)   __attribute__ ((section (name)))
-#define _INTERRUPT_       __attribute__ ((interrupt_handler))
+#define ACE_INLINE_          __inline__
+#define ACE_PACKED_          __attribute__ ((packed))
+#define ACE_SECTION_(name)   __attribute__ ((section (name)))
+#define ACE_INTERRUPT_       __attribute__ ((interrupt_handler))
+#define ACE_ALIGNED_(alignment) __attribute__ ((aligned (alignment)))
 
 /** NULL pointer */
 #define NULL ((void*)0)
 
 /** Calculate elements in an array. */
-#define ARRAYSIZE(x) (sizeof(x)/sizeof(x[0]))
-#define MIN(a,b) ((a) <= (b) ? (a) : (b))
-#define MAX(a,b) ((a) >= (b) ? (a) : (b))
+#define ACE_ARRAYSIZE(x) (sizeof(x)/sizeof(x[0]))
+#define ACE_MIN(a,b) ((a) <= (b) ? (a) : (b))
+#define ACE_MAX(a,b) ((a) >= (b) ? (a) : (b))
 
 /** Boolean enumeration */
-enum bool
+enum ACE_bool
 { 
 	FALSE,
   	TRUE
 };
 
 /** Boolean type */
-typedef enum bool bool_t;
+typedef enum ACE_bool ACE_bool_t;
 
 /** type which sizeof operator returns */
-typedef unsigned long size_t;
+typedef unsigned long ACE_size_t;
 
 /** signed size type */
-typedef long ssize_t;
+typedef long ACE_ssize_t;
 
 /** 8 Bit unsigned */
-typedef unsigned char u8_t;
+typedef unsigned char ACE_u8_t;
 /** 8 Bit signed */
-typedef signed char s8_t;
+typedef signed char ACE_s8_t;
 
 /** 16 Bit unsigned */
-typedef unsigned short u16_t;
+typedef unsigned short ACE_u16_t;
 /** 16 Bit signed */
-typedef signed short s16_t;
+typedef signed short ACE_s16_t;
 
 /** 32 Bit unsigned */
-typedef unsigned long u32_t;
+typedef unsigned long ACE_u32_t;
 /** 32 Bit signed */
-typedef signed long s32_t;
+typedef signed long ACE_s32_t;
 
 /*------------------------------------------------------------------------*/
 

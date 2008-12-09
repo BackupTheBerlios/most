@@ -73,14 +73,14 @@ typedef struct USO_pipe USO_pipe_t;
  * @param size : Size of buffer.
  */
 extern void USO_pipe_init (USO_pipe_t * pipe,
-                           char *buf, size_t size);
+                           char *buf, ACE_size_t size);
 
 /**
  * Creates an instance of a pipe.
  *
  * @param size : Size of buffer.
  */
-extern USO_pipe_t *USO_pipe_new (size_t size);
+extern USO_pipe_t *USO_pipe_new (ACE_size_t size);
 
 /**
  * Deletes an instance of a pipe.
@@ -89,8 +89,8 @@ extern USO_pipe_t *USO_pipe_new (size_t size);
  */
 extern void USO_pipe_del (USO_pipe_t * pipe);
 
-extern size_t USO_pipe_read_ns (USO_pipe_t * pipe, char *buf, size_t len);
-extern size_t USO_pipe_write_ns (USO_pipe_t * pipe, const char *buf, size_t len);
+extern ACE_size_t USO_pipe_read_ns (USO_pipe_t * pipe, char *buf, ACE_size_t len);
+extern ACE_size_t USO_pipe_write_ns (USO_pipe_t * pipe, const char *buf, ACE_size_t len);
 
 /*------------------------------------------------------------------------*/
 

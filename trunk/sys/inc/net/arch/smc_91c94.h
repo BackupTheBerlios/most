@@ -45,7 +45,7 @@ struct NET_smc91c94
     unsigned long tx_mcc;
     unsigned long tx_scc;
     unsigned short link_down_count;
-    bool_t link_is_up;
+    ACE_bool_t link_is_up;
     USO_semaphore_t rx_sem;
 };
 

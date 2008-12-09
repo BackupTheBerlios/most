@@ -22,16 +22,16 @@ enum MFS_stream_type
 struct MFS_stream
 {
 	enum MFS_stream_type type;
-	size_t size_tx;
-	size_t pos_rx;
+	ACE_size_t size_tx;
+	ACE_size_t pos_rx;
 	USO_mutex_t lock;
 	struct MFS_stream_op *operations;
 	MFS_stream_represent_t *represent;
 };
 
-extern size_t MFS_read(MFS_stream_t *stream, char *buf, size_t len);
-extern size_t MFS_write(MFS_stream_t *stream, char *buf, size_t len);
-extern int MFS_seek(MFS_stream_t *stream, ssize_t off, size_t pos);
+extern ACE_size_t MFS_read(MFS_stream_t *stream, char *buf, ACE_size_t len);
+extern ACE_size_t MFS_write(MFS_stream_t *stream, char *buf, ACE_size_t len);
+extern int MFS_seek(MFS_stream_t *stream, ACE_ssize_t off, ACE_size_t pos);
 extern void MFS_flush(MFS_stream_t *stream);
 
 extern MFS_stream_t *MFS_get_stream (MFS_descriptor_t *stream_desc);
@@ -41,7 +41,7 @@ extern void MFS_stream_init(MFS_stream_t *stream,
 								struct MFS_stream_op *operations,
 								MFS_stream_represent_t *represent);
 
-extern size_t MFS_empty_read(MFS_stream_t *stream, char *buf, size_t len);
-extern size_t MFS_empty_write(MFS_stream_t *stream, const char *buf, size_t len);
+extern ACE_size_t MFS_empty_read(MFS_stream_t *stream, char *buf, ACE_size_t len);
+extern ACE_size_t MFS_empty_write(MFS_stream_t *stream, const char *buf, ACE_size_t len);
 
 #endif

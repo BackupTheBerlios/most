@@ -23,7 +23,7 @@ struct sci_reg
     volatile unsigned char TDR; // /< transmit data register
     volatile unsigned char SSR; // /< serial status register
     volatile unsigned char RDR; // /< receive data register
-} _PACKED_;
+} ACE_PACKED_;
 
 typedef struct sci_reg sci_reg_t;
 
@@ -168,7 +168,7 @@ DEV_h8300_sci_start (int port, DEV_serial_t * serial)
     int c;
     sci_reg_t *const p = ports[port];
 
-    if ((c = serial->int_interface->tx_char (serial)) != EOF)
+    if ((c = serial->int_interface->tx_char (serial)) != ACE_EOF)
     {
         tx_write (port, (char)c);
         p->SCR |= H8_SCR_TIE | H8_SCR_TEIE;
@@ -185,7 +185,7 @@ DEV_h8300_sci_txe (int port, DEV_serial_t * serial)
     int c;
     sci_reg_t *const p = ports[port];
 
-    if ((c = serial->int_interface->tx_char (serial)) == EOF)
+    if ((c = serial->int_interface->tx_char (serial)) == ACE_EOF)
     {
         p->SCR &= ~H8_SCR_TEIE;
         serial->int_interface->tx_finished (serial);
@@ -203,7 +203,7 @@ DEV_h8300_sci_txi (int port, DEV_serial_t * serial)
     int c;
     sci_reg_t *const p = ports[port];
 
-    if ((c = serial->int_interface->tx_char (serial)) == EOF)
+    if ((c = serial->int_interface->tx_char (serial)) == ACE_EOF)
     {
         p->SCR &= ~H8_SCR_TIE;
     }

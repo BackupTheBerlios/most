@@ -40,8 +40,8 @@ extern char bss_start, bss_end;               /* Defined in *.ld! */
 extern char heap_start, heap_end;             /* Defined in *.ld! */
 extern char stack_start, stack_end;           /* Defined in *.ld! */
 
-FILE *ser0 = NULL;
-static FILE *ser1 = NULL;
+ACE_FILE *ser0 = NULL;
+static ACE_FILE *ser1 = NULL;
 
 static USO_heap_t heap;
 

@@ -68,7 +68,7 @@ DEV_diginputs_sample (DEV_diginputs_t* inputs)
     USO_map (&inputs->inputs, sample);
 }
 
-extern bool_t
+extern ACE_bool_t
 DEV_digin_isset (DEV_digin_t * in)
 {
     if (in->debounce_time == 0){

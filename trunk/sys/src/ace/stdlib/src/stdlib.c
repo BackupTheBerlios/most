@@ -13,12 +13,12 @@ ACE_stdlib_init (USO_heap_t* heap)
 	global_heap = heap;
 }
 
-extern void *malloc (size_t size)
+extern void *ACE_malloc (ACE_size_t size)
 {
 	return USO_mem_alloc (global_heap, size);
 }
 
-extern void free (void *block)
+extern void ACE_free (void *block)
 {
 	USO_mem_free (global_heap, block);
 }

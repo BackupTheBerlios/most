@@ -7,8 +7,8 @@
 #include <dev/arch/at91/lib_AT91SAM7X256.h>
 #include <dev/arch/at91/aic.h>
 
-#include "net/arch/at91_emac.h"
-#include "net/arch/at91_emac_def.h"
+#include "dev/arch/at91/emac.h"
+#include "dev/arch/at91/emac_def.h"
 #include "net/arch/mii.h"
 #include "net/debug.h"
 #include "net/netif.h"
@@ -42,11 +42,11 @@ one not be immediately available when trying to transmit a frame. */
 
 /* Buffer written to by the EMAC DMA.  Must be aligned as described by the
 comment above the emacADDRESS_MASK definition. */
-static volatile char rx_buffer[NB_RX_BUFFERS * ETH_RX_BUFFER_SIZE] __attribute__((aligned(8)));
+static volatile char rx_buffer[NB_RX_BUFFERS * ETH_RX_BUFFER_SIZE] ACE_ALIGNED_(8);
 
 /* Buffer read by the EMAC DMA.  Must be aligned as described by he comment
 above the emacADDRESS_MASK definition. */
-static char tx_buffer[NB_TX_BUFFERS * ETH_TX_BUFFER_SIZE] __attribute__((aligned(8)));
+static char tx_buffer[NB_TX_BUFFERS * ETH_TX_BUFFER_SIZE] ACE_ALIGNED_(8);
 
 /* Descriptors used to communicate between the program and the EMAC peripheral.
 These descriptors hold the locations and state of the Rx and Tx buffers. */
@@ -240,7 +240,7 @@ static int probe_phy( void )
 }
 
 extern void 
-NET_at91_emac_interrupt(NET_at91_emac_t* mac)
+DEV_at91_emac_interrupt(DEV_at91_emac_t* mac)
 {
 	volatile unsigned long int_status, rx_status;
 
@@ -259,7 +259,7 @@ NET_at91_emac_interrupt(NET_at91_emac_t* mac)
 }
 
 static void
-at91_emac_start(NET_at91_emac_t* mac)
+at91_emac_start(DEV_at91_emac_t* mac)
 {
 	/* After PHY power up, hardware reset. */
 	AT91C_BASE_RSTC->RSTC_RMR = AT91_EMAC_RESET_KEY | AT91_EMAC_RESET_LENGTH;
@@ -312,7 +312,7 @@ at91_emac_start(NET_at91_emac_t* mac)
 
 
 static void
-at91_emac_send(NET_at91_emac_t* mac, NET_netbuf_t* packet)
+at91_emac_send(DEV_at91_emac_t* mac, NET_netbuf_t* packet)
 {
 	static unsigned int tx_buffer_index = 0;
 	int wait_cycles = 0;
@@ -376,7 +376,7 @@ at91_emac_send(NET_at91_emac_t* mac, NET_netbuf_t* packet)
 }
 
 static NET_netbuf_t*
-at91_emac_poll(NET_at91_emac_t* mac)
+at91_emac_poll(DEV_at91_emac_t* mac)
 {
 	NET_netbuf_t* packet = NULL;
 	static int next_rx_buffer = 0;
@@ -486,7 +486,7 @@ at91_emac_poll(NET_at91_emac_t* mac)
 }
 
 static NET_netbuf_t *
-at91_emac_recv (NET_at91_emac_t* mac)
+at91_emac_recv (DEV_at91_emac_t* mac)
 {
 	NET_netbuf_t* packet;
     while ( (packet = at91_emac_poll(mac)) == NULL)
@@ -497,9 +497,9 @@ at91_emac_recv (NET_at91_emac_t* mac)
 }
 
 static void
-at91_emac_info (NET_at91_emac_t* mac)
+at91_emac_info (DEV_at91_emac_t* mac)
 {
-	printf("\tAT91 EMAC\n"
+	ACE_printf("\tAT91 EMAC\n"
 		   "\tRX: %lu, ovr %u, drop %u, bad %u\n"
 		   "\tTX: %lu, alloc fail %u\n"
 		   "\tLINK: %s, down cnt %u\n",  
@@ -514,8 +514,8 @@ at91_emac_info (NET_at91_emac_t* mac)
 }
     
 extern void
-NET_at91_emac_init (NET_ethif_t* ethif,
-		     	  	NET_at91_emac_t* mac)
+DEV_at91_emac_init (NET_ethif_t* ethif,
+		     	  	DEV_at91_emac_t* mac)
 {
     ethif->mac = mac;
     ethif->start = (void(*)(void*)) at91_emac_start;

@@ -1,5 +1,5 @@
-#ifndef NET_AT91C_EMAC_DEF_H
-#define NET_AT91C_EMAC_DEF_H
+#ifndef DEV_AT91C_EMAC_DEF_H
+#define DEV_AT91C_EMAC_DEF_H
 
 #define NB_RX_BUFFERS			24			//* Number of receive buffers
 #define ETH_RX_BUFFER_SIZE		128         //*

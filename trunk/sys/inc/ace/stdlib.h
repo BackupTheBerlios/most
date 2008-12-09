@@ -24,29 +24,29 @@
  *  @param s Pointer auf Ziffer
  *  @return Wert
  */
-extern int atoi (const char *s);
+extern int ACE_atoi (const char *s);
 
 /** ascii to long.
  *  @param s Pointer auf Ziffer
  *  @return binary
  */
-extern long atol (const char *s);
+extern long ACE_atol (const char *s);
 
 /** char to hex.
  *  @param c Character
  *  @return hex value
  */
-extern int atox (char c);
+extern int ACE_atox (char c);
 
 /** 2 char to hex.
  *  @param s Pointer to string
  *  @return hex value
  */
-extern int atoxc (char* s);
+extern int ACE_atoxc (char* s);
 
 
-#define ntohl(n) htonl(n)
-#define ntohs(n) htons(n)
+#define ACE_ntohl(n) ACE_htonl(n)
+#define ACE_ntohs(n) ACE_htons(n)
 
 #ifdef ACE_BYTE_ORDER
 #if ACE_BYTE_ORDER == ACE_LITTLE_ENDIAN
@@ -56,22 +56,22 @@ extern int atoxc (char* s);
  * @param n : short to convert.
  * @return value whith changed byte order.
  */
-extern u16_t htons (u16_t n);
+extern ACE_u16_t ACE_htons (ACE_u16_t n);
 
 /**
  * If BYTE_ORDER = LITTLE_ENDIAN.
  * @param n : long to convert.
  * @return value whith changed byte order.
  */
-extern u32_t htonl (u32_t n);
+extern ACE_u32_t ACE_htonl (ACE_u32_t n);
 
 #elif ACE_BYTE_ORDER == ACE_BIG_ENDIAN
 
 /** If BYTE_ORDER = BIG_ENDIAN */
-#define htons(n) (n)
+#define ACE_htons(n) (n)
 
 /** If BYTE_ORDER = BIG_ENDIAN */
-#define htonl(n) (n)
+#define ACE_htonl(n) (n)
 
 #elif
 #error "ACE_BYTE_ORDER not valid!"
@@ -81,8 +81,8 @@ extern u32_t htonl (u32_t n);
 #endif
 
 extern void ACE_stdlib_init (USO_heap_t* heap);
-extern void *malloc (size_t size);
-extern void free (void *block);
+extern void *ACE_malloc (ACE_size_t size);
+extern void ACE_free (void *block);
 
 /*------------------------------------------------------------------------*/
 

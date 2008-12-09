@@ -32,11 +32,11 @@ static unsigned char *addr;
 static unsigned char *boot_base;
 static unsigned long boot_size; 
 
-static bool_t
-recv_data(char* data, size_t len)
+static ACE_bool_t
+recv_data(char* data, ACE_size_t len)
 {
 	if (boot_size + len > sector_size){
-		printf("Boot size > sector size\n");
+		ACE_printf("Boot size > sector size\n");
 		return FALSE;
 	}
 	memcpy(addr, data, len);
@@ -49,27 +49,27 @@ static void
 eth_download_boot_exec (char *file)
 {
 	if (file){
-		addr = malloc(sector_size);
+		addr = ACE_malloc(sector_size);
 		if (addr){
 			boot_size = 0;
 			boot_base = addr;
 			if (NAP_tftp_open(&MDC_ee_config.ip_addr, &MDC_ee_config.server) >= 0){
 				if (NAP_tftp_get(file, recv_data) >= 0){
-					printf("Download done %lu\n", boot_size);
+					ACE_printf("Download done %lu\n", boot_size);
 				} else {
-					puts("Tftp get failed\n");
-					free(addr);
+					ACE_puts("Tftp get failed\n");
+					ACE_free(addr);
 				}
 				NAP_tftp_close();
 			} else {
-				puts("Tftp open failed\n");
-				free(addr);
+				ACE_puts("Tftp open failed\n");
+				ACE_free(addr);
 			}
 		} else {
-			puts("Ram not available\n");
+			ACE_puts("Ram not available\n");
 		}
 	} else {
-		puts("Give file name as param\n");
+		ACE_puts("Give file name as param\n");
 	}
 }
 
@@ -77,25 +77,25 @@ static void
 serial_download_boot_exec(char* file_size)
 {
 	if (file_size){
-		boot_size = atol(file_size);
+		boot_size = ACE_atol(file_size);
 		if (boot_size <= sector_size){
-			boot_base = malloc(boot_size);
+			boot_base = ACE_malloc(boot_size);
 			if (boot_base){
-				printf("Send file len %ld\n", boot_size);
-				read((char*)boot_base, boot_size);
-				puts("Download done\n");
+				ACE_printf("Send file len %ld\n", boot_size);
+				ACE_read((char*)boot_base, boot_size);
+				ACE_puts("Download done\n");
 			} else {
-				printf("Ram not available %ld\n", boot_size);
+				ACE_printf("Ram not available %ld\n", boot_size);
 			}
 		} else {
-			printf("Boot size > sector size %ld\n", boot_size);
+			ACE_printf("Boot size > sector size %ld\n", boot_size);
 		}
 	} else {
-		puts("Give boot size as param\n");
+		ACE_puts("Give boot size as param\n");
 	}
 }
 
-static void prog_flash(void) _SECTION_ (".ramcode");
+static void prog_flash(void) ACE_SECTION_ (".ramcode");
 
 static void prog_flash(void)
 {

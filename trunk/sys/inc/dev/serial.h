@@ -36,7 +36,7 @@ struct DEV_serial
     const DEV_serial_int_interface_t *int_interface;
     USO_pipe_t rx_buf;
     USO_pipe_t tx_buf;
-    bool_t tx_busy;
+    ACE_bool_t tx_busy;
     void (*open) (const struct DEV_serial_settings *);
     void (*close) (void);
     void (*tx_start) (void);
@@ -47,7 +47,7 @@ struct DEV_serial
     USO_mutex_t rx_mutex;
     USO_mutex_t tx_mutex;
     USO_barrier_t rx_barrier;
-    bool_t block;
+    ACE_bool_t block;
 };
 
 
@@ -71,7 +71,7 @@ extern void DEV_serial_init (DEV_serial_t * serial,
                                void (*open) (const struct DEV_serial_settings *),
                                void (*close) (void),
                                void (*tx_start) (void),
-                               bool_t block,
+                               ACE_bool_t block,
                                char *name);
 
 

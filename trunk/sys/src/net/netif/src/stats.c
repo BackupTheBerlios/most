@@ -14,7 +14,7 @@ struct NET_stats NET_stats;
 static void
 print_stat(char* name, struct NET_stats_proto *stat)
 {
- 	printf("\t%s: \t%u \t%u \t%u\n", 
+ 	ACE_printf("\t%s: \t%u \t%u \t%u\n", 
 			 name,
              stat->tx,
 			 stat->rx,
@@ -25,7 +25,7 @@ static void
 info (MFS_entry_t *entry)
 {
 	struct NET_stats *stats = (struct NET_stats*) entry;
-	printf("\n\tProto \tTX \tRX \tRX_Drop\n");
+	ACE_printf("\n\tProto \tTX \tRX \tRX_Drop\n");
 	print_stat("ip", &stats->ip);	
 	print_stat("icmp", &stats->icmp);	
 	print_stat("udp", &stats->udp);	
@@ -39,6 +39,6 @@ static struct MFS_descriptor_op stats_descriptor_op = {.open = NULL,
 extern void
 NET_stats_init (void)
 {
-    bzero (&NET_stats, sizeof (struct NET_stats));
+    ACE_bzero (&NET_stats, sizeof (struct NET_stats));
 	MFS_create_desc(MFS_sysfs_net(), "stats", (MFS_entry_t*) &NET_stats, MFS_DESC, &stats_descriptor_op);
 }

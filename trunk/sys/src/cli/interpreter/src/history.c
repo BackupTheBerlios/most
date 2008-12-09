@@ -14,8 +14,8 @@ static void entry_info
 )
 {
 	for (int i = 0; i < ((CLI_hisentry_t*)entry)->token.argc; i++)
-		printf ("%s ", ((CLI_hisentry_t*)entry)->token.buffer[i]);
-	putc ('\n');
+		ACE_printf ("%s ", ((CLI_hisentry_t*)entry)->token.buffer[i]);
+	ACE_putc ('\n');
 }
 
 extern void CLI_history_init
@@ -41,7 +41,7 @@ extern void CLI_history_add
 	
 	if (history->count < history->size)
 	{
-		entry = (CLI_hisentry_t*)malloc (sizeof(CLI_hisentry_t));
+		entry = (CLI_hisentry_t*)ACE_malloc (sizeof(CLI_hisentry_t));
 		history->count++;
 	}
 	else

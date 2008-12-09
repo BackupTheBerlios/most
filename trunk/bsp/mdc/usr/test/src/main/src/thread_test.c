@@ -39,7 +39,7 @@ scheduler_test_exec (char *text)
     {
         USO_sleep(ACE_MSEC_2_TICKS(SLEEP_TIME_MSEC));
     }
-    printf("Sched time usec: %lu\n", (ACE_TICKS_2_MSEC(USO_current()->ticks - ticks) * 1000) / SCHEDULE_COUNT);
+    ACE_printf("Sched time usec: %lu\n", (ACE_TICKS_2_MSEC(USO_current()->ticks - ticks) * 1000) / SCHEDULE_COUNT);
 }
 
 extern void
