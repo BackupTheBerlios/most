@@ -81,7 +81,7 @@ init (void)
 		DEV_at91_dbgu_print_ascii("open ser1 failed\n");
     }
 
-    USO_log_init (ser0, USO_LL_DEBUG);
+    USO_log_init (ser0, USO_LL_INFO);
     USO_enable ();
     USO_kputs (USO_LL_INFO, "Debug on ser0.\n");
 

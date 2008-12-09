@@ -53,9 +53,6 @@ These descriptors hold the locations and state of the Rx and Tx buffers. */
 static volatile tx_descriptor_t tx_descriptors[NB_TX_BUFFERS];
 static volatile rx_descriptor_t rx_descriptors[NB_RX_BUFFERS];
 
-/* The IP and Ethernet addresses are read from the uIP setup. */
-static const char mac_address[6] = { 0x00, 0xa0, 0xba, 0xd0, 0xca, 0xfe};
-
 static void setup_descriptors(void)
 {
 	int i;
@@ -82,20 +79,29 @@ static void setup_descriptors(void)
 	AT91C_BASE_EMAC->EMAC_TBQP = (unsigned long) tx_descriptors;
 	
 	AT91C_BASE_EMAC->EMAC_RSR = ( AT91C_EMAC_OVR | AT91C_EMAC_REC | AT91C_EMAC_BNA );
-	AT91C_BASE_EMAC->EMAC_NCFGR |= ( AT91C_EMAC_CAF | AT91C_EMAC_NBC | AT91C_EMAC_DRFCS);
+//	AT91C_BASE_EMAC->EMAC_NCFGR |= ( AT91C_EMAC_CAF | AT91C_EMAC_NBC | AT91C_EMAC_DRFCS);
+	AT91C_BASE_EMAC->EMAC_NCFGR |= ( AT91C_EMAC_MTI | AT91C_EMAC_DRFCS);
 	AT91C_BASE_EMAC->EMAC_NCR |= ( AT91C_EMAC_TE | AT91C_EMAC_RE | AT91C_EMAC_WESTAT );
 }	
 
-static void setup_mac_address(void)
+static void setup_mac_address(DEV_at91_emac_t* mac)
 {
 	/* Must be written SA1L then SA1H. */
-	AT91C_BASE_EMAC->EMAC_SA1L =	( ( unsigned long ) mac_address[ 3 ] << 24 ) |
-									( ( unsigned long ) mac_address[ 2 ] << 16 ) |
-									( ( unsigned long ) mac_address[ 1 ] << 8  ) |
-									mac_address[ 0 ];
+	AT91C_BASE_EMAC->EMAC_SA1L =	( ( unsigned long ) mac->mac_addr[ 3 ] << 24 ) |
+									( ( unsigned long ) mac->mac_addr[ 2 ] << 16 ) |
+									( ( unsigned long ) mac->mac_addr[ 1 ] << 8  ) |
+									( mac->mac_addr[ 0 ] );
 
-	AT91C_BASE_EMAC->EMAC_SA1H =	( ( unsigned long ) mac_address[ 5 ] << 8 ) |
-									mac_address[ 4 ];
+	AT91C_BASE_EMAC->EMAC_SA1H =	( ( unsigned long ) mac->mac_addr[ 5 ] << 8 ) |
+									( mac->mac_addr[ 4 ] );
+}
+
+static void setup_hash_address(void)
+{
+	/* Must be written HRB then HRT. */
+	AT91C_BASE_EMAC->EMAC_HRB =	0xFFFFFFFF;
+
+	AT91C_BASE_EMAC->EMAC_HRT =	0xFFFFFFFF;
 }
 
 static void read_phy( unsigned char phy_address,
@@ -299,7 +305,8 @@ at91_emac_start(DEV_at91_emac_t* mac)
 
 	setup_descriptors();
 	
-	setup_mac_address();
+	setup_mac_address(mac);
+	setup_hash_address();
 
 	if( probe_phy() == 0)
 	{

@@ -15,7 +15,7 @@
 
 struct MDC_ee_configuration MDC_ee_config;
 
-static unsigned char default_eth_addr[NET_ETH_ADDR_SIZE] = {0xA0, 0xBA, 0xD0, 0xCA, 0xFE, 0x00};
+static unsigned char default_eth_addr[NET_ETH_ADDR_SIZE] = {0x00, 0xa0, 0xba, 0xd0, 0xca, 0xfe};
 
 static void ee_config_init(void)
 {
