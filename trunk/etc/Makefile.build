@@ -60,18 +60,20 @@ OBJDUMP 	:= $(EXECPREF)objdump
 
 INC_PATH 	:= -I$(MOST_ROOT)/sys/inc -I$(MOST_ROOT)/usr/inc $(INC_PATH_OPT)
 
-CCFLAGS 	:= $(MOST_OPTI) $(MOST_DEBUG) $(TARGET_CCFLAGS) -fno-builtin -std=iso9899:199x -Wall -pedantic -Werror 
+CCFLAGS 	:= $(MOST_OPTI) $(MOST_DEBUG) $(TARGET_CCFLAGS) $(CCFLAGS_OPT) 
+CCFLAGS     += -fno-builtin -std=iso9899:199x -Wall -pedantic -Werror
 
 DEFINES 	:= $(TARGET_DEFINES) $(DEFINES_OPT)
 
-LIB_PATH 	:=  $(LIB_PATH_OPT)\
-				-L$(MOST_ROOT)/usr/lib/$(MOST_TARGET)\
-	            -L$(MOST_ROOT)/sys/lib/$(MOST_TARGET)\
-	            -L$(MOST_ROOT)/gcc/$(MOST_GCC)/lib/gcc-lib/$(MOST_TARGET)
+LIB_PATH 	:=  $(LIB_PATH_OPT)
+LIB_PATH	+=	-L$(MOST_ROOT)/usr/lib/$(MOST_TARGET)
+LIB_PATH	+=  -L$(MOST_ROOT)/sys/lib/$(MOST_TARGET)
+LIB_PATH	+=  -L$(MOST_ROOT)/gcc/$(MOST_GCC)/lib/gcc-lib/$(MOST_TARGET)
 
-LDFLAGS		:= --sort-common --warn-common $(TARGET_LDFLAGS) -T$(PROG_NAME).ld $(LDFLAGS_OPT)\
-			   --cref -Map $(PROG_NAME).map
+LDFLAGS		:= --sort-common --warn-common $(TARGET_LDFLAGS) -T$(PROG_NAME).ld $(LDFLAGS_OPT)
+LDFLAGS     += --cref -Map $(PROG_NAME).map
 
+# Use absolute path names for files so that gdb can find the files
 WORKING_DIR:=$(shell pwd)/
 
 LOCAL_SOURCES  		:= $(wildcard src/*.c)

@@ -11,9 +11,7 @@ LIB_NAMES_SYS := 		 -l_cli\
 		 -l_net\
 		 -l_dev\
 		 -l_uso\
-		 -l_ace\
-		 -l_uso\
-		 -l_dev
+		 -l_ace
 
 LIB_NAMES_USR :=
 

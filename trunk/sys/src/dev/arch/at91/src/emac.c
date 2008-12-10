@@ -253,15 +253,16 @@ DEV_at91_emac_interrupt(DEV_at91_emac_t* mac)
 	int_status = AT91C_BASE_EMAC->EMAC_ISR;
 	rx_status = AT91C_BASE_EMAC->EMAC_RSR;
 
+	/* Clear the interrupt befor context switch. */
+	AT91C_BASE_AIC->AIC_EOICR = 0;
+
 	if( (int_status & AT91C_EMAC_RCOMP ) || ( rx_status & AT91C_EMAC_REC ) )
 	{
 		/* A frame has been received, signal to rx task for processing the Rx descriptors. */
-		USO_signal(&mac->rx_sem);
 		AT91C_BASE_EMAC->EMAC_RSR = AT91C_EMAC_REC;
+		USO_signal(&mac->rx_sem);
 	}
 
-	/* Clear the interrupt. */
-	AT91C_BASE_AIC->AIC_EOICR = 0;
 }
 
 static void
