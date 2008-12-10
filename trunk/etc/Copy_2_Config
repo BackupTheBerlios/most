@@ -1,4 +1,5 @@
-# Uncomment following lines at your needs!
+# Copy this file to a file named Config 
+# and uncomment following lines at your needs!
 
 MOST_HOST:=linux
 #MOST_HOST:=cygwin

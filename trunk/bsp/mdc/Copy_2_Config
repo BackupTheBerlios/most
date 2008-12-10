@@ -1,3 +1,6 @@
+# Copy this file to a file named Config 
+# and uncomment following lines at your needs!
+
 MOST_GCC:=3.2
 MOST_CPU:=h8300
 MOST_SYSTEM:=coff

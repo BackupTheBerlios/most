@@ -1,3 +1,6 @@
+# Copy this file to a file named Config 
+# and uncomment following lines at your needs!
+
 MOST_GCC:=4.1
 MOST_CPU:=arm
 MOST_SYSTEM:=elf
