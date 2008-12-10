@@ -24,9 +24,8 @@ void SAM_pins_init (void)
 	AT91C_BASE_PIOB->PIO_PPUDR = (AT91B_LCD_BL);	// disable pull up
 
 	// for LCD Reset
-	AT91C_BASE_PIOB->PIO_OER = (AT91B_LCD_RST);		// set to output
-	AT91C_BASE_PIOB->PIO_PER = (AT91B_LCD_RST);		// set to PIO mode
-	AT91C_BASE_PIOB->PIO_SODR = (AT91B_LCD_RST);		// set to high
+	AT91C_BASE_PIOA->PIO_OER = (AT91A_LCD_RST);		// set to output
+	AT91C_BASE_PIOA->PIO_PER = (AT91A_LCD_RST);		// set to PIO mode
 
 	// for PHY power down
 	AT91C_BASE_PIOB->PIO_OER = (AT91B_PHY_POWER_DOWN);		// set to output

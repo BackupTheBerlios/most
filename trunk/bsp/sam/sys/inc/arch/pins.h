@@ -10,7 +10,7 @@
 #define AT91B_PHY_POWER_DOWN	AT91C_PIO_PB18	// PHY power down
 
 #define AT91B_LCD_BL		AT91C_PIO_PB20	// LCD Backlight
-#define AT91B_LCD_RST		AT91C_PIO_PA2	// LCD Reset
+#define AT91A_LCD_RST		AT91C_PIO_PA2	// LCD Reset
 
 #define AT91B_SW1           AT91C_PIO_PB24  // Switch 1
 #define AT91B_SW2           AT91C_PIO_PB25  // Switch 2

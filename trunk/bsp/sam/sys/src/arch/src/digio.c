@@ -64,13 +64,13 @@ clear_lcd_light (void)
 static void
 set_lcd_reset (void)
 {
-	AT91C_BASE_PIOB->PIO_SODR = AT91B_LCD_RST;
+	AT91C_BASE_PIOA->PIO_SODR = AT91A_LCD_RST;
 }
 
 static void
 clear_lcd_reset (void)
 {
-    AT91C_BASE_PIOB->PIO_CODR = AT91B_LCD_RST;
+    AT91C_BASE_PIOA->PIO_CODR = AT91A_LCD_RST;
 }
 
 static void
