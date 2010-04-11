@@ -73,10 +73,10 @@ extern ACE_u32_t ACE_htonl (ACE_u32_t n);
 /** If BYTE_ORDER = BIG_ENDIAN */
 #define ACE_htonl(n) (n)
 
-#elif
+#else
 #error "ACE_BYTE_ORDER not valid!"
 #endif
-#elif
+#else
 #error "ACE_BYTE_ORDER not defined!"
 #endif
 
