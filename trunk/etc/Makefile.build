@@ -48,7 +48,7 @@ ifeq ($(MOST_BUILD_LOG),off)
 BUILD_LOG :=@
 endif
 
-EXECPREF:=$(MOST_ROOT)/gcc/$(MOST_GCC)/bin/$(MOST_TARGET)-
+EXECPREF:=$(MOST_ROOT)/gcc/$(MOST_TARGET)-$(MOST_GCC)/bin/$(MOST_TARGET)-
 
 CC			:= $(EXECPREF)gcc
 LD			:= $(EXECPREF)ld
@@ -68,7 +68,7 @@ DEFINES 	:= $(TARGET_DEFINES) $(DEFINES_OPT)
 LIB_PATH 	:=  $(LIB_PATH_OPT)
 LIB_PATH	+=	-L$(MOST_ROOT)/usr/lib/$(MOST_TARGET)
 LIB_PATH	+=  -L$(MOST_ROOT)/sys/lib/$(MOST_TARGET)
-LIB_PATH	+=  -L$(MOST_ROOT)/gcc/$(MOST_GCC)/lib/gcc-lib/$(MOST_TARGET)
+LIB_PATH	+=  -L$(MOST_ROOT)/gcc/$(MOST_TARGET)-$(MOST_GCC)/lib/gcc/$(MOST_TARGET)/$(MOST_GCC)
 
 LDFLAGS		:= --sort-common --warn-common $(TARGET_LDFLAGS) -T$(PROG_NAME).ld $(LDFLAGS_OPT)
 LDFLAGS     += --cref -Map $(PROG_NAME).map
