@@ -41,4 +41,4 @@ debug-telnet:
 	telnet localhost 4444
 
 debug-gdb:
-	$(EXECPREF)arm-none-linux-gnueabi-gdb
+	$(EXECPREF)-gdb

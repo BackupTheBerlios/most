@@ -76,7 +76,7 @@ init (void)
 
     SAM_uart_init_1 ();
     ser1 = MFS_get_stream (MFS_open(MFS_sysfs_serial(), "1"));
-    if (ser0 == NULL){
+    if (ser1 == NULL){
     	DEV_digout_set (&SAM_red_led);
 		DEV_at91_dbgu_print_ascii("open ser1 failed\n");
     }

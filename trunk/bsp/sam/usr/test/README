@@ -38,7 +38,7 @@ compile OpenOCD:
 
 the ftd2xx library is used, this library must also be installed to /usr/lib.
 
-configuration files are placed in MOST_ROOT/ocd
+configuration files are placed in MOST_ROOT/etc/ocd and MOST_ROOT/bsp/board/ocd.
 correct the Makefile to your needed configuration.
 
 use make ocd-start for startting ocd
