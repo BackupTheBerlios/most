@@ -8,5 +8,8 @@
 extern void
 DEV_cpudelay (unsigned long loop)
 {
-    while (--loop);
+  volatile unsigned long i = loop; /* because compiler optimization */
+  while (i){
+    --i;
+  }
 }
