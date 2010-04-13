@@ -83,7 +83,7 @@ init (void)
 
     USO_log_init (ser0, USO_LL_INFO);
     USO_enable ();
-    USO_kputs (USO_LL_INFO, "Debug on ser0.\n");
+    USO_kputs (USO_LL_INFO, "\n\nDebug on ser0.\n");
 
     unsigned long loop_count = DEV_get_ticks();
     DEV_cpudelay(ACE_USEC_2_LOOPS(50000));

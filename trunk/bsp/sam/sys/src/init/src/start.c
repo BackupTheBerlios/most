@@ -57,7 +57,7 @@ SAM_start_run (void *nix)
     USO_kputs (USO_LL_INFO, "RunLed started.\n");
 	USO_yield();
 
-	SAM_eth_start();
+	//SAM_eth_start();
 
     CLI_setup ("samy");
     CLI_interpreter_init (&cli0);

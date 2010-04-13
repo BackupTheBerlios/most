@@ -186,7 +186,7 @@ CLI_cmd_run (CLI_interpreter_t *cli)
         			break;
         	}
         } else {
-        	ACE_puts("param: <prio:u|s|i><sched:f|r> arg_opt.\n"); 
+        	ACE_puts("run (u|s|i)(f|r) [arg]\n");
         	return done;
         }
        	USO_thread_t *t = USO_thread_new ((void (*)(void*))exec->f,
@@ -213,7 +213,7 @@ extern ACE_bool_t
 CLI_cmd_klog (CLI_interpreter_t *cli)
 {
     if (cli->argc <= 0) {
-        ACE_puts ("param: <ll:+|-|s>.\n");
+        ACE_puts ("klog (+|-|s)\n");
         return FALSE;
     }
     switch (cli->argv[0][0]){
