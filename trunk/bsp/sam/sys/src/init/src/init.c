@@ -43,8 +43,6 @@
 #include "init/init.h"
 #include "init/start.h"
 
-#define START_STACK_SIZE       0x400
-
 ACE_FILE *ser0 = NULL;
 static ACE_FILE *ser1 = NULL;
 
@@ -55,11 +53,13 @@ extern char heap_start, heap_end;             /* Defined in *.ld! */
 
 static USO_heap_t heap;
 
+#define INIT_STACK_SIZE       0x1000
+static USO_thread_t init_thread;
+static USO_stack_t init_stack[INIT_STACK_SIZE];
+
 static void
 init (void)
 {
-    USO_thread_t *start_thread;
-
     DEV_timers_init ();
     DEV_clock_init ();
 
@@ -89,16 +89,14 @@ init (void)
     DEV_cpudelay(ACE_USEC_2_LOOPS(50000));
     USO_kprintf (USO_LL_INFO, "Loop calib 50ms: %lu.\n", DEV_get_ticks_diff(loop_count));
     
-    /* The start thread has its own stack
-       and its stacksize can be changed here! */
-    start_thread = USO_thread_new (SAM_start_run, START_STACK_SIZE, USO_USER,
-                                  USO_ROUND_ROBIN, "Start");
-	if (start_thread != NULL)
-	{
-		USO_thread_flags_set(start_thread, (1 << USO_FLAG_DETACH));
-    	USO_start (start_thread);
-	}
-    USO_kputs (USO_LL_DEBUG, "Idle.\n");
+    USO_kputs (USO_LL_INFO, "Start Init.\n");
+    USO_thread_init (&init_thread,
+                     SAM_start_run,
+                     init_stack, ACE_ARRAYSIZE (init_stack),
+                     USO_USER, USO_FIFO, "Init");
+    USO_start (&init_thread);
+
+    USO_kputs (USO_LL_INFO, "Idle.\n");
 }
 
 extern void SAM_init(void)
