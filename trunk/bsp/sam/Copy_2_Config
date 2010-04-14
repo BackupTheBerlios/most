@@ -1,14 +1,19 @@
 # Copy this file to a file named Config 
 # and uncomment following lines at your needs!
 
-MOST_GCC:=4.1
+MOST_GCC:=4.4.3
 MOST_CPU:=arm
 MOST_SYSTEM:=elf
 MOST_ENDIAN:=little
 MOST_BIT:=32
-MOST_OPTI:=-Os
+MOST_OPTI:=-O0
+#MOST_OPTI:=-O1
+#MOST_OPTI:=-O2
+#MOST_OPTI:=-Os
 MOST_DEBUG:=-g
 #MOST_BUILD_ERR_FILE:=on
 #MOST_BUILD_LOG:=off
 MOST_ARCH:=at91
 MOST_SUB_ARCH:=sam7x
+MOST_JTAG=olimex-arm-usb-ocd
+#MOST_JTAG=parport
