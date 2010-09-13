@@ -5,12 +5,10 @@
 
 #include <uso/log.h>
 
-#include "init/main.h"
-
-#define VERSION "Frame 0.1.0"
+#include "frame.h"
 
 extern void
 MDC_main (void)
 {
-    USO_kputs (USO_LL_INFO, VERSION"\n");
+    USO_kputs (USO_LL_INFO, MDC_APPLICATION" "ACE_MOST_VERSION"\n");
 }

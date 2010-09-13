@@ -20,9 +20,9 @@
 
 
 /**
- * The Main Thread run function.
+ * Start services.
  */
-extern void MDC_start_run (void *);
+extern void MDC_start (void);
 
 /** @}
  */

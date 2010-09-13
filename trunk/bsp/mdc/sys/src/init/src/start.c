@@ -19,8 +19,9 @@
 #include "init/config.h"
 #include "init/boot.h"
 
-#define RUNLED_STACK_SIZE     0x50
-#define CLI_STACK_SIZE        0x400
+#define RUNLED_STACK_SIZE     (0x200/sizeof(USO_stack_t))
+#define CLI_STACK_SIZE        (0x400/sizeof(USO_stack_t))
+#define START_STACK_SIZE      (0x400/sizeof(USO_stack_t))
 
 static USO_thread_t run_led_thread;
 static USO_stack_t run_led_stack[RUNLED_STACK_SIZE];
@@ -40,20 +41,21 @@ run_led_run (void *nix)
     }
 }
 
-extern void
-MDC_start_run (void *nix)
+static void
+start_run (void *nix)
 {
-    USO_kputs (USO_LL_INFO, "Init run.\n");
+    USO_kputs (USO_LL_INFO, "Start run.\n");
 
     USO_thread_init (&run_led_thread,
                      run_led_run,
                      run_led_stack, ACE_ARRAYSIZE (run_led_stack),
-                     USO_SYSTEM, USO_FIFO, "RunLed");
+                     USO_SYSTEM, USO_FIFO, "Run");
     USO_start (&run_led_thread);
-    USO_kputs (USO_LL_INFO, "RunLed started.\n");
+    USO_kputs (USO_LL_INFO, "Run led.\n");
 	USO_yield();
 
 	MDC_eth_start();
+    USO_kputs (USO_LL_INFO, "Eth on.\n");
 
     CLI_setup (MDC_ee_config.hostname);
     CLI_interpreter_init (&cli0);
@@ -66,13 +68,25 @@ MDC_start_run (void *nix)
     USO_start (&cli0_thread);
     USO_kputs (USO_LL_INFO, "Cli0 on ser0.\n");
 
+	MFS_descriptor_t *bsp;
+	bsp = MFS_create_dir(MFS_sysfs_root(), "bsp");
+
 	if (MDC_ee_config.flags & MDC_EE_CONFIG_FLAG_BOOTP)
 		MDC_bootp ();
 		
     MDC_config_install ();
 	MDC_boot_install ();
 
-    USO_kputs (USO_LL_INFO, "Main.\n");
     DEV_digout_set (&MDC_green_led);
     MDC_main ();
+}
+
+extern void
+MDC_start (void)
+{
+    USO_kputs (USO_LL_INFO, "Start.\n");
+   	USO_thread_t *start_thread = USO_thread_new ((void (*)(void*))start_run,
+   			START_STACK_SIZE, USO_USER, USO_ROUND_ROBIN, "Start");
+    USO_thread_flags_set(start_thread, 1 << USO_FLAG_DETACH);
+	USO_start (start_thread);
 }

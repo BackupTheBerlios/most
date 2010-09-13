@@ -5,7 +5,7 @@
 
 #include <uso/log.h>
 
-#include "init/main.h"
+#include "test.h"
 #include "ram_test.h"
 #include "flash_test.h"
 #include "ee_test.h"
@@ -16,12 +16,10 @@
 #include "mfs/directory.h"
 #include "mfs/sysfs.h"
 
-#define VERSION "Test 0.1.0"
-
 extern void
 MDC_main (void)
 {
-    USO_kputs (USO_LL_INFO, VERSION"\n");
+    USO_kputs (USO_LL_INFO, MDC_APPLICATION" "ACE_MOST_VERSION"\n");
     USO_kprintf(USO_LL_INFO, "Sizeof(int) = %d.\n", sizeof(int));
 
 	MFS_descriptor_t *test;

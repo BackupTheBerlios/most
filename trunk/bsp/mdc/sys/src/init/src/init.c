@@ -33,7 +33,7 @@
 #include "arch/digio.h"
 
 
-#define START_STACK_SIZE       0x400
+#define IDLE_STACK_SIZE       0x400
 
 extern char data_start, data_end, code_end;   /* Defined in *.ld! */
 extern char bss_start, bss_end;               /* Defined in *.ld! */
@@ -48,7 +48,8 @@ static USO_heap_t heap;
 static void
 init (void)
 {
-    USO_thread_t *start_thread;
+    ACE_stdio_init ();
+    USO_sleep_init ();
 
     DEV_timers_init ();
     DEV_clock_init ();
@@ -77,17 +78,8 @@ init (void)
     DEV_cpudelay(ACE_USEC_2_LOOPS(50000));
     USO_kprintf (USO_LL_INFO, "Loop calib 50ms: %lu.\n", DEV_get_ticks_diff(loop_count));
 	
-    /* Why an start thread? the start thread has its own stack
-       and its stacksize can be changed here! */
-       
-    start_thread = USO_thread_new (MDC_start_run, START_STACK_SIZE, USO_USER,
-    							  USO_ROUND_ROBIN, "start");
-	if (start_thread != NULL)
-	{
-		USO_thread_flags_set(start_thread, (1 << USO_FLAG_DETACH));
-    	USO_start (start_thread);
-	}
-    USO_kputs (USO_LL_DEBUG, "Turn to idle.\n");
+    MDC_start();
+    USO_kputs (USO_LL_INFO, "Idle.\n");
 }
 
 extern void
@@ -110,5 +102,5 @@ MDC_init (void)
     }
  	USO_heap_install(&heap, "0");
 
-    USO_transform (init, (USO_stack_t*)&stack_start, 1024 / sizeof(USO_stack_t));
+    USO_transform (init, (USO_stack_t*)&stack_start, IDLE_STACK_SIZE/sizeof(USO_stack_t));
 }

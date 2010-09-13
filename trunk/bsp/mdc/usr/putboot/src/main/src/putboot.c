@@ -6,16 +6,14 @@
 #include <uso/log.h>
 
 #include "arch/digio.h"
-#include "init/main.h"
+#include "putboot.h"
 #include "init/boot.h"
 #include "download.h"
-
-#define VERSION "PutBoot 0.1.0"
 
 extern void
 MDC_main (void)
 {
-    USO_kputs (USO_LL_INFO, VERSION"\n");
+    USO_kputs (USO_LL_INFO, MDC_APPLICATION" "ACE_MOST_VERSION"\n");
     if (DEV_digin_isset(&MDC_switch) == FALSE)
     	MDC_start_app();
     if (DEV_digin_isset(&MDC_button) == FALSE)

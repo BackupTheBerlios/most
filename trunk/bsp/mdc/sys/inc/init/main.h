@@ -18,6 +18,7 @@
  * @{
  */
 
+#define MDC_BOARD "MDC"
 
 /**
  * This function is called from the Init Thread.
