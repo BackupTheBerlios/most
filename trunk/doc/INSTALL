@@ -1,83 +1,81 @@
-1.) Checkout the MOST trunk.
-============================
-
-2.) Setup.
+1.) Setup.
 ==========
 
-As host actually only linux x386 is supported.
+A description for the setup you will find on http://most.berlios.de/ .
 
-As target actually a board with H83003 is supported.
-For crosscompiling you need to extract the compiler tool chain
-package in the trunk folder. I didn check in the compiler tool
-chain to the repository, if you need it i can send it per email(2,5MB).
+A short description:
+
+Set MOST_ROOT environment variable to the root directory of the MOST project (trunk folder).
+This can be done with the command "source ROOT" in the trunk folder if the project is checked out
+with the name trunk.
+
+Setup the Config files (Copy Copy_2_Config to Config and edit it to your needs)
+in trunk/etc/Config and trunk/bsp/board/Config.
+
+Create a directory "gcc" in the trunk folder and create a link to your toolchain
+in the gcc directory. The link must have the name $MOST_TARGET-$MOST_GCC according
+to your Config files.
+$MOST_TARGET will be the prefix to your toolchain binaries for example "arm-elf"
+and $MOST_GCC must be the exact version of your gcc for example "4.4.3".
 
 
-2.1.) Commandline and editor(emacs):
-------------------------------------
+2.) Build.
+==========
 
-To setup the environment type at commandline in the "trunk" folder: 
-"source etc/Settings.env" for each shell.
+Just call "make all" in the trunk folder to build the libraries and binary.
 
-2.2.) Eclipse:
---------------
+To build the MOST API go to the inc (header files) folder for example
+mostroot/sys/inc and type there "make doc".
 
-Install the C/C++ Plugin
-Import the Project:
-File->Import->General->Excisting Project into Workspace
-Change variable MOST_ROOT in the projects environment to your needs. 
+Use "make help" to show the available build commands.
 
-3.) Compile.
-============
+
+
+3.) How the build system works.
+===============================
+
+The common makefiles are placed in the mostroot/etc folder and you should not use them directly, 
+they are called from the other makefiles.
 
 There are a lot of makefiles:
-for building the objects, libraries, bsp and programms.
+for building the objects, libraries, bsp and programs.
 
 The main makefile in the trunk folder calls the makefiles
-for libraries and programms and these call makefiles for the objects.
+for building the libraries and programs and these call makefiles for building the objects.
 
-You can build all, a programm, just a library or just some objects.
+The file system works as project manager, this means
+the makefile to build the objects will build all objects for the source files
+which are placed in the sub folder src. To add a source file just place it in the source folder.
+The built objects are placed in the o folder, the dependencies are placed in the d folder and 
+if you build the asm files (make asm) they are placed in the s folder.
+Assembler source files are placed like: src/$MOST_CPU/name.S .
 
-The common makefiles are placed in etc and you should not use them directly.
+You can build all, a program, just a library or just some objects by using the appropriate
+Makefile.
 
 trunk>
-	Makefile   (all)
+	Makefile   (all, clean)
 	sys/src>
-			Makefile (sys libs)
+			Makefile (libs)
 			ace>
-				Makefile (ace lib)
+				Makefile (lib)
 				stdio>
-					Makefile (objects)
+					Makefile (obj)
 					src>
 						all *.c files are build
 			...
 		inc>
-			Makefile (documentation)
+			Makefile (doc)
 			ace/doc>
-					Makefile (ace documentation)
+					Makefile (doc)
 			...		
 	usr/...
 	bsp/mdc/sys/src>
-					Makefile (bsp objects)
+					Makefile (obj)
 					...
 			usr/boot/
 					Makefile (prog, bin, srec)
-					src/ (Application)
-					
+					src/
+					   Makefile(obj)
 
-3.1.) Commandline:
-------------------
-
-Type "make" or "make help" to get more information.
-
-3.2.) Eclipse:
---------------
-
-Project->Build
-Project->Clean
-Project->Build make target 
- 
-4.) Download.
-Have a look to the board support package as example.
-Actually the download works with serial cable (binary),
-or ethernet with bootp and tftp.
 

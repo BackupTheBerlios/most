@@ -1,26 +1,82 @@
-<html><head>
-<title>Main</title>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="robots" content="NOINDEX,NOFOLLOW">
+<meta name="keywords"
+content="MOST API">
+<meta name="description"
+content="MOST API" >
+<title>MOST API</title>
+<!-- Der Copyright-Hinweis ist nicht zu löschen. Ein Entfernen des Copyright/Urheberrecht-Vermerks kann rechtliche Schritte nach sich ziehen -->
+<!-- (c)Copyright by S.I.S.Papenburg / www.on-mouseover.de/templates/ -->
+
+<!-- Hinweis:
+Das Anbieten dieser Vorlage auf ihrer eigenen Webseite, CD, DVD oder anderen Bild/Tonträgern zum Zwecke des Verkaufs ist untersagt.
+Die Vorlage kann privat (kostenlos) und kommerziell (gegen Bezahlung) für Sie selber oder eine dritte Person (andere Person oder Firma) genutzt werden.
+Je nach dem Inhalt, welcher eingefügt wird, kann auch für Privatpersonen eine kommerzielle Nutzung vorliegen.
+Lesen Sie auf der Webseite www.on-mouseover.de/templates/
+bitte die Nutzungsbedingungen nach.
+-->
+
+<link rel="stylesheet" href="format.css" type="text/css">
 </head>
-  <body BGCOLOR="CEEFBD">
-  <CENTER>
-	<TABLE>
+
+<body">
+
+<table width="100%" height="100%" align="center"  cellspacing="0" cellpadding="0" border="0"  >
+
+<tr>
+<td align="right"  class="li" ><img src="images/pixelspace.gif" width="18" height="1" border="0" alt=""></td>
+
+<td  ><!--ende aussentab-->
+<table align="center"  width="100%"  height="100%" id="main"   border="0" cellpadding="0" cellspacing="0"  >
+
+<tr>
+<td valign="top"  id="sp1" >
+ <CENTER>
+<h2>Software Structure</h2>
+<br>  
+	<TABLE border="0">
 	<TR>
 	<TD>
-	<IMG SRC="../images/maik_sl.png">
+Applications are build within a board support package and linked with the system and user libraries. The Applications are placed in the "most_root/bsp/board_name/usr" directory. The builded binary files are placed in the application directory.
+	</TD>
+	</TR>
+	<TR>
+	<TD>
+	<TABLE border="0">
+	<TR>
+	<TD>
+User Libraries are providing additional functionality and may depend on the system libraries. They are placed in the "most_root/usr" directory.
 	</TD>
 	<TD>
-	<H1>  M O S T <FONT COLOR="red">A P I  </H1>
+	<IMG SRC="images/MOST-Layer.png">
 	</TD>
 	<TD>
-	<IMG SRC="../images/maik_sr.png">
+Board Support Packages are providing board setup which is common to all applications for a board. They are using the system libraries and are placed in the "most_root/bsp/board_name/sys" directory.
 	</TD>
 	</TR>
 	</TABLE>
+	</TD>
+	</TR>
+	<TR>
+	<TD>
+System Libraries are providing the basic system functionality. They are placed in the "most_root/sys" directory. 
+	</TD>
+	</TR>
+	</TABLE>
+
   </CENTER>
-	<P>
-    The Micro O S Tool is a tool to provide an OS for embedded systems.
-    It is designed to run on Microcontrollers and has no support for memmory protection.
-	It consists of libraries and board support backages which are linked together.
-    </P> 
+
+</td>
+</tr>
+</table>
+
+<td class="re"><img src="images/pixelspace.gif" width="18" height="1" border="0" alt=""</td><!-- aussentab-->
+</tr>
+</table>
+
   </body>
 </html>

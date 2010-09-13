@@ -1,0 +1,16 @@
+* x-modem protcol for serial download
+* put for tftp to upload files
+* TCP
+* network stack synchronization
+* global memory management in DEV for flash, serial eeprom ...
+* global interrupt handling in DEV (register interrupt handler, wait for interrupt ?)
+* global exception handling and post mortem dump
+* flash file system
+* filesystem
+* synchronization CLI, MFS
+* documentation
+* SPI driver
+* Display Nokia for SAM7_EX256
+* CAN, CAN open
+* SD card
+* ....
