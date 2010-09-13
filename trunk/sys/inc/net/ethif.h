@@ -19,23 +19,31 @@
  * @{
  */
 
+#define ETH_RX_STACK_SIZE     (0x400/sizeof(USO_stack_t))
+
+/** Ethernet Interface structure. */
 struct NET_ethif
 {
-    struct NET_eth_addr *eth_addr;
-    void *mac;
-    void (*start) (void*);
-    NET_netbuf_t* (*receive) (void *);
-    void (*transmit) (void *, NET_netbuf_t *);
-    void (*info) (void*);
-	USO_thread_t rx_thread;
-	USO_stack_t rx_stack[400];
+    struct NET_eth_addr *eth_addr;                 /**< Ethernet address. */
+    void *mac;                                     /**< Pointer to MAC device. */
+    void (*start) (void*);                         /**< MAC device start function . */
+    NET_netbuf_t* (*receive) (void *);             /**< MAC device receive function. */
+    void (*transmit) (void *, NET_netbuf_t *);     /**< MAC device transmit function. */
+    void (*info) (void*);                          /**< MAC device print information and statistic. */
+	USO_thread_t rx_thread;                        /**< Receive thread. */
+	USO_stack_t rx_stack[ETH_RX_STACK_SIZE];                     /**< Stack for receive thread. */
 };
 
 /** Ethernet Interface */
 typedef struct NET_ethif NET_ethif_t;
 
 /**
- * Initialize ethernet interface 
+ * Initialize ethernet interface.
+ * The ethernet interface is registert as device in the Network interface.
+ *
+ * @param netif : Network interface.
+ * @param ethif : Ethernet interface.
+ * @param addr : Ethernet address of the ethernet interface.
  */
 extern void NET_ethif_init (NET_netif_t *netif,
 							NET_ethif_t *ethif,
@@ -43,7 +51,9 @@ extern void NET_ethif_init (NET_netif_t *netif,
 
 
 /**
- * Start ethernet interface 
+ * Start ethernet interface.
+ *
+ * @param ethif : Ethernet interface.
  */
 extern void NET_ethif_start (NET_ethif_t *ethif);
 

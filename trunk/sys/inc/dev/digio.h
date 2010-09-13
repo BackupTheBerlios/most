@@ -14,25 +14,26 @@
 
 /*------------- Representation ------------------------------------------*/
 
-/** IO State */
+/** IO State. */
 enum DEV_digio_state
 {
-    /** state low */
-    DEV_DIGIO_LOW,
-
-    /** state high */
-    DEV_DIGIO_HIGH
+	DEV_DIGIO_LOW, /**< Physically low signal. */
+    DEV_DIGIO_HIGH /**< Physically high signal. */
 };
 
-/** IO logic */
+/** IO logic. */
 enum DEV_digio_logig
 {
+    DEV_DIGIO_POS,  /**< Logically high is at high voltage. */
+    DEV_DIGIO_NEG   /**< Logically high is at low voltage. */
+};
 
-    /** pos logigc */
-    DEV_DIGIO_POS,
-
-    /** neg logigc */
-    DEV_DIGIO_NEG
+/** IO edge. */
+enum DEV_digio_edge
+{
+    DEV_DIGIO_NO,     /**< No edge. */
+    DEV_DIGIO_RAISE,  /**< Raising edge. */
+    DEV_DIGIO_FALL    /**< Falling edge. */
 };
 
 /*------------------------------------------------------------------------*/

@@ -21,6 +21,7 @@ DEV_digin_init (DEV_diginputs_t* inputs,
 {
     in->logig = logig;
     in->sample = sample;
+    in->edge = DEV_DIGIO_NO;
     in->debounce_time = debounce_time;
     in->debounce_count = 0;
     if (sample ())
@@ -32,31 +33,34 @@ DEV_digin_init (DEV_diginputs_t* inputs,
 }
 
 static void
-sample (USO_node_t * in)
+sample (USO_node_t *input)
 {
-    if (((DEV_digin_t *) in)->debounce_count == 0)
+	DEV_digin_t *in = (DEV_digin_t*)input;
+    in->edge = DEV_DIGIO_NO;
+    if (in->debounce_count == 0)
     {
-        unsigned long s = ((DEV_digin_t *) in)->sample ();
-        if ((s && (((DEV_digin_t *) in)->state == DEV_DIGIO_LOW)) ||
-            (!s && (((DEV_digin_t *) in)->state == DEV_DIGIO_HIGH)))
+        unsigned long s = in->sample ();
+        if ((s && (in->state == DEV_DIGIO_LOW)) ||
+            (!s && (in->state == DEV_DIGIO_HIGH)))
         {
-            ((DEV_digin_t *) in)->debounce_count =
-                ((DEV_digin_t *) in)->debounce_time;
+            in->debounce_count = in->debounce_time;
         }
     }
     else
     {
-        --((DEV_digin_t *) in)->debounce_count;
-        if (((DEV_digin_t *) in)->debounce_count == 0)
+        --in->debounce_count;
+        if (in->debounce_count == 0)
         {
-            unsigned long s = ((DEV_digin_t *) in)->sample ();
-            if (s && (((DEV_digin_t *) in)->state == DEV_DIGIO_LOW))
+            unsigned long s = in->sample ();
+            if (s && (in->state == DEV_DIGIO_LOW))
             {
-                ((DEV_digin_t *) in)->state = DEV_DIGIO_HIGH;
+                in->state = DEV_DIGIO_HIGH;
+                in->edge = DEV_DIGIO_RAISE;
             }
-            else if (!s && (((DEV_digin_t *) in)->state == DEV_DIGIO_HIGH))
+            else if (!s && (in->state == DEV_DIGIO_HIGH))
             {
-                ((DEV_digin_t *) in)->state = DEV_DIGIO_LOW;
+                in->state = DEV_DIGIO_LOW;
+                in->edge = DEV_DIGIO_FALL;
             }
         }
     }
@@ -90,5 +94,40 @@ DEV_digin_isset (DEV_digin_t * in)
             return FALSE;
         else
             return TRUE;
+    }
+}
+
+extern enum DEV_digio_edge
+DEV_digin_ischanged (DEV_digin_t * in)
+{
+    if (in->debounce_time == 0){
+        in->edge = DEV_DIGIO_NO;
+        unsigned long s = in->sample ();
+        if (s && (in->state == DEV_DIGIO_LOW))
+        {
+            in->state = DEV_DIGIO_HIGH;
+            in->edge = DEV_DIGIO_RAISE;
+        }
+        else if (!s && (in->state == DEV_DIGIO_HIGH))
+        {
+            in->state = DEV_DIGIO_LOW;
+            in->edge = DEV_DIGIO_FALL;
+        }
+    }
+    if (in->edge == DEV_DIGIO_NO)
+    	return DEV_DIGIO_NO;
+    if (in->logig == DEV_DIGIO_POS)
+    {
+        if (in->edge == DEV_DIGIO_RAISE)
+            return DEV_DIGIO_RAISE;
+        else
+            return DEV_DIGIO_FALL;
+    }
+    else
+    {
+        if (in->edge == DEV_DIGIO_RAISE)
+            return DEV_DIGIO_FALL;
+        else
+            return DEV_DIGIO_RAISE;
     }
 }

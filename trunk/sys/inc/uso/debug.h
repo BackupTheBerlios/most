@@ -12,7 +12,7 @@
  *
  * Debug definitions for developing.
  *
- * Turn on debugging at compiletime.
+ * Turn on debugging at compile time.
  * @{
  */
 
@@ -27,13 +27,13 @@
  */
 #define DEBUGF(debug, x) do { if(debug){ USO_debug x; } } while(0)
 
-#define USO_DEBUGGING        1
-#define DEV_DEBUGGING        0
-#define NET_DEBUGGING        1
-#define NAP_DEBUGGING        1
-#define CLI_DEBUGGING        0
-#define BSP_DEBUGGING        0
-#define USR_DEBUGGING        0
+#define USO_DEBUGGING        1     /**< Enable debugging for USO library. */
+#define DEV_DEBUGGING        0     /**< Enable debugging for DEV library. */
+#define NET_DEBUGGING        1     /**< Enable debugging for NET library. */
+#define NAP_DEBUGGING        1     /**< Enable debugging for NAP library. */
+#define CLI_DEBUGGING        0     /**< Enable debugging for CLI library. */
+#define BSP_DEBUGGING        0     /**< Enable debugging for Board Support Packages. */
+#define USR_DEBUGGING        0     /**< Enable debugging for USR libraries. */
 
 #else
 
@@ -53,8 +53,8 @@
 
 #if USO_DEBUGGING
 
-#define USO_HEAP_DEBUG       1
-#define USO_HEAP_LIST_DEBUG  0
+#define USO_HEAP_DEBUG       1      /**< USO : enable debugging for the heap module. */
+#define USO_HEAP_LIST_DEBUG  0      /**< USO : analyze the heap list. */
 
 #else
 

@@ -31,6 +31,7 @@ struct USO_heap
 	unsigned long search_average;
 };
 
+/** USO_heap type. */
 typedef struct USO_heap USO_heap_t;
 
 /*-------------- Interface -----------------------------------------------*/
@@ -45,23 +46,29 @@ typedef struct USO_heap USO_heap_t;
  */
 extern ACE_bool_t USO_heap_init (USO_heap_t* heap, void *start, void *end);
 
+/**
+ * Allocate memory block.
+ *
+ * @param heap : Pointer to heap.
+ * @param name : Install the heap in the file system.
+ */
 extern void USO_heap_install(USO_heap_t* heap, char *name);
 
 /**
- * Initialize heap.
+ * Allocate memory block.
  *
- * @param heap : Heap.
+ * @param heap : Pointer to heap.
  * @param size : Size of the memory you want.
  *
- * @return Pointer to memory block or NULL if no memory avilable.
+ * @return Pointer to memory block or NULL if no memory is available.
  */
 extern void *USO_mem_alloc (USO_heap_t* heap, ACE_size_t size);
 
 /** 
- * Fremm memory block.
+ * Free memory block.
  *
- * @param heap : Heap.
- * @param block : valid memory block.
+ * @param heap : Pointer to heap.
+ * @param block : Allocated memory block.
  */
 extern void USO_mem_free (USO_heap_t* heap, void *block);
 

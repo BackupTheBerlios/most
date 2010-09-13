@@ -10,7 +10,18 @@
 
 /** @defgroup port port.h
  *
- * Inter process communication.
+ * Synchron inter process communication.
+ *
+ * The principle is like a function call.
+ *
+ * Sender:
+ *
+ * send message   ->  get replied message.
+ *
+ * Receiver:
+ *
+ * receive a message  -> reply a message to sender.
+ *
  * @{
  */
 
@@ -23,19 +34,13 @@
  */
 struct USO_port
 {
-    /*
-     * Threads send blocked 
-     */
+    /* Threads send blocked */
     USO_list_t send;
 
-    /*
-     * Treads receive blocked 
-     */
+    /* Treads receive blocked */
     USO_list_t receive;
 
-    /*
-     * Threads reply blocked 
-     */
+    /* Threads reply blocked */
     USO_list_t reply;
 
 };
@@ -60,7 +65,7 @@ extern void USO_port_init (USO_port_t * port);
 /**
  * Send a message to a port.
  *
- * Block send and block reply.
+ * Block until a message can be send and then block until a message is replied.
  *
  * @param port : Pointer to port.
  * @param message : Message.
@@ -71,7 +76,7 @@ extern void * USO_send (USO_port_t * port, void * message);
 /**
  * Receive a message from a port.
  *
- * Block receive.
+ * Block until a message is received.
  *
  * @param port : Pointer to port.
  * @return Message.

@@ -25,10 +25,7 @@
  */
 struct USO_barrier
 {
-    /*
-     * List of blocked threads 
-     */
-    USO_list_t threads;
+    USO_list_t threads; /* List of blocked threads */
 };
 
 /** 
@@ -47,8 +44,25 @@ typedef struct USO_barrier USO_barrier_t;
  */
 extern void USO_barrier_init (USO_barrier_t * barrier);
 
+/**
+ * Block on a barrier.
+ *
+ * @param barrier : Pointer to barrier.
+ */
 extern void USO_block (USO_barrier_t * barrier);
+
+/**
+ * The first thread which is blocking on a barrier is allowed to run.
+ *
+ * @param barrier : Pointer to barrier.
+ */
 extern void USO_go (USO_barrier_t * barrier);
+
+/**
+ * All threads which are blocking on a barrier are allowed tu run.
+ *
+ * @param barrier : Pointer to barrier.
+ */
 extern void USO_go_all (USO_barrier_t * barrier);
 
 

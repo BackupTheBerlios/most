@@ -63,7 +63,7 @@ extern void USO_list_init (USO_list_t * list);
 /**
  * Remove node from list.
  *
- * @param list : Must contain the node..
+ * @param list : Must contain the node.
  * @param node : Will be removed from list.
  */
 extern void USO_remove (USO_list_t * list, USO_node_t * node);
@@ -101,7 +101,7 @@ extern USO_node_t *USO_dequeue (USO_list_t * list);
 extern USO_node_t *USO_pop (USO_list_t * list);
 
 /**
- * Insert node into list using an delta list alorithm.
+ * Insert node into list using an delta list algorithm.
  *
  * @param list : Pointer to list.
  * @param node : Pointer to node.
@@ -118,14 +118,14 @@ extern void USO_delta_insert (USO_list_t * list, USO_node_t * node, long key);
 extern void USO_delta_remove (USO_list_t * list, USO_node_t * node);
 
 /**
- * Decrement delta value of the head of the deltalist.
+ * Decrement delta value of the head of the delta list.
  *
  * @param list : Pointer to delta list.
  */
 extern void USO_delta_dec (USO_list_t * list);
 
 /**
- * Are there nodes in the list whith delat 0.
+ * Are there nodes in the list whit delta 0.
  *
  * @param list : Pointer to delta list.
  * @return TRUE when delta of head <= 0 else FALSE.
@@ -145,13 +145,13 @@ extern ACE_bool_t USO_isempty (USO_list_t * list);
  * The element is not removed from the list.
  *
  * @param list : Pointer to list.
- * @param iterator : Iterator.
+ * @param iterator : Iterator(Pointer to current node or NULL for list head).
  * @return Element.
  */
 extern USO_node_t *USO_next_element (USO_list_t * list, USO_node_t *iterator);
 
 /**
- * Get the prev element in the list.
+ * Get the previous element in the list.
  * The element is not removed from the list.
  *
  * @param list : Pointer to list.
@@ -161,14 +161,14 @@ extern USO_node_t *USO_next_element (USO_list_t * list, USO_node_t *iterator);
 extern USO_node_t *USO_prev_element (USO_list_t * list, USO_node_t *iterator);
 
 /**
- * Use function f on each element of the list.
+ * Do function f on each element of the list.
  *
  * Beginning with the head as long f returns FALSE,
  * use f on the next node, when f returns TRUE, the node
  * on which f was used will be returned.
  *
  * @param list : Pointer to list.
- * @param f : function used on each node.
+ * @param f : Function used on each node.
  * @return Node if one was found or NULL.
  */
 extern void USO_map (USO_list_t *list, void (*f) (USO_node_t *) );

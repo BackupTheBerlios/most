@@ -36,6 +36,12 @@ USO_post (USO_mailbox_t * mailbox, USO_node_t * mail)
     USO_restore (ps);
 }
 
+extern int
+USO_post_would_block(USO_mailbox_t * mailbox)
+{
+	return USO_sem_count(&mailbox->post_sem);
+}
+
 extern USO_node_t *
 USO_fetch (USO_mailbox_t * mailbox)
 {
@@ -47,6 +53,12 @@ USO_fetch (USO_mailbox_t * mailbox)
         USO_signal (&mailbox->post_sem);
     USO_restore (ps);
     return mail;
+}
+
+extern int
+USO_fetch_would_block(USO_mailbox_t * mailbox)
+{
+	return USO_sem_count(&mailbox->fetch_sem);
 }
 
 extern void

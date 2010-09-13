@@ -17,10 +17,10 @@
  * is written to the beginning of the buffer.
  * When you get a buffer it is not zero initialized!
  * 
- * The size of a buffer has to be aligned to 4 Bytes,
+ * The buffer has to be aligned to 4 Bytes,
  * or a address boundary where a pointer can be placed.
  *
- * Buffer pools should be used for message passing and IO buffering.
+ * Buffer pools may be used for message passing and IO buffering.
  * @{
  */
 

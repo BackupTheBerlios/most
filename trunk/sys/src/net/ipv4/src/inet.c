@@ -216,12 +216,6 @@ chksum(void *dataptr, int len)
 #endif
 
 
-/*-----------------------------------------------------------------------------------*/
-/*
- * inet_chksum: Calculates the Internet checksum over a portion of
- * memory. Used primarely for IP and ICMP. 
- */
-/*-----------------------------------------------------------------------------------*/
 
 extern ACE_u16_t
 NET_inet_chksum (void *dataptr, ACE_u16_t len)
@@ -229,14 +223,6 @@ NET_inet_chksum (void *dataptr, ACE_u16_t len)
 	return ~chksum(dataptr, len);
 }
 
-
-/**
- * Calculate a checksum over a chain of pbufs (without pseudo-header, much like
- * inet_chksum only pbufs are used).
- *
- * @param p pbuf chain over that the checksum should be calculated
- * @return checksum (as u16_t) to be saved directly in the protocol header
- */
 
 static ACE_u16_t
 chksum_buf(NET_netbuf_t* p)
@@ -271,24 +257,12 @@ NET_inet_chksum_buf(NET_netbuf_t* p)
 	return ~chksum_buf(p);
 }
 
-/* inet_chksum_pseudo:
- *
- * Calculates the pseudo Internet checksum used by TCP and UDP for a pbuf chain.
- * IP addresses are expected to be in network byte order.
- *
- * @param p chain of pbufs over that a checksum should be calculated (ip data part)
- * @param src source ip address (used for checksum of pseudo header)
- * @param dst destination ip address (used for checksum of pseudo header)
- * @param proto ip protocol (used for checksum of pseudo header)
- * @param proto_len length of the ip data part (used for checksum of pseudo header)
- * @return checksum (as u16_t) to be saved directly in the protocol header
- */
-
 extern ACE_u16_t
 NET_inet_chksum_pseudo (NET_netbuf_t * p,
                         NET_ip_addr_t * src,
                         NET_ip_addr_t * dest,
-                        ACE_u8_t proto, ACE_u16_t proto_len)
+                        ACE_u8_t proto,
+                        ACE_u16_t proto_len)
 {
 	ACE_u32_t acc;
   	acc = chksum_buf(p);

@@ -3,8 +3,6 @@
  *
  */
 
-#include <ace/stdio.h>
-
 #include "uso/list.h"
 #include "uso/thread.h"
 #include "uso/scheduler.h"
@@ -26,8 +24,8 @@ static USO_thread_t idle_thread;
 static USO_thread_t *current_thread = NULL;
 static USO_thread_t *old_thread = NULL;
 
-static int preemption;
-static unsigned long schedule_time;
+static int preemption = 0;
+static unsigned long schedule_time = 0;
 
 static void
 idle (void)
@@ -45,8 +43,6 @@ USO_transform (void (*init) (void), USO_stack_t* stack, int stack_size)
     USO_thread_ios_init (&idle_thread, NULL, NULL);
     current_thread = &idle_thread;
     old_thread = &idle_thread;
-    USO_sleep_init ();
-    ACE_stdio_init ();
     init ();
     idle ();
 }
@@ -58,7 +54,7 @@ USO_next2run (void)
     {
         return (USO_thread_t *) USO_dequeue (&interrupt_threads);
     }
-    if (USO_isempty (&system_threads) == FALSE)
+    else if (USO_isempty (&system_threads) == FALSE)
     {
         return (USO_thread_t *) USO_dequeue (&system_threads);
     }
@@ -69,6 +65,29 @@ USO_next2run (void)
     else
     {
         return &idle_thread;
+    }
+}
+
+static void
+stack_check(void)
+{
+    /* For the case of an stack overflow where the sp has returned to the range between top and bottom
+     * the top element is checked and if its not free, its interpreted as overrun.
+     */
+    if (USO_stack_check_free(old_thread->stack_top) == FALSE)
+    {
+    	USO_panic (__FILE__, __LINE__);
+    }
+    /* Also check the pointer for overrun for the case the same value as free stack
+     * entries are marked was pushed to the top.
+     */
+    if (USO_stack_check_overrun(old_thread->stack_top, old_thread->cpu.sp) == TRUE)
+    {
+    	USO_panic (__FILE__, __LINE__);
+    }
+    if (USO_stack_check_overrun(old_thread->stack_max, old_thread->cpu.sp) == TRUE)
+    {
+		old_thread->stack_max = (USO_stack_t*)old_thread->cpu.sp;
     }
 }
 
@@ -86,15 +105,8 @@ USO_schedule (USO_thread_t * new_thread)
     {
         USO_thread_terminate (old_thread);
     }
-    if (USO_stack_check_overrun(new_thread->stack_top, new_thread->cpu.sp) == TRUE)
-    {
-    	USO_panic (__FILE__, __LINE__);
-    }
-    if (USO_stack_check_overrun(new_thread->stack_max, new_thread->cpu.sp) == TRUE)
-    {
-		new_thread->stack_max = (USO_stack_t*)new_thread->cpu.sp;
-    }
     old_thread = current_thread;
+    stack_check();
     old_thread->ticks += DEV_get_ticks_diff(schedule_time);
     schedule_time = DEV_get_ticks();
     preemption = PREEMPTION;

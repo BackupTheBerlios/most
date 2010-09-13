@@ -18,7 +18,7 @@
 /*------------- Representation ------------------------------------------*/
 
 /**
- * Kernel log levels
+ * Kernel log levels.
  */
 enum USO_log_level
 {
@@ -32,13 +32,13 @@ enum USO_log_level
     /** Show all error and warnings */
     USO_LL_WARNING,
 
-    /** info message level */
+    /** Show error, warning and info messages. */
     USO_LL_INFO,
 
-    /** level for debugging */
+    /** Also show debugging messages. */
     USO_LL_DEBUG,
 
-    /** show also messages for protokolling what happens */
+    /** Show all messages */
     USO_LL_PROTOCOL
 };
 
@@ -50,7 +50,7 @@ enum USO_log_level
  * Initialize kprintf.
  *
  * @param ios : IO Stream for output.
- * @param level : default log level.
+ * @param level : Default log level.
  */
 extern void USO_log_init (ACE_FILE * ios, enum USO_log_level level);
 
@@ -70,7 +70,7 @@ extern void USO_log_inc (void);
 /**
  * Decrease log level.
  *
- * For less Output.
+ * For lesser Output.
  */
 extern void USO_log_dec (void);
 
@@ -78,25 +78,25 @@ extern void USO_log_dec (void);
 /**
  * Put string to kernel log output.
  *
- * @param level : print when log_level >= level.
+ * @param level : Print string when log_level >= level.
  * @param string : Pointer to string.
  */
 extern void USO_kputs (enum USO_log_level level, char *string);
 
 /**
- * Format print string to kernel log output.
+ * Print formatted string to kernel log output.
  *
- * @param level : print when log_level >= level.
- * @param fmt : Pointer to formated string.
+ * @param level : Print string when log_level >= level.
+ * @param fmt : Pointer to formatted string.
  */
 extern void USO_kprintf (enum USO_log_level level, const char *fmt, ...);
 
 /**
- * Format debug to kernel log output.
+ * Print formatted debug message to kernel log output.
  * 
  * Log Level is DEBUG.
  *
- * @param fmt : Pointer to formated string.
+ * @param fmt : Pointer to formatted string.
  */
 extern void USO_debug (const char *fmt, ...);
 

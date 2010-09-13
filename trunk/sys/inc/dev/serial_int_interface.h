@@ -16,7 +16,7 @@
  * Functions which will be called by the interrupt routines.
  * Each Serial Device Type has to implement this interface
  * so that it can be casted to that interface type.
- * First Entry in the device struct.
+ * First Entry in the device structure.
  * @{
  */
 
@@ -36,10 +36,10 @@ typedef struct DEV_serial_int_interface DEV_serial_int_interface_t;
 struct DEV_serial_int_interface
 {
 
-    /** Function called by the interrupt routines when a char is received */
+    /** Function called by the interrupt routines when a char is received. */
     void (*rx_char) (DEV_serial_t *, char);
 
-    /** Function called by the interrupt routnines when e rx error occours */
+    /** Function called by the interrupt routines when an receive error occur. */
     void (*rx_error) (DEV_serial_t *, enum DEV_serial_rx_err);
 
     /** Function called by the interrupt routines to fetch a character 
@@ -47,7 +47,7 @@ struct DEV_serial_int_interface
      */
     int (*tx_char) (DEV_serial_t *);
 
-    /** Function called by the inerrupt routines if transmission is finished */
+    /** Function called by the inerrupt routines if transmission is finished. */
     void (*tx_finished) (DEV_serial_t *);
 };
 

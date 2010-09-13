@@ -15,26 +15,25 @@
 
 /*------------- Definitions ------------------------------------------*/
 
-/** variable list type */
+/** Variable argument list type. */
 typedef void *ACE_va_list_t;
 
-/** variable argument symbol */
+/** Variable argument symbol. */
 #define ACE_va_ellipsis ...
 
-/** va_rounded_size */
 #define ACE_va_rounded_size(TYPE) (((sizeof (TYPE) + sizeof (long) - 1) / sizeof (long)) * sizeof (long))
 
-/** va_start */
+/** Set argument pointer to beginning of list of optional arguments.*/
 #define ACE_va_start(AP,LASTARG) (AP = ((ACE_va_list_t) __builtin_next_arg (LASTARG)))
 
-/** va_arg */
+/** Retrieve current argument.*/
 #define ACE_va_arg(AP, TYPE) \
  (AP = (ACE_va_list_t) ((char *) (AP) + ACE_va_rounded_size (TYPE)),	\
   *((TYPE *) (void *) ((char *) (AP)					\
 		       - ((sizeof (TYPE) < ACE_va_rounded_size (int)	\
 			  ? sizeof (TYPE) : ACE_va_rounded_size (TYPE))))))
 
-/** va_end */
+/** Reset argument pointer.*/
 #define ACE_va_end(AP)	((void) 0)
 
 /*------------------------------------------------------------------------*/

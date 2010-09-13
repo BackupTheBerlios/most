@@ -10,6 +10,9 @@
 /** @defgroup io io.h
  *
  * IO architecture low level.
+ * This is used by the network layer,
+ * i think this comes from the i386 IO system.
+ * Think if it is really necessary.
  *
  * @{
  */

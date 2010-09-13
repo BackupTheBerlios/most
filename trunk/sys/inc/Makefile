@@ -3,6 +3,7 @@
 makegoal = make $(1) -C ace/doc;\
 	       make $(1) -C uso/doc;\
 	       make $(1) -C dev/doc;\
+	       make $(1) -C mfs/doc;\
 	       make $(1) -C net/doc;\
 	       make $(1) -C nap/doc;\
 	       make $(1) -C cli/doc;

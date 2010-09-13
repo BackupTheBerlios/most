@@ -31,10 +31,16 @@ static CLI_command_t run;
 static CLI_command_t klog;
 
 extern void
+CLI_command_info_head(void)
+{
+	ACE_printf("\tName\tDescription\n");
+}
+
+static void
 command_info(MFS_entry_t *entry)
 {
 	CLI_command_t * command = (CLI_command_t *) entry;
-	ACE_printf("[ %s ].\n", command->description);
+	ACE_printf("[ %s ]\n", command->description);
 }
 
 static struct MFS_descriptor_op command_descriptor_op = {.open = NULL,
@@ -55,18 +61,18 @@ CLI_command_init (CLI_command_t * command,
 extern void
 CLI_commands_init (void)
 {
-    CLI_command_init (&open, "open", "Descriptor open", CLI_cmd_open);
-    CLI_command_init (&close, "close", "Descriptor close", CLI_cmd_close);
-    CLI_command_init (&start, "start", "Thread start", CLI_cmd_start);
-    CLI_command_init (&stop, "stop", "Thread stop", CLI_cmd_stop);
-    CLI_command_init (&info, "info", "Descriptor information", CLI_cmd_info);
-    CLI_command_init (&list, "list", "List directory", CLI_cmd_list);
-    CLI_command_init (&exec, "exec", "Execute descriptor", CLI_cmd_exec);
-    CLI_command_init (&run, "run", "Run descriptor", CLI_cmd_run);
-    CLI_command_init (&klog, "klog", "Kenel log level", CLI_cmd_klog);
+    CLI_command_init (&open, "open", "open desc", CLI_cmd_open);
+    CLI_command_init (&close, "close", "close", CLI_cmd_close);
+    CLI_command_init (&start, "start", "start thread", CLI_cmd_start);
+    CLI_command_init (&stop, "stop", "stop thread", CLI_cmd_stop);
+    CLI_command_init (&info, "info", "(/desc)opt info", CLI_cmd_info);
+    CLI_command_init (&list, "list", "(/dir)opt list (i|c|t|h|s)opt", CLI_cmd_list);
+    CLI_command_init (&exec, "exec", "(/exec)opt exec (arg)opt", CLI_cmd_exec);
+    CLI_command_init (&run, "run", "(/exec)opt run (u|s|i)(f|r) (arg)opt", CLI_cmd_run);
+    CLI_command_init (&klog, "klog", "klog (+|-|s)", CLI_cmd_klog);
 }
 
-extern void
+static void
 exec_info(MFS_entry_t *entry)
 {
 	CLI_exec_t * exec = (CLI_exec_t *) entry;

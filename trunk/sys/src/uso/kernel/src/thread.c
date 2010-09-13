@@ -54,12 +54,16 @@ USO_thread_init (USO_thread_t * thread,
     thread->out = USO_current()->out;
     thread->state = USO_INIT;
     thread->stack = stack;
+    thread->stack_size = stack_size;
     thread->stack_bot = USO_stack_beginn (stack, stack_size);
     thread->stack_top = USO_stack_end (stack, stack_size);
     thread->stack_max = USO_stack_beginn (stack, stack_size);
     thread->ticks = 0;
 	thread->desc = MFS_create_desc(MFS_sysfs_threads(), name,
 				 (MFS_entry_t*) thread, MFS_DESC, &thread_descriptor_op);
+    if (priority != USO_IDLE){
+    	USO_stack_init(stack, stack_size);
+    }
 }
 
 extern USO_thread_t *
@@ -240,10 +244,10 @@ info(MFS_entry_t *entry)
     switch (thread->scheduling)
     {
     case USO_FIFO:
-        scheduling = "fifo";
+        scheduling = "fi";
         break;
     case USO_ROUND_ROBIN:
-        scheduling = "roro";
+        scheduling = "ro";
         break;
     default:
         scheduling = error;
@@ -296,15 +300,33 @@ info(MFS_entry_t *entry)
         break;
     }
     
-    ACE_printf ("%s\t%s\t%s\t%lu\t%p %p %p %p\n",
+    ACE_printf ("%s\t%s\t%s\t%lu\t%i\t%i\t%p %p %p %p\n",
     	priority,
     	scheduling,
     	state,
     	thread->ticks,
+    	thread->stack_size * sizeof(USO_stack_t),
+    	USO_stack_get_free(thread->stack_top, thread->stack_size) * sizeof(USO_stack_t),
     	(void*)thread->stack_top,
     	(void*)thread->stack_max,
     	(void*)thread->cpu.sp,
     	(void*)thread->stack_bot);
 }
 
+extern void
+USO_thread_info_head(void)
+{
+	ACE_printf ("\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+		"Name",
+		"Prior",
+		"Sched",
+		"State",
+		"Ticks",
+		"S.size",
+		"S.free",
+		"S.top",
+		"S.max",
+		"S.sp",
+		"S.bot");
+}
 /*------------------------------------------------------------------------*/

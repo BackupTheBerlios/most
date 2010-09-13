@@ -18,21 +18,27 @@
 
 /*------------- Representation ------------------------------------------*/
 
+/* private */
 struct DEV_diginputs
 {
 	USO_list_t inputs;
 };
 
+/**
+ * A collection of digital inputs.
+ */
 typedef struct DEV_diginputs DEV_diginputs_t;
 
 /*
- * Struct digital input Private 
+ * Struct digital input.
+ * Private.
  */
 struct DEV_digin
 {
     USO_node_t node;
     enum DEV_digio_state state;
     enum DEV_digio_logig logig;
+    enum DEV_digio_edge edge;
     unsigned long (*sample) (void);
     unsigned int debounce_time;
     unsigned int debounce_count;
@@ -53,7 +59,7 @@ extern void DEV_diginputs_init (DEV_diginputs_t* inputs);
  * @param in : Pointer to digital input type.
  * @param logig : pos or neg logic
  * @param sample : Function to sample the input.
- * @param debounce_time : Entprell zeit.
+ * @param debounce_time : Wait for stabilized input signal.
  */
 extern void DEV_digin_init (DEV_diginputs_t* inputs,
 							DEV_digin_t * in,
@@ -65,18 +71,24 @@ extern void DEV_digin_init (DEV_diginputs_t* inputs,
  * Sample all digital inputs.
  *
  * Calls each sample function of all dig inputs.
- * Should be periodically called from an inerrupt.
+ * Should be periodically called from an interrupt.
  */
 extern void DEV_diginputs_sample (DEV_diginputs_t* inputs);
 
 /**
  * Determine if input is set.
  *
- * @param in : Pointer to dig input.
+ * @param in : Pointer to digital input.
  *
- * @return TRUE if logical set elde FALSE.
+ * @return TRUE if logical set else FALSE.
  */
 extern ACE_bool_t DEV_digin_isset (DEV_digin_t * in);
+
+/**
+ * Check for edges.
+ */
+extern enum DEV_digio_edge
+DEV_digin_ischanged (DEV_digin_t * in);
 
 /*------------------------------------------------------------------------*/
 

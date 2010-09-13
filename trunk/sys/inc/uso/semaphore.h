@@ -11,10 +11,13 @@
 /** @defgroup semaphore semaphore.h
  *
  * Counting semaphore.
+ * A difference to a mutex is that if a thread reenter a critical section
+ * inside the critical section, it will block.
+ * If you want to do this you have to use the USO_mutex_t.
  *
  * Wait and signal keep the following condition invariant:
  *
- * A nonnegativ semaphore count means that the queue is empty.
+ * A non negative semaphore count means that the queue is empty.
  * A semaphore count of negative n means that the queue contains n 
  * waiting threads.
  *
@@ -30,14 +33,10 @@
  */
 struct USO_semaphore
 {
-    /*
-     * -n : n threads in the list n : counting n wait calls before block 
-     */
+    /* -n : n threads in the list n : counting n wait calls before block */
     int count;
 
-    /*
-     * List of blocked threads 
-     */
+    /* List of blocked threads */
     USO_list_t threads;
 };
 

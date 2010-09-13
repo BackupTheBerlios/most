@@ -184,12 +184,6 @@ add_arp_entry (NET_ip_addr_t * ipaddr, struct NET_eth_addr *ethaddr)
     return;
 }
 
-/*
- * Should be called for all incoming packets of IP kind. The function does 
- * not alter the packet in any way, it just updates the ARP table. After
- * this function has been called, the normal TCP/IP stack input function
- * should be called. 
- */
 extern void
 NET_arp_ip_input (NET_netif_t * netif, NET_netbuf_t * p)
 {
@@ -219,12 +213,6 @@ NET_arp_ip_input (NET_netif_t * netif, NET_netbuf_t * p)
     add_arp_entry (&(hdr->ip.src), &(hdr->eth.src));
 }
 
-/*
- * Should be called for incoming ARP packets. The pbuf in the argument is
- * freed by this function. If the function returns a pbuf (i.e., returns
- * non-NULL), that pbuf constitutes an ARP reply and should be sent out on 
- * the Ethernet. 
- */
 extern NET_netbuf_t *
 NET_arp_arp_input (NET_netif_t * netif,
                    struct NET_eth_addr *ethaddr, NET_netbuf_t * p)
@@ -295,11 +283,6 @@ NET_arp_arp_input (NET_netif_t * netif,
     return NULL;
 }
 
-/*
- * arp_loopup() is called to do an IP address -> Ethernet address
- * translation. If the function returns NULL, there is no mapping and the
- * arp_query() function should be called. 
- */
 extern struct NET_eth_addr *
 NET_arp_lookup (NET_ip_addr_t * ipaddr)
 {
@@ -315,11 +298,6 @@ NET_arp_lookup (NET_ip_addr_t * ipaddr)
     return NULL;
 }
 
-/*
- * Constructs an ARP query packet for the given IP address. The function
- * returns a pbuf that contains the reply and that should be sent out on
- * the Ethernet. 
- */
 extern NET_netbuf_t *
 NET_arp_query (NET_netif_t * netif,
                struct NET_eth_addr *ethaddr, NET_ip_addr_t * ipaddr)

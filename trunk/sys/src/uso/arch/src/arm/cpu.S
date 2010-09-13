@@ -30,12 +30,15 @@ USO_enable:
 	bx	lr			
 
    	.global  USO_disable
-USO_disable:	
+USO_disable:
 	mrs r0, CPSR
 	mov r1, r0
 	orr r1, r1, #I_BIT
 	msr CPSR, r1
-	bx	lr			
+	mrs r1, CPSR
+	ands r1, r1, #I_BIT
+	beq USO_disable 
+	bx  lr	/* r0 has old CPSR as return value */ 		
 
    	.global  USO_restore
 USO_restore:
@@ -45,11 +48,13 @@ USO_restore:
    	.global  USO_context_switch
 USO_context_switch:       /* r0 &old_thread->cpu r1 &new_thread->cpu */  
 	stmia   r0!,{r2-r14}
-    mrs     r2,cpsr
-    str     r2,[r0]
-    ldr     r2,[r1,#(13*4)]
-    msr	    cpsr,r2
-    ldmia   r1,{r2-r14}
+    mrs     r2,CPSR
+    mrs     r3,SPSR
+	stmia   r0,{r2-r3}
+    ldmia   r1!,{r2-r14}
+    ldmia   r1,{r0-r1}
+    msr	    CPSR,r0
+    msr	    SPSR,r1
 	bx		lr
 	
    	.END

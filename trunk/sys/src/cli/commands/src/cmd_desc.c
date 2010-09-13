@@ -15,7 +15,9 @@
 #include "mfs/directory.h"
 #include "mfs/sysfs.h"
 
-#define CLI_RUN_STACK_SIZE 0x400
+#define CLI_RUN_STACK_SIZE  (0x400/sizeof(USO_stack_t))
+
+static char arg_missing[] = "arg is missing.\n";
 
 extern ACE_bool_t
 CLI_cmd_open (CLI_interpreter_t *cli)
@@ -28,6 +30,8 @@ CLI_cmd_open (CLI_interpreter_t *cli)
 			cli->desc = desc;
 			done = TRUE;
 		}
+	} else {
+    	ACE_puts(arg_missing);
 	}
 	return done;
 }
@@ -56,6 +60,8 @@ CLI_cmd_start (CLI_interpreter_t *cli)
 			USO_start((USO_thread_t*)desc->entry);
 			done = TRUE;
 		}
+	} else {
+	   	ACE_puts(arg_missing);
 	}
 	return done;
 }
@@ -71,6 +77,8 @@ CLI_cmd_stop (CLI_interpreter_t *cli)
 			USO_stop((USO_thread_t*)desc->entry);
 			done = TRUE;
 		}
+	} else {
+	   	ACE_puts(arg_missing);
 	}
 	return done;
 }
@@ -79,21 +87,6 @@ extern ACE_bool_t
 CLI_cmd_info (CLI_interpreter_t *cli)
 {
     MFS_descriptor_t *desc = cli->desc;
-    if (cli->argc >= 1) {
-	   	switch (cli->argv[0][0]){
-       		case 't' :
-       			desc = MFS_sysfs_threads();
-       			break;
-       		case 'h' :
-       			desc = MFS_sysfs_heaps();
-       			break;
-       		case 's' :
-       			desc = MFS_sysfs_serial();
-       			break;
-       		default :
-       			break;
-       	}
-    }
     MFS_info_desc(desc);
 	return TRUE;
 }
@@ -111,6 +104,7 @@ CLI_cmd_list (CLI_interpreter_t *cli)
        			break;
        		case 't' :
        			info = TRUE;
+       			USO_thread_info_head();
        			desc = MFS_sysfs_threads();
        			break;
        		case 'h' :
@@ -119,6 +113,7 @@ CLI_cmd_list (CLI_interpreter_t *cli)
        			break;
        		case 'c' :
        			info = TRUE;
+       			CLI_command_info_head();
        			desc = MFS_sysfs_cli();
        			break;
        		case 's' :
@@ -186,7 +181,7 @@ CLI_cmd_run (CLI_interpreter_t *cli)
         			break;
         	}
         } else {
-        	ACE_puts("run (u|s|i)(f|r) [arg]\n");
+    	   	ACE_puts(arg_missing);
         	return done;
         }
        	USO_thread_t *t = USO_thread_new ((void (*)(void*))exec->f,
@@ -213,7 +208,7 @@ extern ACE_bool_t
 CLI_cmd_klog (CLI_interpreter_t *cli)
 {
     if (cli->argc <= 0) {
-        ACE_puts ("klog (+|-|s)\n");
+	   	ACE_puts(arg_missing);
         return FALSE;
     }
     switch (cli->argv[0][0]){

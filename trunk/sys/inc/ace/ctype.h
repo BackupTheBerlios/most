@@ -27,58 +27,58 @@
 extern const unsigned char _ACE_ctype[];
 extern char _ACE_ctmp;
 
-/** isalpha(c) oder isdigit(c)
+/** Isalpha(c) or isdigit(c).
  */
 #define ACE_isalnum(c) (_ACE_ctype[(unsigned char)(c)]&(_ACE_U|_ACE_L|_ACE_D))
 
-/** isupper(c) oder islower(c)
+/** Isupper(c) or islower(c).
  */
 #define ACE_isalpha(c) (_ACE_ctype[(unsigned char)(c)]&(_ACE_U|_ACE_L))
 
-/** Steuerzeichen
+/** Control character.
  */
 #define ACE_iscntrl(c) (_ACE_ctype[(unsigned char)(c)]&(_ACE_C))
 
-/** dezimale Ziffer
+/** Decimal digit.
  */
 #define ACE_isdigit(c) (_ACE_ctype[(unsigned char)(c)]&(_ACE_D))
 
-/** sichtbares Zeichen, kein Leerzeichen
+/** Printable character, without space.
  */
 #define ACE_isgraph(c) (_ACE_ctype[(unsigned char)(c)]&(_ACE_P|_ACE_U|_ACE_L|_ACE_D))
 
-/** Kleinbuchstabe aber kein Umlaut
+/** Lowercase letter.
  */
 #define ACE_islower(c) (_ACE_ctype[(unsigned char)(c)]&(_ACE_L))
 
-/** sichtbares Zeichen, auch Leerzeichen
+/** Printable character, with space.
  */
 #define ACE_isprint(c) (_ACE_ctype[(unsigned char)(c)]&(_ACE_P|_ACE_U|_ACE_L|_ACE_D|_ACE_SP))
 
-/** sichtbares Zeichen, mit Ausnahme von Leerzeichen, Buchstabe oder Ziffer
+/** Printable character, without space, letter or digit.
  */
 #define ACE_ispunct(c) (_ACE_ctype[(unsigned char)(c)]&(_ACE_P))
 
-/** Leerzeichen, Seitenvorschub \\f, Zeilentrenner \\n, Wagenru"cklauf \\r,
- *  Tabulator \\t, Vertikal Tabulator \\v
+/** Space, formfeed \\f, linefeed \\n, cariage return \\r,
+ *  tabulator \\t, vertical tabulator \\v.
  */
 #define ACE_isspace(c) (_ACE_ctype[(unsigned char)(c)]&(_ACE_S))
 
-/** Groszbuchstabe
+/** Upper case letter.
  */
 #define ACE_isupper(c) (_ACE_ctype[(unsigned char)(c)]&(_ACE_U))
 
-/** hexadezimale Ziffer
+/** Hexadecimale digit
  */
 #define ACE_isxdigit(c) (_ACE_ctype[(unsigned char)(c)]&(_ACE_D|_ACE_X))
 
-/** wandelt c in einen Kleinbuchstaben um
+/** Convert c to lower case letter.
  */
-#define ACE_tolower(c) (_ACE_ctmp=(c), isupper(_ACE_ctmp) ? _ACE_ctmp - ('A'-'a') : _ACE_ctmp)
+#define ACE_tolower(c) (_ACE_ctmp=(c), ACE_isupper(_ACE_ctmp) ? _ACE_ctmp - ('A'-'a') : _ACE_ctmp)
 
-/** wandelt c in einen Groszbuchstaben um
+/** Convert c to upper case letter.
  */
-#define ACE_toupper(c) (_ACE_ctmp=(c), islower(_ACE_ctmp) ? _ACE_ctmp - ('a'-'A') : _ACE_ctmp)
+#define ACE_toupper(c) (_ACE_ctmp=(c), ACE_islower(_ACE_ctmp) ? _ACE_ctmp - ('a'-'A') : _ACE_ctmp)
 
 /*------------------------------------------------------------------------*/
 

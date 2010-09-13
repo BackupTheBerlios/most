@@ -12,6 +12,9 @@
 /** @defgroup timer timer.h
  *
  * Timer functions.
+ * Currently the timer callback functions run on an interrupt context.
+ * Maybe a timer thread shall be used so the timer functions can use synchronization mechanism.
+ *
  * @{
  */
 
@@ -22,8 +25,8 @@
  */
 enum DEV_timer_state
 {
-    DEV_TIMER_OFF,
-    DEV_TIMER_ON
+    DEV_TIMER_OFF, /**< OFF. */
+    DEV_TIMER_ON   /**< ON. */
 };
 
 /*
@@ -51,7 +54,7 @@ typedef struct DEV_timer DEV_timer_t;
 /*-------------- Interface -----------------------------------------------*/
 
 /**
- * Initialize timer functionallity.
+ * Initialize timer functionality.
  *
  */
 extern void DEV_timers_init (void);
@@ -60,9 +63,9 @@ extern void DEV_timers_init (void);
  * Initialize an timer.
  *
  * @param timer : Pointer to timer.
- * @param f : Function which has to be called from the timer thread(system).
- * @param param : Parameter which will be passed to f..
- * @param ticks : System ticks you want to wait.
+ * @param f : Callback function, currently called at interrupt context.
+ * @param param : Parameter which will be passed to function f.
+ * @param ticks : System ticks until the timer expires.
  */
 extern void DEV_timer_init (DEV_timer_t * timer,
                             void (*f) (void *), void *param, long ticks);
@@ -85,13 +88,12 @@ extern void DEV_timer_stop (DEV_timer_t * timer);
  * Function which has to be called periodically.
  *
  * During an Interrupt, other Interrupts have to be disabled!
- * This is normally done by the hardware.
  *
  * If there is a timer in the delta list, it decrements its delta.
- * All timers in the delta list whose delta <= 0, execute ther callback
- * function whith passing param to it.
+ * All timers in the delta list whose delta <= 0, execute their callback
+ * function whit passing parameter to it.
  *
- * if timer_fire is called in an interrupt(normally),
+ * If timer_fire is called in an interrupt(normally),
  * the callback function f runs also in the context of the interrupt.
  */
 extern void DEV_timer_fire (void);

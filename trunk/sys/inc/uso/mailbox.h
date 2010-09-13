@@ -11,7 +11,7 @@
 
 /** @defgroup mailbox mailbox.h
  *
- * Inter process communication.
+ * For asynchronous inter process communication.
  * @{
  */
 
@@ -24,19 +24,9 @@
  */
 struct USO_mailbox
 {
-    /*
-     * Messages in the mailbox 
-     */
-    USO_list_t mails;
-
-    /*
-     * Semaphore on which sender will block if mailbox is full 
-     */
-    USO_semaphore_t post_sem;
-
-    /*
-     * Semaphore on which receiver will block if mailbox is empty 
-     */
+    USO_list_t mails; /* Messages in the mailbox */
+    USO_semaphore_t post_sem;  /* Semaphore on which sender will block if mailbox is full*/
+    /* Semaphore on which receiver will block if mailbox is empty */
     USO_semaphore_t fetch_sem;
 };
 
@@ -54,7 +44,7 @@ typedef struct USO_mailbox USO_mailbox_t;
  * Initialize a mailbox.
  *
  * @param mailbox : Pointer to mailbox.
- * @param max : Max mails the mailbox can contain befor post blocks.
+ * @param max : Max mails the mailbox can contain before post blocks.
  */
 extern void USO_mailbox_init (USO_mailbox_t * mailbox, int max);
 
@@ -68,15 +58,21 @@ extern void USO_mailbox_init (USO_mailbox_t * mailbox, int max);
  */
 extern void USO_post (USO_mailbox_t * mailbox, USO_node_t * mail);
 
+extern int
+USO_post_would_block(USO_mailbox_t * mailbox);
+
 /**
  * Fetch a mail from a mailbox.
  *
  * Block if the mailbox is empty.
  *
  * @param mailbox : Pointer to mailbox.
- * @return mail or NULL if aborted.
+ * @return Mail or NULL if aborted.
  */
 extern USO_node_t *USO_fetch (USO_mailbox_t * mailbox);
+
+extern int
+USO_fetch_would_block(USO_mailbox_t * mailbox);
 
 /**
  * Abort fetching a mail from a mailbox.
