@@ -6,6 +6,7 @@
 #include <ace/stddef.h>
 #include <dev/arch/cpu.h>
 #include <dev/arch/at91/emac.h>
+#include <dev/arch/at91/AT91SAM7X256.h>
 #include <net/netif.h>
 #include <net/err.h>
 #include <net/ethernet.h>
@@ -57,9 +58,9 @@ SAM_eth_init (void)
     NET_loopif_init (&SAM_lo);
 
     NET_netif_init (&SAM_eth0, "eth0");
-    NET_ip4_addr (&ip_eth0, 192, 168, 2, 102);
+    NET_ip4_addr (&ip_eth0, 192, 168, 1, 1);
     NET_ip4_addr (&netmask_eth0, 255, 255, 255, 0);
-    NET_ip4_addr (&gateway_eth0, 192, 168, 2, 2);
+    NET_ip4_addr (&gateway_eth0, 192, 168, 1, 100);
 	NET_netif_set_ipaddr (&SAM_eth0, &ip_eth0);
 	NET_netif_set_netmask (&SAM_eth0, &netmask_eth0);
 	NET_netif_set_gateway (&SAM_eth0, &gateway_eth0);
@@ -79,5 +80,6 @@ SAM_eth_start (void)
 extern void
 SAM_eth_interrupt (void)
 {
+	AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_EMAC);
    	DEV_at91_emac_interrupt (&mac);
 }

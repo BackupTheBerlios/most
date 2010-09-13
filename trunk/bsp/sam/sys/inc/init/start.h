@@ -20,9 +20,9 @@
 
 
 /**
- * The Main Thread run function.
+ * Start all services.
  */
-extern void SAM_start_run (void *);
+extern void SAM_start (void);
 
 /** @}
  */

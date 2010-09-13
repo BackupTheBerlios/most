@@ -87,6 +87,8 @@ clear_phy_power_down (void)
 
 DEV_digin_t SAM_switch_1;
 DEV_digin_t SAM_switch_2;
+DEV_digin_t SAM_card_write;
+DEV_digin_t SAM_card_insert;
 DEV_digin_t SAM_joystick_up;
 DEV_digin_t SAM_joystick_down;
 DEV_digin_t SAM_joystick_left;
@@ -96,50 +98,55 @@ DEV_digin_t SAM_joystick_center;
 static unsigned long
 sample_switch_1 (void)
 {
-    //return AT91C_PIOB_PDSR & AT91B_SW1;
-    return 0;
+    return *AT91C_PIOB_PDSR & AT91B_SW1;
 }
 
 static unsigned long
 sample_switch_2 (void)
 {
-    //return AT91C_PIOB_PDSR & AT91B_SW2;
-    return 0;
+    return *AT91C_PIOB_PDSR & AT91B_SW2;
+}
+
+static unsigned long
+sample_card_write (void)
+{
+    return *AT91C_PIOB_PDSR & AT91B_WP;
+}
+
+static unsigned long
+sample_card_insert (void)
+{
+    return *AT91C_PIOB_PDSR & AT91B_CP;
 }
 
 static unsigned long
 sample_joystick_up (void)
 {
-    //return AT91C_PIOA_PDSR & AT91A_JS_UP;
-    return 0;
+    return *AT91C_PIOA_PDSR & AT91A_JS_UP;
 }
 
 static unsigned long
 sample_joystick_down (void)
 {
-    //return AT91C_PIOA_PDSR & AT91A_JS_DOWN;
-    return 0;
+    return *AT91C_PIOA_PDSR & AT91A_JS_DOWN;
 }
 
 static unsigned long
 sample_joystick_left (void)
 {
-    //return AT91C_PIOA_PDSR & AT91A_JS_LEFT;
-    return 0;
+    return *AT91C_PIOA_PDSR & AT91A_JS_LEFT;
 }
 
 static unsigned long
 sample_joystick_right (void)
 {
-    //return AT91C_PIOA_PDSR & AT91A_JS_RIGHT;
-    return 0;
+    return *AT91C_PIOA_PDSR & AT91A_JS_RIGHT;
 }
 
 static unsigned long
 sample_joystick_center (void)
 {
-    //return AT91C_PIOA_PDSR & AT91A_JS_CENTER;
-    return 0;
+    return *AT91C_PIOA_PDSR & AT91A_JS_CENTER;
 }
 
 DEV_diginputs_t SAM_control_in;
@@ -156,11 +163,13 @@ SAM_digio_init (void)
 	DEV_digout_init (&SAM_lcd_reset, DEV_DIGIO_HIGH, DEV_DIGIO_POS, set_lcd_reset, clear_lcd_reset);
 
 	DEV_diginputs_init (&SAM_control_in);
-    DEV_digin_init (&SAM_control_in, &SAM_switch_1, DEV_DIGIO_NEG, sample_switch_1, 0);
-    DEV_digin_init (&SAM_control_in, &SAM_switch_2, DEV_DIGIO_NEG, sample_switch_2, 0);
-    DEV_digin_init (&SAM_control_in, &SAM_joystick_up, DEV_DIGIO_NEG, sample_joystick_up, 0);
-    DEV_digin_init (&SAM_control_in, &SAM_joystick_down, DEV_DIGIO_NEG, sample_joystick_down, 0);
-    DEV_digin_init (&SAM_control_in, &SAM_joystick_left, DEV_DIGIO_NEG, sample_joystick_left, 0);
-    DEV_digin_init (&SAM_control_in, &SAM_joystick_right, DEV_DIGIO_NEG, sample_joystick_right, 0);
-    DEV_digin_init (&SAM_control_in, &SAM_joystick_center, DEV_DIGIO_NEG, sample_joystick_center, 0);
+    DEV_digin_init (&SAM_control_in, &SAM_switch_1, DEV_DIGIO_NEG, sample_switch_1, 1);
+    DEV_digin_init (&SAM_control_in, &SAM_switch_2, DEV_DIGIO_NEG, sample_switch_2, 1);
+    DEV_digin_init (&SAM_control_in, &SAM_card_write, DEV_DIGIO_NEG, sample_card_write, 0);
+    DEV_digin_init (&SAM_control_in, &SAM_card_insert, DEV_DIGIO_NEG, sample_card_insert, 1);
+    DEV_digin_init (&SAM_control_in, &SAM_joystick_up, DEV_DIGIO_NEG, sample_joystick_up, 1);
+    DEV_digin_init (&SAM_control_in, &SAM_joystick_down, DEV_DIGIO_NEG, sample_joystick_down, 1);
+    DEV_digin_init (&SAM_control_in, &SAM_joystick_left, DEV_DIGIO_NEG, sample_joystick_left, 1);
+    DEV_digin_init (&SAM_control_in, &SAM_joystick_right, DEV_DIGIO_NEG, sample_joystick_right, 1);
+    DEV_digin_init (&SAM_control_in, &SAM_joystick_center, DEV_DIGIO_NEG, sample_joystick_center, 1);
 }

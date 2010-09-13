@@ -1,5 +1,8 @@
 ## reset
 
+soft_reset_halt
+
+mww 0xfffffd00 0xa5000004  # reset peripherals
 mww 0xfffffd44 0x00008000  # disable watchdog
 mww 0xfffffd08 0xa5000001  # enable user reset
 mww 0xfffffc20 0x00000601  # CKGR_MOR : enable the main oscillator

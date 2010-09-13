@@ -21,47 +21,53 @@
  * @{
  */
 
-/** Run Led */
+/** Run Led. */
 extern DEV_digout_t SAM_run_led;
 
-/** Green Led */
+/** Green Led. */
 extern DEV_digout_t SAM_green_led;
 
-/** Red Led */
+/** Red Led. */
 extern DEV_digout_t SAM_red_led;
 
-/** LCD background light */
+/** LCD background light. */
 extern DEV_digout_t SAM_lcd_light;
 
-/** LCD reset */
+/** LCD reset. */
 extern DEV_digout_t SAM_lcd_reset;
 
-/** Ethernet PHY power down */
+/** Ethernet PHY power down. */
 extern DEV_digout_t SAM_phy_power_down;
 
 
-/** Button left */
+/** Button left. */
 extern DEV_digin_t SAM_switch_1;
 
-/** Button right */
+/** Button right. */
 extern DEV_digin_t SAM_switch_2;
 
-/** Joystick up */
+/** SD card write protect. */
+extern DEV_digin_t SAM_card_write;
+
+/** SD card protect. */
+extern DEV_digin_t SAM_card_insert;
+
+/** Joystick up. */
 extern DEV_digin_t SAM_joystick_up;
 
-/** Joystick down */
+/** Joystick down. */
 extern DEV_digin_t SAM_joystick_down;
 
-/** Joystick left */
+/** Joystick left. */
 extern DEV_digin_t SAM_joystick_left;
 
-/** Joystick right */
+/** Joystick right. */
 extern DEV_digin_t SAM_joystick_right;
 
-/** Joystick button */
+/** Joystick button. */
 extern DEV_digin_t SAM_joystick_center;
 
-/** Control panel inputs */
+/** Control panel inputs. */
 extern DEV_diginputs_t SAM_control_in;
 
 /**

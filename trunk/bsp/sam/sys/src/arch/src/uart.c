@@ -74,10 +74,12 @@ SAM_uart_init_1 (void)
 
 extern void SAM_uart_interrupt_0 (void)
 {
+	AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_US0);
     DEV_at91_uart_interrupt (0, &ser0);
 }
 
 extern void SAM_uart_interrupt_1 (void)
 {
+	AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_US1);
     DEV_at91_uart_interrupt (1, &ser1);
 }

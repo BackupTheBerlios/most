@@ -17,28 +17,32 @@
     
 #include <ace/arch/cpu.h>
 #include <ace/stddef.h>
+#include <ace/stdio.h>
 #include <ace/string.h>
 #include <ace/stdlib.h>
 #include <uso/scheduler.h>
-#include <uso/thread.h>
 #include <uso/stack.h>
+#include <uso/sleep.h>
 #include <uso/log.h>
 #include <dev/arch/at91/debug.h>
 #include <dev/timer.h>
 #include <dev/clock.h>
 #include <dev/arch/cpu.h>
-#include <cli/interpreter.h>
 #include <mfs/sysfs.h>
 #include <mfs/descriptor.h>
 #include <mfs/stream.h>
 #include <mfs/sysfs.h>
 
+#include "arch/cpu.h"
 #include "arch/pins.h"
 #include "arch/exceptions.h"
 #include "arch/uart.h"
 #include "arch/eth.h"
 #include "arch/ticks.h"
 #include "arch/digio.h"
+#include "arch/spi.h"
+#include "arch/adc.h"
+#include "arch/pwm.h"
 #include "init/main.h"
 #include "init/init.h"
 #include "init/start.h"
@@ -53,32 +57,30 @@ extern char heap_start, heap_end;             /* Defined in *.ld! */
 
 static USO_heap_t heap;
 
-#define INIT_STACK_SIZE       0x1000
-static USO_thread_t init_thread;
-static USO_stack_t init_stack[INIT_STACK_SIZE];
-
 static void
 init (void)
 {
+    ACE_stdio_init ();
+    USO_sleep_init ();
+
     DEV_timers_init ();
     DEV_clock_init ();
 
     SAM_ticks_init ();
-	SAM_eth_init ();
     SAM_sys_interrupt_init();
- 
+
     SAM_uart_init_0 ();
     ser0 = MFS_get_stream (MFS_open(MFS_sysfs_serial(), "0"));
     if (ser0 == NULL){
     	DEV_digout_set (&SAM_red_led);
-		DEV_at91_dbgu_print_ascii("open ser0 failed\n");
+		DEV_at91_dbgu_print_ascii("Open ser0 failed!\n");
     }
 
     SAM_uart_init_1 ();
     ser1 = MFS_get_stream (MFS_open(MFS_sysfs_serial(), "1"));
     if (ser1 == NULL){
     	DEV_digout_set (&SAM_red_led);
-		DEV_at91_dbgu_print_ascii("open ser1 failed\n");
+		DEV_at91_dbgu_print_ascii("Open ser1 failed!\n");
     }
 
     USO_log_init (ser0, USO_LL_INFO);
@@ -89,13 +91,14 @@ init (void)
     DEV_cpudelay(ACE_USEC_2_LOOPS(50000));
     USO_kprintf (USO_LL_INFO, "Loop calib 50ms: %lu.\n", DEV_get_ticks_diff(loop_count));
     
-    USO_kputs (USO_LL_INFO, "Start Init.\n");
-    USO_thread_init (&init_thread,
-                     SAM_start_run,
-                     init_stack, ACE_ARRAYSIZE (init_stack),
-                     USO_USER, USO_FIFO, "Init");
-    USO_start (&init_thread);
-
+    SAM_adc_init();
+    SAM_pwm_init();
+    if (SAM_spi_init() != 0){
+       	DEV_digout_set (&SAM_red_led);
+        USO_kputs (USO_LL_ERROR, "SPI init failed.\n");
+    }
+	SAM_eth_init ();
+	SAM_start();
     USO_kputs (USO_LL_INFO, "Idle.\n");
 }
 
@@ -125,5 +128,5 @@ extern void SAM_init(void)
     }
     USO_heap_install(&heap, "0");
    
-    USO_transform (init, (USO_stack_t*)&stack_start, 2048 / sizeof(USO_stack_t) );
+    USO_transform (init, (USO_stack_t*)&stack_start, SAM_IDLE_STACK_SIZE/sizeof(USO_stack_t) );
 }

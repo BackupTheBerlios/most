@@ -27,6 +27,7 @@ SAM_ticks_init (void)
 extern void SAM_ticks_interrupt (void)
 {
 	unsigned int pivr;
+	AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_SYS);
 	if (AT91C_BASE_PITC->PITC_PISR)
 	{
     	USO_preempt ();

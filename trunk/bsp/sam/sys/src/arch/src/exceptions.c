@@ -6,81 +6,69 @@
 #include "arch/ticks.h"
 #include "arch/uart.h"
 #include "arch/eth.h"
+#include "arch/digio.h"
 
+
+extern void
+SAM_undefined_instruction(void)
+{
+    DEV_digout_set (&SAM_red_led);
+	DEV_at91_dbgu_print_ascii("-F- Undefined instruction!\n");
+    while(1);
+}
 
 extern void
 SAM_prefetch_abort(void)
 {
+    DEV_digout_set (&SAM_red_led);
 	DEV_at91_dbgu_print_ascii("-F- Prefetch abort at ");
 	DEV_at91_dbgu_print_hex8(AT91C_BASE_MC->MC_AASR);
-	DEV_at91_dbgu_print_ascii("\n");
-	for(;;);
+	DEV_at91_dbgu_print_ascii("!\n");
+    while(1);
 }
 
 extern void
 SAM_data_abort(void)
 {
+    DEV_digout_set (&SAM_red_led);
 	DEV_at91_dbgu_print_ascii("-F- Data abort at ");
 	DEV_at91_dbgu_print_hex8(AT91C_BASE_MC->MC_AASR);
 	DEV_at91_dbgu_print_ascii("\n");
-	for(;;);
+    while(1);
 }
 
 
 extern void
 SAM_default_spurious_handler(void)
 {
+    DEV_digout_set (&SAM_red_led);
     DEV_at91_dbgu_print_ascii("-F- Spurious Interrupt\n");
-    while(1);
-}
-
-extern void
-SAM_default_fiq_handler(void)
-{
-    DEV_at91_dbgu_print_ascii("-F- Unexpected FIQ Interrupt\n");
     while(1);
 }
 
 extern void
 SAM_default_irq_handler(void)
 {
-    DEV_at91_dbgu_print_ascii("-F- Unexpected IRQ Interrupt\n");
+    DEV_digout_set (&SAM_red_led);
+    DEV_at91_dbgu_print_ascii("-F- Default IRQ\n");
     while(1);
 }
 
-
-static void
-sys_interrupt(void)
+extern void
+SAM_default_fiq_handler(void)
 {
-	if (AT91C_BASE_AIC->AIC_IPR & (1 << AT91C_ID_SYS) ){
-		AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_SYS);
-		SAM_ticks_interrupt();
-	}
-	
-	if (AT91C_BASE_AIC->AIC_IPR & (1 << AT91C_ID_US0) ) {
-		AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_US0);
-		SAM_uart_interrupt_0();
-	}
-
-	if (AT91C_BASE_AIC->AIC_IPR & (1 << AT91C_ID_US1) ) {
-		AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_US1);
-		SAM_uart_interrupt_1();
-	}
-
-	if (AT91C_BASE_AIC->AIC_IPR & (1 << AT91C_ID_EMAC) ) {
-		AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_EMAC);
-		SAM_eth_interrupt();
-	}
-
+    DEV_digout_set (&SAM_red_led);
+    DEV_at91_dbgu_print_ascii("-F- Default FIQ\n");
+    while(1);
 }
 
 extern void
 SAM_sys_interrupt_init(void)
 {
-	DEV_at91_aic_configure_IT(AT91C_ID_SYS, (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 0x3 ), sys_interrupt);
-	DEV_at91_aic_configure_IT(AT91C_ID_US0, (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 0x4 ), sys_interrupt);
-	DEV_at91_aic_configure_IT(AT91C_ID_US1, (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 0x4 ), sys_interrupt);
-	DEV_at91_aic_configure_IT(AT91C_ID_EMAC, (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 0x3 ), sys_interrupt);
+	DEV_at91_aic_configure_IT(AT91C_ID_SYS, (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 0x5 ), SAM_ticks_interrupt);
+	DEV_at91_aic_configure_IT(AT91C_ID_US0, (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 0x6 ), SAM_uart_interrupt_0);
+	DEV_at91_aic_configure_IT(AT91C_ID_US1, (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 0x6 ), SAM_uart_interrupt_1);
+	DEV_at91_aic_configure_IT(AT91C_ID_EMAC, (AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL | 0x3 ), SAM_eth_interrupt);
 	DEV_at91_aic_enable_IT(AT91C_ID_SYS);
 	DEV_at91_aic_enable_IT(AT91C_ID_US0);
 	DEV_at91_aic_enable_IT(AT91C_ID_US1);

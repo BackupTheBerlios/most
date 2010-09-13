@@ -6,14 +6,15 @@ ifneq ($(MOST_BOARD),sam)
 $(error Wrong board defined!)
 endif
 
-LIB_NAMES_SYS := 		 -l_cli\
+LIB_NAMES_SYS := -l_cli\
 		 -l_mfs\
 		 -l_net\
 		 -l_dev\
 		 -l_uso\
 		 -l_ace
 
-LIB_NAMES_USR :=
+LIB_NAMES_USR := -l_dpy\
+				-l_tst
 
 LDFLAGS_OPT := #-Ttext $(SAM_TEXT) -Tdata $(SAM_DATA)
 

@@ -8,27 +8,27 @@
 /* Exception vectors (should be a branch to be detected as a valid code by the rom */
 _exception_vectors:
 reset_vector:
-        ldr      pc, =reset_handler
+        ldr      pc, =reset_handler                /* Reset */
 undef_vector:
-        b        undef_vector    /* Undefined Instruction */
+        ldr      pc, =SAM_undefined_instruction    /* Undefined Instruction */
 swi_vector:
-        b        swi_vector      /* Software Interrupt */
+        b        swi_vector                        /* Software Interrupt */
 pabt_vector:
-        ldr      pc, =SAM_prefetch_abort    /* Prefetch Abort */
+        ldr      pc, =SAM_prefetch_abort           /* Prefetch Abort */
 dabt_vector:
-        ldr      pc, =SAM_data_abort     /* Data Abort */
+        ldr      pc, =SAM_data_abort               /* Data Abort */
 rsvd_vector:
-        b        rsvd_vector     /* reserved */
+        b        rsvd_vector                       /* Reserved */
 irq_vector:
-        b        irq_handler     /* IRQ : read the AIC */
+        b        irq_handler                       /* IRQ : read the AIC */
 fiq_vector:
-/*------------------------------------------------------------------------------
+ /*------------------------------------------------------------------------------
  *- Function             : fiq_handler
  *- Treatments           : FIQ Interrupt Handler.
  *- Called Functions     : 
  *------------------------------------------------------------------------------*/
 fiq_handler:
-	b        fiq_handler
+		b        fiq_handler
 	
 /*------------------------------------------------------------------------------
  *- Function             : irq_handler
@@ -36,44 +36,40 @@ fiq_handler:
  *- Called Functions     : AIC_IVR[interrupt]
  *------------------------------------------------------------------------------*/
 irq_handler:
-/*- Save LR_irq in IRQ stack */
-        stmfd    sp!, {lr}
-/*- Save r0 and SPSR in IRQ stack */
-        mrs      r14, SPSR
-        stmfd    sp!, {r0,r14}
+/*- Save r0 , r1, lr and SPSR in IRQ stack */
+        stmfd    sp!, {r0-r1, lr}
+        mrs      r0, SPSR
+        stmfd    sp!, {r0}
 
 /*- Write in the IVR to support Protect Mode */
 /*- No effect in Normal Mode */
 /*- De-assert the NIRQ and clear the source in Protect Mode */
-        ldr      r14, =AT91C_BASE_AIC
-        ldr      r0 , [r14, #AIC_IVR]
-        str      r14, [r14, #AIC_IVR]
+        ldr      r0, =AT91C_BASE_AIC
+        ldr      r1, [r0, #AIC_IVR]
+        str      r1, [r0, #AIC_IVR]
+        str      r0, [r0, #AIC_EOICR]
 
 /*- Switch in Supervisor Mode , dont enable interrupt */
         msr      CPSR_c, #ARM_MODE_SVC | I_BIT
 
-/*- Save scratch/used registers and LR in User Stack */
-        stmfd    sp!, {r1-r3, r12, r14}
+/*- Save scratch/used registers and LR in Supervisor Stack */
+        stmfd    sp!, {r2-r4, r12, lr}
 
 
 /*- Branch to the routine pointed by the AIC_IVR */
-        mov      r14, pc
-        bx       r0
+        mov      lr, pc
+        bx       r1
 
-/*- Restore scratch/used registers and LR from User Stack */
-       ldmia    sp!, {r1-r3, r12, r14}
+/*- Restore scratch/used registers and LR from Supervisor Stack */
+        ldmfd    sp!, {r2-r4, r12, lr}
 
 /*-  and switch back in IRQ mode */
         msr      CPSR_c, #ARM_MODE_IRQ | I_BIT
 
-/*- Mark the End of Interrupt on the AIC */
-        ldr      r14, =AT91C_BASE_AIC
-        str      r14, [r14, #AIC_EOICR]
+/*- Restore SPSR_irq and r0,r1, lr from IRQ stack */
+        ldmfd    sp!, {r0}
+        msr      SPSR, r0
+        ldmfd    sp!, {r0-r1, lr}
 
-/*- Restore SPSR_irq and r0 from IRQ stack */
-        ldmia    sp!, {r0,r14}
-        msr      SPSR_cxsf, r14
-
-/*- Restore LR_irq from IRQ stack and finish interrupt */
-       ldmia    sp!, {lr}
-       subs		pc, lr, #4
+/*- Finish interrupt */
+        subs	 pc, lr, #4

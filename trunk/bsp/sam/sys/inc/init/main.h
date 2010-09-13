@@ -18,6 +18,7 @@
  * @{
  */
 
+#define SAM_BOARD "SAM"
 
 /**
  * This function is called from the Init Thread.
