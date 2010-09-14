@@ -6,6 +6,8 @@
 #ifndef MDC_BOOT_H
 #define MDC_BOOT_H
 
+#include <mfs/sysfs.h>
+
 /** @addtogroup initialization
  *
  * @{
@@ -27,7 +29,7 @@ extern void MDC_start_boot(void);
 /**
  * Install jump commands.
  */
-extern void MDC_boot_install (void);
+extern void MDC_boot_install (MFS_descriptor_t *bsp);
 
 /** @}
  */

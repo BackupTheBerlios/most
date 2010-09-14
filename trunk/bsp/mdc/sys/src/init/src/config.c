@@ -6,7 +6,6 @@
 #include <ace/string.h>
 #include <ace/stdlib.h>
 #include <cli/commands.h>
-#include <mfs/sysfs.h>
 #include <mfs/directory.h>
 
 #include "arch/93C46.h"
@@ -272,9 +271,9 @@ set_exec (char *param)
 }
 
 extern void
-MDC_config_install (void)
+MDC_config_install (MFS_descriptor_t *bsp)
 {
-	config = MFS_create_dir(MFS_sysfs_root(), "config");
+	config = MFS_create_dir(bsp, "config");
     CLI_exec_init (config, &conf, "conf", "ee config", conf_exec);
     CLI_exec_init (config, &set, "set", "set ee config field", set_exec);
 }

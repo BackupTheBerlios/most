@@ -69,6 +69,7 @@ LIB_PATH 	:=  $(LIB_PATH_OPT)
 LIB_PATH	+=	-L$(MOST_ROOT)/usr/lib/$(MOST_TARGET)
 LIB_PATH	+=  -L$(MOST_ROOT)/sys/lib/$(MOST_TARGET)
 LIB_PATH	+=  -L$(MOST_ROOT)/gcc/$(MOST_TARGET)-$(MOST_GCC)/lib/gcc/$(MOST_TARGET)/$(MOST_GCC)
+LIB_PATH	+=  -L$(MOST_ROOT)/gcc/$(MOST_TARGET)-$(MOST_GCC)/lib/gcc-lib/$(MOST_TARGET)
 
 LDFLAGS		:= --sort-common --warn-common $(TARGET_LDFLAGS) -T$(PROG_NAME).ld $(LDFLAGS_OPT)
 LDFLAGS     += --cref -Map $(PROG_NAME).map

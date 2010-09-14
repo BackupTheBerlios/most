@@ -7,7 +7,6 @@
 #include <uso/sleep.h>
 #include <cli/commands.h>
 #include <nap/bootp.h>
-#include <mfs/sysfs.h>
 #include <mfs/directory.h>
 
 #include "arch/cpu.h"
@@ -71,9 +70,9 @@ start_app_exec (char *nix)
 }
 
 extern void
-MDC_boot_install (void)
+MDC_boot_install (MFS_descriptor_t *bsp)
 {
-	boot = MFS_create_dir(MFS_sysfs_root(), "boot");
+	boot = MFS_create_dir(bsp, "boot");
     CLI_exec_init (boot, &bootp, "bootp", "Bootp request", bootp_exec);
     CLI_exec_init (boot, &start_boot, "startb", "Start boot", start_boot_exec);
     CLI_exec_init (boot, &start_app, "starta", "Start app", start_app_exec);

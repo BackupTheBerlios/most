@@ -16,7 +16,7 @@ OBJ_NAMES := src/main/o/$(MOST_TARGET)/*.o\
 	../../sys/src/arch/o/$(MOST_TARGET)/*.o\
 	../../sys/src/init/o/$(MOST_TARGET)/*.o
 
-LIB_NAMES_USR :=
+LIB_NAMES_USR := -l_tst
 
 LDFLAGS_OPT := --relax 
 

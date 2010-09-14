@@ -11,12 +11,15 @@
  *      if you go from d to r version major or minor or bugfix must be increased
  */
 
-#define ACE_MOST_VERSION "V-0.1.0-d-1"
+#define ACE_MOST_VERSION "V-0.1.0-d-2"
 
 /* CVS Log:
  *
  * $Log: version.h,v $
- * Revision 1.1  2010/09/13 13:16:33  maik42
+ * Revision 1.2  2010/09/14 17:28:38  maik42
+ * V-0.1.0-d-2: bsp/mdc: compileable and running,
+ *
+ * Revision 1.1  2010-09-13 13:16:33  maik42
  * SYS: add version file, add stack check, improve doxygen header
  *
  *

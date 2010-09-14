@@ -8,6 +8,12 @@
 #include <uso/sleep.h>
 #include <uso/log.h>
 #include <cli/interpreter.h>
+#include <mfs/sysfs.h>
+#include <mfs/descriptor.h>
+#include <mfs/stream.h>
+#include <mfs/directory.h>
+#include <mfs/sysfs.h>
+#include <cli/commands.h>
 
 #include "arch/cpu.h"
 #include "arch/digio.h"
@@ -74,8 +80,8 @@ start_run (void *nix)
 	if (MDC_ee_config.flags & MDC_EE_CONFIG_FLAG_BOOTP)
 		MDC_bootp ();
 		
-    MDC_config_install ();
-	MDC_boot_install ();
+    MDC_config_install (bsp);
+	MDC_boot_install (bsp);
 
     DEV_digout_set (&MDC_green_led);
     MDC_main ();

@@ -4,17 +4,17 @@
  */
 
 #include <uso/log.h>
+#include <mfs/directory.h>
+#include <mfs/sysfs.h>
+#include <tst/ram_test.h>
+#include <tst/ser_test.h>
+#include <tst/net_test.h>
+#include <tst/thread_test.h>
 
 #include "test.h"
-#include "ram_test.h"
 #include "flash_test.h"
 #include "ee_test.h"
 #include "digio_test.h"
-#include "ser_test.h"
-#include "net_test.h"
-#include "thread_test.h"
-#include "mfs/directory.h"
-#include "mfs/sysfs.h"
 
 extern void
 MDC_main (void)
@@ -25,11 +25,11 @@ MDC_main (void)
 	MFS_descriptor_t *test;
 	test = MFS_create_dir(MFS_sysfs_root(), "test");
     
-    ram_test_install(test);
+    TST_ram_test_install(test);
+    TST_ser_test_install(test);
+    TST_thread_test_install(test);
+    TST_net_test_install(test);
     flash_test_install(test);
     ee_test_install(test);
-    ser_test_install(test);
-    thread_test_install(test);
     digio_test_install(test);
-    net_test_install(test);
 }

@@ -5,3 +5,4 @@ gcc.tar.bz2
 .project
 .settings
 .cproject
+build.err

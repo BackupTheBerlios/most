@@ -6,6 +6,8 @@
 #ifndef MDC_CONFIG_H
 #define MDC_CONFIG_H
 
+#include <mfs/sysfs.h>
+
 /** @addtogroup initialization
  *
  * @{
@@ -65,7 +67,7 @@ extern void MDC_ee_config_ip(void);
 /**
  * Install config commands.
  */
-extern void MDC_config_install (void);
+extern void MDC_config_install (MFS_descriptor_t *bsp);
 
 /** @}
  */
