@@ -1,6 +1,6 @@
 #include <dev/arch/at91/AT91SAM7X256.h>
 
-#include "arch/cpu.h"
+#include "arch/reset.h"
 
 .section .vectors
 .arm
@@ -35,6 +35,7 @@ fiq_handler:
  *- Treatments           : IRQ Controller Interrupt Handler.
  *- Called Functions     : AIC_IVR[interrupt]
  *------------------------------------------------------------------------------*/
+
 irq_handler:
 /*- Save r0 , r1, lr and SPSR in IRQ stack */
         stmfd    sp!, {r0-r1, lr}

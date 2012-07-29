@@ -12,21 +12,22 @@ LIB_NAMES_SYS := -l_nap\
 		 -l_uso\
 		 -l_ace
 
-OBJ_NAMES := src/main/o/$(MOST_TARGET)/*.o\
-	../../sys/src/arch/o/$(MOST_TARGET)/*.o\
-	../../sys/src/init/o/$(MOST_TARGET)/*.o
-
 LIB_NAMES_USR := -l_tst
 
+OBJ_NAMES := ../../sys/src/arch/o/$(MOST_TARGET)/*.o\
+			../../sys/src/init/o/$(MOST_TARGET)/*.o\
+			src/main/o/$(MOST_TARGET)/*.o
+			
 LDFLAGS_OPT := --relax 
 
 LIB_PATH_OPT := 
 LIB_NAMES_OPT :=
 
-makegoal = make $(1) -C src;\
-           make $(1) -C ../../sys/src;
+makegoal_src = make $(1) -C ../../sys/src;\
+	       make $(1) -C src;
+
+makegoal_inc = make $(1) -C ../../sys/inc/doc;
+
 
 STRIP_FLAGS:= --target=$(MOST_SYSTEM)-$(MOST_CPU)
 STRIP_SECTIONS:= -s -R .noinit -R .stack -R .heap -R .eight 
-
--include $(MOST_ROOT)/etc/Makefile.prog

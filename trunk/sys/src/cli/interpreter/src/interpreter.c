@@ -18,7 +18,7 @@
 #include "mfs/sysfs.h"
 
 
-#define CLI_RX_POLLING_TIME ACE_MSEC_2_TICKS(250)
+#define CLI_RX_POLLING_TIME USO_MSEC_2_TICKS(250)
 
 static const char *hostname;
 
@@ -27,127 +27,188 @@ CLI_setup (const char *name)
 {
     hostname = name;
     CLI_commands_init ();
-} 
+}
 
 extern void
-CLI_interpreter_init (CLI_interpreter_t *cli)
+CLI_interpreter_init (CLI_interpreter_t * cli)
 {
-    cli->desc = MFS_sysfs_root();
+    cli->desc = MFS_sysfs_get_dir (MFS_SYSFS_DIR_ROOT);
 }
 
 static void
-promt (CLI_interpreter_t *cli)
+promt (CLI_interpreter_t * cli)
 {
     ACE_printf ("%s:%s> ", hostname, cli->desc->name);
 }
 
 static CLI_command_t *
-find(char* name)
+find (char *name)
 {
-	MFS_descriptor_t *desc = MFS_lookup(MFS_sysfs_cli(), name);
-	if (NULL != desc)
-		return (CLI_command_t*)desc->entry;
-	return NULL;
+    MFS_descriptor_t *desc;
+    desc = MFS_lookup (MFS_sysfs_get_dir (MFS_SYSFS_DIR_CMD), name);
+    if (NULL != desc)
+        return (CLI_command_t *) desc->entry;
+    return NULL;
 }
 
 static int
-parse (CLI_interpreter_t *cli, char* buf)
+parse (CLI_interpreter_t * cli, char *buf)
 {
     char *token = buf;
     ++cli->argc;
-    for (;;) {
+    for (;;)
+    {
         int c = ACE_getc ();
-        if (c == ACE_EOF) {
+        if (c == ACE_EOF)
+        {
             USO_sleep (CLI_RX_POLLING_TIME);
-        } else {
-            if (ACE_isprint (c)) {
+        }
+        else
+        {
+            if (ACE_isprint (c))
+            {
                 ACE_putc ((unsigned char)c);
-			}
-			if (c == '\n') {
+            }
+            if (c == '\n')
+            {
                 *token = '\0';
                 return (token - buf);
-			} else if (c == '\b') {
-				if (token > buf) {
-					ACE_putc ((unsigned char)c);
-					ACE_putc ((unsigned char)' ');
-					ACE_putc ((unsigned char)c);	
-					token--;
-				} else if (cli->argc > 1) {
-					cli->argc--;
-					return (-1);
-				}
-			} else if (ACE_isgraph (c)) {
-                if (token < buf + CLI_TOKEN_SIZE - 1) {
+            }
+            else if (c == '\b')
+            {
+                if (token > buf)
+                {
+                    ACE_putc ((unsigned char)c);
+                    ACE_putc ((unsigned char)' ');
+                    ACE_putc ((unsigned char)c);
+                    token--;
+                }
+                else if (cli->argc > 1)
+                {
+                    cli->argc--;
+                    return (-1);
+                }
+            }
+            else if (ACE_isgraph (c))
+            {
+                if (token < buf + CLI_TOKEN_SIZE - 1)
+                {
                     *token++ = c;
                 }
-            } else if (c == ' ') {
+            }
+            else if (c == ' ')
+            {
                 *token = '\0';
-		        if (cli->argc < CLI_TOKEN_COUNTER) { 
-		        	if (parse (cli, cli->token_buffer[cli->argc]) < 0)
-		        		ACE_putc ((unsigned char)'\b');
-		        	else
-		        		return (token - buf);		
-		        } else
-                	return (token - buf);
+                if (cli->argc < CLI_TOKEN_COUNTER)
+                {
+                    if (parse (cli, cli->token_buffer[cli->argc]) < 0)
+                        ACE_putc ((unsigned char)'\b');
+                    else
+                        return (token - buf);
+                }
+                else
+                    return (token - buf);
             }
         }
     }
+    return 0;
 }
 
 static int
-inc_argv(CLI_interpreter_t * cli, int idx)
+inc_argv (CLI_interpreter_t * cli, int idx)
 {
-   	if (cli->argc > 0) { --cli->argc; }
-   	++idx;
-    for (int i = 0; i < cli->argc; ++i){ 
-  		cli->argv[i] = cli->token_buffer[idx + i];
-   	}
-   	return idx;
+    if (cli->argc > 0)
+    {
+        --cli->argc;
+    }
+    ++idx;
+    for (int i = 0; i < cli->argc; ++i)
+    {
+        cli->argv[i] = cli->token_buffer[idx + i];
+    }
+    return idx;
 }
 
 extern void
 CLI_interpreter_run (void *param)
 {
-	CLI_interpreter_t *cli = (CLI_interpreter_t *)param; 
+    CLI_interpreter_t *cli = (CLI_interpreter_t *) param;
     CLI_command_t *command;
     int idx;
-    ACE_puts ("\nCLI:\n");
+    int open = 0;
+    ACE_puts ("CLI:\n");
     for (;;)
     {
-        for (int i = 0; i < CLI_TOKEN_COUNTER; ++i){ 
-        	cli->token_buffer[i][0] = '\0';
-	    	cli->argv[i] = cli->token_buffer[i];
+        for (int i = 0; i < CLI_TOKEN_COUNTER; ++i)
+        {
+            cli->token_buffer[i][0] = '\0';
+            cli->argv[i] = cli->token_buffer[i];
         }
         cli->argc = 0;
-		idx = 0;
+        idx = 0;
 
         promt (cli);
-        (void) parse (cli, cli->token_buffer[cli->argc]);
+        (void)parse (cli, cli->token_buffer[cli->argc]);
         ACE_putc ('\n');
 
-		if (cli->argv[0][0] == '/'){
-   	    	cli->argv[0] = &cli->token_buffer[0][1];
-       	    if (CLI_cmd_open(cli) == FALSE){
-            	ACE_puts ("error\n");
-            	continue;
-           	}
-           	idx = inc_argv(cli, idx);
-		}
+        if (ACE_strlen (cli->argv[0]) <= 0)
+            continue;
 
-        command = find (cli->argv[0]);
-        if (command != NULL) {
-	       	idx = inc_argv(cli, idx);       	
-            if (command->f (cli) == FALSE){
-	            ACE_puts ("error\n");
+        if (cli->argv[0][0] == '/')
+        {
+            cli->argv[0] = &cli->token_buffer[0][1];
+            if (CLI_cmd_open (cli) == FALSE)
+            {
+                ACE_puts ("open fail.\n");
+                continue;
             }
-        } else if (ACE_strlen(cli->argv[0])) {
-            ACE_printf ("? %s\n", cli->argv[0]);
+            idx = inc_argv (cli, idx);
         }
 
-		if (idx >= 2){
-			cli->argc = 0;
-       	    CLI_cmd_close(cli);
-		}
-        
+        command = find (cli->argv[0]);
+        if (command == NULL)
+        {
+            if (cli->argv[0][0] == '&')
+            {
+                cli->argv[0] = &cli->token_buffer[0][1];
+                command = find ("run");
+            }
+            else
+            {
+                command = find ("exec");
+            }
+            if (CLI_cmd_open (cli) == FALSE)
+            {
+                ACE_puts ("open fail.\n");
+                continue;
+            }
+            open = 1;
+        }
+        else
+        {
+            open = 0;
+        }
+        idx = inc_argv (cli, idx);
+        if (command != NULL)
+        {
+            if (command->f (cli) == FALSE)
+            {
+                ACE_puts ("cmd fail.\n");
+            }
+        }
+        else
+        {
+            ACE_puts ("sys fail.\n");
+        }
+        if (open)
+        {
+            CLI_cmd_close (cli);
+        }
+        if (idx >= 2)
+        {
+            cli->argc = 0;
+            CLI_cmd_close (cli);
+        }
+
     }
 }

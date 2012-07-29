@@ -21,6 +21,7 @@
  * @{
  */
 
+
 /** Run Led */
 extern DEV_digout_t MDC_run_led;
 
@@ -56,6 +57,11 @@ extern DEV_diginputs_t MDC_control_in;
  * Initialize digital io.
  */
 extern void MDC_digio_init (void);
+
+/**
+ * Register digital io in sysfs.
+ */
+extern void MDC_digio_install (void);
 
 /** @}
  */

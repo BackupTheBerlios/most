@@ -1,3 +1,6 @@
 #!/bin/sh
 
-find $MOST_ROOT -name \*~ -exec rm -i -v $1 {} \; 
+# -i promt before every removal
+
+find $MOST_ROOT -name \*~ -exec rm -v {} \; 
+echo "finished"

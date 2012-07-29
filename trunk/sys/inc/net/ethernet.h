@@ -1,6 +1,10 @@
 #ifndef NET_ETHERNET_H
 #define NET_ETHERNET_H
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup ethernet ethernet.h
  *
  * Ethernet protocol layer.
@@ -20,9 +24,7 @@
  * @param netif : Network interface.
  * @param p : An incoming ethernet packet.
  */
-extern void
-NET_eth_input (NET_netif_t * netif,
-			   NET_netbuf_t * p);
+extern void NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p);
 
 
 /**
@@ -35,19 +37,18 @@ NET_eth_input (NET_netif_t * netif,
  * @param ipaddr : Destination IP address.
  * @return NET_ERR_ARP, NET_ERR_MEM or NET_ERR_OK.
  */
-extern NET_err_t
-NET_eth_output (NET_netif_t * netif,
-				NET_netbuf_t * p,
-				NET_ip_addr_t * ipaddr);
+extern ACE_err_t NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr);
 
 /**
  * Initialize the ethernet layer.
  * Initialize ARP.
  */
-extern void
-NET_eth_init (void);
+extern void NET_eth_init (void);
 
 /** @}
  */
 
-#endif /*NET_ETHERNET_H*/
+/** @}
+ */
+
+#endif /*NET_ETHERNET_H */

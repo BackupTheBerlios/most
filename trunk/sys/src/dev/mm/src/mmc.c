@@ -1,350 +1,479 @@
-#include "dev/mmc.h"
+#include <ace/string.h>
+#include <mfs/sysfs.h>
+#include <mfs/vfs.h>
+#include <mfs/descriptor.h>
+#include <mfs/directory.h>
+#include <dev/mmc.h>
 
-// Tokens (necessary because at nop/idle (and CS active) only 0xff is on the data/command line)
-#define MMC_START_DATA_BLOCK_TOKEN 					0xfe	// Data token start byte, Start Single Block Read
-#define MMC_START_DATA_MULTIPLE_BLOCK_READ		 	0xfe	// Data token start byte, Start Multiple Block Read
-#define MMC_START_DATA_BLOCK_WRITE					0xfe	// Data token start byte, Start Single Block Write
-#define MMC_START_DATA_MULTIPLE_BLOCK_WRITE			0xfc	// Data token start byte, Start Multiple Block Write
-#define MMC_STOP_DATA_MULTIPLE_BLOCK_WRITE			0xfd	// Data token stop byte, Stop Multiple Block Write
+/* Response token */
+#define MMC_RESPONSE  0xff
 
-// an affirmative R1 response (no errors)
-#define MMC_R1_RESPONSE       0x00
+/* an affirmative R1 response
+ */
+#define MMC_R1_RESPONSE_OK         0x00 /* no errors */
+#define MMC_R1_RESPONSE_IDLE       0x01 /* in idle state and doing initialization */
 
-// commands: first bit 0 (start bit), second 1 (transmission bit); CMD-number + 0ffsett 0x40
-#define MMC_GO_IDLE_STATE 			0x40    //CMD0
-#define MMC_SEND_OP_COND 			0x41    //CMD1
-#define MMC_READ_CSD 				0x49	//CMD9
-#define MMC_SEND_CID 				0x4a    //CMD10
-#define MMC_STOP_TRANSMISSION 		0x4c    //CMD12
-#define MMC_SEND_STATUS 			0x4d    //CMD13
-#define MMC_SET_BLOCKLEN 			0x50	//CMD16 Set block length for next read/write
-#define MMC_READ_SINGLE_BLOCK 		0x51	//CMD17 Read block from memory
-#define MMC_READ_MULTIPLE_BLOCK 	0x52    //CMD18
-#define MMC_CMD_WRITEBLOCK 			0x54	//CMD20 Write block to memory
-#define MMC_WRITE BLOCK 			0x58    //CMD25
-#define MMC_WRITE_MULTIPLE_BLOCK 	0x59   	//CMD??
-#define MMC_WRITE_CSD 				0x5b	//CMD27 PROGRAM_CSD
-#define MMC_SET_WRITE_PROT 			0x5c    //CMD28
-#define MMC_CLR_WRITE_PROT 			0x5d    //CMD29
-#define MMC_SEND_WRITE_PROT 		0x5e    //CMD30
-#define MMC_TAG_SECTOR_START 		0x60    //CMD32
-#define MMC_TAG_SECTOR_END 			0x61    //CMD33
-#define MMC_UNTAG_SECTOR 			0x62    //CMD34
-#define MMC_TAG_EREASE_GROUP_START 	0x63 	//CMD35
-#define MMC_TAG_EREASE_GROUP_END 	0x64  	//CMD36
-#define MMC_UNTAG_EREASE_GROUP 		0x65    //CMD37
-#define MMC_EREASE 					0x66    //CMD38
-#define MMC_READ_OCR 				0x67    //CMD39
-#define MMC_CRC_ON_OFF 				0x68    //CMD40
+/* Response comes 1-8bytes after command
+ * the first bit will be a 0 followed by an error code
+ * data will be 0xff until response
+ */
+#define MMC_MAX_BYTES_TO_RESPONSE   64  /* ??? 8 is not enough ? */
+#define MMC_MAX_BYTES_TO_XX_RESPONSE   500      /* ??? 8 is not enough ? */
 
+/* Data Tokens (necessary because at nop/idle (and CS active) only 0xff is on the data/command line)
+ */
+#define MMC_DATA_START_SINGLE_BLOCK_READ        0xfe    /* Data token start byte, Start Single Block Read */
+#define MMC_DATA_START_MULTIPLE_BLOCK_READ      0xfe    /* Data token start byte, Start Multiple Block Read */
+#define MMC_DATA_START_SINGLE_BLOCK_WRITE       0xfe    /* Data token start byte, Start Single Block Write */
+#define MMC_DATA_START_MULTIPLE_BLOCK_WRITE     0xfc    /* Data token start byte, Start Multiple Block Write */
+#define MMC_DATA_STOP_MULTIPLE_BLOCK_WRITE      0xfd    /* Data token stop byte, Stop Multiple Block Write */
+
+#define MMC_DATA_ACEPPTED      0x05
+#define MMC_DATA_CRC_ERROR     0x0b
+#define MMC_DATA_WRITE_ERROR   0x0d
+
+/* command tokens: first bit 0 (start bit), second 1 (transmission bit)-> CMD-number + 0ffset 0x40
+ */
+#define MMC_START_BIT          0x80
+#define MMC_TRANSMISSION_BIT   0x40
+
+#define MMC_CMD_GO_IDLE_STATE           0x00    /* CMD0 */
+#define MMC_CMD_SEND_OP_COND            0x01    /* CMD1 */
+#define MMC_CMD_SEND_CSD                0x09    /* CMD9  Read Card Specific Data Register */
+#define MMC_CMD_SEND_CID                0x0A    /* CMD10 Read Card IDentification Register */
+#define MMC_CMD_STOP_TRANSMISSION       0x0C    /* CMD12 */
+#define MMC_CMD_SEND_STATUS             0x0D    /* CMD13 */
+#define MMC_CMD_SET_BLOCKLEN            0x10    /* CMD16 Set block length for next read/write */
+#define MMC_CMD_READ_SINGLE_BLOCK       0x11    /* CMD17 Read block from memory */
+#define MMC_CMD_READ_MULTIPLE_BLOCK     0x12    /* CMD18 */
+#define MMC_CMD_WRITE_SINGLE_BLOCK      0x18    /* CMD24 */
+#define MMC_CMD_WRITE_MULTIPLE_BLOCK    0x19    /* CMD25 */
+#define MMC_CMD_WRITE_CSD               0x1b    /* CMD27 Program CSD */
+#define MMC_CMD_SET_WRITE_PROT          0x1c    /* CMD28 */
+#define MMC_CMD_CLR_WRITE_PROT          0x1d    /* CMD29 */
+#define MMC_CMD_SEND_WRITE_PROT         0x1e    /* CMD30 */
+#define MMC_CMD_TAG_SECTOR_START        0x20    /* CMD32 */
+#define MMC_CMD_TAG_SECTOR_END          0x21    /* CMD33 */
+#define MMC_CMD_UNTAG_SECTOR            0x22    /* CMD34 */
+#define MMC_CMD_TAG_EREASE_GROUP_START  0x23    /* CMD35 */
+#define MMC_CMD_TAG_EREASE_GROUP_END    0x24    /* CMD36 */
+#define MMC_CMD_UNTAG_EREASE_GROUP      0x25    /* CMD37 */
+#define MMC_CMD_EREASE                  0x26    /* CMD38 */
+#define MMC_CMD_READ_OCR                0x27    /* CMD39 */
+#define MMC_CMD_CRC_ON_OFF              0x28    /* CMD40 */
+
+#define MMC_BUSY           0
+
+#define MMC_CRC_INITIAL    0x95
+#define MMC_CRC_NOT_USED   0xff
+
+#define MMC_CID_LENGTH                  16      /**< CID Register Length */
+#define MMC_CSD_LENGTH                  16      /**< CSD Register Length */
 
 
 
 static DEV_spi_dev_t *spi;
-char mmc_buffer[512] = { 0 };	// Buffer for mmc i/o for data and registers
+
+static void info (MFS_entry_t * entry);
+
+static struct MFS_descriptor_op mmc_descriptor_op = {.open = NULL,
+    .close = NULL,
+    .info = info
+};
 
 
-
-static unsigned char spiSendByte(const unsigned char data)
+static unsigned char
+spi_send_byte (const unsigned char data)
 {
-	ACE_u32_t in;
-	DEV_spi_exchange (spi, data, &in);
-	return in;
+    ACE_u32_t in;
+    DEV_spi_exchange (spi, data, &in);
+    return in;
 }
 
-static char mmcGetResponse(void)
+static unsigned char
+mmc_get_response (void)
 {
-	//Response comes 1-8bytes after command
-	//the first bit will be a 0
-	//followed by an error code
-	//data will be 0xff until response
-	int i=0;
+    unsigned char response;
 
-	char response;
-
-	while(i<=64)
-	{
-		response=spiSendByte(0xff);
-		if(response==0x00)break;
-		if(response==0x01)break;
-		i++;
-	}
-	return response;
-}
-
-static char mmcGetXXResponse(const char resp)
-{
-	//Response comes 1-8bytes after command
-	//the first bit will be a 0
-	//followed by an error code
-	//data will be 0xff until response
-	int i=0;
-
-	char response;
-
-	while(i<=500)
-	{
-		response=spiSendByte(0xff);
-		if(response==resp)break;
-		i++;
-	}
-	return response;
-}
-
-static char mmcCheckBusy(void)
-{
-	//Response comes 1-8bytes after command
-	//the first bit will be a 0
-	//followed by an error code
-	//data will be 0xff until response
-	int i=0;
-
-	char response;
-	char err;
-	while(i<=64)
-	{
-		response=spiSendByte(0xff);
-		response &= 0x1f;
-		switch(response)
-		{
-		case 0x05: err = MMC_SUCCESS;break;
-		case 0x0b: return(MMC_CRC_ERROR);
-		case 0x0d: return(MMC_WRITE_ERROR);
-		default:
-			err = MMC_OTHER_ERROR;
-			break;
-		}
-		if(err == MMC_SUCCESS)break;
-		i++;
-	}
-	i=0;
-	do
-	{
-		response=spiSendByte(0xff);
-		i++;
-	}while(response==0);
-	return response;
-}
-
-static void mmcSendCmd (const char cmd, unsigned long data, const char crc)
-{
-	char frame[6];
-	char temp;
-	int i;
-
-	frame[0]=(cmd|0x40);
-	for(i=3;i>=0;i--){
-		temp=(char)(data>>(8*i));
-		frame[4-i]=(temp);
-	}
-	frame[5]=(crc);
-	for(i=0;i<6;i++)
-		spiSendByte(frame[i]);
-}
-
-static char mmcSetBlockLength (const unsigned long blocklength)
-{
-	//MMC_SET_BLOCKLEN =CMD16
-	mmcSendCmd(16, blocklength, 0xFF);
-	// get response from MMC - make sure that its 0x00 (R1 ok response format)
-	if(mmcGetResponse()!=0x00);
-	// Send 8 Clock pulses of delay.
-	spiSendByte(0xff);
-	return MMC_SUCCESS;
-}
-
-
-
-extern int DEV_mmc_spi_init (DEV_spi_dev_t *dev)
-{
-	spi = dev;
-
-	if (0 != DEV_spi_dev_config (spi,
-			                     0x1F,      /* clock */
-			                     0,         /* mode */
-			                     8,         /* word size */
-			                     0,         /* delay_b_sclk */
-			                     0,         /* delay_b_ct */
-			                     DEV_SPI_DEV_CS_ACTIVE))
-		return (-1);
-	return 0;
-}
-
-extern char DEV_mmc_init (void)
-{
-	//raise SS and MOSI for 80 clock cycles
-	//SendByte(0xff) 10 times with SS high
-	//RAISE SS
-	int i;
-	char response=0x01;
-	char err = MMC_SUCCESS;
-
-	DEV_spi_acquire (spi);
-
-	//initialization sequence on PowerUp
-	for(i=0;i<=9;i++)
-		spiSendByte(0xff);
-	//Send Command 0 to put MMC in SPI mode
-	mmcSendCmd(0x00,0,0x95);
-	//Now wait for READY RESPONSE
-	if(mmcGetResponse()!=0x01)
-	{
-		err = MMC_RESPONSE_ERROR;
-	} else {
-		while(response==0x01)
-		{
-			spiSendByte(0xff);
-			mmcSendCmd(0x01,0x00,0xff);
-			response=mmcGetResponse();
-		}
-		spiSendByte(0xff);
-	}
-
-	DEV_spi_release (spi);
-
-	return err;
-}
-
-// Reading the contents of the CSD and CID registers in SPI mode is a simple
-// read-block transaction.
-char DEV_mmc_read_register (const char cmd_register, const unsigned char length)
-{
-	char err = MMC_TIMEOUT_ERROR;
-
-	DEV_spi_acquire (spi);
-
-	if (mmcSetBlockLength (length) == MMC_SUCCESS)
-	{
-		// CRC not used: 0xff as last byte
-		mmcSendCmd(cmd_register, 0x000000, 0xff);
-
-		// wait for response
-		// in the R1 format (0x00 is no errors)
-		if (mmcGetResponse() == 0x00)
-		{
-			if (mmcGetXXResponse(0xfe)== 0xfe)
-				for (int i = 0; i < length; i++)
-					mmc_buffer[i] = spiSendByte(0xff);
-			// get CRC bytes (not really needed by us, but required by MMC)
-			spiSendByte(0xff);
-			spiSendByte(0xff);
-		}
-		else
-			err = MMC_RESPONSE_ERROR;
-
-		// Send 8 Clock pulses of delay.
-		spiSendByte(0xff);
-	}
-
-	DEV_spi_release (spi);
-
-	return err;
-}
-
-// The card will respond with a standard response token followed by a data
-// block suffixed with a 16 bit CRC.
-extern char DEV_mmc_read_block(const unsigned long address, const unsigned long count)
-{
-	unsigned long i = 0;
-	char err = MMC_RESPONSE_ERROR;
-
-	DEV_spi_acquire (spi);
-
-	// Set the block length to read
-	if (mmcSetBlockLength (count) == MMC_SUCCESS)	// block length could be set
-	{
-		// send read command MMC_READ_SINGLE_BLOCK=CMD17
-		mmcSendCmd (17,address, 0xFF);
-		// Send 8 Clock pulses of delay, check if the MMC acknowledged the read block command
-		// it will do this by sending an affirmative response
-		// in the R1 format (0x00 is no errors)
-		if (mmcGetResponse() == 0x00)
-		{
-			// now look for the data token to signify the start of
-			// the data
-			if (mmcGetXXResponse(MMC_START_DATA_BLOCK_TOKEN) == MMC_START_DATA_BLOCK_TOKEN)
-			{
-				// clock the actual data transfer and receive the bytes; spi_read automatically finds the Data Block
-				for (i = 0; i < 512; i++)
-					mmc_buffer[i] = spiSendByte(0xff);	// is executed with card inserted
-
-				// get CRC bytes (not really needed by us, but required by MMC)
-				spiSendByte(0xff);
-				spiSendByte(0xff);
-				err = MMC_SUCCESS;
-			}
-			else
-			{
-				// the data token was never received
-				err = MMC_DATA_TOKEN_ERROR;	// 3
-			}
-		}
-		else
-		{
-			// the MMC never acknowledge the read command
-			err = MMC_RESPONSE_ERROR;	// 2
-		}
-	}
-	else
+    for (int i = 0; i <= MMC_MAX_BYTES_TO_RESPONSE; ++i)
     {
-		err = MMC_BLOCK_SET_ERROR;	// 1
+        response = spi_send_byte (MMC_RESPONSE);
+        if (response == MMC_R1_RESPONSE_OK)
+            break;
+        if (response == MMC_R1_RESPONSE_IDLE)
+            break;
     }
-	spiSendByte(0xff);
-
-	DEV_spi_release (spi);
-
-	return err;
+    return response;
 }
 
-extern char DEV_mmc_write_block (const unsigned long address)
+static unsigned char
+mmc_get_XX_response (const char resp)
 {
-	unsigned long i = 0;
-	char err = MMC_RESPONSE_ERROR;
+    unsigned char response;
 
-	DEV_spi_acquire (spi);
-
-	// Set the block length to read
-	if (mmcSetBlockLength (512) == MMC_SUCCESS)	// block length could be set
-	{
-		// send write command
-		mmcSendCmd (24,address, 0xFF);
-
-		// check if the MMC acknowledged the write block command
-		// it will do this by sending an affirmative response
-		// in the R1 format (0x00 is no errors)
-		if (mmcGetXXResponse(MMC_R1_RESPONSE) == MMC_R1_RESPONSE)
-		{
-			spiSendByte(0xff);
-			// send the data token to signify the start of the data
-			spiSendByte(0xfe);
-			// clock the actual data transfer and transmit the bytes
-			for (i = 0; i < 512; i++)
-				spiSendByte(mmc_buffer[i]);	// mmc_buffer[i];       Test: i & 0xff
-			// put CRC bytes (not really needed by us, but required by MMC)
-			spiSendByte(0xff);
-			spiSendByte(0xff);
-			// read the data response xxx0<status>1 : status 010: Data accected, status 101: Data
-			//   rejected due to a crc error, status 110: Data rejected due to a Write error.
-			mmcCheckBusy();
-		}
-		else
-		{
-			// the MMC never acknowledge the write command
-			err = MMC_RESPONSE_ERROR;	// 2
-		}
-	}
-	else
+    for (int i = 0; i <= MMC_MAX_BYTES_TO_XX_RESPONSE; ++i)
     {
-		err = MMC_BLOCK_SET_ERROR;	// 1
+        response = spi_send_byte (MMC_RESPONSE);
+        if (response == resp)
+            break;
     }
-	//give the MMC the required clocks to finish up what ever it needs to do
-	//for (i = 0; i < 9; ++i)
-	//spiSendByte(0xff);
+    return response;
+}
 
-	// Send 8 Clock pulses of delay.
-	spiSendByte(0xff);
+static ACE_err_t
+mmc_check_busy (void)
+{
+    unsigned char response;
+    ACE_err_t err;
 
-	DEV_spi_release (spi);
+    /* read the data response xxx0<status>1 : status 010: Data accepted, status 101: Data
+     * rejected due to a crc error, status 110: Data rejected due to a Write error.
+     */
+    for (int i = 0; i <= MMC_MAX_BYTES_TO_RESPONSE; ++i)
+    {
+        response = spi_send_byte (MMC_RESPONSE);
+        response &= 0x1f;
+        switch (response)
+        {
+        case MMC_DATA_ACEPPTED:
+            err = ACE_ERR_OK;
+            break;
+        case MMC_DATA_CRC_ERROR:
+            return (DEV_ERR_MMC_CRC);
+        case MMC_DATA_WRITE_ERROR:
+            return (DEV_ERR_MMC_WRITE);
+        default:
+            err = DEV_ERR_MMC_OTHER;
+            break;
+        }
+        if (err == ACE_ERR_OK)
+            break;
+    }
 
-	return err;
+    do
+    {
+        response = spi_send_byte (MMC_RESPONSE);
+    }
+    while (response == MMC_BUSY);
+
+    return err;
+}
+
+static void
+mmc_send_cmd (const char cmd, unsigned long data, const char crc)
+{
+    char frame[6];
+    char temp;
+
+    frame[0] = (cmd | MMC_TRANSMISSION_BIT);
+    for (int i = 3; i >= 0; i--)
+    {
+        temp = (char)(data >> (8 * i));
+        frame[4 - i] = (temp);
+    }
+    frame[5] = (crc);
+    for (int i = 0; i < 6; i++)
+        spi_send_byte (frame[i]);
+}
+
+static ACE_err_t
+mmc_set_block_length (const unsigned long blocklength)
+{
+    ACE_err_t err = DEV_ERR_MMC_RESPONSE;
+    mmc_send_cmd (MMC_CMD_SET_BLOCKLEN, blocklength, MMC_CRC_NOT_USED);
+
+    if (mmc_get_response () == MMC_R1_RESPONSE_OK)
+        err = ACE_ERR_OK;
+
+    /* Send 8 Clock pulses of delay. */
+    spi_send_byte (MMC_RESPONSE);
+
+    return err;
+}
+
+/* Reading the contents of the CSD and CID registers in SPI mode is a simple
+ * read-block transaction.
+ */
+static ACE_err_t
+mmc_read_register (const char cmd, const unsigned int length, unsigned char buffer[])
+{
+    ACE_err_t err = DEV_ERR;
+
+    DEV_spi_acquire (spi);
+
+    if (mmc_set_block_length (length) == ACE_ERR_OK)
+    {
+        mmc_send_cmd (cmd, 0, MMC_CRC_NOT_USED);
+
+        if (mmc_get_response () == MMC_R1_RESPONSE_OK)
+        {
+            if (mmc_get_XX_response (MMC_DATA_START_SINGLE_BLOCK_READ) ==
+                MMC_DATA_START_SINGLE_BLOCK_READ)
+            {
+                for (int i = 0; i < length; i++)
+                    buffer[i] = spi_send_byte (MMC_RESPONSE);
+                /* get CRC bytes (not really needed by us, but required by MMC) */
+                spi_send_byte (MMC_RESPONSE);
+                spi_send_byte (MMC_RESPONSE);
+                err = ACE_ERR_OK;
+            }
+            else
+            {
+                err = DEV_ERR_MMC_DATA_TOKEN;
+            }
+        }
+        else
+        {
+            err = DEV_ERR_MMC_RESPONSE;
+        }
+        /* Send 8 Clock pulses of delay. */
+        spi_send_byte (MMC_RESPONSE);
+    }
+    else
+    {
+        err = DEV_ERR_MMC_BLOCK_SET;
+    }
+
+    DEV_spi_release (spi);
+
+    return err;
+}
+
+
+extern ACE_err_t
+DEV_mmc_spi_init (DEV_spi_dev_t * dev)
+{
+    spi = dev;
+    ACE_err_t err = DEV_ERR;
+
+    if (0 == DEV_spi_dev_config (spi, 0x1F,     /* clock */
+                                 0,     /* mode */
+                                 8,     /* word size */
+                                 0,     /* delay_b_sclk */
+                                 0,     /* delay_b_ct */
+                                 DEV_SPI_DEV_CS_ACTIVE))
+    {
+        err = ACE_ERR_OK;
+    }
+    return err;
+}
+
+extern ACE_err_t
+DEV_mmc_init (void)
+{
+    /* raise SS and MOSI for 80 clock cycles
+     * send_byte(0xff) 10 times with SS high
+     * raise SS
+     */
+    unsigned char response = MMC_R1_RESPONSE_IDLE;
+    ACE_err_t err = DEV_ERR;
+
+    DEV_spi_acquire (spi);
+
+    /* initialization sequence on Power Up */
+    for (int i = 0; i <= 9; i++)
+        spi_send_byte (MMC_RESPONSE);
+
+    mmc_send_cmd (MMC_CMD_GO_IDLE_STATE, 0, MMC_CRC_INITIAL);
+
+    /* Now wait for READY RESPONSE */
+    if (mmc_get_response () != MMC_R1_RESPONSE_IDLE)
+    {
+        err = DEV_ERR_MMC_INIT;
+    }
+    else
+    {
+        while (response == MMC_R1_RESPONSE_IDLE)
+        {
+            spi_send_byte (MMC_RESPONSE);
+            mmc_send_cmd (MMC_CMD_SEND_OP_COND, 0, MMC_CRC_NOT_USED);
+            response = mmc_get_response ();
+        }
+        spi_send_byte (MMC_RESPONSE);
+        err = ACE_ERR_OK;
+    }
+
+    DEV_spi_release (spi);
+
+    return err;
+}
+
+extern void
+DEV_mmc_install (void)
+{
+    MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_MM), "mmc",
+                     (MFS_entry_t *) NULL, MFS_DESC, &mmc_descriptor_op);
+}
+
+/* The card will respond with a standard response token followed by a data
+ * block suffixed with a 16 bit CRC.
+ */
+extern ACE_err_t
+DEV_mmc_read_block (const unsigned long address, const unsigned long count, char buffer[])
+{
+    ACE_err_t err = DEV_ERR;
+
+    DEV_spi_acquire (spi);
+
+    /* Set the block length to read */
+    if (mmc_set_block_length (count) == ACE_ERR_OK)
+    {
+        mmc_send_cmd (MMC_CMD_READ_SINGLE_BLOCK, address, MMC_CRC_NOT_USED);
+
+        /* Send 8 Clock pulses of delay, check if the MMC acknowledged the read block command
+         * it will do this by sending an affirmative response
+         */
+        if (mmc_get_response () == MMC_R1_RESPONSE_OK)
+        {
+            /* now look for the data token to signify the start of the data */
+            if (mmc_get_XX_response (MMC_DATA_START_SINGLE_BLOCK_READ) ==
+                MMC_DATA_START_SINGLE_BLOCK_READ)
+            {
+                /* clock the actual data transfer and receive the bytes; spi_read automatically finds the Data Block */
+                for (int i = 0; i < count; i++)
+                    buffer[i] = spi_send_byte (MMC_RESPONSE);
+
+                /* get CRC bytes (not really needed by us, but required by MMC) */
+                spi_send_byte (MMC_RESPONSE);
+                spi_send_byte (MMC_RESPONSE);
+                err = ACE_ERR_OK;
+            }
+            else
+            {
+                /* the data token was never received */
+                err = DEV_ERR_MMC_DATA_TOKEN;
+            }
+        }
+        else
+        {
+            /* the MMC never acknowledge the read command */
+            err = DEV_ERR_MMC_RESPONSE;
+        }
+    }
+    else
+    {
+        err = DEV_ERR_MMC_BLOCK_SET;
+    }
+    spi_send_byte (MMC_RESPONSE);
+
+    DEV_spi_release (spi);
+
+    return err;
+}
+
+extern ACE_err_t
+DEV_mmc_write_block (const unsigned long address, char buffer[])
+{
+    ACE_err_t err = DEV_ERR;
+
+    DEV_spi_acquire (spi);
+
+    /* Set the block length to read */
+    if (mmc_set_block_length (DEV_MMC_BLOCK_SIZE) == ACE_ERR_OK)
+    {
+        mmc_send_cmd (MMC_CMD_WRITE_SINGLE_BLOCK, address, MMC_CRC_NOT_USED);
+
+        /* check if the MMC acknowledged the write block command
+         * it will do this by sending an affirmative response
+         */
+        if (mmc_get_XX_response (MMC_R1_RESPONSE_OK) == MMC_R1_RESPONSE_OK)
+        {
+            spi_send_byte (MMC_RESPONSE);
+            /* send the data token to signify the start of the data */
+            spi_send_byte (MMC_DATA_START_SINGLE_BLOCK_WRITE);
+            /* clock the actual data transfer and transmit the bytes */
+            for (int i = 0; i < DEV_MMC_BLOCK_SIZE; i++)
+                spi_send_byte (buffer[i]);
+            /* put CRC bytes (not really needed by us, but required by MMC) */
+            spi_send_byte (MMC_RESPONSE);
+            spi_send_byte (MMC_RESPONSE);
+
+            err = mmc_check_busy ();
+        }
+        else
+        {
+            /* the MMC never acknowledge the write command */
+            err = DEV_ERR_MMC_RESPONSE;
+        }
+    }
+    else
+    {
+        err = DEV_ERR_MMC_BLOCK_SET;
+    }
+
+    /* Send 8 Clock pulses of delay. */
+    spi_send_byte (MMC_RESPONSE);
+
+    DEV_spi_release (spi);
+
+    return err;
+}
+
+extern ACE_err_t
+DEV_mmc_read_CID (struct DEV_mmc_CID *cid)
+{
+    ACE_err_t err;
+    unsigned char buffer[MMC_CID_LENGTH];
+    err = mmc_read_register (MMC_CMD_SEND_CID, sizeof (buffer), buffer);
+    if (err == ACE_ERR_OK)
+    {
+        cid->mid = buffer[0];
+        memcpy (cid->name, buffer + 3, 6);
+        cid->name[6] = '\0';
+        memcpy (&cid->serial_nr, buffer + 10, 4);       /* @revise : byte order little endian */
+    }
+    return err;
+}
+
+extern ACE_err_t
+DEV_mmc_read_CSD (struct DEV_mmc_CSD *csd)
+{
+    ACE_err_t err;
+    unsigned char buffer[MMC_CSD_LENGTH];
+    err = mmc_read_register (MMC_CMD_SEND_CSD, sizeof (buffer), buffer);
+    if (err == ACE_ERR_OK)
+    {
+        csd->read_block_len = 1 << (buffer[5] & 0x0f);
+        csd->read_block_partial = (buffer[6] & 0x80) ? TRUE : FALSE;
+        csd->write_block_len = 1 << (((buffer[12] & 0x03) << 2) | ((buffer[13] & 0xc0) >> 6));
+        csd->write_block_partial = (buffer[13] & 0x20) ? TRUE : FALSE;
+        unsigned int c_size = ((buffer[6] & 0x03) << 10) |
+            ((buffer[7]) << 2) | ((buffer[8] & 0xc0) >> 6);
+        unsigned int c_size_mul = 4 << (((buffer[9] & 0x03) << 1) | ((buffer[10] & 0x80) >> 7));
+        csd->block_nr = (c_size + 1) * c_size_mul;
+    }
+    return err;
+}
+
+static void
+info (MFS_entry_t * entry)
+{
+    ACE_err_t err;
+    struct DEV_mmc_CID cid;
+    err = DEV_mmc_read_CID (&cid);
+    if (err == ACE_ERR_OK)
+    {
+        ACE_printf ("MID=0x%02x   Name=%s   SNr=%lu\n", cid.mid, cid.name, cid.serial_nr);
+    }
+    else
+    {
+        ACE_printf ("Read CID failed, err: %d\n", err);
+    }
+    struct DEV_mmc_CSD csd;
+    err = DEV_mmc_read_CSD (&csd);
+    if (err == ACE_ERR_OK)
+    {
+        ACE_printf ("\tRead: block len = %d B, partial = %s\n",
+                    csd.read_block_len, csd.read_block_partial == TRUE ? "true" : "false");
+        ACE_printf ("\tWrite: block len = %d B , partial = %s\n",
+                    csd.write_block_len, csd.write_block_partial == TRUE ? "true" : "false");
+        ACE_printf ("\tNumber of blocks = %d\n", csd.block_nr);
+        ACE_printf ("\tCard capacity = %ul MB\n",
+                    (csd.block_nr * csd.read_block_len) / (((unsigned long)1024) * 1024));
+
+    }
+    else
+    {
+        ACE_printf ("Read CSD failed, err: %d\n", err);
+    }
 }

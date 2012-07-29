@@ -6,6 +6,11 @@
 #ifndef DPY_GU256X64SER_USER_H
 #define DPY_GU256X64SER_USER_H
 
+/** @addtogroup dpy
+ *
+ * @{
+ */
+
 /** @addtogroup gu256x64ser
  *
  * @{
@@ -42,7 +47,7 @@ extern void DPY_gu256x64ser_MemorySwDataSend (unsigned char data);
  * .
  */
 extern void DPY_gu256x64ser_FROMImageDefinition (unsigned long address,
-                                    unsigned long length, unsigned char *data);
+                                                 unsigned long length, unsigned char *data);
 
 /** 
  * .
@@ -53,10 +58,9 @@ extern void DPY_gu256x64ser_SaveDownloadedChar (unsigned char fontType);
  * .
  */
 extern void DPY_gu256x64ser_FROMMacroDefinition (unsigned char registration,
-                                    unsigned short length,
-                                    unsigned char displayTime,
-                                    unsigned char idleTime,
-                                    unsigned char *data);
+                                                 unsigned short length,
+                                                 unsigned char displayTime,
+                                                 unsigned char idleTime, unsigned char *data);
 
 /**
  * .
@@ -67,13 +71,16 @@ extern void DPY_gu256x64ser_DownloadCharTransfer (unsigned char fontType);
  * .
  */
 extern void DPY_gu256x64ser_DisplayStatusSendData (unsigned char status,
-                                      unsigned char address,
-                                      unsigned char length);
+                                                   unsigned char address, unsigned char length);
 
 /** @}
  */
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

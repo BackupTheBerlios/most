@@ -7,6 +7,12 @@
 #define USO_HEAP_H
 
 #include "ace/stddef.h"
+#include <mfs/directory.h>
+#include <mfs/sysfs.h>
+
+/** @addtogroup uso
+ * @{
+ */
 
 /** @defgroup heap heap.h
  *
@@ -22,13 +28,13 @@ typedef struct USO_fblock USO_fblock_t;
 
 struct USO_heap
 {
-	USO_mblock_t *mem_blocks;
-	USO_fblock_t *free_blocks;
-	unsigned long free_mem;
-	unsigned long total_mem;
-	unsigned long alloc_count;
-	unsigned long search_count;
-	unsigned long search_average;
+    USO_mblock_t *mem_blocks;
+    USO_fblock_t *free_blocks;
+    unsigned long free_mem;
+    unsigned long total_mem;
+    unsigned long alloc_count;
+    unsigned long search_count;
+    unsigned long search_average;
 };
 
 /** USO_heap type. */
@@ -44,15 +50,15 @@ typedef struct USO_heap USO_heap_t;
  * @param start : Pointer to start of the heap.
  * @param end : Pointer to the end of the heap.
  */
-extern ACE_bool_t USO_heap_init (USO_heap_t* heap, void *start, void *end);
+extern ACE_bool_t USO_heap_init (USO_heap_t * heap, void *start, void *end);
 
 /**
- * Allocate memory block.
+ * Install heap in sysfs.
  *
  * @param heap : Pointer to heap.
- * @param name : Install the heap in the file system.
+ * @param name : name for heap.
  */
-extern void USO_heap_install(USO_heap_t* heap, char *name);
+extern void USO_heap_install (USO_heap_t * heap, char *name);
 
 /**
  * Allocate memory block.
@@ -62,7 +68,7 @@ extern void USO_heap_install(USO_heap_t* heap, char *name);
  *
  * @return Pointer to memory block or NULL if no memory is available.
  */
-extern void *USO_mem_alloc (USO_heap_t* heap, ACE_size_t size);
+extern void *USO_mem_alloc (USO_heap_t * heap, ACE_size_t size);
 
 /** 
  * Free memory block.
@@ -70,11 +76,25 @@ extern void *USO_mem_alloc (USO_heap_t* heap, ACE_size_t size);
  * @param heap : Pointer to heap.
  * @param block : Allocated memory block.
  */
-extern void USO_mem_free (USO_heap_t* heap, void *block);
+extern void USO_mem_free (USO_heap_t * heap, void *block);
+
+/**
+ * Debug heap list.
+ */
+extern void USO_debug_heap_list (MFS_entry_t * entry);
+
+/**
+ * Print info header.
+ */
+extern void USO_heap_info_head (void);
 
 /*------------------------------------------------------------------------*/
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

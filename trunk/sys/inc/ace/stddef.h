@@ -6,6 +6,11 @@
 #ifndef ACE_STDDEF_H
 #define ACE_STDDEF_H
 
+/** @addtogroup ace
+ *
+ * @{
+ */
+
 /** @defgroup stddef stddef.h
  *
  * Standard definitions.
@@ -38,9 +43,9 @@
 
 /** Boolean enumeration. */
 enum ACE_bool
-{ 
-	FALSE = 0, /**< FALSE = 0*/
-  	TRUE = 1  /**< TRUE = 1*/
+{
+    FALSE = 0,     /**< FALSE = 0*/
+    TRUE = 1      /**< TRUE = 1*/
 };
 
 /** Boolean type. */
@@ -68,6 +73,9 @@ typedef unsigned long ACE_u32_t;
 typedef signed long ACE_s32_t;
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

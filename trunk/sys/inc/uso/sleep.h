@@ -6,7 +6,9 @@
 #ifndef USO_SLEEP_H
 #define USO_SLEEP_H
 
-#include <ace/arch/cpu.h>
+/** @addtogroup uso
+ * @{
+ */
 
 /** @defgroup sleep sleep.h
  *
@@ -14,6 +16,28 @@
  *
  * @{
  */
+
+/** Select one of this values */
+#define USO_TICKS_100HZ     100L /**< System is less responsible, but with less scheduling overhead */
+#define USO_TICKS_1KHZ     1000L /**< Default value */
+#define USO_TICKS_10KHZ   10000L /**< System is more responsible, but with more scheduling overhead */
+
+/**
+ * Global variable defining ticks needed for one sec.
+ * The correct value for this depends on the BSP.
+ */
+extern long USO_ticks_per_sec;
+
+/**
+ * Convert msec to ticks.
+ */
+#define USO_MSEC_2_TICKS(USO_msec) ( (USO_ticks_per_sec * (USO_msec)) / 1000L  )
+
+/**
+ * Convert ticks to msec.
+ */
+#define USO_TICKS_2_MSEC(USO_ticks) ( (1000L * (USO_ticks)) / USO_ticks_per_sec )
+
 
 /*-------------- Interface -----------------------------------------------*/
 
@@ -41,6 +65,9 @@ extern void USO_wakeup (void);
 extern void USO_sleep (long ticks);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

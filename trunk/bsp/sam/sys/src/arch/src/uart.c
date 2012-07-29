@@ -57,29 +57,31 @@ start_1 (void)
 extern void
 SAM_uart_init_0 (void)
 {
-	DEV_at91_uart0_init();
+    DEV_at91_uart0_init ();
     DEV_serial_settings_init (&ser0_settings);
     ser0_settings.baud = DEV_SER_BAUD_9600;
-    DEV_serial_init (&ser0, &ser0_settings, open_0, close_0, start_0, TRUE, "0");
+    DEV_serial_init (&ser0, &ser0_settings, open_0, close_0, start_0, TRUE, "ser0");
 }
 
 extern void
 SAM_uart_init_1 (void)
 {
-	DEV_at91_uart1_init();
+    DEV_at91_uart1_init ();
     DEV_serial_settings_init (&ser1_settings);
     ser1_settings.baud = DEV_SER_BAUD_9600;
-    DEV_serial_init (&ser1, &ser1_settings, open_1, close_1, start_1, TRUE, "1");
+    DEV_serial_init (&ser1, &ser1_settings, open_1, close_1, start_1, TRUE, "ser1");
 }
 
-extern void SAM_uart_interrupt_0 (void)
+extern void
+SAM_uart_interrupt_0 (void)
 {
-	AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_US0);
+    AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_US0);
     DEV_at91_uart_interrupt (0, &ser0);
 }
 
-extern void SAM_uart_interrupt_1 (void)
+extern void
+SAM_uart_interrupt_1 (void)
 {
-	AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_US1);
+    AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_US1);
     DEV_at91_uart_interrupt (1, &ser1);
 }

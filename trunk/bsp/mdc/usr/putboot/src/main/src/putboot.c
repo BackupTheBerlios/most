@@ -4,20 +4,23 @@
  */
 
 #include <uso/log.h>
-
-#include "arch/digio.h"
-#include "putboot.h"
-#include "init/boot.h"
-#include "download.h"
+#include <mfs/sysfs.h>
+#include <mfs/directory.h>
+#include <arch/digio.h>
+#include <init/bsp_commands.h>
+#include <putboot.h>
+#include <download.h>
 
 extern void
 MDC_main (void)
 {
-    USO_kputs (USO_LL_INFO, MDC_APPLICATION" "ACE_MOST_VERSION"\n");
-    if (DEV_digin_isset(&MDC_switch) == FALSE)
-    	MDC_start_app();
-    if (DEV_digin_isset(&MDC_button) == FALSE)
-    	MDC_start_boot();
+    USO_log_puts (USO_LL_INFO, MDC_APPLICATION " " ACE_MOST_VERSION "\n");
+    if (DEV_digin_isset (&MDC_switch) == FALSE)
+        MDC_start_app ();
+    if (DEV_digin_isset (&MDC_button) == FALSE)
+        MDC_start_boot ();
     DEV_digout_set (&MDC_red_led);
-	MDC_download_install();
+    MFS_descriptor_t *boot;
+    boot = MFS_create_dir (MFS_sysfs_get_dir (MFS_SYSFS_DIR_ROOT), "boot");
+    MDC_download_install (boot);
 }

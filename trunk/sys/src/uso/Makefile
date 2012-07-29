@@ -16,5 +16,5 @@ makegoal = make $(1) -C arch;\
 	       make $(1) -C list;\
 	       make $(1) -C mm;
 
--include $(MOST_ROOT)/etc/Makefile.lib
+-include $(MOST_ROOT)/etc/build/lib/Makefile
 

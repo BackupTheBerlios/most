@@ -8,6 +8,10 @@
 
 #include <ace/stddef.h>
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup stats stats.h
  *
  * Network Statistic.
@@ -39,6 +43,9 @@ extern struct NET_stats NET_stats;
  * Initialize network statistic.
  */
 extern void NET_stats_init (void);
+
+/** @}
+ */
 
 /** @}
  */

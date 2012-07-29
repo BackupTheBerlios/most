@@ -15,6 +15,10 @@
 #include "net/udp_sock.h"
 
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup udp udp.h
  *
  * User Datagramm Protocol.
@@ -45,8 +49,7 @@ extern void NET_udp_init (void);
  * @param p : Incoming UDP packet.
  * @return NET_ERR.
  */
-extern NET_err_t NET_udp_input (NET_netif_t *inp,
-								NET_netbuf_t *p);
+extern ACE_err_t NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p);
 
 /**
  * UDP output function for outgoing packets.
@@ -56,10 +59,13 @@ extern NET_err_t NET_udp_input (NET_netif_t *inp,
  * @param p : UDP packet which has to be sent.
  * @return NET_ERR.
  */
-extern NET_err_t NET_udp_output (NET_udp_socket_t *sock,
-								 NET_netbuf_t *p);
+extern ACE_err_t NET_udp_output (NET_udp_socket_t * sock, NET_netbuf_t * p);
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

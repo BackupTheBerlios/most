@@ -1,13 +1,47 @@
-# Copy this file to a file named Config 
-# and uncomment following lines at your needs!
+## most config
+## Copy this file to a file renamed "Config" 
+## and set following lines at your needs!
 
-MOST_HOST:=linux
-#MOST_HOST:=cygwin
 
-#MOST_BOARD:=mdc
+## HOST Configuration
+## ==================
+
+## [linux]
+MOST_HOST_SYSTEM:=linux
+
+## [i386, amd64]
+MOST_HOST_CPU:=amd64
+
+MOST_HOST:=$(MOST_HOST_CPU)-$(MOST_HOST_SYSTEM)
+
+
+## Build Tool Configuration
+## ========================
+
+## [off, on]
+## off: write build log to stdout (for build with Eclipse or Emacs-> jump to error)
+## on: write build errors to file "build.log"
+MOST_BUILD_LOG_FILE:=off
+
+## [off, on]
+## off: turn off full build messages and just print short messages (easier to read)
+## on: print full build messages (for build with Eclipse or Emacs-> jump to error)
+MOST_BUILD_LOG:=on
+
+
+## TARGET Configuration
+## ====================
+
+## [mdc, sam]
 MOST_BOARD:=sam
-
-# Don't make changes after this line
+#MOST_BOARD:=mdc
 
 -include $(MOST_ROOT)/bsp/$(MOST_BOARD)/Config
-MOST_TARGET:=$(MOST_CPU)-$(MOST_SYSTEM)
+
+
+## Cross Tools Configuration
+## =========================
+
+## Path to your Cross Toolchain
+MOST_CROSS:=/home/maik/work/cross/bin/$(MOST_HOST)/$(MOST_TARGET)/$(MOST_GCC)
+

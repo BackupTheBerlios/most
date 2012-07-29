@@ -6,6 +6,9 @@
 #ifndef MDC_DOWNLOAD_H
 #define MDC_DOWNLOAD_H
 
+#include <mfs/directory.h>
+#include <mfs/sysfs.h>
+
 /** @addtogroup save
  *
  * @{
@@ -21,7 +24,7 @@
 /**
  * Install download commands.
  */
-extern void MDC_download_install (void);
+extern void MDC_download_install (MFS_descriptor_t * boot);
 
 /** @}
  */

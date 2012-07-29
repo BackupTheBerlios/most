@@ -11,6 +11,10 @@
 #include "mfs/vfs.h"
 #include "cli/commands.h"
 
+/** @addtogroup mfs
+ * @{
+ */
+
 /** @defgroup sysfs sysfs.h
  *
  * System file system.
@@ -19,46 +23,39 @@
  * @{
  */
 
+enum MFS_sysfs_dir
+{
+    MFS_SYSFS_DIR_ROOT,
+    MFS_SYSFS_DIR_SYS,
+    MFS_SYSFS_DIR_USR,
+    MFS_SYSFS_DIR_USO,
+    MFS_SYSFS_DIR_THREADS,
+    MFS_SYSFS_DIR_HEAPS,
+    MFS_SYSFS_DIR_DEV,
+    MFS_SYSFS_DIR_SERIAL,
+    MFS_SYSFS_DIR_TIMER,
+    MFS_SYSFS_DIR_DIGIO,
+    MFS_SYSFS_DIR_MM,
+    MFS_SYSFS_DIR_NET,
+    MFS_SYSFS_DIR_NETIF,
+    MFS_SYSFS_DIR_CLI,
+    MFS_SYSFS_DIR_CMD
+};
+
 /**
  * Initialize system file system.
  * @return 0 if initialization fails.
  */
-extern ACE_bool_t MFS_sysfs_init(void);
+extern ACE_bool_t MFS_sysfs_init (void);
 
 /**
- * @return Root directory descriptor.
+ * @return Directory descriptor.
  */
-extern MFS_descriptor_t *MFS_sysfs_root(void);
+extern MFS_descriptor_t *MFS_sysfs_get_dir (enum MFS_sysfs_dir dir);
 
-/**
- * @return Serial directory descriptor.
- */
-extern MFS_descriptor_t *MFS_sysfs_serial(void);
 
-/**
- * @return Threads directory descriptor.
+/** @}
  */
-extern MFS_descriptor_t *MFS_sysfs_threads(void);
-
-/**
- * @return Heaps directory descriptor.
- */
-extern MFS_descriptor_t *MFS_sysfs_heaps(void);
-
-/**
- * @return NET directory descriptor.
- */
-extern MFS_descriptor_t *MFS_sysfs_net(void);
-
-/**
- * @return Netif directory descriptor.
- */
-extern MFS_descriptor_t *MFS_sysfs_netif(void);
-
-/**
- * @return CLI directory descriptor.
- */
-extern MFS_descriptor_t *MFS_sysfs_cli(void);
 
 /** @}
  */

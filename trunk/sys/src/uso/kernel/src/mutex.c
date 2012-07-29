@@ -19,10 +19,10 @@ extern void
 USO_lock (USO_mutex_t * mutex)
 {
     USO_cpu_status_t ps = USO_disable ();
-	USO_thread_t* current = USO_current();
+    USO_thread_t *current = USO_current ();
     if (mutex->lock == NULL)
     {
-    	mutex->lock = current;	
+        mutex->lock = current;
     }
     else if (mutex->lock != current)
     {
@@ -37,9 +37,10 @@ extern void
 USO_unlock (USO_mutex_t * mutex)
 {
     USO_cpu_status_t ps = USO_disable ();
-	mutex->lock = NULL;
-	USO_thread_t * t;
-	if ( (t = (USO_thread_t *) USO_dequeue (&mutex->threads)) != NULL ){
+    mutex->lock = NULL;
+    USO_thread_t *t;
+    if ((t = (USO_thread_t *) USO_dequeue (&mutex->threads)) != NULL)
+    {
         USO_ready (t);
     }
     USO_restore (ps);

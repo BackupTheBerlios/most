@@ -11,6 +11,10 @@
 
 #include "net/debug.h"
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup ip_addr ip_addr.h
  *
  * Internet Protocol Address.
@@ -90,5 +94,9 @@ extern NET_ip_addr_t NET_ip_addr_any;
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

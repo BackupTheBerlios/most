@@ -1,22 +1,17 @@
 #include <dev/arch/at91/AT91SAM7X256.h>
-#include <dev/arch/at91/aic.h>
 
 #include "arch/cpu.h"
 #include "arch/exceptions.h"
 
-void SAM_cpu_init(void)
+extern void
+SAM_cpu_init (void)
 {
     int i = 0;
 
     ///////////////////////////////////////////////////////////////////////////
     // EFC Init
     ///////////////////////////////////////////////////////////////////////////
-#ifdef AT91SAM7X512
-    AT91C_BASE_MC->MC0_FMR = AT91C_MC_FWS_1FWS; // 1 Wait State to work at 48MHz
-    AT91C_BASE_MC->MC1_FMR = AT91C_MC_FWS_1FWS; // 1 Wait State to work at 48MHz
-#else
-    AT91C_BASE_MC->MC_FMR = AT91C_MC_FWS_1FWS; // 1 Wait State to work at 48MHz
-#endif
+    AT91C_BASE_MC->MC_FMR = AT91C_MC_FWS_1FWS;  // 1 Wait State to work at 48MHz
 
     ///////////////////////////////////////////////////////////////////////////
     // Init PMC Step 1. Enable Main Oscillator
@@ -35,11 +30,8 @@ void SAM_cpu_init(void)
     // UDP Clock (48,058MHz) is compliant with the Universal Serial Bus
     // Specification (+/- 0.25% for full speed)
     ///////////////////////////////////////////////////////////////////////////
-    AT91C_BASE_PMC->PMC_PLLR = AT91C_CKGR_USBDIV_1           |
-                               AT91C_CKGR_OUT_0              |
-                               (16 << 8)                     |
-                               (AT91C_CKGR_MUL & (72 << 16)) |
-                               (AT91C_CKGR_DIV & 14);
+    AT91C_BASE_PMC->PMC_PLLR = AT91C_CKGR_USBDIV_1 |
+        AT91C_CKGR_OUT_0 | (16 << 8) | (AT91C_CKGR_MUL & (72 << 16)) | (AT91C_CKGR_DIV & 14);
     // Wait for PLL stabilization
     while (!(AT91C_BASE_PMC->PMC_SR & AT91C_PMC_LOCK));
     // Wait until the master clock is established for the case we already
@@ -63,23 +55,39 @@ void SAM_cpu_init(void)
     ///////////////////////////////////////////////////////////////////////////
     // Reset AIC: assign default handler for each interrupt source
     ///////////////////////////////////////////////////////////////////////////
-    AT91C_BASE_AIC->AIC_SVR[0] = (int) SAM_default_fiq_handler ;
-    for (i = 1; i < 31; i++) {
-        AT91C_BASE_AIC->AIC_SVR[i] = (int) SAM_default_irq_handler ;
+    AT91C_BASE_AIC->AIC_SVR[0] = (int)SAM_default_fiq_handler;
+    for (i = 1; i < 31; i++)
+    {
+        AT91C_BASE_AIC->AIC_SVR[i] = (int)SAM_default_irq_handler;
     }
-    AT91C_BASE_AIC->AIC_SPU = (unsigned int) SAM_default_spurious_handler;
+    AT91C_BASE_AIC->AIC_SPU = (unsigned int)SAM_default_spurious_handler;
 
     // Perform 8 IT acknoledge (write any value in EOICR)
-    for (i = 0; i < 8 ; i++) {
+    for (i = 0; i < 8; i++)
+    {
         AT91C_BASE_AIC->AIC_EOICR = 0;
     }
 
     // Enable the Debug mode
     AT91C_BASE_AIC->AIC_DCR = AT91C_AIC_DCR_PROT;
+}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Disable Watchdog
-    ///////////////////////////////////////////////////////////////////////////
+extern void
+SAM_wdt_disable (void)
+{
     AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;
+}
 
+extern void
+SAM_wdt_setup (unsigned short wdv)
+{
+    AT91C_BASE_WDTC->WDTC_WDMR = (wdv << 16) | AT91C_WDTC_WDRSTEN | wdv;
+}
+
+#define SAM_WDT_KEY ( 0xA5 << 24 )
+
+extern void
+SAM_wdt_trigger (void)
+{
+    AT91C_BASE_WDTC->WDTC_WDCR = (SAM_WDT_KEY | AT91C_WDTC_WDRSTT);
 }

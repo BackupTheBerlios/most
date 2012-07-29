@@ -51,13 +51,11 @@
 //         Exported functions
 //------------------------------------------------------------------------------
 
-extern void DEV_at91_aic_configure_IT(unsigned int source,
-                                      unsigned int mode,
-                                      void (*handler)( void ));
+extern void DEV_at91_AIC_configure_IT (unsigned int source,
+                                       unsigned int mode, void (*handler) (void));
 
-extern void DEV_at91_aic_enable_IT(unsigned int source);
+extern void DEV_at91_AIC_enable_IT (unsigned int source);
 
-extern void DEV_at91_aic_disable_IT(unsigned int source);
+extern void DEV_at91_AIC_disable_IT (unsigned int source);
 
 #endif
-

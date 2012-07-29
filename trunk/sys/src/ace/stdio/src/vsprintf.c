@@ -224,12 +224,12 @@ ACE_vsprintf (char *buf, const char *fmt, ACE_va_list_t args)
             if (!(flags & LEFT))
                 while (--field_width > 0)
                     add2str (&str, ' ');        /* *str++ = ' '; */
-            add2str (&str, (unsigned char)ACE_va_arg (args, int));  /* *str++
-                                                                 * =
-                                                                 * (unsigned 
-                                                                 * char)
-                                                                 * va_arg(args, 
-                                                                 * int); */
+            add2str (&str, (unsigned char)ACE_va_arg (args, int));      /* *str++
+                                                                         * =
+                                                                         * (unsigned 
+                                                                         * char)
+                                                                         * va_arg(args, 
+                                                                         * int); */
             while (--field_width > 0)
                 add2str (&str, ' ');    /* *str++ = ' '; */
             continue;

@@ -13,13 +13,6 @@
 #include "mfs/directory.h"
 #include "mfs/sysfs.h"
 
-
-#if USE_COMMAND_LIST
-USO_list_t CLI_commands;
-
-static CLI_command_t help;
-#endif
-
 static CLI_command_t open;
 static CLI_command_t close;
 static CLI_command_t start;
@@ -31,31 +24,33 @@ static CLI_command_t run;
 static CLI_command_t klog;
 
 extern void
-CLI_command_info_head(void)
+CLI_command_info_head (void)
 {
-	ACE_printf("\tName\tDescription\n");
+    ACE_printf ("\tName\tDescription\n");
 }
 
 static void
-command_info(MFS_entry_t *entry)
+command_info (MFS_entry_t * entry)
 {
-	CLI_command_t * command = (CLI_command_t *) entry;
-	ACE_printf("[ %s ]\n", command->description);
+    CLI_command_t *command = (CLI_command_t *) entry;
+    ACE_printf ("[ %s ]\n", command->description);
 }
 
 static struct MFS_descriptor_op command_descriptor_op = {.open = NULL,
-								        		         .close = NULL,
-										                 .info = command_info};
+    .close = NULL,
+    .info = command_info
+};
 
 extern void
 CLI_command_init (CLI_command_t * command,
-                  char *name, char *description, ACE_bool_t (*f) (CLI_interpreter_t *) )
+                  char *name, char *description, ACE_bool_t (*f) (CLI_interpreter_t *))
 {
     command->description = description;
     command->f = f;
 
-	// insert command into fs (directory cli)
-	MFS_create_desc(MFS_sysfs_cli(), name, (MFS_entry_t*) command, MFS_DESC, &command_descriptor_op);
+    // insert command into fs (directory cli)
+    MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_CMD), name, (MFS_entry_t *) command, MFS_DESC,
+                     &command_descriptor_op);
 }
 
 extern void
@@ -66,29 +61,30 @@ CLI_commands_init (void)
     CLI_command_init (&start, "start", "start thread", CLI_cmd_start);
     CLI_command_init (&stop, "stop", "stop thread", CLI_cmd_stop);
     CLI_command_init (&info, "info", "(/desc)opt info", CLI_cmd_info);
-    CLI_command_init (&list, "list", "(/dir)opt list (i|c|t|h|s)opt", CLI_cmd_list);
+    CLI_command_init (&list, "list", "(/dir)opt list (i|c|t|h)opt", CLI_cmd_list);
     CLI_command_init (&exec, "exec", "(/exec)opt exec (arg)opt", CLI_cmd_exec);
     CLI_command_init (&run, "run", "(/exec)opt run (u|s|i)(f|r) (arg)opt", CLI_cmd_run);
-    CLI_command_init (&klog, "klog", "klog (+|-|s)", CLI_cmd_klog);
+    CLI_command_init (&klog, "klog", "klog (+|-)opt", CLI_cmd_klog);
 }
 
 static void
-exec_info(MFS_entry_t *entry)
+exec_info (MFS_entry_t * entry)
 {
-	CLI_exec_t * exec = (CLI_exec_t *) entry;
-	ACE_printf("[ %s ].\n", exec->description);
+    CLI_exec_t *exec = (CLI_exec_t *) entry;
+    ACE_printf ("[ %s ].\n", exec->description);
 }
 
 static struct MFS_descriptor_op exec_descriptor_op = {.open = NULL,
-								        		      .close = NULL,
-										              .info = exec_info};
+    .close = NULL,
+    .info = exec_info
+};
 
 
 extern void
 CLI_exec_init (MFS_descriptor_t * dir, CLI_exec_t * exec,
-                  char *name, char *description, void (*f) (char *))
+               char *name, char *description, void (*f) (char *))
 {
     exec->description = description;
     exec->f = f;
-	MFS_create_desc(dir, name, (MFS_entry_t*) exec, MFS_EXEC, &exec_descriptor_op);
+    MFS_create_desc (dir, name, (MFS_entry_t *) exec, MFS_EXEC, &exec_descriptor_op);
 }

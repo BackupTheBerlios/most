@@ -6,3 +6,4 @@ gcc.tar.bz2
 .settings
 .cproject
 build.err
+.directory

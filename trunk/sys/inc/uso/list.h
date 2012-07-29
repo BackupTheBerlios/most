@@ -8,6 +8,10 @@
 
 #include <ace/stddef.h>
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup list list.h
  *
  * Queue, Stack, Delta List 
@@ -148,7 +152,7 @@ extern ACE_bool_t USO_isempty (USO_list_t * list);
  * @param iterator : Iterator(Pointer to current node or NULL for list head).
  * @return Element.
  */
-extern USO_node_t *USO_next_element (USO_list_t * list, USO_node_t *iterator);
+extern USO_node_t *USO_next_element (USO_list_t * list, USO_node_t * iterator);
 
 /**
  * Get the previous element in the list.
@@ -158,7 +162,7 @@ extern USO_node_t *USO_next_element (USO_list_t * list, USO_node_t *iterator);
  * @param iterator : Iterator.
  * @return Element.
  */
-extern USO_node_t *USO_prev_element (USO_list_t * list, USO_node_t *iterator);
+extern USO_node_t *USO_prev_element (USO_list_t * list, USO_node_t * iterator);
 
 /**
  * Do function f on each element of the list.
@@ -171,11 +175,15 @@ extern USO_node_t *USO_prev_element (USO_list_t * list, USO_node_t *iterator);
  * @param f : Function used on each node.
  * @return Node if one was found or NULL.
  */
-extern void USO_map (USO_list_t *list, void (*f) (USO_node_t *) );
+extern void USO_map (USO_list_t * list, void (*f) (USO_node_t *));
 
 /*------------------------------------------------------------------------*/
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

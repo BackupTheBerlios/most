@@ -4,8 +4,8 @@
  */
 
 #include <ace/stddef.h>
-#include <dev/arch/cpu.h>
-#include <net/arch/smc_91c94.h>
+#include <dev/cpu.h>
+#include <dev/chips/smc_91c94.h>
 #include <net/netif.h>
 #include <net/err.h>
 #include <net/ethernet.h>
@@ -28,39 +28,40 @@ static NET_ip_addr_t ip_lo;
 static NET_ip_addr_t netmask_lo;
 
 static NET_ethif_t ethif0;
-static NET_smc91c94_t smc;
+static DEV_smc91c94_t smc;
 
 static void
 eth_reset (void)
 {
     DEV_digout_set (&MDC_eth_reset);
-    DEV_cpudelay (ACE_USEC_2_LOOPS(100));
+    DEV_cpudelay (DEV_USEC_2_LOOPS (100));
     DEV_digout_clear (&MDC_eth_reset);
-    DEV_cpudelay (ACE_USEC_2_LOOPS(1000));
+    DEV_cpudelay (DEV_USEC_2_LOOPS (1000));
 }
 
 extern void
 MDC_eth_init (void)
 {
-	NET_stats_init ();	
+    NET_stats_init ();
     NET_netbuf_init ();
-	NET_eth_init ();
-	NET_ip_init();
+    NET_eth_init ();
+    NET_ip_init ();
     NET_udp_init ();
 
     NET_netif_init (&MDC_lo, "lo");
     NET_ip4_addr (&ip_lo, 127, 0, 0, 1);
     NET_ip4_addr (&netmask_lo, 255, 0, 0, 0);
-	NET_netif_set_ipaddr (&MDC_lo, &ip_lo);
-	NET_netif_set_netmask (&MDC_lo, &netmask_lo);
+    NET_netif_set_ipaddr (&MDC_lo, &ip_lo);
+    NET_netif_set_netmask (&MDC_lo, &netmask_lo);
     NET_loopif_init (&MDC_lo);
 
     NET_netif_init (&MDC_eth0, "eth0");
-	MDC_ee_config_ip();
-	NET_netif_set_default (&MDC_eth0);
-    NET_ethif_init (&MDC_eth0, &ethif0, &MDC_ee_config.eth_addr);
+    MDC_config_ip ();
+    NET_ethif_init (&MDC_eth0, &ethif0, &MDC_config.eth_addr, "eth0");
+
+    NET_netif_set_default (&MDC_eth0);
     eth_reset ();
-    NET_smc_init (&ethif0, &smc, SMC_IOADDR);
+    DEV_smc_init (&ethif0, &smc, SMC_IOADDR);
 }
 
 extern void
@@ -69,8 +70,8 @@ MDC_eth_start (void)
     NET_ethif_start (&ethif0);
 }
 
-extern ACE_INTERRUPT_
-void MDC_IRQ7_ISR (void)
+extern ACE_INTERRUPT_ void
+MDC_IRQ7_ISR (void)
 {
-    NET_smc_interrupt (&smc);
+    DEV_smc_interrupt (&smc);
 }

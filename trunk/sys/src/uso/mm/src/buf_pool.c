@@ -30,15 +30,19 @@ extern USO_buf_pool_t *
 USO_buf_pool_new (int count, long size)
 {
     USO_buf_pool_t *buf_pool = ACE_malloc (sizeof (USO_buf_pool_t));
-    if (buf_pool) {
+    if (buf_pool)
+    {
         void *buf = ACE_malloc (count * size);
-        if (buf) {
+        if (buf)
+        {
             USO_buf_pool_init (buf_pool, buf, count, size);
-        } else {
+        }
+        else
+        {
             ACE_free (buf_pool);
             buf_pool = NULL;
         }
-    }   
+    }
     return buf_pool;
 }
 

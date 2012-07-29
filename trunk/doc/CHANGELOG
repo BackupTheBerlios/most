@@ -1,0 +1,35 @@
+VERSION = V-0.1.0-d-3 : commit
+=====================
+
+DATE = 23.06.2012
+AUTOR = maik
+-----------------
+
+STATE = SAM : compileable and running
+        MDC : compileable and running (serial eeprom does not work)
+        
+ADD = ACE DEV: time, rtc,
+	  BSP: Audio out(beep),
+	  NAP: Syslog client
+	  ACE BSP: ASSERT, PANIC 
+	  CHANGELOG file
+	  Ubuntu OpenOCD 0.5.0	
+	  GDB support for Eclipse
+	  Build structure improvements
+	  tty to handle CR/LF conversion
+	  Doxygen: just one doc folder for all sys-, one for all usr -libraries
+	  rename Makefiles.* all do Makefile so that editors can handle tabs (instead of spaces)
+	  error headers with error constant definitions
+      io_spi for serial eeprom(not working correct, cs has do be done)
+	  
+FIX = NET: error in emac sending (only one netbuf was transmitted)
+
+
+VERSION = V-0.1.0-d-2 : labeled (V-0-1-0-d-2)
+=====================
+
+DATE = 01.12.2010
+AUTOR = maik
+-----------------
+
+STATE = SAM, MDC compileable and running, Ubuntu OpenOCD 0.2.0 in development

@@ -39,7 +39,7 @@
 ///
 /// !Usage
 ///
-/// -# Initialize System timer for a period in µsecond with
+/// -# Initialize System timer for a period in ï¿½second with
 ///    PIT_Init
 /// -# Set the PIT Periodic Interval Value with PIT_SetPIV
 /// -# Enable the PIT with PIT_Enable
@@ -55,24 +55,51 @@
 ///    PIT_GetPIVR
 //------------------------------------------------------------------------------
 
-#ifndef PIT_H
-#define PIT_H
+#ifndef DEV_AT91_PIT_H
+#define DEV_AT91_PIT_H
 
-//------------------------------------------------------------------------------
-//         Headers
-//------------------------------------------------------------------------------
+#define DEV_AT91_PIT_SEC_IN_USEC 1000000
 
-//------------------------------------------------------------------------------
-//         Exported functions
-//------------------------------------------------------------------------------
-extern void PIT_Init(unsigned int period, unsigned int pit_frequency);
-extern void PIT_SetPIV(unsigned int piv);
-extern void PIT_Enable(void);
-extern void PIT_EnableIT(void);
-extern void PIT_DisableIT(void);
-extern unsigned int PIT_GetMode(void);
-extern unsigned int PIT_GetStatus(void);
-extern unsigned int PIT_GetPIIR(void);
-extern unsigned int PIT_GetPIVR(void);
+/** Initialize the System timer.
+ *  @param period : Amount of periods per second.
+ *  @param pit_frequency : System clock frequency in MHz.
+ */
+extern void DEV_at91_PIT_init (unsigned int period, unsigned int pit_frequency);
 
-#endif //#ifndef PIT_H
+/**
+ * Enable PIT periodic interrupt
+ */
+extern void DEV_at91_PIT_enable_IT (void);
+
+/**
+ * Disable PIT periodic interrupt
+ */
+extern void DEV_at91_PIT_disable_IT (void);
+
+/**
+ * Read PIT mode register
+ * @return PIT_MR value.
+ */
+extern unsigned int DEV_at91_PIT_get_mode (void);
+
+/**
+ * PIT status
+ * @return 0 not reached PIV : 1 reached PIV since last read.
+ */
+extern unsigned int DEV_at91_PIT_get_status (void);
+
+/**
+ * Read PIT CPIV and PICNT without resetting the counters
+ * @return PIT_PIIR value.
+ */
+extern unsigned int DEV_at91_PIT_get_PIIR (unsigned int *picnt);
+
+/**
+ * Returns the value of the PIT Value Register, clearing it as a side effect.
+ * @return PIT_PIVR value.
+ */
+extern unsigned int DEV_at91_PIT_get_PIVR (unsigned int *picnt);
+
+extern unsigned int DEV_at91_PIT_ticks_2_usec (unsigned int pit_ticks);
+
+#endif // DEV_AT91_PIT_H

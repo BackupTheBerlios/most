@@ -59,8 +59,7 @@ static unsigned char DownloadCharDefinitionData[] = { ESC, '&', _a, _c1, _c2 };
 
 extern void
 DPY_gu256x64ser_DownloadCharDefinition (unsigned char type,
-                                  unsigned char start,
-                                  unsigned char end, unsigned char *data)
+                                        unsigned char start, unsigned char end, unsigned char *data)
 {
     unsigned char size, x;
     if (type == 1)
@@ -73,7 +72,7 @@ DPY_gu256x64ser_DownloadCharDefinition (unsigned char type,
     DownloadCharDefinitionData[3] = start;
     DownloadCharDefinitionData[4] = end;
     DPY_gu256x64ser_WriteArray2Display (DownloadCharDefinitionData,
-                        sizeof (DownloadCharDefinitionData));
+                                        sizeof (DownloadCharDefinitionData));
     for (x = 1; x <= size; ++x)
     {
         DPY_gu256x64ser_WriteChar2Display (x);
@@ -89,7 +88,7 @@ DPY_gu256x64ser_DeleteDownloadedChar (unsigned char select, unsigned char code)
     DeleteDownloadedCharData[2] = select;
     DeleteDownloadedCharData[3] = code;
     DPY_gu256x64ser_WriteArray2Display (DeleteDownloadedCharData,
-                        sizeof (DeleteDownloadedCharData));
+                                        sizeof (DeleteDownloadedCharData));
 }
 
 static unsigned char InternalFontSetData[] = { ESC, 'R', _n };
@@ -123,8 +122,7 @@ static const unsigned char VerticalScrollModeData[] = { US, MD2 };
 extern void
 DPY_gu256x64ser_VerticalScrollMode (void)
 {
-    DPY_gu256x64ser_WriteArray2Display (VerticalScrollModeData,
-                        sizeof (VerticalScrollModeData));
+    DPY_gu256x64ser_WriteArray2Display (VerticalScrollModeData, sizeof (VerticalScrollModeData));
 }
 
 static const unsigned char HorizontalScrollModeData[] = { US, MD3 };
@@ -133,7 +131,7 @@ extern void
 DPY_gu256x64ser_HorizontalScrollMode (void)
 {
     DPY_gu256x64ser_WriteArray2Display (HorizontalScrollModeData,
-                        sizeof (HorizontalScrollModeData));
+                                        sizeof (HorizontalScrollModeData));
 }
 
 static unsigned char HorizontalScrollSpeedData[] = { US, 's', _n };
@@ -143,7 +141,7 @@ DPY_gu256x64ser_HorizontalScrollSpeed (unsigned char speed)
 {
     HorizontalScrollSpeedData[2] = speed;
     DPY_gu256x64ser_WriteArray2Display (HorizontalScrollSpeedData,
-                        sizeof (HorizontalScrollSpeedData));
+                                        sizeof (HorizontalScrollSpeedData));
 }
 
 static unsigned char ReverseDisplayData[] = { US, 'r', _n };
@@ -161,8 +159,7 @@ extern void
 DPY_gu256x64ser_MixtureDisplayMode (unsigned char mode)
 {
     MixtureDisplayModeData[2] = mode;
-    DPY_gu256x64ser_WriteArray2Display (MixtureDisplayModeData,
-                        sizeof (MixtureDisplayModeData));
+    DPY_gu256x64ser_WriteArray2Display (MixtureDisplayModeData, sizeof (MixtureDisplayModeData));
 }
 
 static unsigned char BrightnessLevelData[] = { US, 'X', _n };
@@ -181,8 +178,7 @@ DPY_gu256x64ser_RAMMacroDefinition (unsigned short length, unsigned char *data)
 {
     RAMMacroDefinitionData[2] = (unsigned char)length;
     RAMMacroDefinitionData[3] = (unsigned char)(length >> 8);
-    DPY_gu256x64ser_WriteArray2Display (RAMMacroDefinitionData,
-                        sizeof (RAMMacroDefinitionData));
+    DPY_gu256x64ser_WriteArray2Display (RAMMacroDefinitionData, sizeof (RAMMacroDefinitionData));
     DPY_gu256x64ser_WriteArray2Display (data, (ACE_size_t) length);
 }
 
@@ -190,7 +186,7 @@ static unsigned char MacroExecutionData[] = { US, '^', _n, _t1, _t2 };
 
 extern void
 DPY_gu256x64ser_MacroExecution (unsigned char definitionNr,
-                          unsigned char displayTime, unsigned char idleTime)
+                                unsigned char displayTime, unsigned char idleTime)
 {
     MacroExecutionData[2] = definitionNr;
     MacroExecutionData[3] = displayTime;

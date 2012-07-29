@@ -10,6 +10,10 @@
 #include "net/err.h"
 #include "net/ip_addr.h"
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup netif netif.h
  *
  * Network Interface.
@@ -30,8 +34,8 @@ struct NET_netif
     NET_ip_addr_t ip_addr;              /**< IP address of the interface. */
     NET_ip_addr_t netmask;              /**< Netmask of the interface. */
     NET_ip_addr_t gateway;              /**< IP address for the gateway. */
-    NET_err_t (*output) (NET_netif_t *,NET_netbuf_t *, NET_ip_addr_t * ipaddr); /**< Output function the interface will use. */
-    void (*info)(void*);                /**< Info function of the device. */
+      ACE_err_t (*output) (NET_netif_t *, NET_netbuf_t *, NET_ip_addr_t * ipaddr);
+                                                                                /**< Output function the interface will use. */
     void *device;                       /**< Pointer to device driver( ethernet interface, loopback interface, ...). */
 };
 
@@ -45,29 +49,33 @@ extern NET_netif_t *NET_netif_default;
  * @param netif : Network interface.
  * @param name : Name for the network interface.
  */
-extern void NET_netif_init (NET_netif_t *netif, char *name);
+extern void NET_netif_init (NET_netif_t * netif, char *name);
 
 /**
  * Set default network interface to netif.
  */
-extern void NET_netif_set_default (NET_netif_t *netif);
+extern void NET_netif_set_default (NET_netif_t * netif);
 
 /**
  * Set IP address to ipaddr.
  */
-extern void NET_netif_set_ipaddr (NET_netif_t *netif, NET_ip_addr_t *ipaddr);
+extern void NET_netif_set_ipaddr (NET_netif_t * netif, NET_ip_addr_t * ipaddr);
 
 /**
  * Set IP netmask to netmask.
  */
-extern void NET_netif_set_netmask (NET_netif_t *netif, NET_ip_addr_t *netmask);
+extern void NET_netif_set_netmask (NET_netif_t * netif, NET_ip_addr_t * netmask);
 
 /**
  * Set gateway IP address to gateway.
  */
-extern void NET_netif_set_gateway (NET_netif_t *netif, NET_ip_addr_t *gateway);
+extern void NET_netif_set_gateway (NET_netif_t * netif, NET_ip_addr_t * gateway);
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

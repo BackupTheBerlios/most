@@ -6,7 +6,7 @@
 #ifndef MDC_MAIN_H
 #define MDC_MAIN_H
 
-/** @addtogroup initialization
+/** @addtogroup init
  *
  * @{
  */
@@ -21,10 +21,10 @@
 #define MDC_BOARD "MDC"
 
 /**
- * This function is called from the Init Thread.
+ * This function is called from the Start Thread.
  * This is the right place to start your application.
- * Keep in mind that you are running on the init thread.
- * If the function ends, the init thread terminates and
+ * Keep in mind that you are running on the start thread.
+ * If the function ends, the start thread terminates and
  * its recources are freed.
  */
 extern void MDC_main (void);

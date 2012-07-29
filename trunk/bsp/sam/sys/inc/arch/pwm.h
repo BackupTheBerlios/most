@@ -10,8 +10,42 @@
 
 #include <dev/pwm.h>
 
-extern DEV_pwm_t pwm;
+/** @addtogroup arch
+ *
+ * @{
+ */
 
-extern void SAM_pwm_init(void);
+/** @defgroup pwm pwm.h
+ *
+ * Puls with modulation.
+ *
+ * @{
+ */
+
+/**
+ *
+ */
+extern DEV_pwm_t speaker;
+
+/**
+ *
+ */
+extern void SAM_pwm_init (void);
+
+/**
+ *
+ */
+extern void SAM_pwm_interrupt (void);
+
+/**
+ *
+ */
+extern void SAM_beep (void);
+
+/** @}
+ */
+
+/** @}
+ */
 
 #endif /* _SAM_PWM_H_ */

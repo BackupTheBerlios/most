@@ -6,7 +6,9 @@
 #ifndef MDC_START_H
 #define MDC_START_H
 
-/** @addtogroup initialization
+#include <ace/stdio.h>
+
+/** @addtogroup init
  *
  * @{
  */
@@ -22,7 +24,7 @@
 /**
  * Start services.
  */
-extern void MDC_start (void);
+extern void MDC_start (ACE_FILE * stdio);
 
 /** @}
  */

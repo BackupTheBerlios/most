@@ -8,6 +8,26 @@
 
 #include "mfs/vfs.h"
 
-extern void TST_thread_test_install (MFS_descriptor_t *test);
+/** @addtogroup test
+ *
+ * @{
+ */
+/** @defgroup thread_test thread_test.h
+ *
+ * @{
+ */
+
+
+/**
+ *
+ */
+extern void TST_thread_test_install (MFS_descriptor_t * test);
+
+
+/** @}
+ */
+
+/** @}
+ */
 
 #endif

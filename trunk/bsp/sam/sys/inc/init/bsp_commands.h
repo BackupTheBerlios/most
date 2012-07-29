@@ -10,6 +10,43 @@
 
 #include "mfs/vfs.h"
 
-extern void bsp_commands_install(MFS_descriptor_t *bsp);
+/** @addtogroup init
+ *
+ * @{
+ */
+
+/** @defgroup bsp_commands bsp_commands.h
+ *
+ * Configuration
+ *
+ * @{
+ */
+
+
+/**
+ *
+ */
+extern void SAM_bootp (void);
+
+/**
+ *
+ */
+extern void SAM_start_app (void);
+
+/**
+ *
+ */
+extern void SAM_start_boot (void);
+
+/**
+ *
+ */
+extern void SAM_bsp_commands_install (MFS_descriptor_t * bsp);
+
+/** @}
+ */
+
+/** @}
+ */
 
 #endif /* BSP_COMMANDS_H_ */

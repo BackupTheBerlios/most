@@ -13,6 +13,10 @@
 #include "net/netif.h"
 #include "net/err.h"
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup ip ip.h
  *
  * Internet Protocol.
@@ -25,7 +29,7 @@
 #define NET_IP_PROTO_ICMP 1  /**< ICMP Protocol. */
 #define NET_IP_PROTO_UDP 17  /**< UDP Protocol. */
 #define NET_IP_PROTO_UDPLITE 170 /** UDPLITE Protocol. */
-#define NET_IP_PROTO_TCP 6 /* TCP Protocol. */
+#define NET_IP_PROTO_TCP 6      /* TCP Protocol. */
 
 /*
  * This is passed as the destination address to ip_output_if (not to
@@ -116,7 +120,7 @@ extern void NET_ip_init (void);
  * @param dest : Destination IP address.
  * @return Network interface for transmitting the packet.
  */
-extern NET_netif_t *NET_ip_route (NET_ip_addr_t *dest);
+extern NET_netif_t *NET_ip_route (NET_ip_addr_t * dest);
 
 /**
  * Ip_input: This function is called by the network interface device
@@ -125,7 +129,7 @@ extern NET_netif_t *NET_ip_route (NET_ip_addr_t *dest);
  * @param p : Received packet.
  * @return NET_ERR.
  */
-extern NET_err_t NET_ip_input (NET_netif_t *inp, NET_netbuf_t *p);
+extern ACE_err_t NET_ip_input (NET_netif_t * inp, NET_netbuf_t * p);
 
 /**
  * Ip_output: Simple interface to ip_output_if. It finds the outgoing
@@ -137,11 +141,9 @@ extern NET_err_t NET_ip_input (NET_netif_t *inp, NET_netbuf_t *p);
  * @param proto : Protocol.
  * @return NET_ERR.
  */
-NET_err_t
+ACE_err_t
 NET_ip_output (NET_netbuf_t * p,
-               NET_ip_addr_t * src,
-               NET_ip_addr_t * dest,
-               ACE_u8_t ttl, ACE_u8_t proto);
+               NET_ip_addr_t * src, NET_ip_addr_t * dest, ACE_u8_t ttl, ACE_u8_t proto);
 
 /**
  * Ip_output_if: Sends an IP packet on a network interface. This function
@@ -156,14 +158,16 @@ NET_ip_output (NET_netbuf_t * p,
  * @param netif : Network interface for transmitting the packet.
  * @return NET_ERR.
  */
-extern NET_err_t
+extern ACE_err_t
 NET_ip_output_if (NET_netbuf_t * p,
                   NET_ip_addr_t * src,
-                  NET_ip_addr_t * dest,
-                  ACE_u8_t ttl, ACE_u8_t proto,
-                  NET_netif_t * netif);
+                  NET_ip_addr_t * dest, ACE_u8_t ttl, ACE_u8_t proto, NET_netif_t * netif);
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

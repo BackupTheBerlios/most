@@ -15,6 +15,10 @@
 #include "net/ip.h"
 #include "net/err.h"
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup udp_sock udp_sock.h
  *
  * User Datagramm Socket.
@@ -41,7 +45,7 @@ struct NET_udp_socket
     ACE_u16_t chksum_len;          /**< Checksum and length. */
     USO_mailbox_t rx_que;          /**< Receive mailbox. */
     DEV_timer_t rx_timer;          /**< Receive timer. */
-    ACE_bool_t rx_timeout;         /**< Receive timeout. */
+    unsigned long rx_timeout;      /**< Receive timeout. */
 };
 
 #define NET_udp_flags(sock)  ((sock)->flags) /**< Get UDP socket flags. */
@@ -51,7 +55,7 @@ struct NET_udp_socket
  * Initialize UDP socket.
  * @param sock : UDP socket.
  */
-extern void NET_udp_socket_init (NET_udp_socket_t *sock);
+extern void NET_udp_socket_init (NET_udp_socket_t * sock);
 
 /**
  * Create and initialize a UDP socket.
@@ -63,13 +67,13 @@ extern NET_udp_socket_t *NET_udp_socket_new (void);
  * Add UDP socket to list of UDP sockets.
  * @param sock : UDP socket.
  */
-extern void NET_udp_socket_open (NET_udp_socket_t *sock);
+extern void NET_udp_socket_open (NET_udp_socket_t * sock);
 
 /**
  * Remove UDP socket from list of UDP sockets and release resources.
  * @param sock : UDP socket.
  */
-extern void NET_udp_socket_close (NET_udp_socket_t *sock);
+extern void NET_udp_socket_close (NET_udp_socket_t * sock);
 
 /**
  * Bind the UDP socket to a local IP address and port.
@@ -77,7 +81,7 @@ extern void NET_udp_socket_close (NET_udp_socket_t *sock);
  * @param ipaddr : Local IP address.
  * @param port : Local port.
  */
-extern void NET_udp_bind (NET_udp_socket_t *sock, NET_ip_addr_t *ipaddr, ACE_u16_t port);
+extern void NET_udp_bind (NET_udp_socket_t * sock, NET_ip_addr_t * ipaddr, ACE_u16_t port);
 
 /**
  * Bind(connect) the UDP socket to a remote IP address and port.
@@ -85,14 +89,14 @@ extern void NET_udp_bind (NET_udp_socket_t *sock, NET_ip_addr_t *ipaddr, ACE_u16
  * @param ipaddr : Remote IP address.
  * @param port : Remote port.
  */
-extern void NET_udp_connect (NET_udp_socket_t *sock, NET_ip_addr_t *ipaddr, ACE_u16_t port);
+extern void NET_udp_connect (NET_udp_socket_t * sock, NET_ip_addr_t * ipaddr, ACE_u16_t port);
 
 /**
  * Set UDP receive timeout.
  * @param sock : UDP socket.
  * @param timeout : Receive timeout.
  */
-extern void NET_udp_recv_timeout (NET_udp_socket_t *sock, unsigned long timeout);
+extern void NET_udp_recv_timeout (NET_udp_socket_t * sock, unsigned long timeout);
 
 /**
  * Receive a UDP packet as network buffer.
@@ -103,9 +107,8 @@ extern void NET_udp_recv_timeout (NET_udp_socket_t *sock, unsigned long timeout)
  * @param port : Get back the senders (source) port.
  * @return Received UDP packet.
  */
-extern NET_netbuf_t *
-NET_udp_recv_netbuf (NET_udp_socket_t * sock,
-              		 NET_ip_addr_t * ipaddr, ACE_u16_t * port);
+extern NET_netbuf_t *NET_udp_recv_netbuf (NET_udp_socket_t * sock,
+                                          NET_ip_addr_t * ipaddr, ACE_u16_t * port);
 
 /**
  * Receive a UDP packet.
@@ -116,9 +119,8 @@ NET_udp_recv_netbuf (NET_udp_socket_t * sock,
  * @param len : Maximal received data length.
  * @return Real received data length.
  */
-extern long NET_udp_recv (NET_udp_socket_t *sock,
-                          NET_ip_addr_t *ipaddr, ACE_u16_t * port,
-                          char * buf, unsigned int len);
+extern long NET_udp_recv (NET_udp_socket_t * sock,
+                          NET_ip_addr_t * ipaddr, ACE_u16_t * port, char *buf, unsigned int len);
 
 /**
  * Send a network buffer as UDP packet.
@@ -128,8 +130,7 @@ extern long NET_udp_recv (NET_udp_socket_t *sock,
  * @param p : UDP packet as netbuf.
  * @return NET_ERR.
  */
-NET_err_t
-NET_udp_send_netbuf (NET_udp_socket_t *sock, NET_netbuf_t *p);
+ACE_err_t NET_udp_send_netbuf (NET_udp_socket_t * sock, NET_netbuf_t * p);
 
 /**
  * Send a network buffer as UDP packet.
@@ -140,12 +141,13 @@ NET_udp_send_netbuf (NET_udp_socket_t *sock, NET_netbuf_t *p);
  * @param len : Data length.
  * @return NET_ERR.
  */
-extern NET_err_t NET_udp_send (NET_udp_socket_t * sock,
-							   char * data,
-							   unsigned int len);
+extern ACE_err_t NET_udp_send (NET_udp_socket_t * sock, char *data, unsigned int len);
+
+/** @}
+ */
 
 /** @}
  */
 
 
-#endif /*UDP_SOCK_H*/
+#endif /*UDP_SOCK_H */

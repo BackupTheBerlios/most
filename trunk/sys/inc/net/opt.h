@@ -6,6 +6,10 @@
 #ifndef NET_OPT_H
 #define NET_OPT_H
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup opt opt.h
  *
  * Network Options.
@@ -22,6 +26,9 @@
 #define NET_TCP_SYNMAXRTX           6 /**< TCP SYN max receive ??? */
 #define NET_UDP                     1 /**< Enable UDP. */
 #define NET_TCP                     0 /**< Enable TCP. */
+
+/** @}
+ */
 
 /** @}
  */

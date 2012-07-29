@@ -1,6 +1,10 @@
 #ifndef NAP_TFTP_H
 #define NAP_TFTP_H
 
+/** @addtogroup nap
+ * @{
+ */
+
 /** @defgroup tftp tftp.h
  *
  * Trivial file transfer protocol for download.
@@ -21,7 +25,7 @@
  * @param server_addr : Server IP address received with bootp.
  * @return -1 if fails, else 0.
  */
-int NAP_tftp_open(NET_ip_addr_t *client_addr, NET_ip_addr_t *server_addr);
+int NAP_tftp_open (NET_ip_addr_t * client_addr, NET_ip_addr_t * server_addr);
 
 /**
  * Get a file from server.
@@ -29,12 +33,15 @@ int NAP_tftp_open(NET_ip_addr_t *client_addr, NET_ip_addr_t *server_addr);
  * @param f : Callback function, will be called for each received part of the file.
  * @return -1 if fails, else 0.
  */
-int NAP_tftp_get(const char* filename, ACE_bool_t (*f)(char *, ACE_size_t));
+int NAP_tftp_get (const char *filename, ACE_bool_t (*f) (char *, ACE_size_t));
 
 /**
  * Close TFTP connection (socket).
  */
-void NAP_tftp_close(void);
+void NAP_tftp_close (void);
+
+/** @}
+ */
 
 /** @}
  */

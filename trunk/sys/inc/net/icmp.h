@@ -12,6 +12,10 @@
 #include "net/opt.h"
 #include "net/netif.h"
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup icmp icmp.h
  *
  * Internet control message protocol.
@@ -57,14 +61,14 @@ enum NET_icmp_te_type
  * @param inp : Network interface where p is received.
  * @return NET_ERR.
  */
-extern NET_err_t NET_icmp_input (NET_netbuf_t *p, NET_netif_t *inp);
+extern ACE_err_t NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp);
 
 /**
  * Send ICMP destination unreachable.
  * @param p : Received packet.
  * @param t : ICMP duration type.
  */
-extern void NET_icmp_dest_unreach (NET_netbuf_t *p, enum NET_icmp_dur_type t);
+extern void NET_icmp_dest_unreach (NET_netbuf_t * p, enum NET_icmp_dur_type t);
 
 //extern void NET_icmp_time_exceeded (NET_netbuf_t *, enum NET_icmp_te_type);
 
@@ -107,5 +111,9 @@ struct NET_icmp_te_hdr
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

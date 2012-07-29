@@ -10,6 +10,10 @@
 #include "uso/semaphore.h"
 
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup buf_pool buf_pool.h
  *
  * Blocking memory management.
@@ -58,8 +62,7 @@ typedef struct USO_buf_pool USO_buf_pool_t;
  * @param count : Amount of the buffers in the array.
  * @param size : Size of one buffer.
  */
-extern void USO_buf_pool_init (USO_buf_pool_t * buf_pool,
-                               void *buf, int count, long size);
+extern void USO_buf_pool_init (USO_buf_pool_t * buf_pool, void *buf, int count, long size);
 
 /**
  * Create a buffer pool.
@@ -94,6 +97,9 @@ extern void *USO_buf_alloc (USO_buf_pool_t * buf_pool);
 extern void USO_buf_free (USO_buf_pool_t * buf_pool, void *buf);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

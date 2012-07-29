@@ -12,8 +12,9 @@
 
 DEV_adc_t adc;
 
-extern void SAM_adc_init(void)
+extern void
+SAM_adc_init (void)
 {
-	DEV_at91_adc_init();
-	DEV_adc_init(&adc, DEV_at91_adc_get);
+    DEV_at91_ADC_init ();
+    DEV_adc_init (&adc, DEV_at91_ADC_get);
 }

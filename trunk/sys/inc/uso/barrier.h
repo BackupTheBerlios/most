@@ -9,6 +9,10 @@
 #include <ace/stddef.h>
 #include "uso/list.h"
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup barrier barrier.h
  *
  * Barrier.
@@ -25,7 +29,7 @@
  */
 struct USO_barrier
 {
-    USO_list_t threads; /* List of blocked threads */
+    USO_list_t threads;         /* List of blocked threads */
 };
 
 /** 
@@ -67,6 +71,9 @@ extern void USO_go_all (USO_barrier_t * barrier);
 
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

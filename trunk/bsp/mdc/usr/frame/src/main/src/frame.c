@@ -5,10 +5,10 @@
 
 #include <uso/log.h>
 
-#include "frame.h"
+#include <frame.h>
 
 extern void
 MDC_main (void)
 {
-    USO_kputs (USO_LL_INFO, MDC_APPLICATION" "ACE_MOST_VERSION"\n");
+    USO_log_puts (USO_LL_INFO, MDC_APPLICATION " " ACE_MOST_VERSION "\n");
 }

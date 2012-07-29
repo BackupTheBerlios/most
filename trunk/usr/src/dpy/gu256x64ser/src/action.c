@@ -20,12 +20,10 @@ DPY_gu256x64ser_Wait (unsigned char time)
     DPY_gu256x64ser_WriteArray2Display (WaitData, sizeof (WaitData));
 }
 
-static unsigned char ScrollData[] =
-    { US, '(', 'a', '\x10', _wL, _wH, _cL, _cH, _s };
+static unsigned char ScrollData[] = { US, '(', 'a', '\x10', _wL, _wH, _cL, _cH, _s };
 
 extern void
-DPY_gu256x64ser_Scroll (unsigned short screenShift,
-                  unsigned short reptition, unsigned char speed)
+DPY_gu256x64ser_Scroll (unsigned short screenShift, unsigned short reptition, unsigned char speed)
 {
     ScrollData[4] = (unsigned char)screenShift;
     ScrollData[5] = (unsigned char)(screenShift >> 8);
@@ -39,8 +37,7 @@ static unsigned char BlinkData[] = { US, '(', 'a', '\x11', _p, _t1, _t2, _c };
 
 extern void
 DPY_gu256x64ser_Blink (unsigned char pattern,
-                 unsigned char normalTime,
-                 unsigned char brankTime, unsigned char reptition)
+                       unsigned char normalTime, unsigned char brankTime, unsigned char reptition)
 {
     BlinkData[4] = pattern;
     BlinkData[5] = normalTime;
@@ -52,8 +49,7 @@ DPY_gu256x64ser_Blink (unsigned char pattern,
 static unsigned char CurtainData[] = { US, '(', 'a', '\x12', _v, _s, _p };
 
 extern void
-DPY_gu256x64ser_Curtain (unsigned char direction,
-                   unsigned char speed, unsigned char pattern)
+DPY_gu256x64ser_Curtain (unsigned char direction, unsigned char speed, unsigned char pattern)
 {
     CurtainData[4] = direction;
     CurtainData[5] = speed;
@@ -64,8 +60,7 @@ DPY_gu256x64ser_Curtain (unsigned char direction,
 static unsigned char SpringData[] = { US, '(', 'a', '\x13', _v, _s, _pL, _pH };
 
 extern void
-DPY_gu256x64ser_Spring (unsigned char direction,
-                  unsigned char speed, unsigned short patternAddress)
+DPY_gu256x64ser_Spring (unsigned char direction, unsigned char speed, unsigned short patternAddress)
 {
     SpringData[4] = direction;
     SpringData[5] = speed;

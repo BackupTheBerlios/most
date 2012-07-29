@@ -1,19 +1,71 @@
-# Copy this file to a file named Config 
-# and uncomment following lines at your needs!
+## sam config
+## Copy this file to a file named Config
+## and set following lines at your needs!
 
+## ------------ Target System ---------------
+## ==========================================
+
+## [3.4.6, 4.4.3]
+## gcc version number of your toolchain
 MOST_GCC:=4.4.3
+
+## [arm, h8300]
+## target cpu type of your toolchain
 MOST_CPU:=arm
+
+## [elf, none-eabi, hms, coff]
+## target system type of your toolchain
 MOST_SYSTEM:=elf
+
+## do not change
+MOST_TARGET:=$(MOST_CPU)-$(MOST_SYSTEM)
+
+## libgcc in your cross toolchain
+MOST_LIB_GCC:=gcc/$(MOST_TARGET)/$(MOST_GCC)
+
+## [little, big]
+## byte order of your target system
 MOST_ENDIAN:=little
+
+## [16, 32]
+## word with of your target system
 MOST_BIT:=32
-MOST_OPTI:=-O0
-#MOST_OPTI:=-O1
-#MOST_OPTI:=-O2
-#MOST_OPTI:=-Os
-MOST_DEBUG:=-g
-#MOST_BUILD_ERR_FILE:=on
-#MOST_BUILD_LOG:=off
+
+## ------------ Target Architecture   ---------------
+## ==================================================
+
+## [at91, h8]
+## microcontroller architecture
 MOST_ARCH:=at91
-MOST_SUB_ARCH:=sam7x
-MOST_JTAG=olimex-arm-usb-ocd
-#MOST_JTAG=parport
+
+## [at91sam7x, h8300h]
+## microcontroller type
+MOST_ARCH_TYPE:=at91sam7x
+
+## [at91sam7x256, h83003]
+## microcontroller model
+MOST_ARCH_MODEL:=at91sam7x256
+
+## ------------ Target File -------------
+## ======================================
+
+## [bin, hex, srec]
+## produced binary file type
+MOST_FILE:=bin
+
+## ------------ Build Version -----------
+## ======================================
+
+## [-Os]
+## -Os: build Release Version optimized for size
+MOST_BUILD_RUN = -Os
+
+## [-O0 -g]
+## -O0: build Debug Version with no optimization
+## -g: compile with debug information
+MOST_BUILD_DEBUG:=--O0 -g
+
+## [$(MOST_BUILD_RUN), $(MOST_BUILD_DEBUG) ]
+MOST_BUILD:=$(MOST_BUILD_RUN)
+#MOST_BUILD:=$(MOST_BUILD_DEBUG)
+

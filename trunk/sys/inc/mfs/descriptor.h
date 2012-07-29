@@ -6,6 +6,10 @@
 #ifndef MFS_DESCRIPTOR_H
 #define MFS_DESCRIPTOR_H
 
+/** @addtogroup mfs
+ * @{
+ */
+
 /** @defgroup descriptor descriptor.h
  *
  * Descriptor functions.
@@ -27,29 +31,29 @@
 /** Descriptor entry type. */
 enum MFS_entry_type
 {
-	MFS_SUPER,           /**< Super block, mount functionality. */
-	MFS_DIRECTORY,       /**< Directory. */
-	MFS_STREAM,          /**< IO stream, files, serial io, ... .*/
-	MFS_EXEC,            /**< Executable (C function registered as exec). */
-	MFS_DESC             /**< Provide just the descriptor interface, open, close and info. */
+    MFS_SUPER,               /**< Super block, mount functionality. */
+    MFS_DIRECTORY,           /**< Directory. */
+    MFS_STREAM,              /**< IO stream, files, serial io, ... .*/
+    MFS_EXEC,                /**< Executable (C function registered as exec). */
+    MFS_DESC                 /**< Provide just the descriptor interface, open, close and info. */
 };
 
 /** File system descriptor structure. */
 struct MFS_descriptor
 {
-	USO_node_t node;                             /**< List node, to put the descriptor to a list. */
-	MFS_entry_t *entry;                          /**< Descriptor entry. */
-	struct MFS_descriptor_op *operations;        /**< Descriptor function interface. */
-	char name[MFS_NAME_SIZE];                    /**< Name of the descriptor. */
-	enum MFS_entry_type type;                    /**< Kind of descriptor(entry). */
-	MFS_descriptor_t *parent;                    /**< Parent descriptor. */
-}; 
+    USO_node_t node;                                 /**< List node, to put the descriptor to a list. */
+    MFS_entry_t *entry;                              /**< Descriptor entry. */
+    struct MFS_descriptor_op *operations;            /**< Descriptor function interface. */
+    char name[MFS_NAME_SIZE];                        /**< Name of the descriptor. */
+    enum MFS_entry_type type;                        /**< Kind of descriptor(entry). */
+    MFS_descriptor_t *parent;                        /**< Parent descriptor. */
+};
 
 /**
  * Call the descriptors open operation.
  * @param desc : Descriptor.
  */
-extern void MFS_open_desc(MFS_descriptor_t *desc);
+extern void MFS_open_desc (MFS_descriptor_t * desc);
 
 /**
  * Lookup for the name in the directory, if a descriptor is found call its open operation.
@@ -57,33 +61,33 @@ extern void MFS_open_desc(MFS_descriptor_t *desc);
  * @param name : Name of descriptor for lookup.
  * @return Found and opened descriptor or NULL.
  */
-extern MFS_descriptor_t * MFS_open(MFS_descriptor_t *dir_desc, char*name);
+extern MFS_descriptor_t *MFS_open (MFS_descriptor_t * dir_desc, char *name);
 
 /**
  * Call the descriptors close operation.
  * @param desc : Descriptor.
  * @return Parent descriptor.
  */
-extern MFS_descriptor_t * MFS_close_desc(MFS_descriptor_t *desc);
+extern MFS_descriptor_t *MFS_close_desc (MFS_descriptor_t * desc);
 
 /**
  * Call the descriptors info operation.
  * @param desc : Descriptor.
  */
-extern void MFS_info_desc(MFS_descriptor_t *desc);
+extern void MFS_info_desc (MFS_descriptor_t * desc);
 
 /**
  * Lookup for the name in the directory, if a descriptor is found call its info operation.
  * @param dir_desc : Directory.
  * @param name : Name of descriptor for lookup.
  */
-extern void MFS_info(MFS_descriptor_t *dir_desc, char*name);
-	
+extern void MFS_info (MFS_descriptor_t * dir_desc, char *name);
+
 /**
  * Print information about the descriptor.
  * @param desc : Descriptor.
  */
-extern void MFS_descriptor_info(MFS_descriptor_t *desc);
+extern void MFS_descriptor_info (MFS_descriptor_t * desc);
 
 /**
  * Initialize a descriptor.
@@ -94,12 +98,10 @@ extern void MFS_descriptor_info(MFS_descriptor_t *desc);
  * @param type : Kind of entry.
  * @param parent : Parent descriptor.
  */
-extern void MFS_descriptor_init(MFS_descriptor_t *desc,
-							    MFS_entry_t *entry,		
-								struct MFS_descriptor_op *operations,
-								char *name,
-								enum MFS_entry_type type,
-								MFS_descriptor_t *parent);
+extern void MFS_descriptor_init (MFS_descriptor_t * desc,
+                                 MFS_entry_t * entry,
+                                 struct MFS_descriptor_op *operations,
+                                 char *name, enum MFS_entry_type type, MFS_descriptor_t * parent);
 
 /**
  * Initialize a descriptor.
@@ -110,11 +112,13 @@ extern void MFS_descriptor_init(MFS_descriptor_t *desc,
  * @param parent : Parent descriptor.
  * @return Created descriptor.
  */
-extern MFS_descriptor_t *MFS_descriptor_new(MFS_entry_t *entry,		
-								struct MFS_descriptor_op *operations,
-								char *name,
-								enum MFS_entry_type type,
-								MFS_descriptor_t *parent);
+extern MFS_descriptor_t *MFS_descriptor_new (MFS_entry_t * entry,
+                                             struct MFS_descriptor_op *operations,
+                                             char *name,
+                                             enum MFS_entry_type type, MFS_descriptor_t * parent);
+
+/** @}
+ */
 
 /** @}
  */

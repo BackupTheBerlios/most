@@ -38,44 +38,41 @@ NET_netif_set_default (NET_netif_t * netif)
 }
 
 static void
-print_ipaddr(char* name, NET_ip_addr_t ipaddr)
+print_ipaddr (char *name, NET_ip_addr_t ipaddr)
 {
-	long addr = ACE_ntohl(ipaddr.addr);
- 	ACE_printf("\n\t%s: %3ld.%3ld.%3ld.%3ld", 
-			 name,
-             addr >> 24 & 0xff,
-             addr >> 16 & 0xff,
-             addr >> 8 & 0xff,
-             addr & 0xff);
+    long addr = ACE_ntohl (ipaddr.addr);
+    ACE_printf ("\n\t%s: %3ld.%3ld.%3ld.%3ld",
+                name, addr >> 24 & 0xff, addr >> 16 & 0xff, addr >> 8 & 0xff, addr & 0xff);
 }
 
 static void
-info (MFS_entry_t *entry)
+info (MFS_entry_t * entry)
 {
-	NET_netif_t* netif = (NET_netif_t*) entry;
+    NET_netif_t *netif = (NET_netif_t *) entry;
 
-	print_ipaddr("ip_addr", netif->ip_addr);	
-	print_ipaddr("netmask", netif->netmask);	
-	print_ipaddr("gateway", netif->gateway);
-	ACE_printf("\n\tTX: %lu drop %u RX: %lu drop %u\n", netif->tx, netif->tx_drop, netif->rx, netif->rx_drop);	
-	if (netif->info != NULL) { netif->info(netif->device); }
+    print_ipaddr ("ip_addr", netif->ip_addr);
+    print_ipaddr ("netmask", netif->netmask);
+    print_ipaddr ("gateway", netif->gateway);
+    ACE_printf ("\n\tTX: %lu drop %u RX: %lu drop %u\n",
+                netif->tx, netif->tx_drop, netif->rx, netif->rx_drop);
 }
 
 static struct MFS_descriptor_op netif_descriptor_op = {.open = NULL,
-								        		      .close = NULL,
-										              .info = info};
+    .close = NULL,
+    .info = info
+};
 
 extern void
 NET_netif_init (NET_netif_t * netif, char *name)
 {
-	netif->tx = 0;
-	netif->rx = 0;
-	netif->tx_drop = 0;
-	netif->rx_drop = 0;
+    netif->tx = 0;
+    netif->rx = 0;
+    netif->tx_drop = 0;
+    netif->rx_drop = 0;
     netif->device = NULL;
-    netif->info = NULL;
     NET_ip_addr_set (&(netif->ip_addr), &NET_ip_addr_any);
     NET_ip_addr_set (&(netif->netmask), &NET_ip_addr_any);
     NET_ip_addr_set (&(netif->gateway), &NET_ip_addr_any);
-	MFS_create_desc(MFS_sysfs_netif(), name, (MFS_entry_t*) netif, MFS_DESC, &netif_descriptor_op);
+    MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_NETIF),
+                     name, (MFS_entry_t *) netif, MFS_DESC, &netif_descriptor_op);
 }

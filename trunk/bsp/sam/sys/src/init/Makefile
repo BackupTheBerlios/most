@@ -1,5 +1,5 @@
 INC_PATH_OPT := -I../../inc
-CCFLAGS_OPT :=
+CCFLAGS_OPT :=-O0 -g
 DEFINES_OPT :=
 
--include $(MOST_ROOT)/etc/Makefile.objects
+-include $(MOST_ROOT)/etc/build/obj/Makefile

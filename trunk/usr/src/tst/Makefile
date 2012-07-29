@@ -6,4 +6,4 @@ OBJ_NAMES := basic/o/$(MOST_TARGET)/*.o
 
 makegoal = make $(1) -C basic;
 
--include $(MOST_ROOT)/etc/Makefile.lib
+-include $(MOST_ROOT)/etc/build/lib/Makefile

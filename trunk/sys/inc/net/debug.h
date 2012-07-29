@@ -8,7 +8,11 @@
 
 #include "uso/debug.h"
 
-/** @defgroup debug debug.h
+/** @addtogroup net
+ * @{
+ */
+
+/** @addtogroup debug
  *
  * If NET_DEBUGGING is defined.
  *
@@ -18,8 +22,6 @@
 #if NET_DEBUGGING
 
 #define NET_NETBUF_DEBUG      1 /**< NET_DEBUGGING on */
-#define NET_SMC_DEBUG         1 /**< NET_DEBUGGING on */
-#define NET_MAC_DEBUG         1 /**< NET_DEBUGGING on */
 #define NET_ETH_DEBUG         1 /**< NET_DEBUGGING on */
 #define NET_ARP_DEBUG         1 /**< NET_DEBUGGING on */
 #define NET_NETIF_DEBUG       1 /**< NET_DEBUGGING on */
@@ -34,8 +36,6 @@
 #else
 
 #define NET_NETBUF_DEBUG      0 /**< NET_DEBUGGING off */
-#define NET_SMC_DEBUG         0 /**< NET_DEBUGGING off */
-#define NET_MAC_DEBUG         0 /**< NET_DEBUGGING off */
 #define NET_ETH_DEBUG         0 /**< NET_DEBUGGING off */
 #define NET_ARP_DEBUG         0 /**< NET_DEBUGGING off */
 #define NET_NETIF_DEBUG       0 /**< NET_DEBUGGING off */
@@ -48,6 +48,9 @@
 #define NET_TCP_DEBUG         0 /**< NET_DEBUGGING off */
 
 #endif
+
+/** @}
+ */
 
 /** @}
  */

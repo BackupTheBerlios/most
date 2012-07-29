@@ -9,6 +9,10 @@
 #include "uso/mutex.h"
 #include "uso/barrier.h"
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup monitor monitor.h
  *
  * Similar to synchronized, wait and notify in Java.
@@ -48,6 +52,9 @@
 extern void USO_monitor (USO_mutex_t * mutex, USO_barrier_t * barrier);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

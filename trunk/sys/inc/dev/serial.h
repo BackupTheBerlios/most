@@ -17,6 +17,10 @@
 #include "dev/serial_settings.h"
 #include "dev/serial_int_interface.h"
 
+/** @addtogroup dev
+ * @{
+ */
+
 /** @defgroup serial serial.h
  *
  * Serial Device.
@@ -67,16 +71,17 @@ struct DEV_serial
  * @param name : name for device.
  */
 extern void DEV_serial_init (DEV_serial_t * serial,
-                               const struct DEV_serial_settings *settings,
-                               void (*open) (const struct DEV_serial_settings *),
-                               void (*close) (void),
-                               void (*tx_start) (void),
-                               ACE_bool_t block,
-                               char *name);
+                             const struct DEV_serial_settings *settings,
+                             void (*open) (const struct DEV_serial_settings *),
+                             void (*close) (void),
+                             void (*tx_start) (void), ACE_bool_t block, char *name);
 
 
 /*------------------------------------------------------------------------*/
 
+
+/** @}
+ */
 
 /** @}
  */

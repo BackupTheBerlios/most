@@ -6,6 +6,11 @@
 #ifndef ACE_STDARG_H
 #define ACE_STDARG_H
 
+/** @addtogroup ace
+ *
+ * @{
+ */
+
 /** @defgroup stdarg stdarg.h
  *
  * Standard argument definitions.
@@ -37,6 +42,9 @@ typedef void *ACE_va_list_t;
 #define ACE_va_end(AP)	((void) 0)
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

@@ -13,6 +13,10 @@
 #include "ace/stdio.h"
 #include "mfs/vfs.h"
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup thread thread.h
  *
  * Multithreading.
@@ -134,8 +138,8 @@ struct USO_thread
     void (*cleanup) (void);
     void *arg;
     ACE_bool_t stop;
-	ACE_u32_t flags;
-	ACE_u32_t signals;
+    ACE_u32_t flags;
+    ACE_u32_t signals;
     ACE_FILE *in;
     ACE_FILE *out;
     USO_stack_t *stack;
@@ -143,9 +147,9 @@ struct USO_thread
     USO_stack_t *stack_bot;
     USO_stack_t *stack_top;
     USO_stack_t *stack_max;
-    void * message;
-	unsigned long ticks;
-	MFS_descriptor_t *desc;
+    void *message;
+    unsigned long ticks;
+    MFS_descriptor_t *desc;
 };
 
 /** 
@@ -177,8 +181,7 @@ extern void USO_thread_init (USO_thread_t * thread,
                              USO_stack_t * stack,
                              int stack_size,
                              enum USO_thread_priority priority,
-                             enum USO_thread_scheduling scheduling,
-                             char *name);
+                             enum USO_thread_scheduling scheduling, char *name);
 
 /**
  * Create a thread.
@@ -196,8 +199,7 @@ extern void USO_thread_init (USO_thread_t * thread,
 extern USO_thread_t *USO_thread_new (void (*enter) (void *),
                                      int stack_size,
                                      enum USO_thread_priority priority,
-		                             enum USO_thread_scheduling scheduling,
-                                     char *name);
+                                     enum USO_thread_scheduling scheduling, char *name);
 
 /**
  * Terminate thread, called only by scheduler.
@@ -216,8 +218,7 @@ extern void USO_thread_terminate (USO_thread_t * thread);
  * @param in : Input stream.
  * @param out : Output stream.
  */
-extern void USO_thread_ios_init (USO_thread_t * thread,
-                                 ACE_FILE * in, ACE_FILE * out);
+extern void USO_thread_ios_init (USO_thread_t * thread, ACE_FILE * in, ACE_FILE * out);
 
 
 /**
@@ -226,7 +227,7 @@ extern void USO_thread_ios_init (USO_thread_t * thread,
  * @param thread : thread.
  * @param arg : argument.
  */
-extern void USO_thread_arg_init (USO_thread_t * thread, void * arg);
+extern void USO_thread_arg_init (USO_thread_t * thread, void *arg);
 
 /**
  * Set thread flags.
@@ -234,7 +235,7 @@ extern void USO_thread_arg_init (USO_thread_t * thread, void * arg);
  * @param thread : thread.
  * @param flags : Set flags (for example: 1 << FLAG_DETACH & 1 << FLAG_ANY).
  */
-extern void USO_thread_flags_set(USO_thread_t * thread, ACE_u32_t flags);
+extern void USO_thread_flags_set (USO_thread_t * thread, ACE_u32_t flags);
 
 /**
  * Install for the current thread a cleanup handler.
@@ -242,7 +243,7 @@ extern void USO_thread_flags_set(USO_thread_t * thread, ACE_u32_t flags);
  *
  * @param cleanup : Cleanup handler function.
  */
-extern void USO_cleanup_install(void (*cleanup) (void));
+extern void USO_cleanup_install (void (*cleanup) (void));
 
 /**
  * Start thread.
@@ -264,13 +265,13 @@ extern void USO_stop (USO_thread_t * thread);
  * @param thread : thread which may catch the signals.
  * @param signals : The signals will be ored to the already set signals.
  */
-extern void USO_raise(USO_thread_t * thread, ACE_u32_t signals);
+extern void USO_raise (USO_thread_t * thread, ACE_u32_t signals);
 
 /**
  * Current thread block until signals are sent.
  * The signals will be reset to 0.
  */
-extern ACE_u32_t USO_catch(void);
+extern ACE_u32_t USO_catch (void);
 
 /**
  * Current thread will exit and finish.
@@ -283,16 +284,19 @@ extern void USO_exit (void);
 extern void USO_yield (void);
 
 /**
- * Print message and wait for the watchdog.
+ * Return name of current thread.
  */
-extern void USO_panic (char *file, int line);
+extern char *USO_thread_name (void);
 
 /**
  * Print thread info header.
  */
-extern void USO_thread_info_head(void);
+extern void USO_thread_info_head (void);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

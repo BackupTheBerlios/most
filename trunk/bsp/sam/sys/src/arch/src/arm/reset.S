@@ -1,6 +1,6 @@
 #include <dev/arch/at91/AT91SAM7X256.h>
 
-#include "arch/cpu.h"
+#include "arch/reset.h"
 
 #define TOP_OF_MEMORY    (AT91C_ISRAM + AT91C_ISRAM_SIZE)
 #define STACK_INIT_VALUE 0xA5A5A5A5 /* must be the same as in uso/stack.h */
@@ -88,6 +88,24 @@ _branch_SAM_init:
         mov      lr, pc
         bx       r0
 
+	.globl SAM_jump_app
+    .align 4
+
+SAM_jump_app:
+		ldr      r2, =_lp_app_base
+        ldmia    r2, {r0}
+        mov      lr, pc
+        bx       r0
+
+	.globl SAM_jump_boot
+    .align 4
+
+SAM_jump_boot:
+		ldr      r2, =_lp_boot_base
+        ldmia    r2, {r0}
+        mov      lr, pc
+        bx       r0
+
 /*------------------------------------------------------------------------------
  *- Litteral pools
  *------------------------------------------------------------------------------*/
@@ -109,3 +127,10 @@ _lp_stack_mark_empty:
 		.word    SAM_TOTAL_STACK_SIZE          /* Stack size of stack section in ld! */
 		.word	 STACK_INIT_VALUE
 		.word    0x0
+
+_lp_app_base:
+        .word    0x110000
+
+_lp_boot_base:
+        .word    0x100000
+

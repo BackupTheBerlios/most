@@ -8,12 +8,12 @@
 #include "net/loopif.h"
 #include "net/ip.h"
 
-static NET_err_t
+static ACE_err_t
 loopif_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
 {
- 	++netif->tx;
-	++netif->rx;
- 	NET_err_t err = NET_ip_input (netif, p); 
+    ++netif->tx;
+    ++netif->rx;
+    ACE_err_t err = NET_ip_input (netif, p);
     return err;
 }
 

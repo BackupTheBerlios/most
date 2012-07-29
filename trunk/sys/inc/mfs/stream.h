@@ -9,6 +9,10 @@
 #include "uso/mutex.h"
 #include "mfs/vfs.h"
 
+/** @addtogroup mfs
+ * @{
+ */
+
 /** @defgroup stream stream.h
  *
  * A stream performs character io. A file is a stream and also for example e serial device.
@@ -25,20 +29,20 @@ extern struct MFS_descriptor_op MFS_stream_descriptor_op;
 /** Stream types. */
 enum MFS_stream_type
 {
-	MFS_FILE,       /**< FILE. */
-	MFS_IO          /**< IO. */
+    MFS_FILE,           /**< FILE. */
+    MFS_IO              /**< IO. */
 };
 
 
 /* Stream structure. */
 struct MFS_stream
 {
-	enum MFS_stream_type type;         /* Stream type. */
-	ACE_size_t size_tx;                /* File size, for IO the amount of transmitted characters. */
-	ACE_size_t pos_rx;                 /* File position, for IO the amount of received characters. */
-	USO_mutex_t lock;                    /* Synchronization lock. */
-	struct MFS_stream_op *operations;    /* Stream operations. */
-	MFS_stream_represent_t *represent;   /* Realized stream. */
+    enum MFS_stream_type type;  /* Stream type. */
+    ACE_size_t size_tx;         /* File size, for IO the amount of transmitted characters. */
+    ACE_size_t pos_rx;          /* File position, for IO the amount of received characters. */
+    USO_mutex_t lock;           /* Synchronization lock. */
+    struct MFS_stream_op *operations;   /* Stream operations. */
+    MFS_stream_represent_t *represent;  /* Realized stream. */
 };
 
 
@@ -50,7 +54,7 @@ struct MFS_stream
  * @param len : Size of the buffer or max length of data for reading.
  * @return Length of the read data.
  */
-extern ACE_size_t MFS_read(MFS_stream_t *stream, char *buf, ACE_size_t len);
+extern ACE_size_t MFS_read (MFS_stream_t * stream, char *buf, ACE_size_t len);
 
 /**
  * Write data to stream.
@@ -60,7 +64,7 @@ extern ACE_size_t MFS_read(MFS_stream_t *stream, char *buf, ACE_size_t len);
  * @param len : Length of the data to write.
  * @return Length of written data.
  */
-extern ACE_size_t MFS_write(MFS_stream_t *stream, char *buf, ACE_size_t len);
+extern ACE_size_t MFS_write (MFS_stream_t * stream, char *buf, ACE_size_t len);
 
 /**
  * Change the file position.
@@ -71,14 +75,14 @@ extern ACE_size_t MFS_write(MFS_stream_t *stream, char *buf, ACE_size_t len);
  * @param pos : SEEK_SET for beginning of the file, SEEK_CUR for current position, SEEK_END for end of file.
  * @return 0 == OK, 0 != ERROR.
  */
-extern   int MFS_seek(MFS_stream_t *stream, ACE_ssize_t off, ACE_size_t pos);
+extern int MFS_seek (MFS_stream_t * stream, ACE_ssize_t off, ACE_size_t pos);
 
 /**
  * Flush all buffers to disk.
  *
  * @param stream : Stream type.
  */
-extern void MFS_flush(MFS_stream_t *stream);
+extern void MFS_flush (MFS_stream_t * stream);
 
 /**
  * Get stream from stream descriptor.
@@ -86,7 +90,7 @@ extern void MFS_flush(MFS_stream_t *stream);
  * @param stream : Stream type.
  * @return .
  */
-extern MFS_stream_t *MFS_get_stream (MFS_descriptor_t *stream_desc);
+extern MFS_stream_t *MFS_get_stream (MFS_descriptor_t * stream_desc);
 
 /**
  * Initialize a stream.
@@ -96,23 +100,25 @@ extern MFS_stream_t *MFS_get_stream (MFS_descriptor_t *stream_desc);
  * @param operations : The stream operations.
  * @param represent : The stream representation.
  */
-extern void MFS_stream_init(MFS_stream_t *stream,
-								enum MFS_stream_type type,
-								struct MFS_stream_op *operations,
-								MFS_stream_represent_t *represent);
+extern void MFS_stream_init (MFS_stream_t * stream,
+                             enum MFS_stream_type type,
+                             struct MFS_stream_op *operations, MFS_stream_represent_t * represent);
 
 /**
  * Dummy read function.
  * @return Always EOF.
  */
-extern ACE_size_t MFS_empty_read(MFS_stream_t *stream, char *buf, ACE_size_t len);
+extern ACE_size_t MFS_empty_read (MFS_stream_t * stream, char *buf, ACE_size_t len);
 
 /**
  * Dummy write function.
  *
  * @return Always EOF (does write return EOF?).
  */
-extern ACE_size_t MFS_empty_write(MFS_stream_t *stream, const char *buf, ACE_size_t len);
+extern ACE_size_t MFS_empty_write (MFS_stream_t * stream, const char *buf, ACE_size_t len);
+
+/** @}
+ */
 
 /** @}
  */

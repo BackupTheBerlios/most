@@ -8,6 +8,10 @@
 
 #include "uso/arch/cpu.h"
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup stack stack.h
  *
  * On different CPU architectures, the stack grows
@@ -25,7 +29,7 @@
  * @param stack : The stack, an array of type USO_stack_t.
  * @param size : How many entities of stack_t in the array.
  */
-extern void USO_stack_init(USO_stack_t stack[], int size);
+extern void USO_stack_init (USO_stack_t stack[], int size);
 
 /**
  * Check if the entry on the end of the stack is still free, if not an stack overflow has occured.
@@ -33,7 +37,7 @@ extern void USO_stack_init(USO_stack_t stack[], int size);
  * @param end : Pointer to the last entry of the stack.
  * @return TRUE if last entry is free, else FALSE(stack overflow).
  */
-extern ACE_bool_t USO_stack_check_free(USO_stack_t *end);
+extern ACE_bool_t USO_stack_check_free (USO_stack_t * end);
 
 /**
  * Returns the beginn of a stack.
@@ -61,7 +65,7 @@ extern USO_stack_t *USO_stack_end (USO_stack_t stack[], int size);
  * @param sp : Current stack pointer.
  * @return TRUE if a stack overrun has occur.
  */
-extern ACE_bool_t USO_stack_check_overrun(USO_stack_t *end, USO_cpu_register_t sp);
+extern ACE_bool_t USO_stack_check_overrun (USO_stack_t * end, USO_cpu_register_t sp);
 
 /**
  * Determine the free space of a stack.
@@ -70,9 +74,12 @@ extern ACE_bool_t USO_stack_check_overrun(USO_stack_t *end, USO_cpu_register_t s
  * @param size : Size of the stack.
  * @return Free entries on the stack.
  */
-extern int USO_stack_get_free(USO_stack_t *end, int size);
+extern int USO_stack_get_free (USO_stack_t * end, int size);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

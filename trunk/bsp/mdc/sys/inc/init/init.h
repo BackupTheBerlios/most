@@ -8,22 +8,17 @@
 
 #include <ace/stdio.h>
 
-/** @addtogroup initialization
+/** @addtogroup init
  *
  * @{
  */
 
-/** @defgroup init init.h
+/** @defgroup mdc_init init.h
  *
  * Initialize Function Interface
  *
  * @{
  */
-
-/**
- * Serial communication Interface.
- */
-extern ACE_FILE *ser0;
 
 
 /**

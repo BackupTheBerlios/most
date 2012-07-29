@@ -28,13 +28,11 @@ DEV_serial_error_print (struct DEV_serial_error *error)
                 "\t\tRX_Buf_Overrun\t%lu\n"
                 "\t\tTX_Buf_Overrun\t%lu\n",
                 error->rx_overrun,
-                error->rx_framing,
-                error->rx_parity, error->rx_buf_overrun, error->tx_buf_overrun);
+                error->rx_framing, error->rx_parity, error->rx_buf_overrun, error->tx_buf_overrun);
 }
 
 extern void
-DEV_serial_error_rx (struct DEV_serial_error *error,
-                     enum DEV_serial_rx_err err_code)
+DEV_serial_error_rx (struct DEV_serial_error *error, enum DEV_serial_rx_err err_code)
 {
     switch (err_code)
     {

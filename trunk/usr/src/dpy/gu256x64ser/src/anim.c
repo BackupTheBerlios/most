@@ -51,10 +51,8 @@ extern void
 DPY_gu256x64ser_Travel (const char *text)
 {
     gu256x64ser_Center (text, 1);
-    DPY_gu256x64ser_Scroll ((unsigned short)2 * 8, (unsigned short)0x80,
-                      (unsigned char)1);
-    DPY_gu256x64ser_Scroll ((unsigned short)2 * 8, (unsigned short)0x80,
-                      (unsigned char)1);
+    DPY_gu256x64ser_Scroll ((unsigned short)2 * 8, (unsigned short)0x80, (unsigned char)1);
+    DPY_gu256x64ser_Scroll ((unsigned short)2 * 8, (unsigned short)0x80, (unsigned char)1);
 }
 
 extern void

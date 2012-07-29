@@ -6,6 +6,11 @@
 #ifndef ACE_CTYPE_H
 #define ACE_CTYPE_H
 
+/** @addtogroup ace
+ *
+ * @{
+ */
+
 /** @defgroup ctype ctype.h
  *
  * Standard character definitions.
@@ -81,6 +86,9 @@ extern char _ACE_ctmp;
 #define ACE_toupper(c) (_ACE_ctmp=(c), ACE_islower(_ACE_ctmp) ? _ACE_ctmp - ('a'-'A') : _ACE_ctmp)
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

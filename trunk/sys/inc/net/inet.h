@@ -11,6 +11,10 @@
 #include "net/netbuf.h"
 #include "net/ip_addr.h"
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup inet inet.h
  *
  * Calculate the internet checksum.
@@ -34,7 +38,7 @@ extern ACE_u16_t NET_inet_chksum (void *dataptr, ACE_u16_t);
  * @param p : netbuf (packet) chain over that the checksum should be calculated
  * @return Checksum (as u16_t) to be saved directly in the protocol header.
  */
-extern ACE_u16_t NET_inet_chksum_buf (NET_netbuf_t *p);
+extern ACE_u16_t NET_inet_chksum_buf (NET_netbuf_t * p);
 
 /** Inet_chksum_pseudo:
  *
@@ -48,13 +52,15 @@ extern ACE_u16_t NET_inet_chksum_buf (NET_netbuf_t *p);
  * @param proto_len : Length of the IP data part (used for checksum of pseudo header):
  * @return Checksum (as u16_t) to be saved directly in the protocol header.
  */
-extern ACE_u16_t NET_inet_chksum_pseudo (NET_netbuf_t *p,
-                                     NET_ip_addr_t *src,
-                                     NET_ip_addr_t *dst,
-                                     ACE_u8_t proto,
-                                     ACE_u16_t proto_len);
+extern ACE_u16_t NET_inet_chksum_pseudo (NET_netbuf_t * p,
+                                         NET_ip_addr_t * src,
+                                         NET_ip_addr_t * dst, ACE_u8_t proto, ACE_u16_t proto_len);
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

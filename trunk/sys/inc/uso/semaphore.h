@@ -8,6 +8,10 @@
 
 #include "uso/list.h"
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup semaphore semaphore.h
  *
  * Counting semaphore.
@@ -86,6 +90,9 @@ extern void USO_signal (USO_semaphore_t * semaphore);
 extern int USO_sem_count (USO_semaphore_t * semaphore);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

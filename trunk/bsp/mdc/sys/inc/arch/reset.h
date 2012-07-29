@@ -21,12 +21,12 @@
 /**
  * Jump to Application
  */
-void MDC_jump_app(void);
+void MDC_jump_app (void);
 
 /**
  * Jump to Bootloader
  */
-void MDC_jump_boot(void);
+void MDC_jump_boot (void);
 
 /** @}
  */

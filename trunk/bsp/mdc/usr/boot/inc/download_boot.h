@@ -6,6 +6,9 @@
 #ifndef MDC_DOWNLOAD_BOOT_H
 #define MDC_DOWNLOAD_BOOT_H
 
+#include <mfs/directory.h>
+#include <mfs/sysfs.h>
+
 /** @addtogroup putboot
  *
  * @{
@@ -21,7 +24,7 @@
 /**
  * Install bootloader download commands.
  */
-extern void MDC_download_boot_install (void);
+extern void MDC_download_boot_install (MFS_descriptor_t * boot);
 
 /** @}
  */

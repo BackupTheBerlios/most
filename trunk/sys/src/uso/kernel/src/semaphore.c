@@ -23,7 +23,7 @@ USO_wait (USO_semaphore_t * semaphore)
     USO_cpu_status_t ps = USO_disable ();
     if (--(semaphore->count) < 0)
     {
-    	USO_thread_t* current = USO_current();
+        USO_thread_t *current = USO_current ();
         current->state = USO_BLOCKED_WAIT;
         USO_enqueue (&semaphore->threads, (USO_node_t *) current);
         USO_schedule (USO_next2run ());

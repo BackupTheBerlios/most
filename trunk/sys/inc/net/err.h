@@ -6,31 +6,35 @@
 #ifndef NET_ERR_H
 #define NET_ERR_H
 
-/** @defgroup err err.h
+#include <ace/err.h>
+
+/** @addtogroup net
+ * @{
+ */
+
+/** @addtogroup err err.h
  *
  * Definitions for error constants. 
  *
  * @{
  */
 
-/**
- * Network error type
- */
-typedef int NET_err_t;
+#define NET_ERR         (ACE_NET_ERR_NR - 1)         /**< Not specified NET error.  */
+#define NET_ERR_MEM     (ACE_NET_ERR_NR - 2)         /**< Out of memory error.  */
+#define NET_ERR_BUF     (ACE_NET_ERR_NR - 3)         /**< Buffer error.  */
+#define NET_ERR_VAL     (ACE_NET_ERR_NR - 4)         /**< Illegal value.  */
+#define NET_ERR_ARG     (ACE_NET_ERR_NR - 5)         /**< Illegal argument.  */
+#define NET_ERR_ABRT    (ACE_NET_ERR_NR - 6)         /**< Connection aborted.  */
+#define NET_ERR_RST     (ACE_NET_ERR_NR - 7)         /**< Connection reset.  */
+#define NET_ERR_CLSD    (ACE_NET_ERR_NR - 8)         /**< Connection closed.  */
+#define NET_ERR_CONN    (ACE_NET_ERR_NR - 9)         /**< Not connected.  */
+#define NET_ERR_RTE     (ACE_NET_ERR_NR - 10)         /**< Routing problem.  */
+#define NET_ERR_USE     (ACE_NET_ERR_NR - 11)        /**< Address in use.  */
+#define NET_ERR_BAD     (ACE_NET_ERR_NR - 12)        /**< Bad packet */
+#define NET_ERR_ARP     (ACE_NET_ERR_NR - 13)        /**< ARP Request send */
 
-#define NET_ERR_OK    0         /**< No error, everything OK. */
-#define NET_ERR_MEM  -1         /**< Out of memory error.  */
-#define NET_ERR_BUF  -2         /**< Buffer error.  */
-#define NET_ERR_ABRT -3         /**< Connection aborted.  */
-#define NET_ERR_RST  -4         /**< Connection reset.  */
-#define NET_ERR_CLSD -5         /**< Connection closed.  */
-#define NET_ERR_CONN -6         /**< Not connected.  */
-#define NET_ERR_VAL  -7         /**< Illegal value.  */
-#define NET_ERR_ARG  -8         /**< Illegal argument.  */
-#define NET_ERR_RTE  -9         /**< Routing problem.  */
-#define NET_ERR_USE  -10        /**< Address in use.  */
-#define NET_ERR_BAD  -11        /**< Bad packet */
-#define NET_ERR_ARP  -12        /**< ARP Request send */
+/** @}
+ */
 
 /** @}
  */

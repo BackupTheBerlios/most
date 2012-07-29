@@ -2,18 +2,17 @@
 
 LIB_NAME := net
 LIB_TYPE := sys
-OBJ_NAMES :=  arch/o/$(MOST_TARGET)/*.o\
-		 eth/o/$(MOST_TARGET)/*.o\
-		 netif/o/$(MOST_TARGET)/*.o\
-		 ipv4/o/$(MOST_TARGET)/*.o\
-		 mm/o/$(MOST_TARGET)/*.o\
-		 udp/o/$(MOST_TARGET)/*.o
 
-makegoal = make $(1) -C arch;\
-	   make $(1) -C eth;\
-	   make $(1) -C netif;\
-	   make $(1) -C ipv4;\
-	   make $(1) -C mm;\
-	   make $(1) -C udp;
+OBJ_NAMES :=  	eth/o/$(MOST_TARGET)/*.o\
+		 		netif/o/$(MOST_TARGET)/*.o\
+		 		ipv4/o/$(MOST_TARGET)/*.o\
+		 		mm/o/$(MOST_TARGET)/*.o\
+		 		udp/o/$(MOST_TARGET)/*.o
 
--include $(MOST_ROOT)/etc/Makefile.lib
+makegoal = 	   	make $(1) -C eth;\
+	   			make $(1) -C netif;\
+	   			make $(1) -C ipv4;\
+	   			make $(1) -C mm;\
+	   			make $(1) -C udp;
+
+-include $(MOST_ROOT)/etc/build/lib/Makefile

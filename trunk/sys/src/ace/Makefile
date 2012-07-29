@@ -12,4 +12,4 @@ makegoal = make $(1) -C ctype;\
 	       make $(1) -C stdlib;\
 	       make $(1) -C string;
 
--include $(MOST_ROOT)/etc/Makefile.lib
+-include $(MOST_ROOT)/etc/build/lib/Makefile

@@ -10,6 +10,10 @@
 
 #include "dev/digio.h"
 
+/** @addtogroup dev
+ * @{
+ */
+
 /** @defgroup digin digin.h
  *
  * Digital Input.
@@ -21,7 +25,7 @@
 /* private */
 struct DEV_diginputs
 {
-	USO_list_t inputs;
+    USO_list_t inputs;
 };
 
 /**
@@ -51,7 +55,7 @@ typedef struct DEV_digin DEV_digin_t;
 
 /*-------------- Interface -----------------------------------------------*/
 
-extern void DEV_diginputs_init (DEV_diginputs_t* inputs);
+extern void DEV_diginputs_init (DEV_diginputs_t * inputs);
 
 /**
  * Initialize digital input.
@@ -61,11 +65,18 @@ extern void DEV_diginputs_init (DEV_diginputs_t* inputs);
  * @param sample : Function to sample the input.
  * @param debounce_time : Wait for stabilized input signal.
  */
-extern void DEV_digin_init (DEV_diginputs_t* inputs,
-							DEV_digin_t * in,
-                            enum DEV_digio_logig logig,
-                            unsigned long (*sample) (void),
-                            unsigned int debounce_time);
+extern void DEV_digin_init
+    (DEV_diginputs_t * inputs,
+     DEV_digin_t * in,
+     enum DEV_digio_logig logig, unsigned long (*sample) (void), unsigned int debounce_time);
+
+/**
+ * Install digital input in sysfs.
+ *
+ * @param in : Pointer to digital input type.
+ * @param name : name of input
+ */
+extern void DEV_digin_install (DEV_digin_t * in, char *name);
 
 /**
  * Sample all digital inputs.
@@ -73,7 +84,7 @@ extern void DEV_digin_init (DEV_diginputs_t* inputs,
  * Calls each sample function of all dig inputs.
  * Should be periodically called from an interrupt.
  */
-extern void DEV_diginputs_sample (DEV_diginputs_t* inputs);
+extern void DEV_diginputs_sample (DEV_diginputs_t * inputs);
 
 /**
  * Determine if input is set.
@@ -87,10 +98,12 @@ extern ACE_bool_t DEV_digin_isset (DEV_digin_t * in);
 /**
  * Check for edges.
  */
-extern enum DEV_digio_edge
-DEV_digin_ischanged (DEV_digin_t * in);
+extern enum DEV_digio_edge DEV_digin_ischanged (DEV_digin_t * in);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

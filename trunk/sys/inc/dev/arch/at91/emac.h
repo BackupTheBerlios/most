@@ -23,10 +23,8 @@ struct DEV_at91_emac
 typedef struct DEV_at91_emac DEV_at91_emac_t;
 
 
-extern void DEV_at91_emac_interrupt(DEV_at91_emac_t* mac);
+extern void DEV_at91_emac_interrupt (DEV_at91_emac_t * mac);
 
-extern void
-DEV_at91_emac_init (NET_ethif_t* ethif,
-		     	  	DEV_at91_emac_t* mac);
+extern void DEV_at91_emac_init (NET_ethif_t * ethif, DEV_at91_emac_t * mac);
 
 #endif

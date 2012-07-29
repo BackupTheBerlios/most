@@ -1,0 +1,1 @@
+-include $(MOST_ROOT)/etc/build/doc/Makefile

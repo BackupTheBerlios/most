@@ -6,7 +6,7 @@
 #ifndef SAM_MAIN_H
 #define SAM_MAIN_H
 
-/** @addtogroup initialization
+/** @addtogroup init
  *
  * @{
  */

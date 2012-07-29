@@ -16,12 +16,12 @@ ser_test_exec (char *nix)
     int i;
     for (i = 100; i; --i)
     {
-        USO_kprintf (USO_LL_INFO, "Serial Test %d.\n", i);
+        USO_log_printf (USO_LL_INFO, "Serial Test %d.\n", i);
     }
 }
 
 extern void
-TST_ser_test_install(MFS_descriptor_t *test)
+TST_ser_test_install (MFS_descriptor_t * test)
 {
     CLI_exec_init (test, &sert, "ser_T", "Serial Test", ser_test_exec);
 }

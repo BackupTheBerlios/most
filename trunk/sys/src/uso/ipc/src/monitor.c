@@ -15,9 +15,9 @@ extern void
 USO_monitor (USO_mutex_t * mutex, USO_barrier_t * barrier)
 {
     USO_cpu_status_t ps = USO_disable ();
-    USO_unlock(mutex);
-    USO_block(barrier);	
-    USO_lock(mutex);
+    USO_unlock (mutex);
+    USO_block (barrier);
+    USO_lock (mutex);
     USO_restore (ps);
 }
 

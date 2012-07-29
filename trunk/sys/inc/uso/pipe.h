@@ -8,6 +8,10 @@
 
 #include <ace/stddef.h>
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup pipe pipe.h
  *
  * Inter process communication with IO streams.
@@ -31,11 +35,11 @@ enum USO_pipe_state
  */
 struct USO_pipe
 {
-	enum USO_pipe_state state;
-    char *start; /* Pointer to the beginn of buffer */
-    char *end; /* Pointer to the end of buffer */
-    char *read; /* Read pointer into ther buffer */
-    char *write; /* Write pointer into the buffer */
+    enum USO_pipe_state state;
+    char *start;                /* Pointer to the beginn of buffer */
+    char *end;                  /* Pointer to the end of buffer */
+    char *read;                 /* Read pointer into ther buffer */
+    char *write;                /* Write pointer into the buffer */
 
 };
 
@@ -55,8 +59,7 @@ typedef struct USO_pipe USO_pipe_t;
  * @param buf : Pointer to buffer.
  * @param size : Size of buffer.
  */
-extern void USO_pipe_init (USO_pipe_t * pipe,
-                           char *buf, ACE_size_t size);
+extern void USO_pipe_init (USO_pipe_t * pipe, char *buf, ACE_size_t size);
 
 /**
  * Creates an instance of a pipe.
@@ -95,6 +98,9 @@ extern ACE_size_t USO_pipe_read_ns (USO_pipe_t * pipe, char *buf, ACE_size_t len
 extern ACE_size_t USO_pipe_write_ns (USO_pipe_t * pipe, const char *buf, ACE_size_t len);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

@@ -8,6 +8,10 @@
 
 #include "uso/thread.h"
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup scheduler scheduler.h
  *
  * Thread scheduler.
@@ -25,10 +29,14 @@
 
 /*-------------- Interface -----------------------------------------------*/
 
-#define USO_SCHEDULE_TIME_MSEC 100 
+/**
+ * Global variable defining schedule time in msec.
+ * The value for this can be overwritten in the BSP.
+ */
+extern long USO_schedule_time_msec;
 
 /** Current thread */
-extern USO_thread_t *USO_current(void);
+extern USO_thread_t *USO_current (void);
 
 /**
  * Go multithreading!
@@ -44,8 +52,7 @@ extern USO_thread_t *USO_current(void);
  * @param stack : Stack for the idle thread.
  * @param stack_size : Stack size.
  */
-extern void USO_transform (void (*init) (void),
-	USO_stack_t* stack, int stack_size);
+extern void USO_transform (void (*init) (void), USO_stack_t * stack, int stack_size);
 
 /**
  * Determine the next thread which is ready to run.
@@ -72,9 +79,12 @@ extern void USO_ready (USO_thread_t *);
  * If the time slice of a thread is expired it gives control
  * to the next ready thread.
  */
-extern void USO_preempt(void);
+extern void USO_preempt (void);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

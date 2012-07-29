@@ -8,7 +8,7 @@
 
 reset:
 	mov.b	#0x3c,r0l
-	mov.b	r0l,@_h8_PCDDR:8
+	mov.b	r0l,@_H8_PCDDR:8
 	mov.l	#_stack_end,er7      
 	mov.l	#_stack_start,er0
 	mov.b	#0xA5,r1l

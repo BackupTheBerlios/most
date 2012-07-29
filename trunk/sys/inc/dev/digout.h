@@ -8,6 +8,10 @@
 
 #include "dev/digio.h"
 
+/** @addtogroup dev
+ * @{
+ */
+
 /** @defgroup digout digout.h
  *
  * Digital Output.
@@ -45,8 +49,15 @@ typedef struct DEV_digout DEV_digout_t;
  */
 extern void DEV_digout_init (DEV_digout_t * out,
                              enum DEV_digio_state state,
-                             enum DEV_digio_logig logig,
-                             void (*set) (void), void (*clear) (void));
+                             enum DEV_digio_logig logig, void (*set) (void), void (*clear) (void));
+
+/**
+ * Install output in sysfgs.
+ *
+ * @param out : Pointer to output.
+ * @param name : name for output.
+ */
+extern void DEV_digout_install (DEV_digout_t * out, char *name);
 
 /**
  * Set output.
@@ -73,7 +84,19 @@ extern void DEV_digout_clear (DEV_digout_t * out);
  */
 extern void DEV_digout_toggle (DEV_digout_t * out);
 
+/**
+ * Generate blink signal.
+ *
+ * @param out : Pointer to output.
+ * @param count : Count of Pulses.
+ * @param time_ms : Time of one Pulse.
+ */
+extern void DEV_blink_nb (DEV_digout_t * out, unsigned long count, unsigned long time_ms);
+
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

@@ -11,6 +11,11 @@
 
 #include "ace/stdarg.h"
 
+/** @addtogroup ace
+ *
+ * @{
+ */
+
 /** @defgroup stdio stdio.h
  *
  * Standard io functions.
@@ -31,7 +36,7 @@ typedef MFS_stream_t ACE_FILE;
 /*---------------- Interface ---------------------------------------------*/
 
 /**
- *  The function behaves exactly as prinf does, but writing its results to a buffer.
+ *  The function behaves exactly as printf does, but writing its results to a buffer.
  *  The result is terminated with //0.
  *
  *  @param buf : Buffer must have enough space for the result.
@@ -41,14 +46,14 @@ typedef MFS_stream_t ACE_FILE;
  */
 extern int ACE_sprintf (char *buf, const char *fmt, ...);
 
-/** vsprintf Equivalent to sprintf, but the variable argumentliste
+/** vsprintf Equivalent to sprintf, but the variable argumentlist
  *  is replaced with args.
  *  Args has to be initialized with the makro va_start and maybe with calls of va_arg.
  */
 extern int ACE_vsprintf (char *buf, const char *fmt, ACE_va_list_t args);
 
 
- 
+
 /**
  * Initalize list and buffers. Must be called befor you can use the stdio functions.
  */
@@ -156,6 +161,9 @@ extern int ACE_puts (char *string);
 extern int ACE_printf (const char *fmt, ...);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

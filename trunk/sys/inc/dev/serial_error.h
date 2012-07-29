@@ -6,6 +6,11 @@
 #ifndef DEV_SERIAL_ERROR_H
 #define DEV_SERIAL_ERROR_H
 
+/** @addtogroup dev
+ * @{
+ */
+
+
 /** @defgroup serial_error serial_error.h
  *
  * Serial Errors.
@@ -78,10 +83,13 @@ extern void DEV_serial_error_print (struct DEV_serial_error *error);
  * @param error : Pointer to serial error struct.
  * @param err_code : Low level error code.
  */
-extern void DEV_serial_error_rx (struct DEV_serial_error *error,
-                                 enum DEV_serial_rx_err err_code);
+extern void DEV_serial_error_rx (struct DEV_serial_error *error, enum DEV_serial_rx_err err_code);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
+
 
 /** @}
  */

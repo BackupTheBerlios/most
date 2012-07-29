@@ -6,7 +6,9 @@
 #ifndef SAM_START_H
 #define SAM_START_H
 
-/** @addtogroup initialization
+#include <ace/stdio.h>
+
+/** @addtogroup init
  *
  * @{
  */
@@ -22,7 +24,7 @@
 /**
  * Start all services.
  */
-extern void SAM_start (void);
+extern void SAM_start (ACE_FILE * stdio);
 
 /** @}
  */

@@ -6,4 +6,4 @@ makegoal = make $(1) -C ace;\
 	       make $(1) -C cli;\
 	       make $(1) -C mfs;
 
--include $(MOST_ROOT)/etc/Makefile.libs
+-include $(MOST_ROOT)/etc/build/libs/Makefile

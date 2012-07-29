@@ -40,6 +40,9 @@ extern DEV_digout_t SAM_lcd_reset;
 extern DEV_digout_t SAM_phy_power_down;
 
 
+/** Switch bootloader. */
+extern DEV_digin_t SAM_switch_boot;
+
 /** Button left. */
 extern DEV_digin_t SAM_switch_1;
 
@@ -70,10 +73,16 @@ extern DEV_digin_t SAM_joystick_center;
 /** Control panel inputs. */
 extern DEV_diginputs_t SAM_control_in;
 
+
 /**
  * Initialize digital io.
  */
 extern void SAM_digio_init (void);
+
+/**
+ * Install digital io in sysfs.
+ */
+extern void SAM_digio_install (void);
 
 /** @}
  */

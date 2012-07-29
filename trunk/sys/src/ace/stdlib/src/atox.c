@@ -37,15 +37,18 @@ ACE_atox (char c)
 }
 
 extern int
-ACE_atoxc (char* s)
+ACE_atoxc (char *s)
 {
     int x, x1, x2;
     x1 = ACE_atox (*s);
-    x2 = ACE_atox (*(s+1));
-    if ((x1 >= 0) && (x2 >= 0)) {
+    x2 = ACE_atox (*(s + 1));
+    if ((x1 >= 0) && (x2 >= 0))
+    {
         x = (x1 << 4) | x2;
-    } else {
-        x = - 1;
+    }
+    else
+    {
+        x = -1;
     }
     return x;
 }

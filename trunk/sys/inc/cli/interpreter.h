@@ -8,6 +8,10 @@
 
 #include "mfs/vfs.h"
 
+/** @addtogroup cli
+ * @{
+ */
+
 /** @defgroup interpreter interpreter.h
  *
  * Command line interpreter.
@@ -21,10 +25,10 @@
 
 struct CLI_interpreter
 {
-	MFS_descriptor_t *desc;
-	char token_buffer[CLI_TOKEN_COUNTER][CLI_TOKEN_SIZE];
-	char *argv[CLI_TOKEN_COUNTER];
-	int argc;
+    MFS_descriptor_t *desc;
+    char token_buffer[CLI_TOKEN_COUNTER][CLI_TOKEN_SIZE];
+    char *argv[CLI_TOKEN_COUNTER];
+    int argc;
 };
 
 /** CLI_interpreter_t. */
@@ -42,13 +46,16 @@ extern void CLI_setup (const char *name);
  *  
  *  @param cli : Pointer to Command line interpreter.
  */
-extern void CLI_interpreter_init (CLI_interpreter_t *cli);
+extern void CLI_interpreter_init (CLI_interpreter_t * cli);
 
 /**
  *  This function is the entry function for the CLI thread.
  *  @param cli : CLI_interpreter_t passed as argument to the entry function.
  */
 extern void CLI_interpreter_run (void *cli);
+
+/** @}
+ */
 
 /** @}
  */

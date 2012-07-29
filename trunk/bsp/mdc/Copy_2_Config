@@ -1,14 +1,71 @@
-# Copy this file to a file named Config 
-# and uncomment following lines at your needs!
+## mdc config
+## Copy this file to a file named Config
+## and set following lines at your needs!
 
-MOST_GCC:=3.2
+## ------------ Target System ---------------
+## ==========================================
+
+## [3.4.6, 4.4.3]
+## gcc version number of your toolchain
+MOST_GCC:=3.4.6
+
+## [arm, h8300]
+## target cpu type of your toolchain
 MOST_CPU:=h8300
+
+## [elf, none-eabi, hms, coff]
+# target system type of your toolchain
 MOST_SYSTEM:=coff
+
+## do not change
+MOST_TARGET:=$(MOST_CPU)-$(MOST_SYSTEM)
+
+## libgcc in your cross toolchain
+MOST_LIB_GCC:=gcc/$(MOST_TARGET)/$(MOST_GCC)/h8300h
+
+## [little, big]
+## byte order of your target system
 MOST_ENDIAN:=big
-#MOST_BIT:=16
-MOST_OPTI:=-Os
-#MOST_DEBUG:=-g
-#MOST_BUILD_ERR_FILE:=on
-#MOST_BUILD_LOG:=off
-MOST_ARCH:=h8300
-MOST_SUB_ARCH:=3003
+
+## [16, 32]
+## word with of your target system
+MOST_BIT:=16
+
+## ------------ Target Architecture   ---------------
+## ==================================================
+
+## [at91, h8]
+## microcontroller architecture
+MOST_ARCH:=h8
+
+## [at91sam7x, h8300h]
+## microcontroller type
+MOST_ARCH_TYPE:=h8300h
+
+## [at91sam7x256, h83003]
+## microcontroller model
+MOST_ARCH_MODEL:=h83003
+
+## ------------ Target File -------------
+## ======================================
+
+## [bin, hex, srec]
+## produced binary file type
+MOST_FILE:=bin
+
+## ------------ Build Version -----------
+## ======================================
+
+## [-Os]
+## -Os: build Release Version optimized for size
+MOST_BUILD_RUN = -Os
+
+## [-O0 -g]
+## -O0: build Debug Version with no optimization
+## -g: compile with debug information
+MOST_BUILD_DEBUG:=--O0 -g
+
+## [$(MOST_BUILD_RUN), $(MOST_BUILD_DEBUG) ]
+MOST_BUILD:=$(MOST_BUILD_RUN)
+#MOST_BUILD:=$(MOST_BUILD_DEBUG)
+

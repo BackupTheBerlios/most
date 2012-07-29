@@ -9,6 +9,10 @@
 #include <uso/list.h>
 #include <uso/buf_pool.h>
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup netbuf netbuf.h
  *
  * Network packet buffer.
@@ -23,7 +27,7 @@ enum NET_buf_type
     NET_BUF_RAM,    /**< Buffer is allocated from RAM. */
     NET_BUF_POOL,   /**< Buffer is allocated from memory pool. */
     NET_BUF_TRANS,  /**< Transport buffer. */
-	NET_BUF_FREE    /**< Netbuf is already released (to avoid doing a mem_free on a buffer which is already free. */
+    NET_BUF_FREE        /**< Netbuf is already released (to avoid doing a mem_free on a buffer which is already free. */
 };
 
 /** Network buffer type. */
@@ -59,7 +63,7 @@ extern NET_netbuf_t *NET_netbuf_alloc_ram (long size);
  * @param size : Size of the data.
  * @return Network buffer.
  */
-extern NET_netbuf_t *NET_netbuf_alloc_rom ( char *data, long size);
+extern NET_netbuf_t *NET_netbuf_alloc_rom (char *data, long size);
 
 
 
@@ -67,7 +71,7 @@ extern NET_netbuf_t *NET_netbuf_alloc_rom ( char *data, long size);
  * Release network buffer.
  * @param buf : Network buffer.
  */
-extern void NET_netbuf_free (NET_netbuf_t *buf);
+extern void NET_netbuf_free (NET_netbuf_t * buf);
 
 /**
  * Chain buffer b two the end of the buffer chain from buffer a.
@@ -75,21 +79,21 @@ extern void NET_netbuf_free (NET_netbuf_t *buf);
  * @param b : Network buffer.
  * @return Chained network buffer.
  */
-extern NET_netbuf_t* NET_netbuf_chain (NET_netbuf_t *a, NET_netbuf_t *b);
+extern NET_netbuf_t *NET_netbuf_chain (NET_netbuf_t * a, NET_netbuf_t * b);
 
 /**
  * Get the next buffer in the buffer chain.
  * @param buf : Network buffer.
  * @return Next buffer or NULL.
  */
-extern NET_netbuf_t* NET_netbuf_next (NET_netbuf_t * buf);
+extern NET_netbuf_t *NET_netbuf_next (NET_netbuf_t * buf);
 
 /**
  * Get the current index pointing to data in the buffer.
  * @param buf : Network buffer.
  * @return Index.
  */
-extern char * NET_netbuf_index (NET_netbuf_t * buf);
+extern char *NET_netbuf_index (NET_netbuf_t * buf);
 
 /**
  * Adjust the index of the buffer, the increment can be positiv or negativ.
@@ -98,7 +102,7 @@ extern char * NET_netbuf_index (NET_netbuf_t * buf);
  * @param inc : Positive or negative increment.
  * @return TRUE is the index is adjusted, else FALSE.
  */
-extern ACE_bool_t NET_netbuf_index_inc (NET_netbuf_t *buf, long inc);
+extern ACE_bool_t NET_netbuf_index_inc (NET_netbuf_t * buf, long inc);
 
 /**
  * Trim the buffer length to given length.
@@ -107,7 +111,7 @@ extern ACE_bool_t NET_netbuf_index_inc (NET_netbuf_t *buf, long inc);
  * @param len : Length to which the buffer should be trimmed.
  * @return TRUE if buffer length was trimmed else FALSE.
  */
-extern ACE_bool_t NET_netbuf_trim_len (NET_netbuf_t *buf, unsigned long len);
+extern ACE_bool_t NET_netbuf_trim_len (NET_netbuf_t * buf, unsigned long len);
 
 /**
  * Get the buffer length (This is not the total length of all chained buffers).
@@ -121,9 +125,13 @@ extern long NET_netbuf_len (NET_netbuf_t * buf);
  * @param buf : Network buffer.
  * @return Total length.
  */
-extern long NET_netbuf_tot_len (NET_netbuf_t *buf);
+extern long NET_netbuf_tot_len (NET_netbuf_t * buf);
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

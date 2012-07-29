@@ -24,7 +24,7 @@
 extern void
 NET_udp_init (void)
 {
-    NET_udp_socks_init();
+    NET_udp_socks_init ();
 }
 
 #if NET_UDP_HEAD_DEBUG
@@ -47,7 +47,7 @@ udp_head_debug (struct NET_udp_hdr *udphdr)
 #define UDP_HEAD_DEBUG(udphdr)
 #endif
 
-extern NET_err_t
+extern ACE_err_t
 NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
 {
     struct NET_ip_hdr *iphdr;
@@ -57,25 +57,25 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
 
     ++NET_stats.udp.rx;
 
-    iphdr = (struct NET_ip_hdr *)NET_netbuf_index(p);
+    iphdr = (struct NET_ip_hdr *)NET_netbuf_index (p);
     NET_netbuf_index_inc (p, sizeof (struct NET_ip_hdr));
-    udphdr = (struct NET_udp_hdr *)NET_netbuf_index(p);
+    udphdr = (struct NET_udp_hdr *)NET_netbuf_index (p);
 
     DEBUGF (NET_UDP_DEBUG, ("Udp: rx datagram of length %d.\n",
-                            NET_netbuf_len(p) - sizeof (struct NET_udp_hdr)));
+                            NET_netbuf_len (p) - sizeof (struct NET_udp_hdr)));
 
     src = ACE_ntohs (udphdr->src);
     dest = ACE_ntohs (udphdr->dest);
 
     UDP_HEAD_DEBUG (udphdr);
 
-	NET_udp_socks_lock ();
-		
- 	sock = NET_udp_find_sock(inp, iphdr, src, dest);
- 
+    NET_udp_socks_lock ();
+
+    sock = NET_udp_find_sock (inp, iphdr, src, dest);
+
     if (sock == NULL)
     {
-		NET_udp_socks_unlock ();
+        NET_udp_socks_unlock ();
         DEBUGF (NET_UDP_DEBUG, ("Udp: not for us.\n"));
 
         /*
@@ -98,28 +98,28 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
              */
             NET_netbuf_index_inc (p, -sizeof (struct NET_ip_hdr));
             NET_icmp_dest_unreach (p, NET_ICMP_DUR_PORT);
-        } else {
-			NET_netbuf_free (p);
+        }
+        else
+        {
+            NET_netbuf_free (p);
         }
         ++NET_stats.udp.rx_drop;
         return NET_ERR_BAD;
     }
 
-	DEBUGF (NET_UDP_DEBUG, ("Udp: rx calculating checksum.\n"));
+    DEBUGF (NET_UDP_DEBUG, ("Udp: rx calculating checksum.\n"));
 
     // ip unterstuezt nur udp ??? 
     if (NET_IPH_PROTO (iphdr) == NET_IP_PROTO_UDPLITE)
-	{
+    {
         if (NET_inet_chksum_pseudo
             (p, (NET_ip_addr_t *) & (iphdr->src),
-             (NET_ip_addr_t *) & (iphdr->dest), NET_IP_PROTO_UDPLITE,
-             ACE_ntohs (udphdr->len)) != 0)
+             (NET_ip_addr_t *) & (iphdr->dest), NET_IP_PROTO_UDPLITE, ACE_ntohs (udphdr->len)) != 0)
         {
-            DEBUGF (NET_UDP_DEBUG,
-                    ("Udp: udp lite datagram discarded due to failing checksum.\n"));
+            DEBUGF (NET_UDP_DEBUG, ("Udp: udp lite datagram discarded due to failing checksum.\n"));
             ++NET_stats.udp.rx_drop;
-	        NET_netbuf_free (p);
-			NET_udp_socks_unlock ();
+            NET_netbuf_free (p);
+            NET_udp_socks_unlock ();
             return NET_ERR_BAD;
         }
     }
@@ -129,47 +129,44 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
         {
             if (NET_inet_chksum_pseudo
                 (p, (NET_ip_addr_t *) & (iphdr->src),
-                 (NET_ip_addr_t *) & (iphdr->dest),
-                 NET_IP_PROTO_UDP, NET_netbuf_len(p)) != 0)
+                 (NET_ip_addr_t *) & (iphdr->dest), NET_IP_PROTO_UDP, NET_netbuf_len (p)) != 0)
             {
-                DEBUGF (NET_UDP_DEBUG,
-                        ("Udp: udp datagram discarded due to failing checksum.\n"));
+                DEBUGF (NET_UDP_DEBUG, ("Udp: udp datagram discarded due to failing checksum.\n"));
 
                 ++NET_stats.udp.rx_drop;
                 NET_netbuf_free (p);
-				NET_udp_socks_unlock ();
-				return NET_ERR_BAD;
+                NET_udp_socks_unlock ();
+                return NET_ERR_BAD;
             }
         }
     }
     USO_post (&sock->rx_que, (USO_node_t *) p);
     NET_udp_socks_unlock ();
-	return NET_ERR_OK;
+    return ACE_ERR_OK;
 }
 
-NET_err_t
+ACE_err_t
 NET_udp_output (NET_udp_socket_t * sock, NET_netbuf_t * p)
 {
     struct NET_udp_hdr *udphdr;
     NET_netif_t *netif;
     NET_ip_addr_t *src_ip;
-    NET_err_t err;
+    ACE_err_t err;
     short tot_len;
 
-    NET_netbuf_index_inc (p, -sizeof(struct NET_udp_hdr));
+    NET_netbuf_index_inc (p, -sizeof (struct NET_udp_hdr));
 
     tot_len = (unsigned short)NET_netbuf_tot_len (p);
 
-    udphdr = (struct NET_udp_hdr *)NET_netbuf_index(p);
+    udphdr = (struct NET_udp_hdr *)NET_netbuf_index (p);
     udphdr->src = ACE_htons (sock->local_port);
     udphdr->dest = ACE_htons (sock->remote_port);
     udphdr->chksum = 0x0000;
 
     if ((netif = NET_ip_route (&(sock->remote_ip))) == NULL)
     {
-        DEBUGF (NET_UDP_DEBUG,
-                ("Udp: no route to 0x%lx.\n", sock->remote_ip.addr));
-		NET_netbuf_free (p);
+        DEBUGF (NET_UDP_DEBUG, ("Udp: no route to 0x%lx.\n", sock->remote_ip.addr));
+        NET_netbuf_free (p);
         return NET_ERR_RTE;
     }
 
@@ -183,8 +180,7 @@ NET_udp_output (NET_udp_socket_t * sock, NET_netbuf_t * p)
     }
 
     DEBUGF (NET_UDP_DEBUG,
-            ("Udp: tx datagram of length %d.\n",
-             tot_len - sizeof (struct NET_udp_hdr)));
+            ("Udp: tx datagram of length %d.\n", tot_len - sizeof (struct NET_udp_hdr)));
 
     if (sock->flags & NET_UDP_FLAGS_UDPLITE)
     {
@@ -193,9 +189,9 @@ NET_udp_output (NET_udp_socket_t * sock, NET_netbuf_t * p)
          * calculate checksum 
          */
         udphdr->chksum = 0x0000;
-        
+
         udphdr->chksum = NET_inet_chksum_pseudo (p, src_ip, &(sock->remote_ip),
-                                    NET_IP_PROTO_UDP, sock->chksum_len);
+                                                 NET_IP_PROTO_UDP, sock->chksum_len);
         if (udphdr->chksum == 0x0000)
         {
             udphdr->chksum = 0xffff;
@@ -215,9 +211,9 @@ NET_udp_output (NET_udp_socket_t * sock, NET_netbuf_t * p)
         if ((sock->flags & NET_UDP_FLAGS_NOCHKSUM) == 0)
         {
             udphdr->chksum = 0x0000;
-            
+
             udphdr->chksum = NET_inet_chksum_pseudo (p, src_ip, &sock->remote_ip,
-                                        NET_IP_PROTO_UDP, tot_len);
+                                                     NET_IP_PROTO_UDP, tot_len);
             if (udphdr->chksum == 0x0000)
             {
                 udphdr->chksum = 0xffff;
@@ -226,8 +222,7 @@ NET_udp_output (NET_udp_socket_t * sock, NET_netbuf_t * p)
 
         UDP_HEAD_DEBUG (udphdr);
 
-        err = NET_ip_output_if (p, src_ip, &sock->remote_ip,
-                                NET_UDP_TTL, NET_IP_PROTO_UDP, netif);
+        err = NET_ip_output_if (p, src_ip, &sock->remote_ip, NET_UDP_TTL, NET_IP_PROTO_UDP, netif);
     }
 
     ++NET_stats.udp.tx;

@@ -20,18 +20,21 @@ USO_port_init (USO_port_t * port)
 }
 
 extern void *
-USO_send (USO_port_t * port, void * message)
+USO_send (USO_port_t * port, void *message)
 {
-    void * reply_message;
+    void *reply_message;
     USO_cpu_status_t ps = USO_disable ();
-    USO_thread_t * receiver = ((USO_thread_t *) USO_dequeue (&port->receive));
-    USO_thread_t * sender = USO_current(); 
-    if (receiver != NULL){
+    USO_thread_t *receiver = ((USO_thread_t *) USO_dequeue (&port->receive));
+    USO_thread_t *sender = USO_current ();
+    if (receiver != NULL)
+    {
         receiver->message = message;
         USO_ready (receiver);
-    } else {
+    }
+    else
+    {
         sender->message = message;
-		sender->state = USO_BLOCKED_SEND;
+        sender->state = USO_BLOCKED_SEND;
         USO_enqueue (&port->send, (USO_node_t *) sender);
         USO_schedule (USO_next2run ());
     }
@@ -46,32 +49,38 @@ USO_send (USO_port_t * port, void * message)
 extern void *
 USO_receive (USO_port_t * port)
 {
-    void * message;
+    void *message;
     USO_cpu_status_t ps = USO_disable ();
-    USO_thread_t * sender = ((USO_thread_t *) USO_dequeue (&port->send));
-    USO_thread_t * receiver = USO_current(); 
-    if (sender != NULL){
+    USO_thread_t *sender = ((USO_thread_t *) USO_dequeue (&port->send));
+    USO_thread_t *receiver = USO_current ();
+    if (sender != NULL)
+    {
         message = sender->message;
         USO_ready (sender);
-    } else {
-		receiver->state = USO_BLOCKED_RECEIVE;
+    }
+    else
+    {
+        receiver->state = USO_BLOCKED_RECEIVE;
         USO_enqueue (&port->receive, (USO_node_t *) receiver);
         USO_schedule (USO_next2run ());
-		message = USO_current()->message;
+        message = USO_current ()->message;
     }
     USO_restore (ps);
     return message;
 }
 
 extern void
-USO_reply (USO_port_t * port, void * message)
+USO_reply (USO_port_t * port, void *message)
 {
     USO_cpu_status_t ps = USO_disable ();
-    USO_thread_t * to_reply = ((USO_thread_t *) USO_dequeue (&port->reply));
-    if (to_reply != NULL){
+    USO_thread_t *to_reply = ((USO_thread_t *) USO_dequeue (&port->reply));
+    if (to_reply != NULL)
+    {
         to_reply->message = message;
         USO_ready (to_reply);
-    } else {
+    }
+    else
+    {
         // error reply without receive 
     }
     USO_restore (ps);

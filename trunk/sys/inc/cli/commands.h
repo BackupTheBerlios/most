@@ -9,6 +9,10 @@
 #include "mfs/vfs.h"
 #include "cli/interpreter.h"
 
+/** @addtogroup cli
+ * @{
+ */
+
 /** @defgroup commands commands.h
  *
  * Register commands and executables.
@@ -20,7 +24,7 @@
 struct CLI_command
 {
     char *description;
-    ACE_bool_t (*f) (CLI_interpreter_t *);
+      ACE_bool_t (*f) (CLI_interpreter_t *);
 };
 
 /** Command type. */
@@ -30,7 +34,7 @@ typedef struct CLI_command CLI_command_t;
  *  Print command info header.
  *
  */
-extern void CLI_command_info_head(void);
+extern void CLI_command_info_head (void);
 
 /**
  *  Initialize and install a command.
@@ -42,7 +46,7 @@ extern void CLI_command_info_head(void);
  *  @param f : Function which will be executed if you type the command name in the CLI.
  */
 extern void CLI_command_init (CLI_command_t * command,
-	 	              char *name, char *desc, ACE_bool_t (*f) (CLI_interpreter_t *));
+                              char *name, char *desc, ACE_bool_t (*f) (CLI_interpreter_t *));
 
 /**
  *  Initialize and install all basic commands in the cmd_desc.h module.
@@ -72,7 +76,10 @@ typedef struct CLI_exec CLI_exec_t;
  *  @param f : Function which will be executed with the commands exec or run.
  */
 extern void CLI_exec_init (MFS_descriptor_t * dir, CLI_exec_t * exec,
-                  char *name, char *description, void (*f) (char *));
+                           char *name, char *description, void (*f) (char *));
+
+/** @}
+ */
 
 /** @}
  */

@@ -17,18 +17,21 @@ ram_test_exec (char *nix)
 {
     for (;;)
     {
-        if (ACE_malloc (1000) != NULL){
-        	USO_kputs (USO_LL_INFO, "1000 B ram allocated.\n");
-        	USO_sleep (ACE_MSEC_2_TICKS(100));
-        } else {
-        	USO_kputs (USO_LL_INFO, "Out of ram\n");
-        	break;
-        }	
+        if (ACE_malloc (1000) != NULL)
+        {
+            USO_log_puts (USO_LL_INFO, "1000 B ram allocated.\n");
+            USO_sleep (USO_MSEC_2_TICKS (100));
+        }
+        else
+        {
+            USO_log_puts (USO_LL_INFO, "Out of ram\n");
+            break;
+        }
     }
 }
 
 extern void
-TST_ram_test_install(MFS_descriptor_t *test)
+TST_ram_test_install (MFS_descriptor_t * test)
 {
     CLI_exec_init (test, &ramt, "ram_T", "Ram Test", ram_test_exec);
 }

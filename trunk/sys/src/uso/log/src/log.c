@@ -46,43 +46,43 @@ print_ll ()
         level = "WRONG";
         break;
     }
-  	ACE_printf ("LOG LEVEL = %s\n", level);
+    ACE_printf ("LOG LEVEL = %s\n", level);
 }
 
 extern void
 USO_log_inc (void)
 {
-    USO_lock(&ll_sync);
+    USO_lock (&ll_sync);
     if (log_level < USO_LL_PROTOCOL)
         log_level++;
     print_ll ();
-    USO_unlock(&ll_sync);
+    USO_unlock (&ll_sync);
 }
 
 extern void
 USO_log_dec (void)
 {
-    USO_lock(&ll_sync);
+    USO_lock (&ll_sync);
     if (log_level > USO_LL_PANIC)
         log_level--;
     print_ll ();
-    USO_unlock(&ll_sync);
+    USO_unlock (&ll_sync);
 }
 
 extern void
 USO_log_show (void)
 {
-    USO_lock(&ll_sync);
+    USO_lock (&ll_sync);
     print_ll ();
-    USO_unlock(&ll_sync);
+    USO_unlock (&ll_sync);
 }
 
 extern void
 USO_log_init (ACE_FILE * ios, enum USO_log_level level)
 {
     out = ios;
-	USO_mutex_init(&ll_sync);
-	USO_mutex_init(&buf_sync);
+    USO_mutex_init (&ll_sync);
+    USO_mutex_init (&buf_sync);
     if (level >= USO_LL_PANIC && level <= USO_LL_PROTOCOL)
     {
         log_level = level;
@@ -90,24 +90,30 @@ USO_log_init (ACE_FILE * ios, enum USO_log_level level)
 }
 
 extern void
-USO_kputs (enum USO_log_level level, char *string)
+USO_log_puts (enum USO_log_level level, char *string)
 {
-    if (level > log_level) { return; }
+    if (level > log_level)
+    {
+        return;
+    }
     ACE_fputs (out, string);
 }
 
 extern void
-USO_kprintf (enum USO_log_level level, const char *fmt, ...)
+USO_log_printf (enum USO_log_level level, const char *fmt, ...)
 {
     int len;
     ACE_va_list_t args;
-    if (level > log_level) {return;}
-    USO_lock(&buf_sync);
+    if (level > log_level)
+    {
+        return;
+    }
+    USO_lock (&buf_sync);
     ACE_va_start (args, fmt);
     len = ACE_vsprintf (buf, fmt, args);
     ACE_va_end (args);
-	ACE_fwrite (out, buf, len);
-    USO_unlock(&buf_sync);
+    ACE_fwrite (out, buf, len);
+    USO_unlock (&buf_sync);
 }
 
 extern void
@@ -115,13 +121,16 @@ USO_debug (const char *fmt, ...)
 {
     int len;
     ACE_va_list_t args;
-    if (USO_LL_DEBUG > log_level) {return;}
-    USO_lock(&buf_sync);
+    if (USO_LL_DEBUG > log_level)
+    {
+        return;
+    }
+    USO_lock (&buf_sync);
     ACE_va_start (args, fmt);
     len = ACE_vsprintf (buf, fmt, args);
     ACE_va_end (args);
     ACE_fwrite (out, buf, len);
-    USO_unlock(&buf_sync);
+    USO_unlock (&buf_sync);
 }
 
 /*------------------------------------------------------------------------*/

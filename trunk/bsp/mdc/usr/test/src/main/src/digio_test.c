@@ -11,8 +11,8 @@
 #include <dev/digout.h>
 #include <cli/commands.h>
 
-#include "arch/digio.h"
-#include "digio_test.h"
+#include <arch/digio.h>
+#include <digio_test.h>
 
 static CLI_exec_t digio_test;
 
@@ -22,11 +22,11 @@ static DEV_digout_t *runninglight[] = {
 };
 
 static void
-cleanup(void)
+cleanup (void)
 {
     for (int i = 0; i < ACE_ARRAYSIZE (runninglight); ++i)
     {
-	    DEV_digout_clear (runninglight[i]);
+        DEV_digout_clear (runninglight[i]);
     }
 }
 
@@ -34,23 +34,23 @@ static void
 digio_test_exec (char *nix)
 {
     int i;
-    USO_cleanup_install(cleanup);
+    USO_cleanup_install (cleanup);
     for (;;)
     {
         while (DEV_digin_isset (&MDC_jumper_1) == FALSE)
-        	USO_sleep(ACE_MSEC_2_TICKS(100));
+            USO_sleep (USO_MSEC_2_TICKS (100));
         for (;;)
         {
             for (i = 0; i < ACE_ARRAYSIZE (runninglight); ++i)
             {
                 DEV_digout_set (runninglight[i]);
-                USO_sleep (ACE_MSEC_2_TICKS(50));
+                USO_sleep (USO_MSEC_2_TICKS (50));
                 DEV_digout_clear (runninglight[i]);
             }
             while (--i >= 0)
             {
                 DEV_digout_set (runninglight[i]);
-                USO_sleep (ACE_MSEC_2_TICKS(50));
+                USO_sleep (USO_MSEC_2_TICKS (50));
                 DEV_digout_clear (runninglight[i]);
             }
             if (DEV_digin_isset (&MDC_jumper_1) == TRUE)
@@ -60,7 +60,7 @@ digio_test_exec (char *nix)
 }
 
 extern void
-digio_test_install(MFS_descriptor_t *test)
+digio_test_install (MFS_descriptor_t * test)
 {
     CLI_exec_init (test, &digio_test, "digioT", "Digio Test", digio_test_exec);
 }

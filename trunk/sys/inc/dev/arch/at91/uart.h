@@ -39,9 +39,7 @@ extern void DEV_at91_uart1_init (void);
  * @param port : 0 or 1
  * @param settings : initialized serial settings struct.
  */
-extern void DEV_at91_uart_open (int port,
-								const struct DEV_serial_settings *settings
-								);
+extern void DEV_at91_uart_open (int port, const struct DEV_serial_settings *settings);
 
 /**
  * Low level function to close serial port.

@@ -8,6 +8,10 @@
 
 #include "ace/stdio.h"
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup kprintf kprintf.h
  *
  * Kernel log.
@@ -81,7 +85,7 @@ extern void USO_log_dec (void);
  * @param level : Print string when log_level >= level.
  * @param string : Pointer to string.
  */
-extern void USO_kputs (enum USO_log_level level, char *string);
+extern void USO_log_puts (enum USO_log_level level, char *string);
 
 /**
  * Print formatted string to kernel log output.
@@ -89,7 +93,7 @@ extern void USO_kputs (enum USO_log_level level, char *string);
  * @param level : Print string when log_level >= level.
  * @param fmt : Pointer to formatted string.
  */
-extern void USO_kprintf (enum USO_log_level level, const char *fmt, ...);
+extern void USO_log_printf (enum USO_log_level level, const char *fmt, ...);
 
 /**
  * Print formatted debug message to kernel log output.
@@ -101,6 +105,9 @@ extern void USO_kprintf (enum USO_log_level level, const char *fmt, ...);
 extern void USO_debug (const char *fmt, ...);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

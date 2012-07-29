@@ -11,6 +11,11 @@
 
 #include <uso/heap.h>
 
+/** @addtogroup ace
+ *
+ * @{
+ */
+
 /** @defgroup stdlib stdlib.h
  *
  * Standard library functions.
@@ -43,7 +48,7 @@ extern int ACE_atox (char c);
  *  @param s Pointer to string.
  *  @return Integer value.
  */
-extern int ACE_atoxc (char* s);
+extern int ACE_atoxc (char *s);
 
 /** Conversion of data from or to network order is the same.*/
 #define ACE_ntohl(n) ACE_htonl(n)
@@ -85,8 +90,11 @@ extern ACE_u32_t ACE_htonl (ACE_u32_t n);
 /**
  * This function must be called before you can use the stdlib functions.
  * @param heap : Pointer to a heap which will be used with the malloc and free functions.
+ * @param abort_handler: function which will be called in an abort.
  */
-extern void ACE_stdlib_init (USO_heap_t* heap);
+extern void ACE_stdlib_init (USO_heap_t * heap,
+                             void (*abort_handler) (char *msg, char *file, int line),
+                             void (*panic_handler) (char *msg, char *file, int line));
 
 /**
  * Allocate memory.
@@ -101,7 +109,41 @@ extern void *ACE_malloc (ACE_size_t size);
  */
 extern void ACE_free (void *block);
 
+/**
+ * Abort program execution. Not correctable error
+ * but you should be able to print the error message.
+ * @param msg : error message.
+ * @param file : filename from where the function is called.
+ * @param line : line number from where the function is called.
+ *
+ * This function will not return.
+ * If you have registered an abort handler, this handler is called.
+ */
+
+#define ACE_ABORT(msg) ACE_abort(msg, __FILE__, __LINE__)
+
+extern void ACE_abort (char *msg, char *file, int line);
+
+/**
+ * Abort program execution immediate, system is corrupted and
+ * further programm execution is not possible.
+ * @param msg : error message.
+ * @param file : filename from where the function is called.
+ * @param line : line number from where the function is called.
+ *
+ * This function will not return.
+ * If you have registered an panic handler, this handler is called.
+ */
+
+#define ACE_PANIC(msg) ACE_panic(msg, __FILE__, __LINE__)
+
+extern void ACE_panic (char *msg, char *file, int line);
+
+
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

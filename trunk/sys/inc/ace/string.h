@@ -8,6 +8,11 @@
 
 #include "ace/stddef.h"
 
+/** @addtogroup ace
+ *
+ * @{
+ */
+
 /** @defgroup string string.h
  *
  * Standard string and memmory functions.
@@ -112,6 +117,9 @@ extern void *memset (void *s, int c, ACE_size_t n);
 extern ACE_size_t ACE_strnlen (const char *cs, ACE_size_t n);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

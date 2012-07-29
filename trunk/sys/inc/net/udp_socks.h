@@ -13,6 +13,10 @@
 #include "net/err.h"
 #include "net/udp_sock.h"
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup udp_socks udp_socks.h
  *
  * User datagramm socket list.
@@ -28,14 +32,12 @@ extern void NET_udp_socks_init (void);
 /**
  * Lock UDP mutex, used for synchronisation.
  */
-extern void
-NET_udp_socks_lock (void);
+extern void NET_udp_socks_lock (void);
 
 /**
  * Unlock UDP mutex, used for synchronisation.
  */
-extern void
-NET_udp_socks_unlock (void);
+extern void NET_udp_socks_unlock (void);
 
 /**
  * Find appropriate socket.
@@ -47,25 +49,25 @@ NET_udp_socks_unlock (void);
  * @return Found UDP socker or NULL.
  *
  */
-extern NET_udp_socket_t *
-NET_udp_find_sock (NET_netif_t * inp,
-					 struct NET_ip_hdr *iphdr,
-		             ACE_u16_t src,
-				     ACE_u16_t dest);
+extern NET_udp_socket_t *NET_udp_find_sock (NET_netif_t * inp,
+                                            struct NET_ip_hdr *iphdr,
+                                            ACE_u16_t src, ACE_u16_t dest);
 
 /**
  * Add UDP socket to UDP socket list.
  */
-extern void
-NET_udp_socks_add (NET_udp_socket_t * sock);
+extern void NET_udp_socks_add (NET_udp_socket_t * sock);
 
 /**
  * Remove UDP socket from UDP socket list.
  */
-extern void
-NET_udp_socks_remove (NET_udp_socket_t * sock);
+extern void NET_udp_socks_remove (NET_udp_socket_t * sock);
 
 /** @}
  */
 
-#endif /*UDP_SOCKS_H*/
+/** @}
+ */
+
+
+#endif /*UDP_SOCKS_H */

@@ -4,6 +4,7 @@
  */
 
 #include <ace/stddef.h>
+#include <uso/mutex.h>
 #include <dev/timer.h>
 
 #include "net/debug.h"
@@ -14,7 +15,7 @@
 
 #define ARP_TABLE_SIZE 10
 
-#define ARP_MAXAGE 2            /* 120 * 10 seconds = 20 minutes. */
+#define ARP_MAXAGE 120          /* 120 * 10 seconds = 20 minutes. */
 
 #define HWTYPE_ETHERNET 1
 
@@ -60,6 +61,7 @@ struct arp_entry
 static struct arp_entry arp_table[ARP_TABLE_SIZE];
 static ACE_u8_t ctime;
 static DEV_timer_t clear_entry;
+static USO_mutex_t lock_arp_table;
 
 /*
  * The arp_tmr() function should be called every ARP_TMR_INTERVAL
@@ -71,17 +73,18 @@ arp_tmr (void *nix)
 {
     ACE_u8_t i;
 
+    USO_lock (&lock_arp_table);
     ++ctime;
     for (i = 0; i < ARP_TABLE_SIZE; ++i)
     {
-        if (!NET_ip_addr_isany (&arp_table[i].ipaddr) &&
-            ctime - arp_table[i].ctime >= ARP_MAXAGE)
+        if (!NET_ip_addr_isany (&arp_table[i].ipaddr) && ctime - arp_table[i].ctime >= ARP_MAXAGE)
         {
             DEBUGF (NET_ARP_DEBUG, ("Arp: timer expired entry %d.\n", i));
             NET_ip_addr_set (&(arp_table[i].ipaddr), &NET_ip_addr_any);
         }
     }
-    DEV_timer_start (&clear_entry);
+    USO_unlock (&lock_arp_table);
+    DEV_timer_start (&clear_entry, ARP_TMR_INTERVAL);
 }
 
 extern void
@@ -94,8 +97,10 @@ NET_arp_init (void)
         NET_ip_addr_set (&(arp_table[i].ipaddr), &NET_ip_addr_any);
     }
 
-    DEV_timer_init (&clear_entry, arp_tmr, NULL, ARP_TMR_INTERVAL);
-    DEV_timer_start (&clear_entry);
+    USO_mutex_init (&lock_arp_table);
+    DEV_timer_init (&clear_entry, arp_tmr, NULL, DEV_TIMER_THREAD);
+    DEV_timer_install (&clear_entry, "arp");
+    DEV_timer_start (&clear_entry, ARP_TMR_INTERVAL);
 }
 
 static void
@@ -104,46 +109,38 @@ add_arp_entry (NET_ip_addr_t * ipaddr, struct NET_eth_addr *ethaddr)
     ACE_u8_t i, j, k;
     ACE_u8_t maxtime;
 
-    /*
-     * Walk through the ARP mapping table and try to find an entry to
+    USO_lock (&lock_arp_table);
+
+    /* Walk through the ARP mapping table and try to find an entry to
      * update. If none is found, the IP -> MAC address mapping is inserted 
      * in the ARP table. 
      */
     for (i = 0; i < ARP_TABLE_SIZE; ++i)
     {
 
-        /*
-         * Only check those entries that are actually in use. 
-         */
+        /* Only check those entries that are actually in use. */
         if (!NET_ip_addr_isany (&arp_table[i].ipaddr))
         {
-            /*
-             * Check if the source IP address of the incoming packet
+            /* Check if the source IP address of the incoming packet
              * matches the IP address in this ARP table entry. 
              */
             if (NET_ip_addr_cmp (ipaddr, &arp_table[i].ipaddr))
             {
-                /*
-                 * An old entry found, update this and return. 
-                 */
+                /* An old entry found, update this and return. */
                 for (k = 0; k < NET_ETH_ADDR_SIZE; ++k)
                 {
                     arp_table[i].ethaddr.addr[k] = ethaddr->addr[k];
                 }
                 arp_table[i].ctime = ctime;
+                USO_unlock (&lock_arp_table);
                 return;
             }
         }
     }
 
-    /*
-     * If we get here, no existing ARP table entry was found, so we create 
-     * one. 
-     */
+    /*If we get here, no existing ARP table entry was found, so we create one. */
 
-    /*
-     * First, we try to find an unused entry in the ARP table. 
-     */
+    /* First, we try to find an unused entry in the ARP table. */
     for (i = 0; i < ARP_TABLE_SIZE; ++i)
     {
         if (NET_ip_addr_isany (&arp_table[i].ipaddr))
@@ -152,10 +149,7 @@ add_arp_entry (NET_ip_addr_t * ipaddr, struct NET_eth_addr *ethaddr)
         }
     }
 
-    /*
-     * If no unused entry is found, we try to find the oldest entry and
-     * throw it away. 
-     */
+    /* If no unused entry is found, we try to find the oldest entry and throw it away. */
     if (i == ARP_TABLE_SIZE)
     {
         maxtime = 0;
@@ -171,16 +165,15 @@ add_arp_entry (NET_ip_addr_t * ipaddr, struct NET_eth_addr *ethaddr)
         i = j;
     }
 
-    /*
-     * Now, i is the ARP table entry which we will fill with the new
-     * information. 
-     */
+    /* Now, i is the ARP table entry which we will fill with the new information. */
     NET_ip_addr_set (&arp_table[i].ipaddr, ipaddr);
     for (k = 0; k < NET_ETH_ADDR_SIZE; ++k)
     {
         arp_table[i].ethaddr.addr[k] = ethaddr->addr[k];
     }
     arp_table[i].ctime = ctime;
+
+    USO_unlock (&lock_arp_table);
     return;
 }
 
@@ -189,23 +182,21 @@ NET_arp_ip_input (NET_netif_t * netif, NET_netbuf_t * p)
 {
     struct ethip_hdr *hdr;
 
-    if (NET_netbuf_len(p) < sizeof (struct ethip_hdr))
+    if (NET_netbuf_len (p) < sizeof (struct ethip_hdr))
     {
         DEBUGF (NET_ARP_DEBUG,
                 ("Arp: ip packet too short (%d/%d).\n",
-                 NET_netbuf_len(p), sizeof (struct ethip_hdr)));
+                 NET_netbuf_len (p), sizeof (struct ethip_hdr)));
         NET_netbuf_free (p);
         return;
     }
 
-    hdr = (struct ethip_hdr *)NET_netbuf_index(p);
+    hdr = (struct ethip_hdr *)NET_netbuf_index (p);
 
-    /*
-     * Only insert/update an entry if the source IP address of the
-     * incoming IP packet comes from a host on the local network. 
+    /* Only insert/update an entry if the source IP address of the
+     * incoming IP packet comes from a host on the local network.
      */
-    if (!NET_ip_addr_maskcmp
-        (&(hdr->ip.src), &(netif->ip_addr), &(netif->netmask)))
+    if (!NET_ip_addr_maskcmp (&(hdr->ip.src), &(netif->ip_addr), &(netif->netmask)))
     {
         return;
     }
@@ -214,29 +205,26 @@ NET_arp_ip_input (NET_netif_t * netif, NET_netbuf_t * p)
 }
 
 extern NET_netbuf_t *
-NET_arp_arp_input (NET_netif_t * netif,
-                   struct NET_eth_addr *ethaddr, NET_netbuf_t * p)
+NET_arp_arp_input (NET_netif_t * netif, struct NET_eth_addr *ethaddr, NET_netbuf_t * p)
 {
     struct arp_hdr *hdr;
     ACE_u8_t i;
 
-    if (NET_netbuf_len(p) < sizeof (struct arp_hdr))
+    if (NET_netbuf_len (p) < sizeof (struct arp_hdr))
     {
         DEBUGF (NET_ARP_DEBUG,
                 ("Arp: arp packet too short (%d/%d).\n",
-                 NET_netbuf_len(p), sizeof (struct arp_hdr)));
+                 NET_netbuf_len (p), sizeof (struct arp_hdr)));
         NET_netbuf_free (p);
         return NULL;
     }
 
-    hdr = (struct arp_hdr *)NET_netbuf_index(p);
+    hdr = (struct arp_hdr *)NET_netbuf_index (p);
 
     switch (ACE_htons (hdr->opcode))
     {
     case ARP_REQUEST:
-        /*
-         * ARP request. If it asked for our address, we send out a reply. 
-         */
+        /* ARP request. If it asked for our address, we send out a reply. */
         DEBUGF (NET_ARP_DEBUG, ("Arp: arp request.\n"));
         if (NET_ip_addr_cmp (&(hdr->dipaddr), &(netif->ip_addr)))
         {
@@ -264,9 +252,7 @@ NET_arp_arp_input (NET_netif_t * netif,
         }
         break;
     case ARP_REPLY:
-        /*
-         * ARP reply. We insert or update the ARP table. 
-         */
+        /* ARP reply. We insert or update the ARP table. */
         DEBUGF (NET_ARP_DEBUG, ("Arp: arp reply.\n"));
         if (NET_ip_addr_cmp (&(hdr->dipaddr), &(netif->ip_addr)))
         {
@@ -274,8 +260,7 @@ NET_arp_arp_input (NET_netif_t * netif,
         }
         break;
     default:
-        DEBUGF (NET_ARP_DEBUG,
-                ("Arp: unknown type %d.\n", ACE_htons (hdr->opcode)));
+        DEBUGF (NET_ARP_DEBUG, ("Arp: unknown type %d.\n", ACE_htons (hdr->opcode)));
         break;
     }
 
@@ -288,51 +273,60 @@ NET_arp_lookup (NET_ip_addr_t * ipaddr)
 {
     ACE_u8_t i;
 
+    USO_lock (&lock_arp_table);
+
     for (i = 0; i < ARP_TABLE_SIZE; ++i)
     {
         if (NET_ip_addr_cmp (ipaddr, &arp_table[i].ipaddr))
         {
+            USO_unlock (&lock_arp_table);
             return &arp_table[i].ethaddr;
         }
     }
+    USO_unlock (&lock_arp_table);
     return NULL;
 }
 
 extern NET_netbuf_t *
-NET_arp_query (NET_netif_t * netif,
-               struct NET_eth_addr *ethaddr, NET_ip_addr_t * ipaddr)
+NET_arp_query (NET_netif_t * netif, struct NET_eth_addr *ethaddr, NET_ip_addr_t * ipaddr)
 {
     struct arp_hdr *hdr;
     NET_netbuf_t *p;
     ACE_u8_t i;
 
-    p = NET_netbuf_alloc_trans();
-    if(p == NULL) { return NULL; }
-	if (NET_netbuf_index_inc (p, -sizeof(struct arp_hdr))){
-	    hdr = (struct arp_hdr *)NET_netbuf_index(p);
-	    hdr->opcode = ACE_htons (ARP_REQUEST);
-	    for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
-    	{
-        	hdr->dhwaddr.addr[i] = 0x00;
-        	hdr->shwaddr.addr[i] = ethaddr->addr[i];
-    	}
-	    NET_ip_addr_set (&(hdr->dipaddr), ipaddr);
-    	NET_ip_addr_set (&(hdr->sipaddr), &(netif->ip_addr));
-	    hdr->hwtype = ACE_htons (HWTYPE_ETHERNET);
-	    ARPH_HWLEN_SET (hdr, NET_ETH_ADDR_SIZE);
-	    hdr->proto = ACE_htons (NET_ETH_TYPE_IP);
-    	ARPH_PROTOLEN_SET (hdr, sizeof (NET_ip_addr_t));
+    p = NET_netbuf_alloc_trans ();
+    if (p == NULL)
+    {
+        return NULL;
+    }
+    if (NET_netbuf_index_inc (p, -sizeof (struct arp_hdr)))
+    {
+        hdr = (struct arp_hdr *)NET_netbuf_index (p);
+        hdr->opcode = ACE_htons (ARP_REQUEST);
+        for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
+        {
+            hdr->dhwaddr.addr[i] = 0x00;
+            hdr->shwaddr.addr[i] = ethaddr->addr[i];
+        }
+        NET_ip_addr_set (&(hdr->dipaddr), ipaddr);
+        NET_ip_addr_set (&(hdr->sipaddr), &(netif->ip_addr));
+        hdr->hwtype = ACE_htons (HWTYPE_ETHERNET);
+        ARPH_HWLEN_SET (hdr, NET_ETH_ADDR_SIZE);
+        hdr->proto = ACE_htons (NET_ETH_TYPE_IP);
+        ARPH_PROTOLEN_SET (hdr, sizeof (NET_ip_addr_t));
 
-    	for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
-    	{
-        	hdr->ethhdr.dest.addr[i] = 0xff;
-        	hdr->ethhdr.src.addr[i] = ethaddr->addr[i];
-    	}
+        for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
+        {
+            hdr->ethhdr.dest.addr[i] = 0xff;
+            hdr->ethhdr.src.addr[i] = ethaddr->addr[i];
+        }
 
-    	hdr->ethhdr.type = ACE_htons (NET_ETH_TYPE_ARP);
-	} else {
-		NET_netbuf_free(p);
-		p = NULL;
-	}
-   	return p;
+        hdr->ethhdr.type = ACE_htons (NET_ETH_TYPE_ARP);
+    }
+    else
+    {
+        NET_netbuf_free (p);
+        p = NULL;
+    }
+    return p;
 }

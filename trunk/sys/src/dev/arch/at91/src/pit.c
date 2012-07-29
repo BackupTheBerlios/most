@@ -31,89 +31,75 @@
  * ----------------------------------------------------------------------------
  */
 
-//------------------------------------------------------------------------------
-//         Headers
-//------------------------------------------------------------------------------
-
+#include <ace/stddef.h>
 #include "dev/arch/at91/pit.h"
 #include "dev/arch/at91/AT91SAM7X256.h"
 
-//------------------------------------------------------------------------------
-//         Exported functions
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-/// Initialize the System timer for a period in second with a system clock
-/// freq in MHz
-/// \param period  Period in second.
-/// \param pit_frequency  System clock frequency in MHz.
-//------------------------------------------------------------------------------
-void PIT_Init(unsigned int period,
-                     unsigned int pit_frequency)
+static unsigned int periodes_per_sec;
+static unsigned int pit_freq;
+static unsigned int pit_ticks_per_period;
+
+extern void
+DEV_at91_PIT_init (unsigned int period, unsigned int pit_frequency)
 {
-    AT91C_BASE_PITC->PITC_PIMR = period? (period * pit_frequency + 8) >> 4 : 0; // +8 to avoid %10 and /10
+    periodes_per_sec = period;
+    pit_freq = pit_frequency;
+    pit_ticks_per_period = period ? (period * pit_frequency + 8) >> 4 : 0;      // +8 to avoid %10, /10
+    AT91C_BASE_PITC->PITC_PIMR = pit_ticks_per_period;
     AT91C_BASE_PITC->PITC_PIMR |= AT91C_PITC_PITEN;
 }
 
-//------------------------------------------------------------------------------
-/// Set the PIT Periodic Interval Value
-//------------------------------------------------------------------------------
-void PIT_SetPIV(unsigned int piv)
-{
-    AT91C_BASE_PITC->PITC_PIMR = piv | (AT91C_BASE_PITC->PITC_PIMR & (AT91C_PITC_PITEN | AT91C_PITC_PITIEN));
-}
-
-//------------------------------------------------------------------------------
-/// Enable the PIT
-//------------------------------------------------------------------------------
-void PIT_Enable(void)
-{
-    AT91C_BASE_PITC->PITC_PIMR |= AT91C_PITC_PITEN;
-}
-
-//----------------------------------------------------------------------------
-/// Enable PIT periodic interrupt
-//----------------------------------------------------------------------------
-void PIT_EnableIT(void)
+extern void
+DEV_at91_PIT_enable_IT (void)
 {
     AT91C_BASE_PITC->PITC_PIMR |= AT91C_PITC_PITIEN;
 }
 
-//------------------------------------------------------------------------------
-/// Disable PIT periodic interrupt
-//------------------------------------------------------------------------------
-void PIT_DisableIT(void)
+extern void
+DEV_at91_PIT_disable_IT (void)
 {
     AT91C_BASE_PITC->PITC_PIMR &= ~AT91C_PITC_PITIEN;
 }
 
-//------------------------------------------------------------------------------
-/// Read PIT mode register
-//------------------------------------------------------------------------------
-unsigned int PIT_GetMode(void)
+extern unsigned int
+DEV_at91_PIT_get_mode (void)
 {
-    return(AT91C_BASE_PITC->PITC_PIMR);
+    return (AT91C_BASE_PITC->PITC_PIMR);
 }
 
-//------------------------------------------------------------------------------
-/// Read PIT status register
-//------------------------------------------------------------------------------
-unsigned int PIT_GetStatus(void)
+extern unsigned int
+DEV_at91_PIT_get_status (void)
 {
-    return(AT91C_BASE_PITC->PITC_PISR);
+    return ((AT91C_BASE_PITC->PITC_PISR & AT91C_PITC_PITS) == AT91C_PITC_PITS);
 }
 
-//------------------------------------------------------------------------------
-/// Read PIT CPIV and PICNT without ressetting the counters
-//------------------------------------------------------------------------------
-unsigned int PIT_GetPIIR(void)
+extern unsigned int
+DEV_at91_PIT_get_PIIR (unsigned int *picnt)
 {
-    return(AT91C_BASE_PITC->PITC_PIIR);
+    unsigned int piir;
+    piir = AT91C_BASE_PITC->PITC_PIIR;
+    if (picnt != NULL)
+    {
+        *picnt = (piir & AT91C_PITC_PICNT) >> 20;
+    }
+    return piir & AT91C_PITC_CPIV;
 }
 
-//------------------------------------------------------------------------------
-/// Read System timer CPIV and PICNT without ressetting the counters
-//------------------------------------------------------------------------------
-unsigned int PIT_GetPIVR(void)
+extern unsigned int
+DEV_at91_PIT_ticks_2_usec (unsigned int pit_ticks)
 {
-    return(AT91C_BASE_PITC->PITC_PIVR);
+    unsigned int pit_ticks_per_sec = periodes_per_sec * pit_ticks_per_period;
+    return (pit_ticks * DEV_AT91_PIT_SEC_IN_USEC) / pit_ticks_per_sec;
+}
+
+extern unsigned int
+DEV_at91_PIT_get_PIVR (unsigned int *picnt)
+{
+    unsigned int pivr;
+    pivr = AT91C_BASE_PITC->PITC_PIVR;
+    if (picnt != NULL)
+    {
+        *picnt = (pivr & AT91C_PITC_PICNT) >> 20;
+    }
+    return pivr & AT91C_PITC_CPIV;
 }

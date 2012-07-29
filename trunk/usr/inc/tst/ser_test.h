@@ -8,6 +8,25 @@
 
 #include "mfs/vfs.h"
 
-extern void TST_ser_test_install (MFS_descriptor_t *test);
+/** @addtogroup test
+ *
+ * @{
+ */
+/** @defgroup ser_test ser_test.h
+ *
+ * @{
+ */
+
+/**
+ *
+ */
+extern void TST_ser_test_install (MFS_descriptor_t * test);
+
+
+/** @}
+ */
+
+/** @}
+ */
 
 #endif

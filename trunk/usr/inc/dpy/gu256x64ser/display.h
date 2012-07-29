@@ -6,6 +6,11 @@
 #ifndef DPY_GU256X64SER_DISPLAY_H
 #define DPY_GU256X64SER_DISPLAY_H
 
+/** @addtogroup dpy
+ *
+ * @{
+ */
+
 /** @addtogroup gu256x64ser
  *
  * Display.
@@ -56,8 +61,8 @@ extern void DPY_gu256x64ser_DownloadRegister (unsigned char enable);
  * .
  */
 extern void DPY_gu256x64ser_DownloadCharDefinition (unsigned char type,
-                                       unsigned char start,
-                                       unsigned char end, unsigned char *data);
+                                                    unsigned char start,
+                                                    unsigned char end, unsigned char *data);
 /**
  * .
  */
@@ -117,13 +122,16 @@ extern void DPY_gu256x64ser_RAMMacroDefinition (unsigned short length, unsigned 
  * .
  */
 extern void DPY_gu256x64ser_MacroExecution (unsigned char definitionNr,
-                               unsigned char displayTime,
-                               unsigned char idleTime);
+                                            unsigned char displayTime, unsigned char idleTime);
 
 /** @}
  */
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

@@ -12,23 +12,13 @@ with the name trunk.
 Setup the Config files (Copy Copy_2_Config to Config and edit it to your needs)
 in trunk/etc/Config and trunk/bsp/board/Config.
 
-Create a directory "gcc" in the trunk folder and create a link to your toolchain
-in the gcc directory. The link must have the name $MOST_TARGET-$MOST_GCC according
-to your Config files.
-$MOST_TARGET will be the prefix to your toolchain binaries for example "arm-elf"
-and $MOST_GCC must be the exact version of your gcc for example "4.4.3".
-
 
 2.) Build.
 ==========
 
 Just call "make all" in the trunk folder to build the libraries and binary.
-
-To build the MOST API go to the inc (header files) folder for example
-mostroot/sys/inc and type there "make doc".
-
-Use "make help" to show the available build commands.
-
+Use "make help" to see all build targets!
+There are a lot of Makefiles in subdirectories to build subparts, use "make help" to see the possible targets.
 
 
 3.) How the build system works.

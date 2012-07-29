@@ -6,12 +6,17 @@
 #ifndef DPY_GU256X64SER_FONT_H
 #define DPY_GU256X64SER_FONT_H
 
+/** @addtogroup dpy
+ *
+ * @{
+ */
+
 /** @addtogroup gu256x64ser
  *
  * @{
  */
 
-/** @defgroup font font.h
+/** @defgroup gu256x64ser_font font.h
  *
  * Font command group. 
  *
@@ -26,8 +31,7 @@ extern void DPY_gu256x64ser_FontSizeSelect (unsigned char fontSize);
 /**
  * .
  */
-extern void DPY_gu256x64ser_16x16CharDefinition (unsigned short charCode,
-                                    unsigned char *data);
+extern void DPY_gu256x64ser_16x16CharDefinition (unsigned short charCode, unsigned char *data);
 
 /**
  * .
@@ -54,5 +58,9 @@ extern void DPY_gu256x64ser_CharBoldDisplay (unsigned char bold);
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

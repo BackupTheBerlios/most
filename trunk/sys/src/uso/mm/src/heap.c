@@ -12,7 +12,7 @@
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
 
-#define USO_HEAP_MIN_BLOCK_SIZE   24  /* 24 + 4 + 4 = 32 (nextf, prevf) */
+#define USO_HEAP_MIN_BLOCK_SIZE   24    /* 24 + 4 + 4 = 32 (nextf, prevf) */
 
 /*------------- Implementation ------------------------------------------*/
 
@@ -32,7 +32,7 @@ struct USO_mblock
 {
     USO_mblock_t *nextm;
     USO_mblock_t *prevm;
-    long tag_size;       /* highest bit is the used tag, so size is signed. */
+    long tag_size;              /* highest bit is the used tag, so size is signed. */
 };
 
 /*
@@ -47,10 +47,10 @@ struct USO_fblock
 
 
 static void
-calc_search_average (USO_heap_t* heap)
+calc_search_average (USO_heap_t * heap)
 {
-	unsigned long ac = heap->alloc_count;
-	unsigned long sc = heap->search_count;
+    unsigned long ac = heap->alloc_count;
+    unsigned long sc = heap->search_count;
     if ((ac == 0) || (ac > sc))
     {
         heap->search_count = 0;
@@ -63,8 +63,7 @@ calc_search_average (USO_heap_t* heap)
 
 
 static void
-mblock_insert (USO_mblock_t * prev, USO_mblock_t * block, USO_mblock_t * next,
-					 long size)
+mblock_insert (USO_mblock_t * prev, USO_mblock_t * block, USO_mblock_t * next, long size)
 {
     if (prev != NULL)
     {
@@ -94,7 +93,7 @@ mblock_remove (USO_mblock_t * block)
 
 
 static void
-fblock_insert (USO_heap_t* heap, USO_fblock_t * block)
+fblock_insert (USO_heap_t * heap, USO_fblock_t * block)
 {
     if (heap->free_blocks == NULL)
     {
@@ -112,7 +111,7 @@ fblock_insert (USO_heap_t* heap, USO_fblock_t * block)
 }
 
 static void
-fblock_remove (USO_heap_t* heap, USO_fblock_t * block)
+fblock_remove (USO_heap_t * heap, USO_fblock_t * block)
 {
     if (block->nextf == block)
     {
@@ -127,40 +126,36 @@ fblock_remove (USO_heap_t* heap, USO_fblock_t * block)
 }
 
 #define MINBLOCKSIZE (sizeof(USO_fblock_t) - sizeof(USO_mblock_t) + USO_HEAP_MIN_BLOCK_SIZE)
-									 
+
 #define USED_TAG 0x80000000L
 #define ROUND 0x4L
 
 #if USO_HEAP_LIST_DEBUG
 static void
-print_heap_list (USO_heap_t* heap)
+print_heap_list (USO_heap_t * heap)
 {
     USO_mblock_t *block;
     unsigned long mem_blocks = (unsigned long)heap->mem_blocks;
-    USO_kprintf (USO_LL_INFO, 
-    			"\n--------Start---------\n"
-                "Free Blocks: %ld\n"
-                "Alloc: %lu, Search: %lu\n",
-                heap->free_blocks != NULL ?
-                (unsigned long)heap->free_blocks - mem_blocks : -1,
-                heap->alloc_count, heap->search_count);
+    USO_log_printf (USO_LL_INFO,
+                 "\n--------Start---------\n"
+                 "Free Blocks: %ld\n"
+                 "Alloc: %lu, Search: %lu\n",
+                 heap->free_blocks != NULL ?
+                 (unsigned long)heap->free_blocks - mem_blocks : -1,
+                 heap->alloc_count, heap->search_count);
     for (block = heap->mem_blocks; block != NULL; block = block->nextm)
     {
         long nextm;
         long prevm;
         long size;
         int tag;
-        nextm = block->nextm != NULL ?
-            (unsigned long)block->nextm - mem_blocks : -1;
-        prevm = block->prevm != NULL ?
-            (unsigned long)block->prevm - mem_blocks : -1;
+        nextm = block->nextm != NULL ? (unsigned long)block->nextm - mem_blocks : -1;
+        prevm = block->prevm != NULL ? (unsigned long)block->prevm - mem_blocks : -1;
         size = block->tag_size & ~USED_TAG;
         tag = block->tag_size & USED_TAG ? 1 : 0;
-        USO_kprintf (USO_LL_INFO,
-         		"nextm: %ld\n"
-                "prevm: %ld\n"
-                "size: %ld\n"
-				"tag: %d\n", nextm, prevm, size, tag);
+        USO_log_printf (USO_LL_INFO,
+                     "nextm: %ld\n"
+                     "prevm: %ld\n" "size: %ld\n" "tag: %d\n", nextm, prevm, size, tag);
         if (tag == 0)
         {
             long nextf;
@@ -168,63 +163,70 @@ print_heap_list (USO_heap_t* heap)
             nextf = ((USO_fblock_t *) block)->nextf != NULL ?
                 (unsigned long)((USO_fblock_t *) block)->nextf - mem_blocks : -1;
             prevf = ((USO_fblock_t *) block)->prevf != NULL ?
-            	(unsigned long)((USO_fblock_t *) block)->prevf - mem_blocks : -1;
-            USO_kprintf (USO_LL_INFO,
-            		"\tnextf: %ld\n"
-					"\tprevf: %ld\n", nextf, prevf);
+                (unsigned long)((USO_fblock_t *) block)->prevf - mem_blocks : -1;
+            USO_log_printf (USO_LL_INFO, "\tnextf: %ld\n" "\tprevf: %ld\n", nextf, prevf);
         }
     }
-    USO_kprintf (USO_LL_INFO, "--------End-----------\n");
+    USO_log_printf (USO_LL_INFO, "--------End-----------\n");
 }
 #endif
 
-static void
-info (MFS_entry_t *entry)
+extern void
+USO_debug_heap_list (MFS_entry_t * entry)
 {
-	USO_heap_t* heap = (USO_heap_t*) entry;
-	
+    USO_log_printf (USO_LL_INFO, "\n Debug switch is %s.\n", USO_HEAP_LIST_DEBUG ? "on" : "off");
 #if USO_HEAP_LIST_DEBUG
-    print_heap_list (heap);
+    if (entry != NULL)
+        print_heap_list ((USO_heap_t *) entry);
 #endif
+}
 
-    ACE_printf ("\n\tTotal mem: %lu\n"
-              "\tFree mem: %lu\n"
-              "\tAverage search: %lu\n",
-              heap->total_mem, heap->free_mem, heap->search_average);
+static void
+info (MFS_entry_t * entry)
+{
+    USO_heap_t *heap = (USO_heap_t *) entry;
+
+    ACE_printf ("%lu\t%lu\t%lu\n", heap->total_mem, heap->free_mem, heap->search_average);
+}
+
+extern void
+USO_heap_info_head (void)
+{
+    ACE_printf ("\t%s\t%s\t%s\t%s\n", "Name", "Total", "Free", "Av search");
 }
 
 
 static struct MFS_descriptor_op heap_descriptor_op = {.open = NULL,
-											 		  .close = NULL,
-										              .info = info};
+    .close = NULL,
+    .info = info
+};
 
 extern void
-USO_heap_install(USO_heap_t* heap, char *name)
+USO_heap_install (USO_heap_t * heap, char *name)
 {
-	MFS_create_desc(MFS_sysfs_heaps(), name,
-				 (MFS_entry_t*) heap, MFS_DESC, &heap_descriptor_op);
+    MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_HEAPS), name,
+                     (MFS_entry_t *) heap, MFS_DESC, &heap_descriptor_op);
 }
 
 extern ACE_bool_t
-USO_heap_init (USO_heap_t* heap, void *start, void *end)
+USO_heap_init (USO_heap_t * heap, void *start, void *end)
 {
-	heap->mem_blocks = NULL;
-	heap->free_blocks = NULL;
-	heap->free_mem = 0;
-	heap->total_mem = 0;
-	heap->alloc_count = 0;
-	heap->search_count = 0;
-	heap->search_average = 0;
+    heap->mem_blocks = NULL;
+    heap->free_blocks = NULL;
+    heap->free_mem = 0;
+    heap->total_mem = 0;
+    heap->alloc_count = 0;
+    heap->search_count = 0;
+    heap->search_average = 0;
     long size;
     size = (char *)end - (char *)start;
     size &= ~(ROUND - 1);
     if (size < MINBLOCKSIZE + sizeof (USO_mblock_t))
     {
-        DEBUGF(USO_HEAP_DEBUG, ("Heap init failed!\n"));
+        DEBUGF (USO_HEAP_DEBUG, ("Heap init failed!\n"));
         return FALSE;
     }
-    mblock_insert (NULL, (USO_mblock_t *) start, NULL,
-                   (unsigned long)size - sizeof (USO_mblock_t));
+    mblock_insert (NULL, (USO_mblock_t *) start, NULL, (unsigned long)size - sizeof (USO_mblock_t));
     heap->mem_blocks = (USO_mblock_t *) start;
     fblock_insert (heap, (USO_fblock_t *) start);
     heap->total_mem = size;
@@ -233,7 +235,7 @@ USO_heap_init (USO_heap_t* heap, void *start, void *end)
 }
 
 extern void *
-USO_mem_alloc (USO_heap_t* heap, ACE_size_t size)
+USO_mem_alloc (USO_heap_t * heap, ACE_size_t size)
 {
     USO_fblock_t *free;
     USO_mblock_t *used;
@@ -248,8 +250,8 @@ USO_mem_alloc (USO_heap_t* heap, ACE_size_t size)
     USO_cpu_status_t ps = USO_disable ();
     if (heap->free_blocks == NULL)
     {
-        DEBUGF(USO_HEAP_DEBUG, ("Mem alloc: Out of free memmory!\n"));
- 	    USO_restore (ps);
+        DEBUGF (USO_HEAP_DEBUG, ("Mem alloc: Out of free memmory!\n"));
+        USO_restore (ps);
         return NULL;
     }
     free = heap->free_blocks;
@@ -259,13 +261,12 @@ USO_mem_alloc (USO_heap_t* heap, ACE_size_t size)
         ++heap->search_count;
         if (free->head.tag_size >= size)
         {
-            if ( (leftover = free->head.tag_size - (long)size) >=
-                	(MINBLOCKSIZE + sizeof (USO_mblock_t)))
+            if ((leftover = free->head.tag_size - (long)size) >=
+                (MINBLOCKSIZE + sizeof (USO_mblock_t)))
             {
                 free->head.tag_size = leftover - sizeof (USO_mblock_t);
                 used = (USO_mblock_t *) ((char *)free + leftover);
-                mblock_insert ( (USO_mblock_t*)free, used,
-                			    ((USO_mblock_t*)free)->nextm, size);
+                mblock_insert ((USO_mblock_t *) free, used, ((USO_mblock_t *) free)->nextm, size);
                 heap->free_blocks = free->nextf;
                 heap->free_mem -= sizeof (USO_mblock_t);
             }
@@ -277,15 +278,15 @@ USO_mem_alloc (USO_heap_t* heap, ACE_size_t size)
             heap->free_mem -= used->tag_size;
             calc_search_average (heap);
             used->tag_size |= USED_TAG;
-    	    USO_restore (ps);
+            USO_restore (ps);
             return ++used;
         }
         free = free->nextf;
     }
     while (free != heap->free_blocks);
     calc_search_average (heap);
-    DEBUGF(USO_HEAP_DEBUG, ("Mem alloc: Block to large(free:%ld/block:%ld)!\n",
-                 heap->free_mem, (long)size) );
+    DEBUGF (USO_HEAP_DEBUG, ("Mem alloc: Block to large(free:%ld/block:%ld)!\n",
+                             heap->free_mem, (long)size));
     USO_restore (ps);
     return NULL;
 }
@@ -293,19 +294,17 @@ USO_mem_alloc (USO_heap_t* heap, ACE_size_t size)
 static ACE_bool_t
 prev_block_free (USO_mblock_t * block)
 {
-    return ((block->prevm != NULL) &&
-            (!(block->prevm->tag_size & USED_TAG))) ? TRUE : FALSE;
+    return ((block->prevm != NULL) && (!(block->prevm->tag_size & USED_TAG))) ? TRUE : FALSE;
 }
 
 static ACE_bool_t
 next_block_free (USO_mblock_t * block)
 {
-    return ((block->nextm != NULL) &&
-            (!(block->nextm->tag_size & USED_TAG))) ? TRUE : FALSE;
+    return ((block->nextm != NULL) && (!(block->nextm->tag_size & USED_TAG))) ? TRUE : FALSE;
 }
 
 extern void
-USO_mem_free (USO_heap_t* heap, void *block)
+USO_mem_free (USO_heap_t * heap, void *block)
 {
     USO_mblock_t *used;
     USO_mblock_t *ntemp;
@@ -314,8 +313,8 @@ USO_mem_free (USO_heap_t* heap, void *block)
     USO_mblock_t *prev;
     long size;
 
-    used = (USO_mblock_t *) block; // block points to allocated space
-    --used; // now used points to the mblock
+    used = (USO_mblock_t *) block;      // block points to allocated space
+    --used;                     // now used points to the mblock
     used->tag_size &= ~USED_TAG;
 
     USO_cpu_status_t ps = USO_disable ();
@@ -324,10 +323,9 @@ USO_mem_free (USO_heap_t* heap, void *block)
     if ((prev_block_free (used) == TRUE) && (next_block_free (used) == TRUE))
     {
         ptemp = used->prevm;
-  		ntemp = used->nextm;
+        ntemp = used->nextm;
         fblock_remove (heap, (USO_fblock_t *) ntemp);
-        size = ptemp->tag_size + used->tag_size +
-               ntemp->tag_size + 2 * sizeof (USO_mblock_t);
+        size = ptemp->tag_size + used->tag_size + ntemp->tag_size + 2 * sizeof (USO_mblock_t);
         next = ntemp->nextm;
         prev = ptemp->prevm;
         mblock_remove (ntemp);
@@ -349,7 +347,7 @@ USO_mem_free (USO_heap_t* heap, void *block)
     }
     else if (next_block_free (used) == TRUE)
     {
-  		ntemp = used->nextm;
+        ntemp = used->nextm;
         fblock_remove (heap, (USO_fblock_t *) ntemp);
         fblock_insert (heap, (USO_fblock_t *) used);
         size = used->tag_size + ntemp->tag_size + sizeof (USO_mblock_t);

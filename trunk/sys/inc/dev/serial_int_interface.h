@@ -10,6 +10,11 @@
 
 #include "dev/serial_error.h"
 
+/** @addtogroup dev
+ * @{
+ */
+
+
 /** @defgroup serial_int_interface serial_int_interface.h
  *
  * Interface to interrupt routines (lower level).
@@ -52,6 +57,9 @@ struct DEV_serial_int_interface
 };
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

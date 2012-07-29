@@ -1,44 +1,58 @@
 #ifndef SAM_CPU_H
 #define SAM_CPU_H
 
-#include "dev/arch/at91/AT91SAM7X256.h"
+/** @addtogroup arch
+ *
+ * @{
+ */
 
-/* Normal user code, no full access to CPSR  */
-#define ARM_MODE_USR     0x10   /* PC, R14...R0, CPSR */
+/** @defgroup cpu cpu.h
+ *
+ * CPU.
+ *
+ * @{
+ */
 
-/* All exception modes and system mode are privileged modes, full access to CPSR */
+#define SAM_MAIN_OSC             18432000       /**< Main Oscillator MAINCK */
+#define SAM_MCK          ((SAM_MAIN_OSC*73/14)/2)       /**< Output PLL Clock (48 MHz) Master Clock */
+#define SAM_MCK_IN_MHZ    48
 
-/* Fast interrupt, not handled by the OS */
-#define ARM_MODE_FIQ     0x11   /* PC, R14fiq...R8fiq, R7...R0, CPSR, SPSRfiq */
+#define SAM_WDT_DISABLE 1       /**< Set to 1 for disabling watchdog */
+#define SAM_WDV_2SEC    0x200   /**< Watchdog value for 2 seconds */
+#define SAM_WDV_10SEC   0xA00   /**< Watchdog value for 10 seconds */
 
-/* Interrupts */
-#define ARM_MODE_IRQ     0x12   /* PC, R14irq, R13irq, R12...R0, CPSR, SPSRirq */
+/**
+ *
+ */
+extern void SAM_cpu_init (void);
 
-/* Supervisor mode, privilegierte exception mode, Eintritt z.B. durch SWI */
-#define ARM_MODE_SVC     0x13   /* PC, R14svc, R13scv, R12...R0, CPSR, SPSRsvc */
+/**
+ *
+ */
+extern void SAM_wdt_disable (void);
 
-/* Prefetch-, Data-abort, tritt auf wenn eine Datenanforderung nicht erfuellt werden kann */
-#define ARM_MODE_ABT     0x17   /* PC, R14abt, R13abt, R12...R0, CPSR, SPSRabt */
+/**
+ *
+ */
+extern void SAM_wdt_setup (unsigned short wdv);
 
-/* Undefined instruction, Eintritt durch Auftreten eines unbekanten Befehls */
-#define ARM_MODE_UND     0x1B   /* PC, R14und, R13und, R12...R0, CPSR, SPSRund */
+/**
+ *
+ */
+extern void SAM_wdt_trigger (void);
 
-/* System mode, privilegierter code, modify CPSR to enter */
-/* System mode was introduced to handle nested interrupts, MOST does not support nested interrupts */
-#define ARM_MODE_SYS     0x1F   /* PC, R14...R0, CPSR */
+/**
+ * Jump to Application
+ */
+extern void SAM_jump_app (void);
 
-#define I_BIT            0x80
-#define F_BIT            0x40
+/**
+ * Jump to Bootloader
+ */
+extern void SAM_jump_boot (void);
 
-#define AT91B_MAIN_OSC        18432000               // Main Oscillator MAINCK
-#define AT91B_MCK             ((18432000*73/14)/2)   // Output PLL Clock (48 MHz)
-#define AT91B_MASTER_CLOCK    AT91B_MCK
+/** @} */
 
-/* Take care! This Stack sizes must match the definitions in *.ld! */
-#define SAM_IDLE_STACK_SIZE  	  	0x280
-#define SAM_UND_STACK_SIZE   		0x80
-#define SAM_ABT_STACK_SIZE   		0x80
-#define SAM_IRQ_STACK_SIZE   		0x80
-#define SAM_TOTAL_STACK_SIZE       	0x400
+/** @} */
 
 #endif

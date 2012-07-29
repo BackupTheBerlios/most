@@ -12,6 +12,10 @@
 #include "net/netif.h"
 #include "net/ethaddr.h"
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup ethif ethif.h
  *
  * Ethernet Interface.
@@ -24,14 +28,14 @@
 /** Ethernet Interface structure. */
 struct NET_ethif
 {
-    struct NET_eth_addr *eth_addr;                 /**< Ethernet address. */
-    void *mac;                                     /**< Pointer to MAC device. */
-    void (*start) (void*);                         /**< MAC device start function . */
-    NET_netbuf_t* (*receive) (void *);             /**< MAC device receive function. */
+    struct NET_eth_addr *eth_addr;           /**< Ethernet address. */
+    void *mac;                               /**< Pointer to MAC device. */
+    void (*start) (void *);                  /**< MAC device start function . */
+    NET_netbuf_t *(*receive) (void *);       /**< MAC device receive function. */
     void (*transmit) (void *, NET_netbuf_t *);     /**< MAC device transmit function. */
-    void (*info) (void*);                          /**< MAC device print information and statistic. */
-	USO_thread_t rx_thread;                        /**< Receive thread. */
-	USO_stack_t rx_stack[ETH_RX_STACK_SIZE];                     /**< Stack for receive thread. */
+    void (*info) (void *);                   /**< MAC device print information and statistic. */
+    USO_thread_t rx_thread;                   /**< Receive thread. */
+    USO_stack_t rx_stack[ETH_RX_STACK_SIZE];  /**< Stack for receive thread. */
 };
 
 /** Ethernet Interface */
@@ -45,9 +49,8 @@ typedef struct NET_ethif NET_ethif_t;
  * @param ethif : Ethernet interface.
  * @param addr : Ethernet address of the ethernet interface.
  */
-extern void NET_ethif_init (NET_netif_t *netif,
-							NET_ethif_t *ethif,
-                            struct NET_eth_addr *addr);
+extern void NET_ethif_init (NET_netif_t * netif,
+                            NET_ethif_t * ethif, struct NET_eth_addr *addr, char *name);
 
 
 /**
@@ -55,7 +58,10 @@ extern void NET_ethif_init (NET_netif_t *netif,
  *
  * @param ethif : Ethernet interface.
  */
-extern void NET_ethif_start (NET_ethif_t *ethif);
+extern void NET_ethif_start (NET_ethif_t * ethif);
+
+/** @}
+ */
 
 /** @}
  */

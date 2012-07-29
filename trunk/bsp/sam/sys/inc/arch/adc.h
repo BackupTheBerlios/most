@@ -10,8 +10,31 @@
 
 #include <dev/adc.h>
 
+/** @addtogroup arch
+ *
+ * @{
+ */
+
+/** @defgroup adc adc.h
+ *
+ * ADC.
+ *
+ * @{
+ */
+
+
+/**
+ *
+ */
 extern DEV_adc_t adc;
 
-extern void SAM_adc_init(void);
+/**
+ *
+ */
+extern void SAM_adc_init (void);
+
+/** @} */
+
+/** @} */
 
 #endif /* SAM_ADC_H_ */

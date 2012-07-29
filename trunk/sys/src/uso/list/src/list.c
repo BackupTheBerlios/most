@@ -176,8 +176,7 @@ USO_delta_insert (USO_list_t * list, USO_node_t * node, long key)
     else
     {
         USO_node_t *next_node;
-        for (next_node = list->head; next_node != NULL;
-             next_node = next_node->next)
+        for (next_node = list->head; next_node != NULL; next_node = next_node->next)
         {
             if (key <= next_node->data)
             {
@@ -245,34 +244,40 @@ USO_isempty (USO_list_t * list)
 }
 
 extern USO_node_t *
-USO_next_element (USO_list_t * list, USO_node_t *iterator)
+USO_next_element (USO_list_t * list, USO_node_t * iterator)
 {
-    if (iterator == NULL){
-    	iterator=list->head;
-    }else{
+    if (iterator == NULL)
+    {
+        iterator = list->head;
+    }
+    else
+    {
         iterator = iterator->next;
     }
     return iterator;
 }
 
 extern USO_node_t *
-USO_prev_element (USO_list_t * list, USO_node_t *iterator)
+USO_prev_element (USO_list_t * list, USO_node_t * iterator)
 {
-    if (iterator == NULL){
-    	iterator = list->tail;
-    } else {
+    if (iterator == NULL)
+    {
+        iterator = list->tail;
+    }
+    else
+    {
         iterator = iterator->prev;
     }
     return iterator;
 }
 
 extern void
-USO_map (USO_list_t * list, void (*f) (USO_node_t *) )
+USO_map (USO_list_t * list, void (*f) (USO_node_t *))
 {
     USO_node_t *node;
     for (node = list->head; node != NULL; node = node->next)
     {
-        f(node); 
+        f (node);
     }
 }
 

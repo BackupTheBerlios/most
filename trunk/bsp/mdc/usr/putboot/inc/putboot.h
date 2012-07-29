@@ -9,7 +9,7 @@
 #define MDC_PUTBOOT_H_
 
 #include <ace/version.h>
-#include "init/main.h"
+#include <init/main.h>
 
 #define MDC_APPLICATION MDC_BOARD"-Putboot"
 

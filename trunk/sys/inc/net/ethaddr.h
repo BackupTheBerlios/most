@@ -8,6 +8,10 @@
 
 #include <ace/stddef.h>
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup ethaddr ethaddr.h
  *
  * Ethernet Address.
@@ -31,6 +35,9 @@ struct NET_eth_hdr
     struct NET_eth_addr src;  /**< Source Address */
     ACE_u16_t type;               /**< Protocoll Type */
 } ACE_PACKED_;
+
+/** @}
+ */
 
 /** @}
  */

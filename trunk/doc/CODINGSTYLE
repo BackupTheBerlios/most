@@ -26,9 +26,9 @@ and a maximum of clarity.
 ---------------
 
 If a feature cannot be implemented efficiently, it is probably not worth having.
-But don't care for optimization until you have a working system and
+But don't care too much for optimization until you have a working system and
 you recognize bad performance.
-
+Put the focus on doing things right and not on optimization.
 
 
 
@@ -123,40 +123,12 @@ the library prefix:
 	user libs:
 
 	DPY_  (DisPlaYs)
+	TST   (TeST)
 
 The only exception to this rules are functions needed by GCC (memcpy,..).
 Also some macros like NULL have no prefix because of syntax highlighting.
 
-Protected:
-----------
-Functions, variables and defines which have do be used only inside the library shall have the
-prefix PRO_ (PROtected).
-
-
-Private:
---------
-Functions, variables and defines which has to be used only in one source file are normally
-not exported to other source files via the header files.
-But in C there is no way to hide private members for example:
-
-struct PRI_name{
-	type private_member1;
-	type private_member2;
-}; 
-
-typedef struct PRI_name USO_name_t;
-
-We want to export the type USO_name_t but to use this type static in a other source file 
-we also have to export the structure PRI_name so that the compiler can determine the size
-of the type.
-But with exporting the structure with the header file, all private members are visible to the other
-source files and the data encapsulation has gone.
-This is one of the main problems i have with the programming language C.
-The programmers must use a rigorous programming style.
-
- All such private structures exported with the header file shall have the
- prefix PRI_ (PRIvate).
-
+-----------------------  private, public ----------------------------------------------------------
 
 3.3.) Types 
 -----------
@@ -164,22 +136,27 @@ The programmers must use a rigorous programming style.
 All structures which are act as types, this means you have a structure of data and functions 
 which work on this data, shall be defined with a typedef and structure name with an _t.
 In Emacs than the syntax highlighting is correct for this types.
-Most the member variables of such structures are private.	
+Most the member variables of such structures are private.   
+Only use the functional interface for that type.
+
+struct PRI_name{
+	type private_member1;
+	type private_member2;
+}; 
+
+typedef struct PRI_name PRI_name_t;
 
 
-Example:
 
-struct PRI_list{
-    ACE_node_t *head;
-    ACE_node_t *tail;
-    void *data_p;
-};
+Comment:
 
-typedef struct PRI_list ACE_list_t;
-
-extern void ACE_enqueue(ACE_list_t *list, ACE_node_t *node);
-		  
-
+We want to export the type PRI_name_t but to use this type static in a other source file 
+we also have to export the structure PRI_name so that the compiler can determine the size
+of the type.
+But with exporting the structure with the header file, all private members are visible to the other
+source files and the data encapsulation has gone.
+This is one of the main problems i have with the programming language C.
+The programmers must use a rigorous programming style.
 
 3.4.) Defines and macros 
 ------------------------
@@ -188,7 +165,20 @@ shall always be written in UPPERCASE LETTERS.
 Avoid definitions and macros use const and inline functions instead.
 
 
+3.5.) Function and Variable names
+---------------------------------
 
+Write everything with lowercase letters seperated  with an underscore.
+
+shall look like:
+
+function_name()   
+variable_name
+
+and not like:
+
+functionName()
+VariableName
 
 4.) DOCUMENTATION
 =================		       	
@@ -243,13 +233,13 @@ GCC. If there is a better way?
 
 Example:
 
-struct PRI_name {
+struct USO_name {
 	USO_node_t node;
 	type member;
 	..
 }
 
-typdef struct PRI_name USO_name_t;
+typdef struct USO_name USO_name_t;
 
 USO_list_t list;
 USO_name_t name;
@@ -258,3 +248,28 @@ USO_enqueue(&list, (USO_node_t*)&name);
 ...
 
  
+ 6.) HEADER FILES
+ =================
+ 
+ #include <file>
+    This variant is used for system header files. It searches for a file named file in a standard
+    list of system directories. You can prepend directories to this list with the -I option.
+ 
+ #include "file"
+    This variant is used for header files of your own program. It searches for a file named file
+    first in the directory containing the current file, then in the quote directories and then the
+    same directories used for <file>.
+
+
+
+7.) OBJECT INITIALIZATION
+===========================
+
+init()        do Initialization
+clean()       do Cleanup
+
+new()         create Object and call init()
+delete()      call clean() and delete Object
+
+install()     install Object in SYSFS
+remove()      remove Object from SYSFS

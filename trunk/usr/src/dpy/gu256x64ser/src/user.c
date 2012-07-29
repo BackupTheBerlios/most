@@ -11,18 +11,15 @@
  * User set up mode command group 
  */
 
-static const unsigned char UserSetUpModeStartData[] =
-    { US, '(', 'e', '\x01', 'I', 'N' };
+static const unsigned char UserSetUpModeStartData[] = { US, '(', 'e', '\x01', 'I', 'N' };
 
 extern void
 DPY_gu256x64ser_UserSetUpModeStart (void)
 {
-    DPY_gu256x64ser_WriteArray2Display (UserSetUpModeStartData,
-                        sizeof (UserSetUpModeStartData));
+    DPY_gu256x64ser_WriteArray2Display (UserSetUpModeStartData, sizeof (UserSetUpModeStartData));
 }
 
-static const unsigned char UserSetUpModeEndData[] =
-    { US, '(', 'e', '\x02', 'O', 'U', 'T' };
+static const unsigned char UserSetUpModeEndData[] = { US, '(', 'e', '\x02', 'O', 'U', 'T' };
 
 extern void
 DPY_gu256x64ser_UserSetUpModeEnd (void)
@@ -54,7 +51,7 @@ static unsigned char FROMImageDefinitionData[] =
 
 extern void
 DPY_gu256x64ser_FROMImageDefinition (unsigned long address,
-                               unsigned long length, unsigned char *data)
+                                     unsigned long length, unsigned char *data)
 {
     FROMImageDefinitionData[4] = (unsigned char)address;
     FROMImageDefinitionData[5] = (unsigned char)(address >> 8);
@@ -62,8 +59,7 @@ DPY_gu256x64ser_FROMImageDefinition (unsigned long address,
     FROMImageDefinitionData[7] = (unsigned char)length;
     FROMImageDefinitionData[8] = (unsigned char)(length >> 8);
     FROMImageDefinitionData[9] = (unsigned char)(length >> 16);
-    DPY_gu256x64ser_WriteArray2Display (FROMImageDefinitionData,
-                        sizeof (FROMImageDefinitionData));
+    DPY_gu256x64ser_WriteArray2Display (FROMImageDefinitionData, sizeof (FROMImageDefinitionData));
     DPY_gu256x64ser_WriteArray2Display (data, (ACE_size_t) length);
 }
 
@@ -73,26 +69,23 @@ extern void
 DPY_gu256x64ser_SaveDownloadedChar (unsigned char fontType)
 {
     SaveDownloadedCharData[4] = fontType;
-    DPY_gu256x64ser_WriteArray2Display (SaveDownloadedCharData,
-                        sizeof (SaveDownloadedCharData));
+    DPY_gu256x64ser_WriteArray2Display (SaveDownloadedCharData, sizeof (SaveDownloadedCharData));
 }
 
-static unsigned char FROMMacroDefinitionData[] =
-    { US, '(', 'e', '\x12', _a, _pL, _pH, _t1, _t2 };
+static unsigned char FROMMacroDefinitionData[] = { US, '(', 'e', '\x12', _a, _pL, _pH, _t1, _t2 };
 
 extern void
 DPY_gu256x64ser_FROMMacroDefinition (unsigned char registration,
-                               unsigned short length,
-                               unsigned char displayTime,
-                               unsigned char idleTime, unsigned char *data)
+                                     unsigned short length,
+                                     unsigned char displayTime,
+                                     unsigned char idleTime, unsigned char *data)
 {
     FROMMacroDefinitionData[4] = registration;
     FROMMacroDefinitionData[5] = (unsigned char)length;
     FROMMacroDefinitionData[6] = (unsigned char)(length >> 8);
     FROMMacroDefinitionData[7] = displayTime;
     FROMMacroDefinitionData[8] = idleTime;
-    DPY_gu256x64ser_WriteArray2Display (FROMMacroDefinitionData,
-                        sizeof (FROMMacroDefinitionData));
+    DPY_gu256x64ser_WriteArray2Display (FROMMacroDefinitionData, sizeof (FROMMacroDefinitionData));
     DPY_gu256x64ser_WriteArray2Display (data, (ACE_size_t) length);
 }
 
@@ -103,27 +96,25 @@ DPY_gu256x64ser_DownloadCharTransfer (unsigned char fontType)
 {
     DownloadCharTransferData[4] = fontType;
     DPY_gu256x64ser_WriteArray2Display (DownloadCharTransferData,
-                        sizeof (DownloadCharTransferData));
+                                        sizeof (DownloadCharTransferData));
 }
 
-static unsigned char DisplayStatusSendData[] =
-    { US, '(', 'e', '\x40', _a, _b, _c };
+static unsigned char DisplayStatusSendData[] = { US, '(', 'e', '\x40', _a, _b, _c };
 
 extern void
 DPY_gu256x64ser_DisplayStatusSendData (unsigned char status,
-                                 unsigned char address, unsigned char length)
+                                       unsigned char address, unsigned char length)
 {
     DisplayStatusSendData[4] = status;
     if (status == '\x20')
     {
         DisplayStatusSendData[5] = address;
         DisplayStatusSendData[6] = length;
-        DPY_gu256x64ser_WriteArray2Display (DisplayStatusSendData,
-                            sizeof (DisplayStatusSendData));
+        DPY_gu256x64ser_WriteArray2Display (DisplayStatusSendData, sizeof (DisplayStatusSendData));
     }
     else
     {
         DPY_gu256x64ser_WriteArray2Display (DisplayStatusSendData,
-                            sizeof (DisplayStatusSendData) - 2);
+                                            sizeof (DisplayStatusSendData) - 2);
     }
 }

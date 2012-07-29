@@ -19,6 +19,7 @@
 
 #define I_BIT            0x80
 #define UI_BIT	         0x40
+#define N_IUI_BIT        0x3F
 
    .h8300h
    .file    "cpu.S"
@@ -27,7 +28,7 @@
    .align   1
    .global  _USO_enable
 _USO_enable:
-   andc.b   #~(I_BIT | UI_BIT),ccr        
+   andc.b   #N_IUI_BIT,ccr
    rts
 
    .align   1

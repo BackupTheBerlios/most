@@ -12,8 +12,7 @@
 #include "net/stats.h"
 #include "net/ip.h"
 
-static const struct NET_eth_addr ethbroadcast =
-    { {0xff, 0xff, 0xff, 0xff, 0xff, 0xff} };
+static const struct NET_eth_addr ethbroadcast = { {0xff, 0xff, 0xff, 0xff, 0xff, 0xff} };
 
 extern void
 NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
@@ -23,7 +22,7 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
 
     ethif = netif->device;
 
-    ethhdr = (struct NET_eth_hdr *)NET_netbuf_index(p);
+    ethhdr = (struct NET_eth_hdr *)NET_netbuf_index (p);
 
     switch (ACE_htons (ethhdr->type))
     {
@@ -34,15 +33,16 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
 
         ++netif->rx;
 
-		if (NET_netbuf_index_inc (p, sizeof (struct NET_eth_hdr)) == FALSE){
-    	    DEBUGF (NET_ETH_DEBUG, ("Eth: ip packet to short.\n"));
-        	NET_netbuf_free (p);
-			return;
-		}
-
-        if (NET_ip_input (netif, p) < NET_ERR_OK)
+        if (NET_netbuf_index_inc (p, sizeof (struct NET_eth_hdr)) == FALSE)
         {
-	        DEBUGF (NET_ETH_DEBUG, ("Eth: ip error.\n"));
+            DEBUGF (NET_ETH_DEBUG, ("Eth: ip packet to short.\n"));
+            NET_netbuf_free (p);
+            return;
+        }
+
+        if (NET_ip_input (netif, p) < ACE_ERR_OK)
+        {
+            DEBUGF (NET_ETH_DEBUG, ("Eth: ip error.\n"));
         }
         break;
     case NET_ETH_TYPE_ARP:
@@ -50,22 +50,25 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
         p = NET_arp_arp_input (netif, ethif->eth_addr, p);
         if (p != NULL)
         {
-            if (ethif->transmit != NULL) {
-            	ethif->transmit(ethif->mac, p);
-            } else {
-            	NET_netbuf_free (p);
-        	}
+            if (ethif->transmit != NULL)
+            {
+                ethif->transmit (ethif->mac, p);
+            }
+            else
+            {
+                NET_netbuf_free (p);
+            }
         }
         break;
     default:
-        USO_kputs (USO_LL_INFO, "Eth: rx unsuport.\n");
+        USO_log_puts (USO_LL_INFO, "Eth: rx unsuport.\n");
         ++netif->rx_drop;
         NET_netbuf_free (p);
         break;
     }
 }
 
-extern NET_err_t
+extern ACE_err_t
 NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
 {
     NET_ethif_t *ethif;
@@ -84,8 +87,7 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
      * are special, all other addresses are looked up in the ARP table. 
      */
     queryaddr = ipaddr;
-    if (NET_ip_addr_isany (ipaddr) ||
-        NET_ip_addr_isbroadcast (ipaddr, &(netif->netmask)))
+    if (NET_ip_addr_isany (ipaddr) || NET_ip_addr_isbroadcast (ipaddr, &(netif->netmask)))
     {
         dest = (struct NET_eth_addr *)&ethbroadcast;
     }
@@ -133,39 +135,50 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
         q = NET_arp_query (netif, ethif->eth_addr, queryaddr);
         if (q != NULL)
         {
-            if (ethif->transmit != NULL) {
-            	ethif->transmit(ethif->mac, q);
-	        } else {
-	        	NET_netbuf_free (q);
+            if (ethif->transmit != NULL)
+            {
+                ethif->transmit (ethif->mac, q);
             }
-	        if(arp_request_count--){
-            	USO_sleep(ACE_MSEC_2_TICKS(100));
-		        dest = NET_arp_lookup (queryaddr);
-            }else {
-			  	++netif->tx_drop;
-    		    NET_netbuf_free (p);
-	           	return NET_ERR_ARP;
+            else
+            {
+                NET_netbuf_free (q);
             }
-        } else {
-		  	++netif->tx_drop;
-		    NET_netbuf_free (p);
-        	return NET_ERR_MEM;
+            if (arp_request_count--)
+            {
+                USO_sleep (USO_MSEC_2_TICKS (100));
+                dest = NET_arp_lookup (queryaddr);
+            }
+            else
+            {
+                ++netif->tx_drop;
+                NET_netbuf_free (p);
+                return NET_ERR_ARP;
+            }
+        }
+        else
+        {
+            ++netif->tx_drop;
+            NET_netbuf_free (p);
+            return NET_ERR_MEM;
         }
     }
-    ethhdr = (struct NET_eth_hdr *)NET_netbuf_index(p);
+    ethhdr = (struct NET_eth_hdr *)NET_netbuf_index (p);
     for (i = 0; i < 6; i++)
     {
         ethhdr->dest.addr[i] = dest->addr[i];
         ethhdr->src.addr[i] = ethif->eth_addr->addr[i];
     }
     ethhdr->type = ACE_htons (NET_ETH_TYPE_IP);
-    if (ethif->transmit != NULL) {
-    	 ethif->transmit (ethif->mac, p);
-	  	++netif->tx;
-    } else {
-		NET_netbuf_free (p);
+    if (ethif->transmit != NULL)
+    {
+        ethif->transmit (ethif->mac, p);
+        ++netif->tx;
     }
-    return NET_ERR_OK;
+    else
+    {
+        NET_netbuf_free (p);
+    }
+    return ACE_ERR_OK;
 }
 
 extern void

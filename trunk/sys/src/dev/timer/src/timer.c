@@ -4,39 +4,114 @@
  */
 
 #include <uso/list.h>
+#include <uso/semaphore.h>
 #include <uso/arch/cpu.h>
 #include <uso/heap.h>
+#include <uso/thread.h>
+#include <mfs/sysfs.h>
+#include <mfs/vfs.h>
+#include <mfs/descriptor.h>
+#include <mfs/directory.h>
 
 #include "dev/timer.h"
+
 
 /*------------- Implementation ------------------------------------------*/
 
 static USO_list_t onTimer;
+static USO_list_t elapsedTimer;
+static USO_semaphore_t cond;
+
+static USO_thread_t *timers_thread = NULL;
+
+static void info (MFS_entry_t * entry);
+
+static struct MFS_descriptor_op timer_descriptor_op = {.open = NULL,
+    .close = NULL,
+    .info = info
+};
+
+static void
+produce (DEV_timer_t * timer)
+{
+    USO_enqueue (&elapsedTimer, (USO_node_t *) timer);
+    USO_signal (&cond);
+}
+
+static DEV_timer_t *
+consume (void)
+{
+    DEV_timer_t *timer;
+    USO_cpu_status_t ps = USO_disable ();
+    while ((timer = (DEV_timer_t *) USO_dequeue (&elapsedTimer)) == NULL)
+    {
+        USO_restore (ps);
+        USO_wait (&cond);
+        ps = USO_disable ();
+    }
+    USO_restore (ps);
+    return timer;
+}
+
+static void
+timers_run (void *nix)
+{
+    for (;;)
+    {
+        DEV_timer_t *timer = consume ();
+        timer->f (timer->param);
+    }
+}
+
+extern void
+DEV_timers_start (int timers_stack_size)
+{
+    timers_thread = USO_thread_new (timers_run,
+                                    timers_stack_size, USO_INTERRUPT, USO_FIFO, "timers");
+    USO_start (timers_thread);
+}
+
+
 
 extern void
 DEV_timers_init (void)
 {
     USO_list_init (&onTimer);
+    USO_list_init (&elapsedTimer);
+    USO_semaphore_init (&cond, 0);
 }
 
 extern void
-DEV_timer_init (DEV_timer_t * timer,
-                void (*f) (void *), void *param, long ticks)
+DEV_timer_init (DEV_timer_t * timer, void (*f) (void *), void *param, enum DEV_timer_ctx ctx)
 {
-    timer->ticks = ticks;
     timer->f = f;
     timer->param = param;
     timer->state = DEV_TIMER_OFF;
+    timer->ctx = ctx;
 }
 
 extern void
-DEV_timer_start (DEV_timer_t * timer)
+DEV_timer_install (DEV_timer_t * timer, char *name)
+{
+    timer->desc = MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_TIMER), name,
+                                   (MFS_entry_t *) timer, MFS_DESC, &timer_descriptor_op);
+}
+
+extern void
+DEV_timer_remove (DEV_timer_t * timer)
+{
+    MFS_remove_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_TIMER), timer->desc);
+}
+
+extern void
+DEV_timer_start (DEV_timer_t * timer, long ticks)
 {
     USO_cpu_status_t ps = USO_disable ();
     if (timer->state == DEV_TIMER_ON)
     {
         DEV_timer_stop (timer);
     }
+    timer->ticks = ticks;
     USO_delta_insert (&onTimer, (USO_node_t *) timer, timer->ticks);
     timer->state = DEV_TIMER_ON;
     USO_restore (ps);
@@ -62,8 +137,20 @@ DEV_timer_fire (void)
     {
         DEV_timer_t *timer = (DEV_timer_t *) USO_pop (&onTimer);
         timer->state = DEV_TIMER_OFF;
-        timer->f (timer->param);
+        if (timer->ctx == DEV_TIMER_INT)
+            timer->f (timer->param);
+        else
+            produce (timer);
     }
+}
+
+static void
+info (MFS_entry_t * entry)
+{
+    DEV_timer_t *timer = (DEV_timer_t *) entry;
+    ACE_printf ("Timer state: %s , ticks: %lu, ctx: %s\n",
+                timer->state == DEV_TIMER_ON ? "ON" : "OFF",
+                timer->ticks, timer->ctx == DEV_TIMER_INT ? "INT" : "THREAD");
 }
 
 /*------------------------------------------------------------------------*/

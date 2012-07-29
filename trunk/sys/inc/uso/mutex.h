@@ -8,6 +8,10 @@
 
 #include "uso/thread.h"
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup mutex mutex.h
  *
  * Mutual exclusion or also called critical section.
@@ -26,8 +30,8 @@
  */
 struct USO_mutex
 {
-    USO_thread_t* lock;   /* Thread which owns the mutex */
-    USO_list_t threads;   /* List of blocked threads */
+    USO_thread_t *lock;         /* Thread which owns the mutex */
+    USO_list_t threads;         /* List of blocked threads */
 };
 
 typedef struct USO_mutex USO_mutex_t;
@@ -52,4 +56,7 @@ extern void USO_unlock (USO_mutex_t * mutex);
 /** @}
  */
 
- #endif
+/** @}
+ */
+
+#endif

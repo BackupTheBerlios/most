@@ -8,6 +8,25 @@
 
 #include "mfs/vfs.h"
 
-extern void TST_ram_test_install (MFS_descriptor_t *test);
+/** @addtogroup test
+ *
+ * @{
+ */
+/** @defgroup ram_test ram_test.h
+ *
+ * @{
+ */
+
+/**
+ *
+ */
+extern void TST_ram_test_install (MFS_descriptor_t * test);
+
+
+/** @}
+ */
+
+/** @}
+ */
 
 #endif

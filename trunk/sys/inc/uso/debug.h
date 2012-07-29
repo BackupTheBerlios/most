@@ -8,6 +8,10 @@
 
 #include "uso/log.h"
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup debug debug.h
  *
  * Debug definitions for developing.
@@ -28,11 +32,11 @@
 #define DEBUGF(debug, x) do { if(debug){ USO_debug x; } } while(0)
 
 #define USO_DEBUGGING        1     /**< Enable debugging for USO library. */
-#define DEV_DEBUGGING        0     /**< Enable debugging for DEV library. */
-#define NET_DEBUGGING        1     /**< Enable debugging for NET library. */
-#define NAP_DEBUGGING        1     /**< Enable debugging for NAP library. */
+#define DEV_DEBUGGING        1     /**< Enable debugging for DEV library. */
+#define NET_DEBUGGING        0     /**< Enable debugging for NET library. */
+#define NAP_DEBUGGING        0     /**< Enable debugging for NAP library. */
 #define CLI_DEBUGGING        0     /**< Enable debugging for CLI library. */
-#define BSP_DEBUGGING        0     /**< Enable debugging for Board Support Packages. */
+#define BSP_DEBUGGING        1     /**< Enable debugging for Board Support Packages. */
 #define USR_DEBUGGING        0     /**< Enable debugging for USR libraries. */
 
 #else
@@ -64,6 +68,9 @@
 #endif
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

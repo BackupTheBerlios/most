@@ -6,6 +6,11 @@
 #ifndef DPY_GU256X64SER_WINDOW_H
 #define DPY_GU256X64SER_WINDOW_H
 
+/** @addtogroup dpy
+ *
+ * @{
+ */
+
 /** @addtogroup gu256x64ser
  *
  * @{
@@ -28,5 +33,9 @@ extern void DPY_gu256x64ser_WriteScreenMode (unsigned char mode);
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

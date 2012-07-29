@@ -6,22 +6,19 @@
 #ifndef SAM_INIT_H
 #define SAM_INIT_H
 
-/** @addtogroup initialization
+/** @addtogroup init
  *
  * @{
  */
 
-/** @defgroup init init.h
+/** @defgroup init2 init.h
  *
  * Initialize Function Interface
  *
- * @{
  */
 
-/**
- * Serial communication Interface.
+/** @{
  */
-extern ACE_FILE *ser0;
 
 /**
  * This function is called from the cpu reset vector routine after the stack is initialized.

@@ -37,9 +37,9 @@ USO_post (USO_mailbox_t * mailbox, USO_node_t * mail)
 }
 
 extern int
-USO_post_would_block(USO_mailbox_t * mailbox)
+USO_post_would_block (USO_mailbox_t * mailbox)
 {
-	return USO_sem_count(&mailbox->post_sem);
+    return USO_sem_count (&mailbox->post_sem);
 }
 
 extern USO_node_t *
@@ -56,9 +56,9 @@ USO_fetch (USO_mailbox_t * mailbox)
 }
 
 extern int
-USO_fetch_would_block(USO_mailbox_t * mailbox)
+USO_fetch_would_block (USO_mailbox_t * mailbox)
 {
-	return USO_sem_count(&mailbox->fetch_sem);
+    return USO_sem_count (&mailbox->fetch_sem);
 }
 
 extern void

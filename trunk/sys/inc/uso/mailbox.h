@@ -9,6 +9,10 @@
 #include "uso/list.h"
 #include "uso/semaphore.h"
 
+/** @addtogroup uso
+ * @{
+ */
+
 /** @defgroup mailbox mailbox.h
  *
  * For asynchronous inter process communication.
@@ -24,8 +28,8 @@
  */
 struct USO_mailbox
 {
-    USO_list_t mails; /* Messages in the mailbox */
-    USO_semaphore_t post_sem;  /* Semaphore on which sender will block if mailbox is full*/
+    USO_list_t mails;           /* Messages in the mailbox */
+    USO_semaphore_t post_sem;   /* Semaphore on which sender will block if mailbox is full */
     /* Semaphore on which receiver will block if mailbox is empty */
     USO_semaphore_t fetch_sem;
 };
@@ -58,8 +62,7 @@ extern void USO_mailbox_init (USO_mailbox_t * mailbox, int max);
  */
 extern void USO_post (USO_mailbox_t * mailbox, USO_node_t * mail);
 
-extern int
-USO_post_would_block(USO_mailbox_t * mailbox);
+extern int USO_post_would_block (USO_mailbox_t * mailbox);
 
 /**
  * Fetch a mail from a mailbox.
@@ -71,8 +74,7 @@ USO_post_would_block(USO_mailbox_t * mailbox);
  */
 extern USO_node_t *USO_fetch (USO_mailbox_t * mailbox);
 
-extern int
-USO_fetch_would_block(USO_mailbox_t * mailbox);
+extern int USO_fetch_would_block (USO_mailbox_t * mailbox);
 
 /**
  * Abort fetching a mail from a mailbox.
@@ -84,6 +86,9 @@ USO_fetch_would_block(USO_mailbox_t * mailbox);
 extern void USO_fetch_abort (USO_mailbox_t * mailbox);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

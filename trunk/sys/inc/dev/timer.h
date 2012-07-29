@@ -6,8 +6,13 @@
 #ifndef DEV_TIMER_H
 #define DEV_TIMER_H
 
-#include <ace/arch/cpu.h>
+#include <uso/sleep.h>
 #include <uso/list.h>
+#include <mfs/vfs.h>
+
+/** @addtogroup dev
+ * @{
+ */
 
 /** @defgroup timer timer.h
  *
@@ -30,6 +35,15 @@ enum DEV_timer_state
 };
 
 /*
+ * Timer context.
+ */
+enum DEV_timer_ctx
+{
+    DEV_TIMER_INT,     /**< Timer f is executed at interrupt ctx. */
+    DEV_TIMER_THREAD   /**< Timer f is executed at thread ctx. */
+};
+
+/*
  * Timer struct.
  *
  * Private
@@ -41,6 +55,8 @@ struct DEV_timer
     void (*f) (void *);
     void *param;
     enum DEV_timer_state state;
+    enum DEV_timer_ctx ctx;
+    MFS_descriptor_t *desc;
 };
 
 /** 
@@ -52,6 +68,12 @@ typedef struct DEV_timer DEV_timer_t;
 /*------------------------------------------------------------------------*/
 
 /*-------------- Interface -----------------------------------------------*/
+
+/**
+ * Create and start timer thread.
+ *
+ */
+extern void DEV_timers_start (int timers_stack_size);
 
 /**
  * Initialize timer functionality.
@@ -66,16 +88,32 @@ extern void DEV_timers_init (void);
  * @param f : Callback function, currently called at interrupt context.
  * @param param : Parameter which will be passed to function f.
  * @param ticks : System ticks until the timer expires.
+ * @param ctx : Context where timer function is executed.
  */
 extern void DEV_timer_init (DEV_timer_t * timer,
-                            void (*f) (void *), void *param, long ticks);
+                            void (*f) (void *), void *param, enum DEV_timer_ctx ctx);
+
+/**
+ * Install entry in sysfs.
+ *
+ * @param timer : Pointer to timer.
+ * @param name : Name for entry.
+ */
+extern void DEV_timer_install (DEV_timer_t * timer, char *name);
+
+/**
+ * Remove entry from sysfs.
+ *
+ * @param timer : Pointer to timer.
+ */
+extern void DEV_timer_remove (DEV_timer_t * timer);
 
 /**
  * Start timer.
  *
  * @param timer : Pointer to timer.
  */
-extern void DEV_timer_start (DEV_timer_t * timer);
+extern void DEV_timer_start (DEV_timer_t * timer, long ticks);
 
 /**
  * Stop timer.
@@ -99,6 +137,9 @@ extern void DEV_timer_stop (DEV_timer_t * timer);
 extern void DEV_timer_fire (void);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

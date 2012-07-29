@@ -91,6 +91,5 @@ DEV_serial_settings_print (const struct DEV_serial_settings *settings)
                 "\t\tData\t%s\n"
                 "\t\tStop\t%s\n"
                 "\t\tParity\t%s\n"
-                "\t\tTimeout\t%d\n",
-                baud, data, stop, parity, settings->timeout);
+                "\t\tTimeout\t%d\n", baud, data, stop, parity, settings->timeout);
 }

@@ -16,7 +16,7 @@ static unsigned char RAMImageDefinitionData[] =
 
 extern void
 DPY_gu256x64ser_RAMImageDefinition (unsigned long address,
-                              unsigned long length, unsigned char *data)
+                                    unsigned long length, unsigned char *data)
 {
     RAMImageDefinitionData[4] = (unsigned char)address;
     RAMImageDefinitionData[5] = (unsigned char)(address >> 8);
@@ -24,8 +24,7 @@ DPY_gu256x64ser_RAMImageDefinition (unsigned long address,
     RAMImageDefinitionData[7] = (unsigned char)length;
     RAMImageDefinitionData[8] = (unsigned char)(length >> 8);
     RAMImageDefinitionData[9] = (unsigned char)(length >> 16);
-    DPY_gu256x64ser_WriteArray2Display (RAMImageDefinitionData,
-                        sizeof (RAMImageDefinitionData));
+    DPY_gu256x64ser_WriteArray2Display (RAMImageDefinitionData, sizeof (RAMImageDefinitionData));
     DPY_gu256x64ser_WriteArray2Display (data, (ACE_size_t) length);
 }
 
@@ -36,9 +35,8 @@ static unsigned char DownloadImageDisplayData[] =
 
 extern void
 DPY_gu256x64ser_DownloadImageDisplay (unsigned char displayMemory,
-                                unsigned long imageAddress,
-                                unsigned short image,
-                                unsigned short x, unsigned short y)
+                                      unsigned long imageAddress,
+                                      unsigned short image, unsigned short x, unsigned short y)
 {
     DownloadImageDisplayData[4] = displayMemory;
     DownloadImageDisplayData[5] = (unsigned char)imageAddress;
@@ -51,21 +49,20 @@ DPY_gu256x64ser_DownloadImageDisplay (unsigned char displayMemory,
     DownloadImageDisplayData[12] = (unsigned char)y;
     DownloadImageDisplayData[13] = (unsigned char)(y >> 8);
     DPY_gu256x64ser_WriteArray2Display (DownloadImageDisplayData,
-                        sizeof (DownloadImageDisplayData));
+                                        sizeof (DownloadImageDisplayData));
 }
 
 static unsigned char RealTimeImageDisplayData[] =
     { US, '(', 'f', '\x11', _xL, _xH, _yL, _yH, '\x01' };
 
 extern void
-DPY_gu256x64ser_RealTimeImageDisplay (unsigned short x,
-                                unsigned short y, unsigned char *data)
+DPY_gu256x64ser_RealTimeImageDisplay (unsigned short x, unsigned short y, unsigned char *data)
 {
     RealTimeImageDisplayData[4] = (unsigned char)x;
     RealTimeImageDisplayData[5] = (unsigned char)(x >> 8);
     RealTimeImageDisplayData[6] = (unsigned char)y;
     RealTimeImageDisplayData[7] = (unsigned char)(y >> 8);
     DPY_gu256x64ser_WriteArray2Display (RealTimeImageDisplayData,
-                        sizeof (RealTimeImageDisplayData));
+                                        sizeof (RealTimeImageDisplayData));
     DPY_gu256x64ser_WriteArray2Display (data, (ACE_size_t) (x * y));
 }

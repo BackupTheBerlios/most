@@ -8,6 +8,10 @@
 
 #include "net/netif.h"
 
+/** @addtogroup net
+ * @{
+ */
+
 /** @defgroup loopif loopif.h
  *
  * Loopback interface.
@@ -20,9 +24,13 @@
  * Set netif output function to loopback output.
  * @param netif : Network interface.
  */
-extern void NET_loopif_init (NET_netif_t *netif);
+extern void NET_loopif_init (NET_netif_t * netif);
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

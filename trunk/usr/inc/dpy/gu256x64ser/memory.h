@@ -6,6 +6,11 @@
 #ifndef DPY_GU256X64SER_MEMORY_H
 #define DPY_GU256X64SER_MEMORY_H
 
+/** @addtogroup dpy
+ *
+ * @{
+ */
+
 /** @addtogroup gu256x64ser
  *
  * Display.
@@ -30,5 +35,9 @@ extern void DPY_gu256x64ser_MemoryRewriteMode (void);
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

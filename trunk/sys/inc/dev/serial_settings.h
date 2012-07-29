@@ -6,7 +6,11 @@
 #ifndef DEV_SERIAL_SETTINGS_H
 #define DEV_SERIAL_SETTINGS_H
 
-#include <ace/arch/cpu.h>
+#include <uso/sleep.h>
+
+/** @addtogroup dev
+ * @{
+ */
 
 /** @defgroup serial_settings serial_settings.h
  *
@@ -29,7 +33,7 @@
 #define DEV_SERIAL_NB_TX_BUFFER_SIZE 0x400
 
 /** Receive timeout. */
-#define DEV_SER_TIMEOUT ACE_MSEC_2_TICKS(DEV_SER_TIMEOUT_MSEC)
+#define DEV_SER_TIMEOUT USO_MSEC_2_TICKS(DEV_SER_TIMEOUT_MSEC)
 
 /** Baud rate. */
 enum DEV_serial_baud
@@ -138,6 +142,9 @@ extern void DEV_serial_settings_init (struct DEV_serial_settings *settings);
 extern void DEV_serial_settings_print (const struct DEV_serial_settings *settings);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

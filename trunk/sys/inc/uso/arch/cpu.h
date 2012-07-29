@@ -9,7 +9,11 @@
 #ifndef USO_CPU_H
 #define USO_CPU_H
 
-/** @defgroup cpu cpu.h
+/** @addtogroup uso
+ * @{
+ */
+
+/** @defgroup uso_cpu arch/cpu.h
  *
  * Cpu architecture interface.
  * @{
@@ -153,16 +157,16 @@ struct USO_cpu
     USO_cpu_register_t r11;
     USO_cpu_register_t r12;
     USO_cpu_register_t sp;
-    USO_cpu_register_t pc; // lr contains the return address
+    USO_cpu_register_t pc;      // lr contains the return address
     USO_cpu_status_t ps;
     USO_cpu_status_t sps;
 };
 
 #else
-#error "ACE CPU not supported!" 
+#error "ACE CPU not supported!"
 #endif
 #else
-#error "ACE CPU not defined!" 
+#error "ACE CPU not defined!"
 #endif
 
 /*------------------------------------------------------------------------*/
@@ -201,6 +205,9 @@ extern void USO_restore (USO_cpu_status_t status);
 extern void USO_context_switch (USO_cpu_t * old, USO_cpu_t * new);
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
 
 /** @}
  */

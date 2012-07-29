@@ -6,6 +6,11 @@
 #ifndef DPY_GU256X64SER_ANIM_H
 #define DPY_GU256X64SER_ANIM_H
 
+/** @addtogroup dpy
+ *
+ * @{
+ */
+
 /** @addtogroup gu256x64ser
  *
  * @{
@@ -49,5 +54,9 @@ extern void DPY_gu256x64ser_Snow (const char *text);
 
 /** @}
  */
+
+/** @}
+ */
+
 
 #endif

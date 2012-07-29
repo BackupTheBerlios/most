@@ -1,30 +1,49 @@
 This README file describes the MOST release.
 Comments, questions, and bug reports are always welcome.
 
-MOST is a collection of libraries and board support packages
-to provide an operating system for embedded systems.
-They are linked together with the the application.
-The goal is to develope a small, clean and simple os wich runs on
-microcontrollers without mmu and to provide
-a plattform for embedded development.   
+1.)GOAL
+Designing a operating system with a minimum of functionality suitable for 
+embedded system using microcontrollers with a minimum of 64K RAM and 64K FLASH.
 
-MOST features:
-	* a collection of standard ansi c functions
-	* multithreading, inter process communication, memmory management
-	* device drivers for serial port, timers, digital io.
-	* commandline interpreter for interaction and debugging. 
-    * udp/ip networking (tcp has do be done).
-	* network protocols bootp, tftp (others have to be done).
-    * board support packages and bootloaders (actualy only h83003).
-	* api documentation generated with doxygen(in work).
+Statistic: 
+ca:	100 000 Lines, 1000 files
+	 22 000 sloc ansic (98 %)
+	    400 sloc asm   ( 2 %)
+	    
+2.)STRUCTURE 
+MOST is a collection of libraries and board support packages.
+They are linked together to one binary file.
+The files in the sense of an application using the OS are placed in the
+board support packages usr directory.
+The compiled binaries are also placed in this directory.
+
+3.)FEATURES
+	* C library functions(ACE).
+	* Multithreading, inter process communication, memory management(USO).
+	* Device drivers for serial communication, timers, digital io, spi, adc, pwm ...(DEV).
+	* SYS File system for printing system information(MFS).
+	* Commandline interpreter for interaction and debugging (CLI). 
+    * Udp/ip networking (tcp has do be done) (NET).
+	* Network protocols bootp, tftp, syslog (others have to be done)(NAP).
+    * Board support packages and bootloaders(BSP SAM(Olimex SAM7_EX256) actual, MDC(MOST Develpent Computer) outdated ).
+	* Api documentation generated with doxygen(in work).
+	* ARM7 (AT91SAM7X256),  H8 (H8/3003)
 	
-MOST is freely avaliable under the LGPL license(see COPYING).
-MOST must allways be free and there is no commercial version.
+4.)FREE & OPEN	
+MOST is freely available under the LGPL license(see COPYING).
 The applications which are linked with MOST can be commercial.
 
-MOST is in development and has some(maybe more) bugs,
-but it is useable on my board.
-I am looking for help to design and hack the OS, port it to other architectures,
-write board support packages and to write documentation.
+5.)AVAILABILITY
+MOST is a hobby project and it is developed in spare time.
+It is not suitable for production purpose and there is also no warranty.
+It is a research project for small operating systems on embedded systems.
+It may be interesting for students and amateur embedded developers.
+MOST is ready to run on some boards.
+
+6.)HELP WANTED
+To write a operating system is not easy and a time consuming task.
+If you are interested in operating systems and embedded development,
+your help will be welcome. On some development boards MOST can be quickly
+installed and you should be able to test it , to change it, to improve it.
 
 Michael Feiner

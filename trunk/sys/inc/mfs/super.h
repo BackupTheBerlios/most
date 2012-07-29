@@ -9,6 +9,10 @@
 #include "mfs/directory.h"
 #include "mfs/vfs.h"
 
+/** @addtogroup mfs
+ * @{
+ */
+
 /** @defgroup super super.h
  *
  * The root directory with mount and unmount functionality.
@@ -18,8 +22,8 @@
 /* Super structure. */
 struct MFS_super
 {
-	MFS_directory_t dir;                    /* It is a directory. */
-	struct MFS_super_op *operations;        /* Extended with the mount facility. */
+    MFS_directory_t dir;        /* It is a directory. */
+    struct MFS_super_op *operations;    /* Extended with the mount facility. */
 };
 
 
@@ -30,8 +34,7 @@ struct MFS_super
  * @param vfs_op : Virtual file system operations.
  * @param info : Callback for printing super information.
  */
-extern void MFS_super_init(MFS_super_t *super,
-				 struct MFS_vfs_op *vfs_op, void (*info)(void));
+extern void MFS_super_init (MFS_super_t * super, struct MFS_vfs_op *vfs_op, void (*info) (void));
 
 
 /**
@@ -42,15 +45,17 @@ extern void MFS_super_init(MFS_super_t *super,
  * @param info : Callback for printing super information.
  * @return Created super descriptor.
  */
-extern MFS_descriptor_t * MFS_mount (char *name,
-				 struct MFS_vfs_op * vfs_op, void (*info)(void));
+extern MFS_descriptor_t *MFS_mount (char *name, struct MFS_vfs_op *vfs_op, void (*info) (void));
 
 /**
  * Unmount super descriptor.
  *
  * @param desc : Super descriptor.
  */
-extern void MFS_umount_desc (MFS_descriptor_t *desc);
+extern void MFS_umount_desc (MFS_descriptor_t * desc);
+
+/** @}
+ */
 
 /** @}
  */

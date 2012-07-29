@@ -21,7 +21,7 @@
 
 #include <net/netif.h>
 
-/** Loopback device */ 
+/** Loopback device */
 extern NET_netif_t SAM_lo;
 
 /** Ethernet device 0 */

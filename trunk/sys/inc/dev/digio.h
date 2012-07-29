@@ -6,6 +6,10 @@
 #ifndef DEV_DIGIO_H
 #define DEV_DIGIO_H
 
+/** @addtogroup dev
+ * @{
+ */
+
 /** @defgroup digio digio.h
  *
  * Digital IO.
@@ -17,7 +21,7 @@
 /** IO State. */
 enum DEV_digio_state
 {
-	DEV_DIGIO_LOW, /**< Physically low signal. */
+    DEV_DIGIO_LOW,     /**< Physically low signal. */
     DEV_DIGIO_HIGH /**< Physically high signal. */
 };
 
@@ -37,6 +41,10 @@ enum DEV_digio_edge
 };
 
 /*------------------------------------------------------------------------*/
+
+/** @}
+ */
+
 
 /** @}
  */
