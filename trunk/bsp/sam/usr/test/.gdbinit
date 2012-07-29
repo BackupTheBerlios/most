@@ -1,6 +1,6 @@
 ## gdbinit
 
-file ./frame.elf
+file ./boot.elf
 target remote localhost:3333
 
 #set remote hardware-breakpoint-limit 2
