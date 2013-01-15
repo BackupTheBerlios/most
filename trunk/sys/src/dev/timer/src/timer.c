@@ -5,9 +5,10 @@
 
 #include <uso/list.h>
 #include <uso/semaphore.h>
-#include <uso/arch/cpu.h>
+#include <uso/cpu.h>
 #include <uso/heap.h>
 #include <uso/thread.h>
+#include <uso/log.h>
 #include <mfs/sysfs.h>
 #include <mfs/vfs.h>
 #include <mfs/descriptor.h>
@@ -24,11 +25,20 @@ static USO_semaphore_t cond;
 
 static USO_thread_t *timers_thread = NULL;
 
-static void info (MFS_entry_t * entry);
+static void
+info (MFS_descriptor_t * desc)
+{
+    DEV_timer_t *timer = (DEV_timer_t *) desc->represent;
+    ACE_printf ("Timer state: %s , ticks: %lu, ctx: %s\n",
+                timer->state == DEV_TIMER_ON ? "ON" : "OFF",
+                timer->ticks, timer->ctx == DEV_TIMER_INT ? "INT" : "THREAD");
+}
 
-static struct MFS_descriptor_op timer_descriptor_op = {.open = NULL,
+static struct MFS_descriptor_op timer_descriptor_op = {
+	.open = NULL,
     .close = NULL,
-    .info = info
+    .info = info,
+    .control = NULL
 };
 
 static void
@@ -56,6 +66,7 @@ consume (void)
 static void
 timers_run (void *nix)
 {
+    USO_log_puts (USO_LL_INFO, "Timers is running.\n");
     for (;;)
     {
         DEV_timer_t *timer = consume ();
@@ -93,14 +104,14 @@ DEV_timer_init (DEV_timer_t * timer, void (*f) (void *), void *param, enum DEV_t
 extern void
 DEV_timer_install (DEV_timer_t * timer, char *name)
 {
-    timer->desc = MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_TIMER), name,
-                                   (MFS_entry_t *) timer, MFS_DESC, &timer_descriptor_op);
+    timer->desc = MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/clock/timer"), name,
+                                    MFS_SYS, &timer_descriptor_op, (MFS_represent_t *) timer);
 }
 
 extern void
 DEV_timer_remove (DEV_timer_t * timer)
 {
-    MFS_remove_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_TIMER), timer->desc);
+    MFS_remove_desc (MFS_resolve(MFS_get_root(), "sys/dev/clock/timer"), timer->desc);
 }
 
 extern void
@@ -144,13 +155,5 @@ DEV_timer_fire (void)
     }
 }
 
-static void
-info (MFS_entry_t * entry)
-{
-    DEV_timer_t *timer = (DEV_timer_t *) entry;
-    ACE_printf ("Timer state: %s , ticks: %lu, ctx: %s\n",
-                timer->state == DEV_TIMER_ON ? "ON" : "OFF",
-                timer->ticks, timer->ctx == DEV_TIMER_INT ? "INT" : "THREAD");
-}
 
 /*------------------------------------------------------------------------*/

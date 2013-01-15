@@ -46,9 +46,9 @@ print_ipaddr (char *name, NET_ip_addr_t ipaddr)
 }
 
 static void
-info (MFS_entry_t * entry)
+info (MFS_descriptor_t * desc)
 {
-    NET_netif_t *netif = (NET_netif_t *) entry;
+    NET_netif_t *netif = (NET_netif_t *) desc->represent;
 
     print_ipaddr ("ip_addr", netif->ip_addr);
     print_ipaddr ("netmask", netif->netmask);
@@ -57,9 +57,11 @@ info (MFS_entry_t * entry)
                 netif->tx, netif->tx_drop, netif->rx, netif->rx_drop);
 }
 
-static struct MFS_descriptor_op netif_descriptor_op = {.open = NULL,
+static struct MFS_descriptor_op netif_descriptor_op = {
+	.open = NULL,
     .close = NULL,
-    .info = info
+    .info = info,
+    .control = NULL
 };
 
 extern void
@@ -73,6 +75,6 @@ NET_netif_init (NET_netif_t * netif, char *name)
     NET_ip_addr_set (&(netif->ip_addr), &NET_ip_addr_any);
     NET_ip_addr_set (&(netif->netmask), &NET_ip_addr_any);
     NET_ip_addr_set (&(netif->gateway), &NET_ip_addr_any);
-    MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_NETIF),
-                     name, (MFS_entry_t *) netif, MFS_DESC, &netif_descriptor_op);
+    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/net/netif"),
+                     name, MFS_SYS, &netif_descriptor_op, (MFS_represent_t *) netif);
 }

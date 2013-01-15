@@ -15,7 +15,7 @@
  */
 
 #include <ace/stddef.h>
-#include <uso/arch/cpu.h>
+#include <uso/cpu.h>
 #include <dev/chips/flash_29F040.h>
 
 
@@ -80,6 +80,22 @@ FLASH_29F040_segment_size (void)
     return SECTOR_SIZE;
 }
 
+#if 0
+ACE_INLINE_ static unsigned char
+silicon_id (int adi)
+{
+    write_command (BASE_ADDR + H555, CMD_INFO);
+    return read (BASE_ADDR + adi);
+}
+
+ACE_INLINE_ static unsigned char
+protect_verify (volatile unsigned char *sector_addr)
+{
+    write_command (BASE_ADDR + H555, CMD_INFO);
+    return read (sector_addr + NOT_ADI);
+}
+#endif
+
 ACE_INLINE_ static unsigned char
 read (volatile unsigned char *addr)
 {
@@ -106,25 +122,16 @@ reset (void)
     write (BASE_ADDR + HXXX, CMD_RESET);
 }
 
-ACE_INLINE_ static unsigned char
-silicon_id (int adi)
+ACE_INLINE_ static void
+suspend (void)
 {
-    write_command (BASE_ADDR + H555, CMD_INFO);
-    return read (BASE_ADDR + adi);
-}
-
-ACE_INLINE_ static unsigned char
-protect_verify (volatile unsigned char *sector_addr)
-{
-    write_command (BASE_ADDR + H555, CMD_INFO);
-    return read (sector_addr + NOT_ADI);
+    write (BASE_ADDR + HXXX, CMD_SUSPEND);
 }
 
 ACE_INLINE_ static void
-program (volatile unsigned char *addr, unsigned char data)
+resume (void)
 {
-    write_command (BASE_ADDR + H555, CMD_PROGRAM);
-    write (addr, data);
+    write (BASE_ADDR + HXXX, CMD_SECTOR);
 }
 
 ACE_INLINE_ static void
@@ -142,23 +149,19 @@ sector_erase (volatile unsigned char *sector_addr)
 }
 
 ACE_INLINE_ static void
-suspend (void)
-{
-    write (BASE_ADDR + HXXX, CMD_SUSPEND);
-}
-
-ACE_INLINE_ static void
-resume (void)
-{
-    write (BASE_ADDR + HXXX, CMD_SECTOR);
-}
-
-ACE_INLINE_ static void
-un_lock (void)
+unlock (void)
 {
     write_command (BASE_ADDR + H555, CMD_ERASE);
     write_command (BASE_ADDR + H555, CMD_UNLOCK);
 }
+
+ACE_INLINE_ static void
+program (volatile unsigned char *addr, unsigned char data)
+{
+    write_command (BASE_ADDR + H555, CMD_PROGRAM);
+    write (addr, data);
+}
+
 
 static enum FLASH_29F040_err_code
 poll (volatile unsigned char *addr, unsigned char data)

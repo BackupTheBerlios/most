@@ -6,7 +6,7 @@
 #include <ace/stdlib.h>
 #include <uso/sleep.h>
 #include <uso/log.h>
-#include <cli/commands.h>
+#include <cli/exec.h>
 
 #include "tst/ram_test.h"
 

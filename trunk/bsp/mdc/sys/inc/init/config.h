@@ -53,14 +53,9 @@
  */
 #define MDC_CONFIG_STATE_ALTERED   3
 
-/**
- *
- */
-#define MDC_CONFIG_FLAG_BOOTP   0x0001
-/**
- *
- */
-#define MDC_CONFIG_FLAG_TFTP    0x0002
+#define MDC_CONFIG_FLAG_BOOTP     0x0001
+#define MDC_CONFIG_FLAG_TFTP      0x0002
+#define MDC_CONFIG_FLAG_SYSLOG    0x0004
 
 /**
  * serial ee prom 1Kbit

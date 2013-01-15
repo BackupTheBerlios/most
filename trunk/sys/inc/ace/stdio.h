@@ -29,7 +29,7 @@
 #define ACE_EOF (-1)
 
 /** File type. */
-typedef MFS_stream_t ACE_FILE;
+typedef MFS_descriptor_t ACE_FILE;
 
 /*------------------------------------------------------------------------*/
 

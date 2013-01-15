@@ -4,7 +4,7 @@
  */
 
 #include <ace/stdio.h>
-#include <cli/commands.h>
+#include <cli/exec.h>
 #include <dev/arch/at91/flashd.h>
 #include <dev/arch/at91/AT91SAM7X256.h>
 

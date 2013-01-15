@@ -8,19 +8,15 @@
 #include <ace/stddef.h>
 #include <ace/stdio.h>
 #include <ace/stdlib.h>
-#include <uso/arch/cpu.h>
+#include <uso/cpu.h>
 #include <uso/stack.h>
 #include <uso/heap.h>
 #include <uso/sleep.h>
-#include <cli/commands.h>
-#include <nap/bootp.h>
-
-#include "init/bsp_commands.h"
-#include "init/config.h"
-#include "arch/cpu.h"
-#include "arch/reset.h"
-#include "arch/eth.h"
-#include "arch/ticks.h"
+#include <cli/exec.h>
+#include <init/bsp_commands.h>
+#include <arch/cpu.h>
+#include <arch/reset.h>
+#include <arch/ticks.h>
 
 extern char stack_start, stack_end;     /* Defined in *.ld! */
 
@@ -61,26 +57,6 @@ exception_stack_check_exec (char *nix)
     }
 }
 
-static CLI_exec_t bootp;
-
-extern void
-SAM_bootp (void)
-{
-    if (NAP_bootp (&SAM_config.eth_addr) == 0)
-    {
-        NET_netif_set_ipaddr (&SAM_eth0, &NAP_bootp_data.ip_addr);
-        NET_netif_set_gateway (&SAM_eth0, &NAP_bootp_data.gateway);
-        SAM_config.ip_addr = NAP_bootp_data.ip_addr;
-        SAM_config.gateway = NAP_bootp_data.gateway;
-        SAM_config.server = NAP_bootp_data.server;
-    }
-}
-
-static void
-bootp_exec (char *nix)
-{
-    SAM_bootp ();
-}
 
 static CLI_exec_t start_boot;
 
@@ -127,9 +103,11 @@ static CLI_exec_t heap_debug;
 static void
 heap_debug_exec (char *heap)
 {
-    MFS_descriptor_t *desc = MFS_open (MFS_sysfs_get_dir (MFS_SYSFS_DIR_HEAPS), heap);
-    if (desc != NULL)
-        USO_debug_heap_list (desc->entry);
+	MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "sys/uso/heap"), heap);
+	if (desc != NULL)
+		USO_debug_heap_list (desc->represent);
+	else
+		ACE_puts ("heap not found.\n");
 }
 
 static CLI_exec_t ticks_debug;
@@ -145,9 +123,8 @@ SAM_bsp_commands_install (MFS_descriptor_t * bsp)
 {
     CLI_exec_init (bsp, &exception_stack_check, "excep_S", "Exception stack check",
                    exception_stack_check_exec);
-    CLI_exec_init (bsp, &bootp, "bootp", "Bootp request", bootp_exec);
-    CLI_exec_init (bsp, &start_boot, "startb", "Start boot", start_boot_exec);
-    CLI_exec_init (bsp, &start_app, "starta", "Start app", start_app_exec);
+    CLI_exec_init (bsp, &start_boot, "start_B", "Start boot", start_boot_exec);
+    CLI_exec_init (bsp, &start_app, "start_A", "Start app", start_app_exec);
     CLI_exec_init (bsp, &heap_debug, "heap_D", "Debug heap list", heap_debug_exec);
     CLI_exec_init (bsp, &ticks_debug, "tick_D", "Debug ticks interrupt", ticks_debug_exec);
 }

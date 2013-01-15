@@ -22,7 +22,7 @@ help :
 	@$(call makegoal_bsp_src, help)
 	@$(ECHO) "---------------------- Makefile -------------------------------------------------------"
 	@$(ECHO) "help     : print this help message, -> Makefile"
-	@$(ECHO) "all      : sys/src, usr/src -> Makefile(libs), bsp/$(MOST_BOARD) -> Makefile(apps)"
+	@$(ECHO) "all      : sys/src, usr/src -> Makefile(libs), bsp/$(MOST_BOARD) -> Makefile(app)"
 	@$(ECHO) "doc      : sys/inc/doc, usr/inc/doc , bsp/$(MOST_BOARD)/sys/inc/doc -> Makefile"
 	@$(ECHO) "clean    : sys/src, usr/src, bsp/$(MOST_BOARD) -> Makefile"
 	@$(ECHO) "mrproper : sys/src, usr/src, sys/inc/doc, usr/inc/doc, bsp/$(MOST_BOARD), bsp/$(MOST_BOARD)/sys/inc/doc -> Makefile"
@@ -31,7 +31,7 @@ help :
 all :
 	@make clean --no-print-directory -f $(MOST_ROOT)/etc/build/Makefile
 	@$(call makegoal_lib_src, libs)
-	@$(call makegoal_bsp_src, apps)
+	@$(call makegoal_bsp_src, app)
 
 doc :
 	@$(call makegoal_lib_doc, doc)

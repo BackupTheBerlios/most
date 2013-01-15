@@ -5,7 +5,7 @@
 
 #include "uso/semaphore.h"
 #include "uso/thread.h"
-#include "uso/arch/cpu.h"
+#include "uso/cpu.h"
 #include "uso/scheduler.h"
 
 /*------------- Implementation ------------------------------------------*/

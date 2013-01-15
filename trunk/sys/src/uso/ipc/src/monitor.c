@@ -4,7 +4,7 @@
  */
 
 #include "uso/thread.h"
-#include "uso/arch/cpu.h"
+#include "uso/cpu.h"
 #include "uso/scheduler.h"
 #include "uso/heap.h"
 #include "uso/monitor.h"

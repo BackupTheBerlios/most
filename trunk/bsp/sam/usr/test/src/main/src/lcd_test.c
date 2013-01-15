@@ -6,7 +6,7 @@
 #include <uso/thread.h>
 #include <uso/log.h>
 #include <dev/cpu.h>
-#include <cli/commands.h>
+#include <cli/exec.h>
 #include <dpy/nokia6100/nokia6100.h>
 
 #include <test.h>
@@ -155,18 +155,13 @@ card_inserted (void)
 static void
 play_mic (void)
 {
-    ACE_u32_t mic = DEV_adc_get (&adc, DEV_ADC_CHN_7);
-
-    char *s = print_value (mic, "mic");
-    display_value (s);
-    USO_sleep (USO_MSEC_2_TICKS (1000));
+	SAM_tone ();
 }
 
 static void
 play_audio (void)
 {
     SAM_beep ();
-    USO_sleep (USO_MSEC_2_TICKS (3000));
 }
 
 static void
@@ -174,7 +169,7 @@ get_trim (void)
 {
     ACE_u32_t v = DEV_adc_get (&adc, DEV_ADC_CHN_6);
 
-    v /= 16;
+    v /= 4;
 
     char *s = print_value (v, "Contrast");
 
@@ -189,8 +184,8 @@ get_temp (void)
 {
     ACE_u32_t v = DEV_adc_get (&adc, DEV_ADC_CHN_5);
 
-    v *= 10;
-    v /= 19;
+    v *= 21;
+    v /= 10;
     v -= 40;
 
     int grad = v / 10;

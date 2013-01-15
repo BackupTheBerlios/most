@@ -71,6 +71,9 @@ MDC_eth_start (void)
 }
 
 extern ACE_INTERRUPT_ void
+MDC_IRQ7_ISR (void) ACE_SECTION_ (".unref");
+
+extern ACE_INTERRUPT_ void
 MDC_IRQ7_ISR (void)
 {
     DEV_smc_interrupt (&smc);

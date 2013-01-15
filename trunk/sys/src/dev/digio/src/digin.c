@@ -3,6 +3,7 @@
  *
  */
 
+#include <ace/stdio.h>
 #include <mfs/sysfs.h>
 #include <mfs/vfs.h>
 #include <mfs/descriptor.h>
@@ -10,11 +11,21 @@
 
 #include "dev/digin.h"
 
-static void info (MFS_entry_t * entry);
+static void
+info (MFS_descriptor_t * desc)
+{
+    DEV_digin_t *in = (DEV_digin_t *) desc->represent;
+    ACE_printf ("IN state: %s , logig: %s, edge: %s, deb_t: %d, deb_cnt: %d\n",
+                in->state == DEV_DIGIO_HIGH ? "1" : "0",
+                in->logig == DEV_DIGIO_POS ? "+" : "-",
+                in->edge == DEV_DIGIO_POS ? "_|" : "|_", in->debounce_time, in->debounce_count);
+}
 
-static struct MFS_descriptor_op digin_descriptor_op = {.open = NULL,
+static struct MFS_descriptor_op digin_descriptor_op = {
+	.open = NULL,
     .close = NULL,
-    .info = info
+    .info = info,
+	.control = NULL
 };
 
 
@@ -46,8 +57,8 @@ DEV_digin_init (DEV_diginputs_t * inputs,
 extern void
 DEV_digin_install (DEV_digin_t * in, char *name)
 {
-    MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_DIGIO), name,
-                     (MFS_entry_t *) in, MFS_DESC, &digin_descriptor_op);
+    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/digio"), name,
+                     MFS_SYS, &digin_descriptor_op, (MFS_represent_t *) in);
 }
 
 static void
@@ -151,12 +162,3 @@ DEV_digin_ischanged (DEV_digin_t * in)
     }
 }
 
-static void
-info (MFS_entry_t * entry)
-{
-    DEV_digin_t *in = (DEV_digin_t *) entry;
-    ACE_printf ("IN state: %s , logig: %s, edge: %s, deb_t: %d, deb_cnt: %d\n",
-                in->state == DEV_DIGIO_HIGH ? "1" : "0",
-                in->logig == DEV_DIGIO_POS ? "+" : "-",
-                in->edge == DEV_DIGIO_POS ? "_|" : "|_", in->debounce_time, in->debounce_count);
-}

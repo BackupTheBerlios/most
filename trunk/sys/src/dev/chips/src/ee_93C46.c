@@ -43,8 +43,10 @@ chip_ready (void)
 static void
 ee_93c46_write_short (DEV_spi_dev_t *spi, unsigned short addr, unsigned short data)
 {
-    DEV_spi_exchange (spi, (addr & 0x3f) | _MW_COMMAND (_MW_WRITE), NULL);
+    spi->cs = DEV_SPI_DEV_CS_ACTIVE;
+	DEV_spi_exchange (spi, (addr & 0x3f) | _MW_COMMAND (_MW_WRITE), NULL);
     DEV_spi_exchange (spi, data >> 8, NULL);
+    spi->cs = DEV_SPI_DEV_CS_PASSIVE;
     DEV_spi_exchange (spi, data, NULL);
     chip_ready();
 }
@@ -53,8 +55,10 @@ static unsigned short
 ee_93c46_read_short (DEV_spi_dev_t *spi, unsigned short addr)
 {
     unsigned long data = 0;
+    spi->cs = DEV_SPI_DEV_CS_ACTIVE;
     DEV_spi_exchange (spi, (addr & 0x3f) | _MW_COMMAND (_MW_READ), NULL);
     DEV_spi_exchange (spi, 0, &data);
+    spi->cs = DEV_SPI_DEV_CS_PASSIVE;
     DEV_spi_exchange (spi, 0, &data);
     return ((unsigned short)data);
 }
@@ -73,9 +77,9 @@ EE_93C46_init (EE_93C46_t *ee, DEV_spi_dev_t *spi)
                                  8,     /* word size */
                                  0,     /* delay_b_sclk */
                                  0,     /* delay_b_ct */
-                                 DEV_SPI_DEV_CS_ACTIVE))
+                                 DEV_SPI_DEV_CS_PASSIVE))
     {
-        err = ACE_ERR_OK;
+        err = ACE_OK;
     }
     return err;
 }

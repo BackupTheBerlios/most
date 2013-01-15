@@ -1,5 +1,5 @@
 #include <uso/sleep.h>
-#include <ace/arch/cpu.h>
+#include <ace/cpu.h>
 
 #include "dpy/nokia6100/nokia6100.h"
 #include "dpy/nokia6100/font.h"

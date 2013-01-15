@@ -6,7 +6,7 @@
 #ifndef USO_HEAP_H
 #define USO_HEAP_H
 
-#include "ace/stddef.h"
+#include <ace/stddef.h>
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
 
@@ -81,12 +81,12 @@ extern void USO_mem_free (USO_heap_t * heap, void *block);
 /**
  * Debug heap list.
  */
-extern void USO_debug_heap_list (MFS_entry_t * entry);
+extern void USO_debug_heap_list (MFS_represent_t * represent);
 
 /**
  * Print info header.
  */
-extern void USO_heap_info_head (void);
+extern void USO_heap_info_head (MFS_descriptor_t *dir);
 
 /*------------------------------------------------------------------------*/
 

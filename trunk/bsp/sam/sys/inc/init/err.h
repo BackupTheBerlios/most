@@ -20,7 +20,7 @@
  * @{
  */
 
-#define SAM_ERR         (ACE_BSP_ERR_NR - 1)         /**< Not specified BSP error.  */
+#define SAM_ERR         (BSP_ERR_NR - 1)         /**< Not specified BSP error.  */
 
 /** @}
  */

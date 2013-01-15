@@ -143,3 +143,9 @@ DEV_at91_RST_is_busy (AT91PS_RSTC rstc)
     }
     return 0;
 }
+
+unsigned int
+DEV_at91_RST_status (AT91PS_RSTC rstc)
+{
+    return READ_RSTC (rstc, RSTC_RSR);
+}

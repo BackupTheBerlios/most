@@ -20,7 +20,8 @@
 
 /*------------- Representation ------------------------------------------*/
 
-#define DEV_SER_TIMEOUT_MSEC 50L
+#define DEV_SER_BUFFER_FILL_TIME_MSEC 50L
+#define DEV_SER_BUFFER_EMPTY_TIME_MSEC 50L
 
 /** Size of receive buffer. */
 #define DEV_SERIAL_B_RX_BUFFER_SIZE 0x100
@@ -31,9 +32,6 @@
 #define DEV_SERIAL_B_TX_BUFFER_SIZE 0x100
 /** Size of transmit buffer for nonblocking mode. */
 #define DEV_SERIAL_NB_TX_BUFFER_SIZE 0x400
-
-/** Receive timeout. */
-#define DEV_SER_TIMEOUT USO_MSEC_2_TICKS(DEV_SER_TIMEOUT_MSEC)
 
 /** Baud rate. */
 enum DEV_serial_baud
@@ -113,8 +111,11 @@ struct DEV_serial_settings
     /** Parity Bit. */
     enum DEV_serial_parity parity;
 
-    /** Timeout. */
-    int timeout;
+    /** receive more characters to fill buffer time in ms. */
+    int buffer_fill_time;
+
+    /** transmitt more characters to emty buffer time in ms. */
+    int buffer_empty_time;
 };
 
 /*------------------------------------------------------------------------*/

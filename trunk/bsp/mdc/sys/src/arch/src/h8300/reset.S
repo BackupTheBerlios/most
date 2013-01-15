@@ -6,6 +6,8 @@
 	.file    "reset.s"	
 	.global  reset
 
+    .section .unref
+
 reset:
 	mov.b	#0x3c,r0l
 	mov.b	r0l,@_H8_PCDDR:8

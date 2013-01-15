@@ -5,8 +5,8 @@
 
 #include <dev/arch/h8/H83003_REG.h>
 
-#include "arch/pins.h"
-#include "arch/digio.h"
+#include <arch/pins.h>
+#include <arch/digio.h>
 
 
 DEV_digout_t MDC_run_led;

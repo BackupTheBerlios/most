@@ -4,7 +4,7 @@
  */
 
 #include <ace/stdio.h>
-#include <cli/commands.h>
+#include <cli/exec.h>
 
 #include <dev/chips/ee_93C46.h>
 #include <init/config.h>

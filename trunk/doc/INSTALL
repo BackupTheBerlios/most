@@ -10,7 +10,7 @@ This can be done with the command "source ROOT" in the trunk folder if the proje
 with the name trunk.
 
 Setup the Config files (Copy Copy_2_Config to Config and edit it to your needs)
-in trunk/etc/Config and trunk/bsp/board/Config.
+in trunk/etc/Config and trunk/bsp/board/Config and trunk/bsp/board/usr/app/Config.
 
 
 2.) Build.
@@ -24,14 +24,11 @@ There are a lot of Makefiles in subdirectories to build subparts, use "make help
 3.) How the build system works.
 ===============================
 
-The common makefiles are placed in the mostroot/etc folder and you should not use them directly, 
+The common makefiles are placed in the trunk/etc/build folder and you should not use them directly, 
 they are called from the other makefiles.
 
-There are a lot of makefiles:
-for building the objects, libraries, bsp and programs.
-
 The main makefile in the trunk folder calls the makefiles
-for building the libraries and programs and these call makefiles for building the objects.
+for building the libraries and board support packages and these call makefiles for building the objects and programms.
 
 The file system works as project manager, this means
 the makefile to build the objects will build all objects for the source files
@@ -39,33 +36,9 @@ which are placed in the sub folder src. To add a source file just place it in th
 The built objects are placed in the o folder, the dependencies are placed in the d folder and 
 if you build the asm files (make asm) they are placed in the s folder.
 Assembler source files are placed like: src/$MOST_CPU/name.S .
+The generated files are placed in a debug or run folder depending of the settings in your App configuration.
 
 You can build all, a program, just a library or just some objects by using the appropriate
 Makefile.
 
-trunk>
-	Makefile   (all, clean)
-	sys/src>
-			Makefile (libs)
-			ace>
-				Makefile (lib)
-				stdio>
-					Makefile (obj)
-					src>
-						all *.c files are build
-			...
-		inc>
-			Makefile (doc)
-			ace/doc>
-					Makefile (doc)
-			...		
-	usr/...
-	bsp/mdc/sys/src>
-					Makefile (obj)
-					...
-			usr/boot/
-					Makefile (prog, bin, srec)
-					src/
-					   Makefile(obj)
-
-
+<make help> will print the available make targets and the make call tree, this means which makefiles are called by the makefile.

@@ -28,21 +28,21 @@ ACE_stdio_init (void)
 extern ACE_size_t
 ACE_fread (ACE_FILE * in, char *buf, ACE_size_t len)
 {
-    if (in == NULL)
+    if (in != NULL && in->type == MFS_STREAM)
     {
-        return 0;
+        return MFS_read ((MFS_stream_t *)in, buf, len);
     }
-    return MFS_read (in, buf, len);
+    return 0;
 }
 
 extern ACE_size_t
 ACE_fwrite (ACE_FILE * out, char *buf, ACE_size_t len)
 {
-    if (out == NULL)
+    if (out != NULL && out->type == MFS_STREAM)
     {
-        return 0;
+        return MFS_write ((MFS_stream_t *)out, buf, len);
     }
-    return MFS_write (out, buf, len);
+    return 0;
 }
 
 extern int
@@ -60,10 +60,6 @@ extern int
 ACE_fputc (ACE_FILE * out, char c)
 {
     int ret = ACE_fwrite (out, &c, sizeof (c));
-    if (ret < sizeof (c))
-    {
-        ret = ACE_EOF;
-    }
     return ret;
 }
 

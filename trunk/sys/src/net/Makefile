@@ -3,11 +3,11 @@
 LIB_NAME := net
 LIB_TYPE := sys
 
-OBJ_NAMES :=  	eth/o/$(MOST_TARGET)/*.o\
-		 		netif/o/$(MOST_TARGET)/*.o\
-		 		ipv4/o/$(MOST_TARGET)/*.o\
-		 		mm/o/$(MOST_TARGET)/*.o\
-		 		udp/o/$(MOST_TARGET)/*.o
+OBJ_NAMES :=  	eth/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+		 		netif/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+		 		ipv4/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+		 		mm/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+		 		udp/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o
 
 makegoal = 	   	make $(1) -C eth;\
 	   			make $(1) -C netif;\

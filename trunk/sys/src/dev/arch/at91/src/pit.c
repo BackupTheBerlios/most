@@ -42,7 +42,7 @@ static unsigned int pit_ticks_per_period;
 extern void
 DEV_at91_PIT_init (unsigned int period, unsigned int pit_frequency)
 {
-    periodes_per_sec = period;
+    periodes_per_sec = DEV_AT91_PIT_SEC_IN_USEC / period;
     pit_freq = pit_frequency;
     pit_ticks_per_period = period ? (period * pit_frequency + 8) >> 4 : 0;      // +8 to avoid %10, /10
     AT91C_BASE_PITC->PITC_PIMR = pit_ticks_per_period;

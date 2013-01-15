@@ -8,6 +8,7 @@
 #ifndef SAM_RTC_H_
 #define SAM_RTC_H_
 
+#include <ace/stddef.h>
 #include <dev/rtc.h>
 
 /** @addtogroup arch
@@ -35,7 +36,7 @@ extern void SAM_rtc_init (void);
 /**
  *
  */
-extern void SAM_rtc_interrupt (void);
+extern void SAM_rtc_interrupt (void) ACE_SECTION_ (".unref");
 
 /** @}
  */

@@ -20,7 +20,7 @@
  * @{
  */
 
-#define MDC_ERR         (ACE_BSP_ERR_NR - 1)         /**< Not specified INIT error.  */
+#define MDC_ERR         (BSP_ERR_NR - 1)         /**< Not specified INIT error.  */
 
 /** @}
  */

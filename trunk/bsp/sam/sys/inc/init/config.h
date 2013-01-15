@@ -31,7 +31,9 @@
 #define SAM_CONFIG_STATE_SAVED     2
 #define SAM_CONFIG_STATE_ALTERED   3
 
-#define SAM_CONFIG_FLAG_BOOTP   0x0001
+#define SAM_CONFIG_FLAG_BOOTP     0x0001
+#define SAM_CONFIG_FLAG_TFTP      0x0002
+#define SAM_CONFIG_FLAG_SYSLOG    0x0004
 
 struct SAM_configuration
 {

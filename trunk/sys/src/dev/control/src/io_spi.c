@@ -7,29 +7,8 @@
 
 #include <dev/io_spi.h>
 #include <dev/digin.h>
+#include <uso/cpu.h>
 
-
-static int io_spi_dev_config (DEV_spi_dev_t * dev);
-
-static int io_spi_exchange (DEV_spi_dev_t * dev, ACE_u32_t out, ACE_u32_t * in);
-
-static void
-chip_select(DEV_io_spi_bus_t *bus)
-{
-    DEV_digout_clear(bus->clk);
-    DEV_digout_set(bus->cs);
-    bus->startbit = TRUE;
-}
-
-#if 0
-static void
-chip_release(DEV_io_spi_bus_t *bus)
-{
-    DEV_digout_clear(bus->clk);
-    DEV_digout_clear(bus->cs);
-    DEV_digout_clear(bus->dout);
-}
-#endif
 
 static void
 startbit(DEV_io_spi_bus_t *bus)
@@ -37,24 +16,36 @@ startbit(DEV_io_spi_bus_t *bus)
     DEV_digout_set(bus->dout);
     DEV_digout_set(bus->clk);
     DEV_digout_clear(bus->clk);
-    bus->startbit = FALSE;
+}
+
+static void
+chip_select(DEV_io_spi_bus_t *bus)
+{
+    bus->ps = USO_disable ();
+    bus->start = FALSE;
+    DEV_digout_clear(bus->clk);
+    DEV_digout_clear(bus->dout);
+    DEV_digout_set(bus->cs);
+    startbit(bus);
+}
+
+static void
+chip_release(DEV_io_spi_bus_t *bus)
+{
+    DEV_digout_clear(bus->cs);
+    DEV_digout_clear(bus->clk);
+    DEV_digout_clear(bus->dout);
+    bus->start = TRUE;
+    USO_restore (bus->ps);
 }
 
 static int
 io_spi_dev_config (DEV_spi_dev_t * dev)
 {
-    DEV_io_spi_dev_t *io_spi_dev = (DEV_io_spi_dev_t *) dev;
-
     // TODO slave device handling
 
     if (dev->bus->ctrl != DEV_SPI_BUS_CTRL_MASTER)
         return (-1);
-
-    if (dev->cs_active == DEV_SPI_DEV_CS_ACTIVE)
-    {
-        chip_select(io_spi_dev->bus);
-    }
-
 
     return 0;
 }
@@ -66,9 +57,9 @@ io_spi_exchange (DEV_spi_dev_t * dev, ACE_u32_t out, ACE_u32_t * in)
     DEV_io_spi_dev_t *io_spi_dev = (DEV_io_spi_dev_t *) dev;
     DEV_io_spi_bus_t *bus = io_spi_dev->bus;
 
-    if (bus->startbit == TRUE)
+    if (bus->start == TRUE)
     {
-        startbit(bus);
+    	chip_select(bus);
     }
 
     out &= dev->word_mask;
@@ -89,6 +80,11 @@ io_spi_exchange (DEV_spi_dev_t * dev, ACE_u32_t out, ACE_u32_t * in)
         DEV_digout_clear(bus->clk);
     }
 
+    if (dev->cs == DEV_SPI_DEV_CS_PASSIVE)
+    {
+        chip_release(io_spi_dev->bus);
+    }
+
     return 0;
 }
 
@@ -107,7 +103,7 @@ DEV_io_spi_bus_init (DEV_io_spi_bus_t * io_spi_bus,
     io_spi_bus->dout = spi_do;
     io_spi_bus->cs = spi_cs;
     io_spi_bus->din = spi_di;
-    io_spi_bus->startbit = FALSE;
+    io_spi_bus->start = TRUE;
     return 0;
 }
 

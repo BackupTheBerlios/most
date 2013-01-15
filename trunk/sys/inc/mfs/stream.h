@@ -6,8 +6,8 @@
 #ifndef MFS_STREAM_H
 #define MFS_STREAM_H
 
-#include "uso/mutex.h"
-#include "mfs/vfs.h"
+#include <mfs/vfs.h>
+#include <mfs/descriptor.h>
 
 /** @addtogroup mfs
  * @{
@@ -19,9 +19,6 @@
  * @{
  */
 
-/** Stream representation type.
- */
-typedef void MFS_stream_represent_t;
 
 /** Stream descriptor operations instance. */
 extern struct MFS_descriptor_op MFS_stream_descriptor_op;
@@ -30,19 +27,18 @@ extern struct MFS_descriptor_op MFS_stream_descriptor_op;
 enum MFS_stream_type
 {
     MFS_FILE,           /**< FILE. */
-    MFS_IO              /**< IO. */
+    MFS_STREAM_IO              /**< IO. */
 };
 
 
 /* Stream structure. */
 struct MFS_stream
 {
+	MFS_descriptor_t desc;
     enum MFS_stream_type type;  /* Stream type. */
     ACE_size_t size_tx;         /* File size, for IO the amount of transmitted characters. */
     ACE_size_t pos_rx;          /* File position, for IO the amount of received characters. */
-    USO_mutex_t lock;           /* Synchronization lock. */
     struct MFS_stream_op *operations;   /* Stream operations. */
-    MFS_stream_represent_t *represent;  /* Realized stream. */
 };
 
 
@@ -84,38 +80,45 @@ extern int MFS_seek (MFS_stream_t * stream, ACE_ssize_t off, ACE_size_t pos);
  */
 extern void MFS_flush (MFS_stream_t * stream);
 
-/**
- * Get stream from stream descriptor.
- *
- * @param stream : Stream type.
- * @return .
- */
-extern MFS_stream_t *MFS_get_stream (MFS_descriptor_t * stream_desc);
 
 /**
  * Initialize a stream.
  *
  * @param stream : Stream type.
- * @param type : MFS_FILE or MFS_IO.
+ * @param type : MFS_FILE or MFS_STREAM_IO.
  * @param operations : The stream operations.
  * @param represent : The stream representation.
  */
 extern void MFS_stream_init (MFS_stream_t * stream,
                              enum MFS_stream_type type,
-                             struct MFS_stream_op *operations, MFS_stream_represent_t * represent);
+                             struct MFS_stream_op *operations);
 
 /**
- * Dummy read function.
- * @return Always EOF.
+ * Create a file.
+ * A file is a special kind of stream io.
+ * The stream operations for a file are used.
+ * @param dir_desc : Directory descriptor in which a new file descriptor is created.
+ * @param name : Name of the new file.
+ * @return Created file descriptor.
  */
-extern ACE_size_t MFS_empty_read (MFS_stream_t * stream, char *buf, ACE_size_t len);
+extern MFS_descriptor_t *MFS_stream_create_file (MFS_descriptor_t * dir_desc, char *name);
 
 /**
- * Dummy write function.
- *
- * @return Always EOF (does write return EOF?).
+ * Create an IO stream.
+ * The IO stream has to implement the stream operation interface.
+ * @param dir_desc : Directory descriptor in which a new io descriptor is created.
+ * @param name : Name for the io.
+ * @param desc_op : descriptor operations for the stream.
+ * @param io_op : IO operations for the stream.
+ * @param represent : Stream representation.
+ * @return Created io descriptor.
  */
-extern ACE_size_t MFS_empty_write (MFS_stream_t * stream, const char *buf, ACE_size_t len);
+extern MFS_descriptor_t * MFS_stream_create_io (
+		MFS_descriptor_t * dir_desc, char *name, struct MFS_descriptor_op *desc_op,
+		struct MFS_stream_op *io_op, MFS_represent_t * represent);
+
+
+extern void MFS_stream_print (MFS_stream_t * stream);
 
 /** @}
  */

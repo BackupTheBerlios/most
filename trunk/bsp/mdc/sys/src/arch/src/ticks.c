@@ -10,6 +10,7 @@
 #include <dev/clock.h>
 #include <dev/arch/h8/H83003_REG.h>
 #include <dev/arch/h8/H83003.h>
+#include <dev/arch/h8/bitops.h>
 
 #include "arch/ticks.h"
 #include "arch/cpu.h"
@@ -33,6 +34,8 @@ MDC_ticks_init (void)
     DEV_clock_init (NULL);
 }
 
+extern void ACE_INTERRUPT_
+MDC_CMI_ISR (void) ACE_SECTION_ (".unref");
 
 extern void ACE_INTERRUPT_
 MDC_CMI_ISR (void)

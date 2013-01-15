@@ -3,7 +3,8 @@
  *
  */
 
-#include <ace/arch/cpu.h>
+#include <ace/stdio.h>
+#include <ace/cpu.h>
 #include <ace/err.h>
 #include <uso/sleep.h>
 #include <mfs/sysfs.h>
@@ -19,11 +20,18 @@ static struct DEV_clock
     unsigned long (*get_us) (void);
 } clock;
 
-static void info (MFS_entry_t * entry);
+static void
+info (MFS_descriptor_t * desc)
+{
+    ACE_printf ("f = %d HZ, ticks: %lu, usec: %d\n", USO_MSEC_2_TICKS (1000), clock.ticks,
+                DEV_get_usec ());
+}
 
-static struct MFS_descriptor_op clock_descriptor_op = {.open = NULL,
+static struct MFS_descriptor_op clock_descriptor_op = {
+	.open = NULL,
     .close = NULL,
-    .info = info
+    .info = info,
+    .control = NULL
 };
 
 
@@ -32,8 +40,8 @@ DEV_clock_init (unsigned long (*get_usec) (void))
 {
     clock.ticks = 0;
     clock.get_us = get_usec;
-    MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_TIMER), "clock",
-                     (MFS_entry_t *) & clock, MFS_DESC, &clock_descriptor_op);
+    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/clock"), "clock",
+                     MFS_SYS, &clock_descriptor_op, (MFS_represent_t *) &clock);
 }
 
 extern void
@@ -65,9 +73,3 @@ DEV_get_usec (void)
     return v;
 }
 
-static void
-info (MFS_entry_t * entry)
-{
-    ACE_printf ("f = %d HZ, ticks: %lu, usec: %d\n", USO_MSEC_2_TICKS (1000), clock.ticks,
-                DEV_get_usec ());
-}

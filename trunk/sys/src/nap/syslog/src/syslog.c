@@ -2,6 +2,7 @@
 #include <ace/stddef.h>
 #include <ace/stdlib.h>
 #include <ace/string.h>
+#include <uso/mutex.h>
 #include <net/udp_sock.h>
 
 #include "nap/syslog.h"
@@ -62,7 +63,7 @@ NAP_syslog_puts (enum NAP_syslog_level level, enum NAP_syslog_facility facility,
         NET_netbuf_trim_len (send_packet, data - NET_netbuf_index (send_packet));
         ACE_err_t err;
         err = NET_udp_send_netbuf (&sock, send_packet);
-        if (err != ACE_ERR_OK)
+        if (err != ACE_OK)
         {
             USO_log_printf (USO_LL_ERROR, "SYSLOG send error: %d\n", err);
             return -1;

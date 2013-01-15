@@ -6,7 +6,7 @@
 #include <ace/stdlib.h>
 
 #include "uso/buf_pool.h"
-#include "uso/arch/cpu.h"
+#include "uso/cpu.h"
 
 /*------------- Implementation ------------------------------------------*/
 

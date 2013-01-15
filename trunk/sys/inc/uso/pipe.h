@@ -14,7 +14,11 @@
 
 /** @defgroup pipe pipe.h
  *
- * Inter process communication with IO streams.
+ * This is a ring buffer.
+ * But i like it more to see it as an pipe.
+ * On one end you can write data (fill the pipe) as long there is place in the buffer (pipe).
+ * On the other side you can read data as long there is data in the buffer (pipe).
+ *
  * @{
  */
 

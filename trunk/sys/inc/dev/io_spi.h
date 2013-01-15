@@ -12,6 +12,7 @@
 #include <dev/spi.h>
 #include <dev/digout.h>
 #include <dev/digin.h>
+#include <uso/cpu.h>
 
 /** @addtogroup dev
  *
@@ -43,7 +44,8 @@ struct DEV_io_spi_bus
     DEV_digout_t *dout;
     DEV_digout_t *cs;
     DEV_digin_t *din;
-    ACE_bool_t startbit;
+    ACE_bool_t start;
+    USO_cpu_status_t ps;
 };
 
 /**

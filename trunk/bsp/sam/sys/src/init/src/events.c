@@ -47,7 +47,7 @@ SAM_event_create (enum SAM_event event)
 {
     USO_node_t *e = USO_buf_alloc (&SAM_event_pool);
     e->data = event;
-    if (FALSE == USO_slots_put_event (&SAM_event_slots, NULL, e, TRUE))
+    if (FALSE == USO_slots_put_event (&SAM_event_slots, NULL, e, FALSE))
         USO_buf_free (&SAM_event_pool, e);
 }
 

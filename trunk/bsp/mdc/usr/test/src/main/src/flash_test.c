@@ -4,7 +4,7 @@
  */
 
 #include <ace/stdio.h>
-#include <cli/commands.h>
+#include <cli/exec.h>
 
 #include <dev/chips/flash_29F040.h>
 #include <flash_test.h>

@@ -1,147 +1,100 @@
-#include "uso/thread.h"
-#include "uso/heap.h"
-#include "mfs/sysfs.h"
-#include "mfs/descriptor.h"
-#include "mfs/super.h"
-#include "mfs/directory.h"
-#include "mfs/stream.h"
+#include <uso/thread.h>
+#include <uso/heap.h>
+#include <cli/command.h>
+#include <mfs/sysfs.h>
+#include <mfs/descriptor.h>
+#include <mfs/super.h>
+#include <mfs/directory.h>
+#include <mfs/stream.h>
 
 static MFS_descriptor_t *root = NULL;
-static MFS_descriptor_t *sys = NULL;
-static MFS_descriptor_t *usr = NULL;
-static MFS_descriptor_t *uso = NULL;
-static MFS_descriptor_t *threads = NULL;
-static MFS_descriptor_t *heaps = NULL;
-static MFS_descriptor_t *dev = NULL;
-static MFS_descriptor_t *serial = NULL;
-static MFS_descriptor_t *timer = NULL;
-static MFS_descriptor_t *digio = NULL;
-static MFS_descriptor_t *mm = NULL;
-static MFS_descriptor_t *net = NULL;
-static MFS_descriptor_t *netif = NULL;
-static MFS_descriptor_t *cli = NULL;
-static MFS_descriptor_t *cmd = NULL;
 
-static struct MFS_super_op MFS_sysfs_super_op = {.mount = NULL,
+static void
+sysfs_dir_info(MFS_descriptor_t * dir)
+{
+	MFS_directory_print ((MFS_directory_t *)dir);
+}
+
+static void
+sysfs_stream_info(MFS_descriptor_t * stream)
+{
+	MFS_stream_print ((MFS_stream_t *)stream);
+}
+
+static struct MFS_super_op MFS_sysfs_super_op = {
+	.mount = NULL,
     .umount = NULL
 };
 
-static struct MFS_directory_op MFS_sysfs_directory_op = {.open = NULL,
-    .close = NULL,
+static struct MFS_descriptor_op MFS_sysfs_directory_desc_op = {
+	.open = NULL,
+	.close = NULL,
+	.info = sysfs_dir_info,
+	.control = NULL
+};
+
+static struct MFS_directory_op MFS_sysfs_directory_op = {
     .create = NULL,
     .remove = NULL,
     .rename = NULL
 };
 
-static struct MFS_stream_op MFS_sysfs_stream_op = {.open = NULL,
-    .close = NULL,
-    .info = NULL,
-    .read = MFS_empty_read,
-    .write = MFS_empty_write,
+static struct MFS_descriptor_op MFS_sysfs_stream_desc_op = {
+	.open = NULL,
+	.close = NULL,
+	.info = sysfs_stream_info,
+	.control = NULL
+};
+
+static struct MFS_stream_op MFS_sysfs_stream_op = {
+	.read = NULL,
+	.write = NULL,
     .seek = NULL,
     .flush = NULL
 };
 
-static struct MFS_vfs_op MFS_sysfs_vfs_op = {.super_op = &MFS_sysfs_super_op,
-    .dir_op = &MFS_sysfs_directory_op,
+static struct MFS_vfs_op MFS_sysfs_vfs_op = {
+	.super_op = &MFS_sysfs_super_op,
+	.dir_desc_op = &MFS_sysfs_directory_desc_op,
+	.dir_op = &MFS_sysfs_directory_op,
+    .stream_desc_op = &MFS_sysfs_stream_desc_op,
     .stream_op = &MFS_sysfs_stream_op
 };
 
 
-static void
-info (void)
-{
-    ACE_puts ("sysfs\n");
-}
 
 extern ACE_bool_t
 MFS_sysfs_init (void)
 {
-    root = MFS_mount ("root", &MFS_sysfs_vfs_op, info);
-    if (root == NULL)
-        return FALSE;
-    sys = MFS_create_dir (root, "sys");
-    usr = MFS_create_dir (root, "usr");
-    if (sys != NULL)
-    {
-        if ((uso = MFS_create_dir (sys, "uso")) != NULL)
-        {
-            threads = MFS_create_dir (uso, "threads");
-            heaps = MFS_create_dir (uso, "heaps");
-        }
-        if ((dev = MFS_create_dir (sys, "dev")) != NULL)
-        {
-            serial = MFS_create_dir (dev, "serial");
-            timer = MFS_create_dir (dev, "timer");
-            digio = MFS_create_dir (dev, "digio");
-            mm = MFS_create_dir (dev, "mm");
-        }
-        if ((net = MFS_create_dir (sys, "net")) != NULL)
-        {
-            netif = MFS_create_dir (net, "netif");
-        }
-        if ((cli = MFS_create_dir (sys, "cli")) != NULL)
-        {
-            cmd = MFS_create_dir (cli, "cmd");
-        }
-    }
-    return usr && netif && serial && timer && digio && mm && heaps && threads && cli && cmd;
+	MFS_descriptor_t *sys, *dir, *sub;
+    if ( (root = MFS_directory_create_root ("root", &MFS_sysfs_vfs_op)) == NULL) return FALSE;
+
+    if ( (sys = MFS_directory_create (root, "sys")) == NULL) return FALSE;
+
+    if ( (dir = MFS_directory_create (sys, "uso")) == NULL) return FALSE;
+    if ( (sub = MFS_directory_create (dir, "thread")) == NULL) return FALSE;
+    USO_thread_info_head(sub);
+    if ( (sub = MFS_directory_create (dir, "heap")) == NULL) return FALSE;
+    USO_heap_info_head(sub);
+
+    if ( (dir = MFS_directory_create (sys, "dev")) == NULL) return FALSE;
+    if ( (sub = MFS_directory_create (dir, "serial")) == NULL) return FALSE;
+    if ( (sub = MFS_directory_create (dir, "clock")) == NULL) return FALSE;
+    if ( MFS_directory_create (sub, "timer") == NULL) return FALSE;
+    if ( (sub = MFS_directory_create (dir, "digio")) == NULL) return FALSE;
+    if ( (sub = MFS_directory_create (dir, "mm")) == NULL) return FALSE;
+
+    if ( (dir = MFS_directory_create (sys, "net")) == NULL) return FALSE;
+    if ( (sub = MFS_directory_create (dir, "netif")) == NULL) return FALSE;
+
+    if ( (dir = MFS_directory_create (sys, "cli")) == NULL) return FALSE;
+    if ( (sub = MFS_directory_create (dir, "cmd")) == NULL) return FALSE;
+    if ( (sub = MFS_directory_create (dir, "exe")) == NULL) return FALSE;
+    return TRUE;
 }
 
 extern MFS_descriptor_t *
-MFS_sysfs_get_dir (enum MFS_sysfs_dir dir)
+MFS_get_root (void)
 {
-    MFS_descriptor_t *d = NULL;
-    switch (dir)
-    {
-    case MFS_SYSFS_DIR_ROOT:
-        d = root;
-        break;
-    case MFS_SYSFS_DIR_SYS:
-        d = sys;
-        break;
-    case MFS_SYSFS_DIR_USR:
-        d = usr;
-        break;
-    case MFS_SYSFS_DIR_USO:
-        d = uso;
-        break;
-    case MFS_SYSFS_DIR_THREADS:
-        d = threads;
-        break;
-    case MFS_SYSFS_DIR_HEAPS:
-        d = heaps;
-        break;
-    case MFS_SYSFS_DIR_DEV:
-        d = dev;
-        break;
-    case MFS_SYSFS_DIR_SERIAL:
-        d = serial;
-        break;
-    case MFS_SYSFS_DIR_TIMER:
-        d = timer;
-        break;
-    case MFS_SYSFS_DIR_DIGIO:
-        d = digio;
-        break;
-    case MFS_SYSFS_DIR_MM:
-        d = mm;
-        break;
-    case MFS_SYSFS_DIR_NET:
-        d = net;
-        break;
-    case MFS_SYSFS_DIR_NETIF:
-        d = netif;
-        break;
-    case MFS_SYSFS_DIR_CLI:
-        d = cli;
-        break;
-    case MFS_SYSFS_DIR_CMD:
-        d = cmd;
-        break;
-    default:
-        d = root;
-        break;
-    }
-    return d;
+	return root;
 }

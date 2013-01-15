@@ -16,6 +16,8 @@
  *                         main
  *------------------------------------------------------------------------------*/
 .section .reset
+.arm
+
 reset_handler:
 	ldr     pc, =_low_level_init
 
@@ -24,7 +26,6 @@ reset_handler:
  *- Init Stack Pointer to a valid memory area before calling lowlevel_init
  *------------------------------------------------------------------------------*/
 /*- Temporary stack in internal RAM for Low Level Init execution */
-.section .text
 
 _low_level_init:
 		ldr      r2, =_lp_cpu_init
@@ -84,27 +85,31 @@ _stack_init:
  *- Branch to the SAM_init()
  *------------------------------------------------------------------------------*/
 _branch_SAM_init:
-        ldr      r0, = SAM_init
-        mov      lr, pc
-        bx       r0
+        ldr     r0, = SAM_init
+        mov     lr, pc
+        bx      r0
+
 
 	.globl SAM_jump_app
     .align 4
-
 SAM_jump_app:
-		ldr      r2, =_lp_app_base
-        ldmia    r2, {r0}
-        mov      lr, pc
-        bx       r0
+/*  first do remap (remap command toggles the memmory mapping) */
+        ldr      r2, _lp_remap
+        mov      r0, #AT91C_MC_RCB
+        str      r0, [r2]
+/*  then jump to app base */
+        ldr      pc, =SAM_APP_BASE
+
 
 	.globl SAM_jump_boot
     .align 4
-
 SAM_jump_boot:
-		ldr      r2, =_lp_boot_base
-        ldmia    r2, {r0}
-        mov      lr, pc
-        bx       r0
+/*  first do remap (remap command toggles the memmory mapping) */
+        ldr      r2, _lp_remap
+        mov      r0, #AT91C_MC_RCB
+        str      r0, [r2]
+/*  then jump to boot base */
+        ldr      pc, =SAM_BOOT_BASE
 
 /*------------------------------------------------------------------------------
  *- Litteral pools
@@ -127,10 +132,4 @@ _lp_stack_mark_empty:
 		.word    SAM_TOTAL_STACK_SIZE          /* Stack size of stack section in ld! */
 		.word	 STACK_INIT_VALUE
 		.word    0x0
-
-_lp_app_base:
-        .word    0x110000
-
-_lp_boot_base:
-        .word    0x100000
 

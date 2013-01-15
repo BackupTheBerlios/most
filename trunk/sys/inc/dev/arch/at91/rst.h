@@ -100,5 +100,7 @@ extern unsigned char DEV_at91_RST_is_user_reset_detected (AT91PS_RSTC rstc);
  */
 extern unsigned char DEV_at91_RST_is_busy (AT91PS_RSTC rstc);
 
+unsigned int DEV_at91_RST_status (AT91PS_RSTC rstc);
+
 
 #endif // DEV_AT91_RST_H

@@ -19,7 +19,7 @@
  * @{
  */
 
-#define NAP_ERR         (ACE_NAP_ERR_NR - 1)         /**< Not specified NAP error.  */
+#define NAP_ERR         (NAP_ERR_NR - 1)         /**< Not specified NAP error.  */
 
 /** @}
  */

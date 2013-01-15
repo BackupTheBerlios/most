@@ -7,6 +7,10 @@
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
 #include <nap/syslog.h>
+#include <nap/ymodem.h>
+
+#include <init/net.h>
+#include <init/download.h>
 
 #include <tst/ram_test.h>
 #include <tst/ser_test.h>
@@ -21,12 +25,19 @@
 extern void
 MDC_main (void)
 {
-    USO_log_puts (USO_LL_INFO, MDC_APPLICATION " " ACE_MOST_VERSION "\n");
-    USO_log_puts (USO_LL_INFO, "--- 2 ---\n");
-    USO_log_printf (USO_LL_INFO, "Sizeof(int) = %d.\n", sizeof (int));
+    USO_log_puts (USO_LL_INFO, "App: "MDC_APPLICATION" -- 2 -- \n");
+    USO_log_printf (USO_LL_INFO, "Sizeof(char, short, int, long) = %d %d %d %d.\n", sizeof (char), sizeof (short), sizeof (int), sizeof (long));
+
+    NAP_ymodem_install();
+    MDC_net_start(NULL);
+
+    MFS_descriptor_t *putboot;
+    putboot = MFS_directory_create (MFS_get_root(), "putboot");
+
+    MDC_download_install (putboot, 1, 2);
 
     MFS_descriptor_t *test;
-    test = MFS_create_dir (MFS_sysfs_get_dir (MFS_SYSFS_DIR_ROOT), "test");
+    test = MFS_directory_create (MFS_get_root(), "test");
 
     TST_ram_test_install (test);
     TST_ser_test_install (test);

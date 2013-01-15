@@ -5,7 +5,7 @@
 
 #include "uso/port.h"
 #include "uso/list.h"
-#include "uso/arch/cpu.h"
+#include "uso/cpu.h"
 #include "uso/thread.h"
 #include "uso/scheduler.h"
 

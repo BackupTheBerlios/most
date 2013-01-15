@@ -9,7 +9,7 @@
 #include <uso/thread.h>
 #include <dev/digin.h>
 #include <dev/digout.h>
-#include <cli/commands.h>
+#include <cli/exec.h>
 
 #include <arch/digio.h>
 #include <digio_test.h>

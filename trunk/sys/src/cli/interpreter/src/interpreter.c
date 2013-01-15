@@ -6,17 +6,34 @@
 #include <ace/string.h>
 #include <ace/stdio.h>
 #include <ace/ctype.h>
+#include <ace/stdlib.h>
+#include <uso/scheduler.h>
 #include <uso/list.h>
 #include <uso/sleep.h>
+#include <uso/log.h>
 #include <mfs/descriptor.h>
+#include <mfs/directory.h>
 #include <mfs/sysfs.h>
+#include <cli/interpreter.h>
+#include <cli/command.h>
+#include <cli/exec.h>
+#include <cli/pipe.h>
 
-#include "cli/interpreter.h"
-#include "cli/commands.h"
-#include "cli/cmd_desc.h"
-#include "mfs/directory.h"
-#include "mfs/sysfs.h"
+char CLI_err_arg_missing[] = "arg missing.\n";
+char CLI_err_arg_notfound[] = "arg not found.\n";
+char CLI_err_type_inval[] = "type invalid.\n";
+char CLI_err_open_fail[] = "open fail.\n";
+char CLI_err_cmd_fail[] = "cmd fail.\n";
+char CLI_err_sys_fail[] = "sys fail.\n";
 
+#define CLI_PIPE_BUF_SIZE (512)
+
+enum CLI_state
+{
+	CLI_STATE_NORMAL,
+	CLI_STATE_SUB,
+	CLI_STATE_EXEC
+};
 
 #define CLI_RX_POLLING_TIME USO_MSEC_2_TICKS(250)
 
@@ -26,30 +43,26 @@ extern void
 CLI_setup (const char *name)
 {
     hostname = name;
-    CLI_commands_init ();
+    CLI_commands_install ();
+    CLI_executes_install ();
 }
 
 extern void
 CLI_interpreter_init (CLI_interpreter_t * cli)
 {
-    cli->desc = MFS_sysfs_get_dir (MFS_SYSFS_DIR_ROOT);
+    cli->desc = MFS_get_root();
+    cli->exe_desc = NULL;
+    cli->prio = USO_USER;
+    cli->sched = USO_ROUND_ROBIN;
 }
 
 static void
 promt (CLI_interpreter_t * cli)
 {
-    ACE_printf ("%s:%s> ", hostname, cli->desc->name);
+    ACE_printf ("%s:%s# ", hostname, cli->desc->name);
 }
 
-static CLI_command_t *
-find (char *name)
-{
-    MFS_descriptor_t *desc;
-    desc = MFS_lookup (MFS_sysfs_get_dir (MFS_SYSFS_DIR_CMD), name);
-    if (NULL != desc)
-        return (CLI_command_t *) desc->entry;
-    return NULL;
-}
+
 
 static int
 parse (CLI_interpreter_t * cli, char *buf)
@@ -129,16 +142,26 @@ inc_argv (CLI_interpreter_t * cli, int idx)
     return idx;
 }
 
+extern MFS_descriptor_t*
+CLI_get_dir(CLI_interpreter_t * cli)
+{
+	return cli->desc;
+}
+
 extern void
 CLI_interpreter_run (void *param)
 {
     CLI_interpreter_t *cli = (CLI_interpreter_t *) param;
     CLI_command_t *command;
     int idx;
-    int open = 0;
-    ACE_puts ("CLI:\n");
+    enum CLI_state state = CLI_STATE_NORMAL;
+    USO_thread_cli_init (USO_current(), cli);
+    USO_log_puts (USO_LL_INFO, "Cli is running.\n");
     for (;;)
     {
+    	cli->out_desc = NULL;
+    	cli->in_desc = NULL;
+    	state = CLI_STATE_NORMAL;
         for (int i = 0; i < CLI_TOKEN_COUNTER; ++i)
         {
             cli->token_buffer[i][0] = '\0';
@@ -154,59 +177,124 @@ CLI_interpreter_run (void *param)
         if (ACE_strlen (cli->argv[0]) <= 0)
             continue;
 
-        if (cli->argv[0][0] == '/')
+        if (cli->argv[0][0] == '#')
         {
-            cli->argv[0] = &cli->token_buffer[0][1];
-            if (CLI_cmd_open (cli) == FALSE)
-            {
-                ACE_puts ("open fail.\n");
-                continue;
+            if (ACE_strlen (cli->argv[0]) >= 3){
+            	ACE_putc (ACE_atoxc (&cli->argv[0][1]));
             }
+        	continue;
+        }
+
+        if (cli->argv[0][0] == '('){
+        	if (ACE_strlen (cli->argv[0]) >= 2){
+        		if ( cli->desc->type == MFS_DIRECTORY ){
+        			CLI_pipe_new (CLI_PIPE_BUF_SIZE, cli->desc, &cli->argv[0][1]);
+        		}
+        	} else {
+                ACE_puts (CLI_err_arg_missing);
+        	}
+        	continue;
+        }
+
+        if (cli->argv[0][0] == ')'){
+        	if (ACE_strlen (cli->argv[0]) >= 2){
+        		CLI_pipe_del(cli->desc, &cli->argv[0][1]);
+        	} else {
+                ACE_puts (CLI_err_arg_missing);
+        	}
+        	continue;
+        }
+
+        if (cli->argv[0][0] == '>'){
+        	if (ACE_strlen (cli->argv[0]) >= 2){
+                MFS_descriptor_t *desc = MFS_lookup (cli->desc, &cli->argv[0][1]);
+                if (desc != NULL && desc->type == MFS_STREAM)
+                {
+                    cli->out_desc = desc;
+                } else {
+                    ACE_puts (CLI_err_arg_notfound);
+                    continue;
+                }
+        	} else {
+                ACE_puts (CLI_err_arg_missing);
+            	continue;
+        	}
             idx = inc_argv (cli, idx);
         }
 
-        command = find (cli->argv[0]);
-        if (command == NULL)
+        if (cli->argv[0][0] == '<'){
+        	if (ACE_strlen (cli->argv[0]) >= 2){
+                MFS_descriptor_t *desc = MFS_lookup (cli->desc, &cli->argv[0][1]);
+                if (desc != NULL && desc->type == MFS_STREAM)
+                {
+                    cli->in_desc = desc;
+                } else {
+                    ACE_puts (CLI_err_arg_notfound);
+                    continue;
+                }
+        	} else {
+                ACE_puts (CLI_err_arg_missing);
+            	continue;
+        	}
+            idx = inc_argv (cli, idx);
+        }
+
+        if (cli->argv[0][0] == '.')
+        {
+            cli->argv[0] = &cli->argv[0][1];
+            if (CLI_cmd_open (cli) == FALSE)
+            {
+                ACE_puts (CLI_err_open_fail);
+                continue;
+            }
+            state = CLI_STATE_SUB;
+            idx = inc_argv (cli, idx);
+        }
+
+        command = CLI_find_cmd (cli->argv[0]);
+        if ( (command == NULL) && (state == CLI_STATE_NORMAL) )
         {
             if (cli->argv[0][0] == '&')
             {
-                cli->argv[0] = &cli->token_buffer[0][1];
-                command = find ("run");
+                cli->argv[0] = &cli->argv[0][1];
+                command = CLI_find_cmd ("run");
             }
             else
             {
-                command = find ("exec");
+                command = CLI_find_cmd ("exec");
             }
-            if (CLI_cmd_open (cli) == FALSE)
-            {
-                ACE_puts ("open fail.\n");
-                continue;
+            cli->exe_desc = CLI_find_exe(cli->argv[0]);
+            if (cli->exe_desc == NULL){
+            	if (CLI_cmd_open (cli) == FALSE)
+            	{
+            		ACE_puts (CLI_err_open_fail);
+            		continue;
+            	}
             }
-            open = 1;
+            state = CLI_STATE_EXEC;
         }
-        else
-        {
-            open = 0;
-        }
+
         idx = inc_argv (cli, idx);
         if (command != NULL)
         {
             if (command->f (cli) == FALSE)
             {
-                ACE_puts ("cmd fail.\n");
+                ACE_puts (CLI_err_cmd_fail);
             }
         }
         else
         {
-            ACE_puts ("sys fail.\n");
+            ACE_puts (CLI_err_sys_fail);
         }
-        if (open)
+        if (state == CLI_STATE_EXEC)
         {
-            CLI_cmd_close (cli);
+        	if (cli->exe_desc == NULL)
+        		CLI_cmd_close (cli);
+        	else
+        		cli->exe_desc = NULL;
         }
-        if (idx >= 2)
+        else if (state == CLI_STATE_SUB)
         {
-            cli->argc = 0;
             CLI_cmd_close (cli);
         }
 

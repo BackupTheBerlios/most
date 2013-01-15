@@ -184,9 +184,9 @@ VariableName
 =================		       	
 
 4.1.) The header files act as interface, so the doxygen comments are just used in the header files and
-      only to public data and functions which must be knowen by the user.
-      PRI_ (private) structures are not documented.
-      PRO_ (protected) structures should be documented. This is for developers, here users normally are developers
+      only to public data and functions which must be known by the user.
+      (private) structures are not documented.
+      (public and protected(used inside a library)) structures should be documented. This is for developers, here users normally are developers
             with the need to change maybe something in the library and the documentation shall also document the library
             design.
 
@@ -257,7 +257,7 @@ USO_enqueue(&list, (USO_node_t*)&name);
  
  #include "file"
     This variant is used for header files of your own program. It searches for a file named file
-    first in the directory containing the current file, then in the quote directories and then the
+    first in the directory containing the current file, and then the
     same directories used for <file>.
 
 
@@ -273,3 +273,6 @@ delete()      call clean() and delete Object
 
 install()     install Object in SYSFS
 remove()      remove Object from SYSFS
+
+create()      create Object and install it to SYSFS
+destroy()     remove Object from SYSFS and delete it

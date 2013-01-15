@@ -59,7 +59,7 @@ MDC_sci_init_0 (void)
 {
     DEV_serial_settings_init (&ser0_settings);
     ser0_settings.baud = DEV_SER_BAUD_9600;
-    DEV_serial_init (&ser0, &ser0_settings, open_0, close_0, start_0, TRUE, "0");
+    DEV_serial_init (&ser0, &ser0_settings, open_0, close_0, start_0, TRUE, "ser0");
 }
 
 void
@@ -67,9 +67,12 @@ MDC_sci_init_1 (void)
 {
     DEV_serial_settings_init (&ser1_settings);
     ser1_settings.baud = DEV_SER_BAUD_9600;
-    DEV_serial_init (&ser1, &ser1_settings, open_1, close_1, start_1, TRUE, "1");
+    DEV_serial_init (&ser1, &ser1_settings, open_1, close_1, start_1, TRUE, "ser1");
 }
 
+
+extern void ACE_INTERRUPT_
+MDC_TXE0_ISR (void) ACE_SECTION_ (".unref");
 
 extern void ACE_INTERRUPT_
 MDC_TXE0_ISR (void)
@@ -78,10 +81,16 @@ MDC_TXE0_ISR (void)
 }
 
 extern void ACE_INTERRUPT_
+MDC_TXI0_ISR (void) ACE_SECTION_ (".unref");
+
+extern void ACE_INTERRUPT_
 MDC_TXI0_ISR (void)
 {
     DEV_h8_sci_txi (0, &ser0);
 }
+
+extern void ACE_INTERRUPT_
+MDC_RXI0_ISR (void) ACE_SECTION_ (".unref");
 
 extern void ACE_INTERRUPT_
 MDC_RXI0_ISR (void)
@@ -90,10 +99,17 @@ MDC_RXI0_ISR (void)
 }
 
 extern void ACE_INTERRUPT_
+MDC_ERI0_ISR (void) ACE_SECTION_ (".unref");
+
+extern void ACE_INTERRUPT_
 MDC_ERI0_ISR (void)
 {
     DEV_h8_sci_eri (0, &ser0);
 }
+
+
+extern void ACE_INTERRUPT_
+MDC_TXE1_ISR (void) ACE_SECTION_ (".unref");
 
 extern void ACE_INTERRUPT_
 MDC_TXE1_ISR (void)
@@ -102,16 +118,25 @@ MDC_TXE1_ISR (void)
 }
 
 extern void ACE_INTERRUPT_
+MDC_TXI1_ISR (void) ACE_SECTION_ (".unref");
+
+extern void ACE_INTERRUPT_
 MDC_TXI1_ISR (void)
 {
     DEV_h8_sci_txi (1, &ser1);
 }
 
 extern void ACE_INTERRUPT_
+MDC_RXI1_ISR (void) ACE_SECTION_ (".unref");
+
+extern void ACE_INTERRUPT_
 MDC_RXI1_ISR (void)
 {
     DEV_h8_sci_rxi (1, &ser1);
 }
+
+extern void ACE_INTERRUPT_
+MDC_ERI1_ISR (void) ACE_SECTION_ (".unref");
 
 extern void ACE_INTERRUPT_
 MDC_ERI1_ISR (void)

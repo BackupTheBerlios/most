@@ -6,10 +6,11 @@
 #ifndef ACE_STDLIB_H
 #define ACE_STDLIB_H
 
-#include "ace/arch/cpu.h"
+#include "ace/cpu.h"
 #include "ace/stddef.h"
 
 #include <uso/heap.h>
+#include <uso/mutex.h>
 
 /** @addtogroup ace
  *
@@ -138,6 +139,11 @@ extern void ACE_abort (char *msg, char *file, int line);
 #define ACE_PANIC(msg) ACE_panic(msg, __FILE__, __LINE__)
 
 extern void ACE_panic (char *msg, char *file, int line);
+
+extern USO_mutex_t ACE_lock;
+
+extern void ACE_seed(ACE_u32_t seed);
+extern ACE_u32_t ACE_rand(void);
 
 
 /*------------------------------------------------------------------------*/

@@ -19,7 +19,7 @@
  * @{
  */
 
-#define CLI_ERR         (ACE_CLI_ERR_NR - 1)         /**< Not specified USO error.  */
+#define CLI_ERR         (CLI_ERR_NR - 1)         /**< Not specified CLI error.  */
 
 /** @}
  */

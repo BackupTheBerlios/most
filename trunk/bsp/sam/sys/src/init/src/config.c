@@ -5,7 +5,7 @@
 
 #include <ace/string.h>
 #include <ace/stdlib.h>
-#include <cli/commands.h>
+#include <cli/exec.h>
 #include <mfs/directory.h>
 #include <dev/mmc.h>
 
@@ -101,8 +101,8 @@ config_print (void)
     config_print_ip_addr ("gateway", ACE_ntohl (SAM_config.gateway.addr));
     config_print_ip_addr ("server ", ACE_ntohl (SAM_config.server.addr));
     ACE_printf ("filename: %s\n", SAM_config.filename);
-    ACE_printf ("flags: %04X\n", SAM_config.flags);
-    ACE_printf ("state: %u\n", SAM_config.state);
+    ACE_printf ("flags: %04X (0x0001 = BOOTP, 0x0002 = TFTP, 0x0004 = SYSLOG)\n", SAM_config.flags);
+    ACE_printf ("state: %u (1 = default, 2 = saved, 3 = altered)\n", SAM_config.state);
 }
 
 extern void
@@ -246,9 +246,11 @@ conf_exec (char *param)
             SAM_config_ip ();
             break;
         default:
-            ACE_puts ("r read, w write, s show, i conf ip.\n");
+            ACE_puts ("inval param, type <conf> for help.\n");
             break;
         }
+    } else {
+        ACE_puts ("r (read), w (write), s (show), i (conf ip-stack).\n");
     }
 }
 
@@ -286,17 +288,19 @@ set_exec (char *param)
         case 'f':
             config_set_filename (param);
             break;
-        case 'z':
+        case 'y':
             config_set_flags (param);
             break;
-        case 'y':
+        case 'z':
             config_clear_flags (param);
             break;
         default:
-            ACE_puts ("d default, h host, e eth_addr, i ip_addr, n netmask,\n"
-                      "g gateway, s server, f file z set flags y clear flags.\n");
+            ACE_puts ("invalid param, type <set> for help.\n");
             break;
         }
+    } else {
+        ACE_puts ("d (default), h<hostname>, e<eth_addr>, i<ip_addr>, n<netmask>,\n"
+                  "g<gateway>, s<server>, f<file>, y<set flags>, z<clear flags>.\n");
     }
 }
 

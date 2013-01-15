@@ -19,7 +19,7 @@
  * @{
  */
 
-#define TST_ERR         (ACE_TST_ERR_NR - 1)         /**< Not specified TST error.  */
+#define TST_ERR         (TST_ERR_NR - 1)         /**< Not specified TST error.  */
 
 /** @}
  */

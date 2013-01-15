@@ -20,7 +20,7 @@
  * @{
  */
 
-#define DPY_ERR         (ACE_DPY_ERR_NR - 1)         /**< Not specified DPY error.  */
+#define DPY_ERR         (DPY_ERR_NR - 1)         /**< Not specified DPY error.  */
 
 /** @}
  */

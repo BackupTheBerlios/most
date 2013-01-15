@@ -85,7 +85,7 @@ NET_icmp_input (NET_netbuf_t * p, NET_netif_t * inp)
         NET_netbuf_index_inc (p, -hlen);
         NET_ip_output_if (p, &(iphdr->src), NET_IP_HDRINCL,
                           NET_IPH_TTL (iphdr), NET_IP_PROTO_ICMP, inp);
-        return ACE_ERR_OK;
+        return ACE_OK;
 
     default:
         DEBUGF (NET_ICMP_DEBUG, ("Icmp: type not supported.\n"));

@@ -10,12 +10,12 @@ help :
 	@$(call makegoal, help)
 	@$(ECHO) "----------build/bsp/Makefile : BOARD = $(MOST_BOARD) -------------------------------"
 	@$(ECHO) "help     : print this help message, -> Makefile"
-	@$(ECHO) "apps     : -> Makefile(app)"
+	@$(ECHO) "app      : -> Makefile(app)"
 	@$(ECHO) "clean    : -> Makefile"
 	@$(ECHO) "mrproper : -> Makefile"
 	@$(ECHO) "------------------------------------------------------------------------------------"
 
-apps :
+app  :
 	@$(call makegoal, app)
 
 clean :

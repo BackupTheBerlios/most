@@ -79,9 +79,9 @@ SAM_wdt_disable (void)
 }
 
 extern void
-SAM_wdt_setup (unsigned short wdv)
+SAM_wdt_setup (unsigned long wdv)
 {
-    AT91C_BASE_WDTC->WDTC_WDMR = (wdv << 16) | AT91C_WDTC_WDRSTEN | wdv;
+    AT91C_BASE_WDTC->WDTC_WDMR =  (AT91C_WDTC_WDDBGHLT | (0xFFF << 16) | AT91C_WDTC_WDRSTEN | wdv);
 }
 
 #define SAM_WDT_KEY ( 0xA5 << 24 )

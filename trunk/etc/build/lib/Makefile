@@ -26,8 +26,8 @@ obj :
 
 clean : 
 	@$(call makegoal, $@)
-	-$(REMOVE) ../lib/$(MOST_TARGET)/lib_$(LIB_NAME).a
+	-$(REMOVE) ../lib/$(MOST_BUILD)/$(MOST_TARGET_TYPE)/lib_$(LIB_NAME).a
 
 mrproper:
 	@$(call makegoal, $@)
-	-$(REMOVE) ../lib/$(MOST_TARGET)/lib_$(LIB_NAME).a
+	-$(REMOVE) ../lib/$(MOST_BUILD)/$(MOST_TARGET_TYPE)/lib_$(LIB_NAME).a

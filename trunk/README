@@ -1,9 +1,11 @@
 This README file describes the MOST release.
 Comments, questions, and bug reports are always welcome.
+Project Website: http://most.berlios.de
 
-1.)GOAL
-Designing a operating system with a minimum of functionality suitable for 
-embedded system using microcontrollers with a minimum of 64K RAM and 64K FLASH.
+1.)GOAL (just a Hobby ?)
+Designing a operating system with a (minimum of functionality?) suitable for 
+embedded system using microcontrollers with a minimum of 64K RAM and 64K FLASH,
+but better more.
 
 Statistic: 
 ca:	100 000 Lines, 1000 files

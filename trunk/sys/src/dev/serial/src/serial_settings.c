@@ -15,7 +15,8 @@ DEV_serial_settings_init (struct DEV_serial_settings *settings)
     settings->data = DEV_SER_DATA_8;
     settings->stop = DEV_SER_STOP_1;
     settings->parity = DEV_SER_PARITY_NONE;
-    settings->timeout = DEV_SER_TIMEOUT;
+    settings->buffer_fill_time = DEV_SER_BUFFER_FILL_TIME_MSEC;
+    settings->buffer_empty_time = DEV_SER_BUFFER_EMPTY_TIME_MSEC;
 }
 
 extern void
@@ -91,5 +92,6 @@ DEV_serial_settings_print (const struct DEV_serial_settings *settings)
                 "\t\tData\t%s\n"
                 "\t\tStop\t%s\n"
                 "\t\tParity\t%s\n"
-                "\t\tTimeout\t%d\n", baud, data, stop, parity, settings->timeout);
+                "\t\tBuffer fill time\t%d ms\n"
+    			"\t\tBuffer empty time\t%d ms\n", baud, data, stop, parity, settings->buffer_fill_time, settings->buffer_empty_time);
 }

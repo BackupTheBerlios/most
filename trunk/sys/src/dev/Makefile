@@ -2,13 +2,13 @@
 
 LIB_NAME := dev
 LIB_TYPE := sys
-OBJ_NAMES := chips/o/$(MOST_TARGET)/*.o\
-			 arch/$(MOST_ARCH)/o/$(MOST_TARGET)/*.o\
-			 digio/o/$(MOST_TARGET)/*.o\
-			 serial/o/$(MOST_TARGET)/*.o\
-			 control/o/$(MOST_TARGET)/*.o\
-			 timer/o/$(MOST_TARGET)/*.o\
-			 mm/o/$(MOST_TARGET)/*.o
+OBJ_NAMES := chips/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+			 arch/$(MOST_ARCH)/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+			 digio/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+			 serial/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+			 control/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+			 timer/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+			 mm/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o
 
 makegoal = make $(1) -C chips;\
 		   make $(1) -C arch/$(MOST_ARCH);\

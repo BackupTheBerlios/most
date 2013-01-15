@@ -6,10 +6,9 @@
 #ifndef MFS_DIRECTORY_H
 #define MFS_DIRECTORY_H
 
-#include "uso/list.h"
-#include "mfs/vfs.h"
-#include "mfs/descriptor.h"
-#include "mfs/stream.h"
+#include <uso/list.h>
+#include <mfs/vfs.h>
+#include <mfs/descriptor.h>
 
 /** @addtogroup mfs
  * @{
@@ -29,10 +28,10 @@ extern struct MFS_descriptor_op MFS_dir_descriptor_op;
 /* Private: Directory structure. */
 struct MFS_directory
 {
-    struct MFS_vfs_op *vfs_op;  /* Virtual file system operations. */
+	MFS_descriptor_t desc;
+	struct MFS_vfs_op *vfs_op;  /* Virtual file system operations. */
     USO_list_t descriptors;     /* List of descriptors. */
     struct MFS_directory_op *operations;        /* Directory operation interface. */
-    void (*info) (void);        /* Info function. */
 };
 
 /**
@@ -52,50 +51,7 @@ extern MFS_descriptor_t *MFS_next_entry (MFS_descriptor_t * dir_desc, MFS_descri
 extern MFS_descriptor_t *MFS_lookup (MFS_descriptor_t * dir_desc, char *name);
 
 
-/**
- * Create a directory.
- *
- * @param dir_desc : Directory descriptor in which a new directory descriptor is created.
- * @param name : Name of the new directory.
- * @return Created directory descriptor.
- */
-extern MFS_descriptor_t *MFS_create_dir (MFS_descriptor_t * dir_desc, char *name);
-
-/**
- * Create a file.
- * A file is a special kind of stream io.
- * The stream operations for a file are used.
- * @param dir_desc : Directory descriptor in which a new file descriptor is created.
- * @param name : Name of the new file.
- * @return Created file descriptor.
- */
-extern MFS_descriptor_t *MFS_create_file (MFS_descriptor_t * dir_desc, char *name);
-
-/**
- * Create an IO stream.
- * The IO stream has to implement the stream operation interface.
- * @param dir_desc : Directory descriptor in which a new io descriptor is created.
- * @param name : Name for the io.
- * @param io_op : IO operations for the stream.
- * @param represent : Stream representation.
- * @return Created io descriptor.
- */
-extern MFS_descriptor_t *MFS_create_io (MFS_descriptor_t * dir_desc, char *name,
-                                        struct MFS_stream_op *io_op,
-                                        MFS_stream_represent_t * represent);
-
-/**
- * Create an descriptor.
- * @param dir_desc : Directory descriptor in which a new io descriptor is created.
- * @param name : Name for the descriptor.
- * @param entry : Implementation of the descriptor.
- * @param type : Kind of the implementation.
- * @param desc_op : Descriptor operations implementation.
- * @return Created descriptor.
- */
-extern MFS_descriptor_t *MFS_create_desc (MFS_descriptor_t * dir_desc, char *name,
-                                          MFS_entry_t * entry, enum MFS_entry_type type,
-                                          struct MFS_descriptor_op *desc_op);
+extern void MFS_create_desc (MFS_descriptor_t * dir_desc, MFS_descriptor_t * desc);
 
 
 /**
@@ -136,6 +92,19 @@ extern MFS_descriptor_t *MFS_rename (MFS_descriptor_t * dir_desc, char *old_name
  * @param vfs_op : Pointer to virtual file system operations.
  */
 extern void MFS_directory_init (MFS_directory_t * dir, struct MFS_vfs_op *vfs_op);
+
+/**
+ * Create a directory.
+ *
+ * @param dir_desc : Directory descriptor in which a new directory descriptor is created.
+ * @param name : Name of the new directory.
+ * @return Created directory descriptor.
+ */
+extern MFS_descriptor_t *MFS_directory_create (MFS_descriptor_t * dir_desc, char *name);
+
+extern MFS_descriptor_t *MFS_directory_create_root (char *name, struct MFS_vfs_op *vfs_op);
+
+extern void MFS_directory_print (MFS_directory_t * dir);
 
 /** @}
  */

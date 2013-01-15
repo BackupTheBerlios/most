@@ -24,7 +24,7 @@
 /**
  * Start all services.
  */
-extern void SAM_start (ACE_FILE * stdio);
+extern void SAM_start (MFS_descriptor_t * stdio);
 
 /** @}
  */

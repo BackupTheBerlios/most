@@ -4,15 +4,15 @@
  */
 
 #include <ace/stddef.h>
-
-#include "uso/log.h"
-#include "uso/mutex.h"
+#include <uso/log.h>
+#include <uso/mutex.h>
+#include <mfs/stream.h>
 
 #define LOG_BUFFER_SIZE 0x100
 
 /*------------- Implementation ------------------------------------------*/
 
-static ACE_FILE *out = NULL;
+static MFS_descriptor_t *out = NULL;
 static char buf[LOG_BUFFER_SIZE];
 static enum USO_log_level log_level = USO_LL_PANIC;
 static USO_mutex_t ll_sync;
@@ -78,7 +78,7 @@ USO_log_show (void)
 }
 
 extern void
-USO_log_init (ACE_FILE * ios, enum USO_log_level level)
+USO_log_init (MFS_descriptor_t * ios, enum USO_log_level level)
 {
     out = ios;
     USO_mutex_init (&ll_sync);

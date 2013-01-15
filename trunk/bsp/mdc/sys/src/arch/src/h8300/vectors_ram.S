@@ -6,20 +6,20 @@
 	.file   "vectors_ram.S"
 		
 .MACRO  EXCEPTION n, label
-    .section   .ramvect
+    .section   .vectors
     jmp        @\label
 .ENDM
 
 .MACRO  STD_EXCEPTION n, label
-    .section   .ramvect
-    jmp        std_vector
+    .section   .vectors
+    jmp        std_exception
 .ENDM
 
-    .section   .text
-    .global	   std_vector
+    .section   .unref
+    .global	   std_exception
 
-std_vector:
-	rte
+std_exception:
+	bra      std_exception
 	
 	EXCEPTION       0  , reset
 	STD_EXCEPTION   1  , Reserved01

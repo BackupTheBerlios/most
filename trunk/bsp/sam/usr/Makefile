@@ -15,14 +15,14 @@ LIB_NAMES_SYS := -l_cli\
 LIB_NAMES_USR := -l_dpy\
                  -l_tst
 
-LDFLAGS_OPT := #-Ttext $(SAM_TEXT) -Tdata $(SAM_DATA)
+LDFLAGS_OPT :=
 
 LIB_PATH_OPT := 
 LIB_NAMES_OPT :=
 
-OBJ_NAMES := 	../../sys/src/arch/o/$(MOST_TARGET)/*.o\
-		../../sys/src/init/o/$(MOST_TARGET)/*.o\
-		src/main/o/$(MOST_TARGET)/*.o	
+OBJ_NAMES := 	../../sys/src/arch/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+		../../sys/src/init/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+		src/main/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o	
 
 makegoal_src = make $(1) -C ../../sys/src;\
 		make $(1) -C src;

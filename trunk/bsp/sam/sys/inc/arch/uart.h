@@ -6,6 +6,8 @@
 #ifndef SAM_SCI_H
 #define SAM_SCI_H
 
+#include <ace/stddef.h>
+
 /** @addtogroup arch
  *
  * @{
@@ -31,12 +33,12 @@ void SAM_uart_init_1 (void);
 /**
  * Uart 0 interrupt.
  */
-extern void SAM_uart_interrupt_0 (void);
+extern void SAM_uart_interrupt_0 (void) ACE_SECTION_ (".unref");
 
 /**
  * Uart 1 interrupt.
  */
-extern void SAM_uart_interrupt_1 (void);
+extern void SAM_uart_interrupt_1 (void) ACE_SECTION_ (".unref");
 
 
 /** @}

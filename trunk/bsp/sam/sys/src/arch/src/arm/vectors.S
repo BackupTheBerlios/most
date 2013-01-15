@@ -12,7 +12,7 @@ reset_vector:
 undef_vector:
         ldr      pc, =SAM_undefined_instruction    /* Undefined Instruction */
 swi_vector:
-        b        swi_vector                        /* Software Interrupt */
+        ldr      pc, =SAM_software_interrupt      /* Software Interrupt */
 pabt_vector:
         ldr      pc, =SAM_prefetch_abort           /* Prefetch Abort */
 dabt_vector:
@@ -22,6 +22,8 @@ rsvd_vector:
 irq_vector:
         b        irq_handler                       /* IRQ : read the AIC */
 fiq_vector:
+        ldr      pc, =SAM_default_fiq_handler          /* Fast interrupt request */
+
  /*------------------------------------------------------------------------------
  *- Function             : fiq_handler
  *- Treatments           : FIQ Interrupt Handler.
@@ -35,6 +37,9 @@ fiq_handler:
  *- Treatments           : IRQ Controller Interrupt Handler.
  *- Called Functions     : AIC_IVR[interrupt]
  *------------------------------------------------------------------------------*/
+
+.section .vectors
+.arm
 
 irq_handler:
 /*- Save r0 , r1, lr and SPSR in IRQ stack */

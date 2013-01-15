@@ -74,11 +74,44 @@
 
 static DEV_spi_dev_t *spi;
 
-static void info (MFS_entry_t * entry);
+static void
+info (MFS_descriptor_t * desc)
+{
+    ACE_err_t err;
+    struct DEV_mmc_CID cid;
+    err = DEV_mmc_read_CID (&cid);
+    if (err == ACE_OK)
+    {
+        ACE_printf ("MID=0x%02x   Name=%s   SNr=%lu\n", cid.mid, cid.name, cid.serial_nr);
+    }
+    else
+    {
+        ACE_printf ("Read CID failed, err: %d\n", err);
+    }
+    struct DEV_mmc_CSD csd;
+    err = DEV_mmc_read_CSD (&csd);
+    if (err == ACE_OK)
+    {
+        ACE_printf ("\tRead: block len = %d B, partial = %s\n",
+                    csd.read_block_len, csd.read_block_partial == TRUE ? "true" : "false");
+        ACE_printf ("\tWrite: block len = %d B , partial = %s\n",
+                    csd.write_block_len, csd.write_block_partial == TRUE ? "true" : "false");
+        ACE_printf ("\tNumber of blocks = %d\n", csd.block_nr);
+        ACE_printf ("\tCard capacity = %lu MB\n",
+                    (csd.block_nr * csd.read_block_len) / (((unsigned long)1024) * 1024));
 
-static struct MFS_descriptor_op mmc_descriptor_op = {.open = NULL,
+    }
+    else
+    {
+        ACE_printf ("Read CSD failed, err: %d\n", err);
+    }
+}
+
+static struct MFS_descriptor_op mmc_descriptor_op = {
+	.open = NULL,
     .close = NULL,
-    .info = info
+    .info = info,
+    .control = NULL
 };
 
 
@@ -136,7 +169,7 @@ mmc_check_busy (void)
         switch (response)
         {
         case MMC_DATA_ACEPPTED:
-            err = ACE_ERR_OK;
+            err = ACE_OK;
             break;
         case MMC_DATA_CRC_ERROR:
             return (DEV_ERR_MMC_CRC);
@@ -146,7 +179,7 @@ mmc_check_busy (void)
             err = DEV_ERR_MMC_OTHER;
             break;
         }
-        if (err == ACE_ERR_OK)
+        if (err == ACE_OK)
             break;
     }
 
@@ -183,7 +216,7 @@ mmc_set_block_length (const unsigned long blocklength)
     mmc_send_cmd (MMC_CMD_SET_BLOCKLEN, blocklength, MMC_CRC_NOT_USED);
 
     if (mmc_get_response () == MMC_R1_RESPONSE_OK)
-        err = ACE_ERR_OK;
+        err = ACE_OK;
 
     /* Send 8 Clock pulses of delay. */
     spi_send_byte (MMC_RESPONSE);
@@ -201,7 +234,7 @@ mmc_read_register (const char cmd, const unsigned int length, unsigned char buff
 
     DEV_spi_acquire (spi);
 
-    if (mmc_set_block_length (length) == ACE_ERR_OK)
+    if (mmc_set_block_length (length) == ACE_OK)
     {
         mmc_send_cmd (cmd, 0, MMC_CRC_NOT_USED);
 
@@ -215,7 +248,7 @@ mmc_read_register (const char cmd, const unsigned int length, unsigned char buff
                 /* get CRC bytes (not really needed by us, but required by MMC) */
                 spi_send_byte (MMC_RESPONSE);
                 spi_send_byte (MMC_RESPONSE);
-                err = ACE_ERR_OK;
+                err = ACE_OK;
             }
             else
             {
@@ -253,7 +286,7 @@ DEV_mmc_spi_init (DEV_spi_dev_t * dev)
                                  0,     /* delay_b_ct */
                                  DEV_SPI_DEV_CS_ACTIVE))
     {
-        err = ACE_ERR_OK;
+        err = ACE_OK;
     }
     return err;
 }
@@ -290,7 +323,7 @@ DEV_mmc_init (void)
             response = mmc_get_response ();
         }
         spi_send_byte (MMC_RESPONSE);
-        err = ACE_ERR_OK;
+        err = ACE_OK;
     }
 
     DEV_spi_release (spi);
@@ -301,8 +334,8 @@ DEV_mmc_init (void)
 extern void
 DEV_mmc_install (void)
 {
-    MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_MM), "mmc",
-                     (MFS_entry_t *) NULL, MFS_DESC, &mmc_descriptor_op);
+    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/mm"), "mmc",
+                     MFS_SYS, &mmc_descriptor_op, NULL);
 }
 
 /* The card will respond with a standard response token followed by a data
@@ -316,7 +349,7 @@ DEV_mmc_read_block (const unsigned long address, const unsigned long count, char
     DEV_spi_acquire (spi);
 
     /* Set the block length to read */
-    if (mmc_set_block_length (count) == ACE_ERR_OK)
+    if (mmc_set_block_length (count) == ACE_OK)
     {
         mmc_send_cmd (MMC_CMD_READ_SINGLE_BLOCK, address, MMC_CRC_NOT_USED);
 
@@ -336,7 +369,7 @@ DEV_mmc_read_block (const unsigned long address, const unsigned long count, char
                 /* get CRC bytes (not really needed by us, but required by MMC) */
                 spi_send_byte (MMC_RESPONSE);
                 spi_send_byte (MMC_RESPONSE);
-                err = ACE_ERR_OK;
+                err = ACE_OK;
             }
             else
             {
@@ -369,7 +402,7 @@ DEV_mmc_write_block (const unsigned long address, char buffer[])
     DEV_spi_acquire (spi);
 
     /* Set the block length to read */
-    if (mmc_set_block_length (DEV_MMC_BLOCK_SIZE) == ACE_ERR_OK)
+    if (mmc_set_block_length (DEV_MMC_BLOCK_SIZE) == ACE_OK)
     {
         mmc_send_cmd (MMC_CMD_WRITE_SINGLE_BLOCK, address, MMC_CRC_NOT_USED);
 
@@ -415,7 +448,7 @@ DEV_mmc_read_CID (struct DEV_mmc_CID *cid)
     ACE_err_t err;
     unsigned char buffer[MMC_CID_LENGTH];
     err = mmc_read_register (MMC_CMD_SEND_CID, sizeof (buffer), buffer);
-    if (err == ACE_ERR_OK)
+    if (err == ACE_OK)
     {
         cid->mid = buffer[0];
         memcpy (cid->name, buffer + 3, 6);
@@ -431,7 +464,7 @@ DEV_mmc_read_CSD (struct DEV_mmc_CSD *csd)
     ACE_err_t err;
     unsigned char buffer[MMC_CSD_LENGTH];
     err = mmc_read_register (MMC_CMD_SEND_CSD, sizeof (buffer), buffer);
-    if (err == ACE_ERR_OK)
+    if (err == ACE_OK)
     {
         csd->read_block_len = 1 << (buffer[5] & 0x0f);
         csd->read_block_partial = (buffer[6] & 0x80) ? TRUE : FALSE;
@@ -445,35 +478,3 @@ DEV_mmc_read_CSD (struct DEV_mmc_CSD *csd)
     return err;
 }
 
-static void
-info (MFS_entry_t * entry)
-{
-    ACE_err_t err;
-    struct DEV_mmc_CID cid;
-    err = DEV_mmc_read_CID (&cid);
-    if (err == ACE_ERR_OK)
-    {
-        ACE_printf ("MID=0x%02x   Name=%s   SNr=%lu\n", cid.mid, cid.name, cid.serial_nr);
-    }
-    else
-    {
-        ACE_printf ("Read CID failed, err: %d\n", err);
-    }
-    struct DEV_mmc_CSD csd;
-    err = DEV_mmc_read_CSD (&csd);
-    if (err == ACE_ERR_OK)
-    {
-        ACE_printf ("\tRead: block len = %d B, partial = %s\n",
-                    csd.read_block_len, csd.read_block_partial == TRUE ? "true" : "false");
-        ACE_printf ("\tWrite: block len = %d B , partial = %s\n",
-                    csd.write_block_len, csd.write_block_partial == TRUE ? "true" : "false");
-        ACE_printf ("\tNumber of blocks = %d\n", csd.block_nr);
-        ACE_printf ("\tCard capacity = %ul MB\n",
-                    (csd.block_nr * csd.read_block_len) / (((unsigned long)1024) * 1024));
-
-    }
-    else
-    {
-        ACE_printf ("Read CSD failed, err: %d\n", err);
-    }
-}

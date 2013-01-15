@@ -2,9 +2,11 @@
 -include $(MOST_ROOT)/etc/build/Commands
 
 ifeq ($(MOST_CPU),h8300)
+ifeq ($(MOST_CPU_TYPE),h8300h)
 TARGET_CCFLAGS := -mh
 TARGET_DEFINES := -DMOST_CPU=1
 TARGET_LDFLAGS := -m h8300h
+endif
 else
 ifeq ($(MOST_CPU),i386)
 TARGET_CCFLAGS :=
@@ -12,7 +14,7 @@ TARGET_DEFINES := -DMOST_CPU=2
 TARGET_LDFLAGS := 
 else
 ifeq ($(MOST_CPU),arm)
-TARGET_CCFLAGS := -mcpu=arm7tdmi 
+TARGET_CCFLAGS := -mcpu=$(MOST_CPU_TYPE) 
 TARGET_DEFINES := -DMOST_CPU=3 
 TARGET_LDFLAGS :=
 else
@@ -50,6 +52,28 @@ ifeq ($(MOST_BUILD_LOG),off)
 BUILD_LOG :=@
 endif
 
+ifeq ($(MOST_BUILD),debug)
+MOST_BUILD_FLAGS:=$(MOST_BUILD_DEBUG_FLAGS)
+REMOVE_CODE_CCFLAGS:=
+REMOVE_CODE_LDFLAGS:=
+else
+ifeq ($(MOST_BUILD),run)
+MOST_BUILD_FLAGS:=$(MOST_BUILD_RUN_FLAGS)
+ifeq ($(MOST_REMOVE_CODE),on)
+REMOVE_CODE_CCFLAGS:=-ffunction-sections
+REMOVE_CODE_LDFLAGS:=--gc-sections
+else
+REMOVE_CODE_CCFLAGS:=
+REMOVE_CODE_LDFLAGS:=
+endif
+else
+$(error No build variant defined! (run, debug))
+endif
+endif
+
+
+PROG_NAME := $(MOST_BUILD)/$(MOST_APP)
+
 EXECPREF:=$(MOST_CROSS)/bin/$(MOST_TARGET)-
 
 CC			:= $(EXECPREF)gcc
@@ -62,35 +86,35 @@ OBJDUMP		:= $(EXECPREF)objdump
 
 INC_PATH 	:= -I$(MOST_ROOT)/sys/inc -I$(MOST_ROOT)/usr/inc $(INC_PATH_OPT)
 
-CCFLAGS		:= $(MOST_BUILD) $(TARGET_CCFLAGS) $(CCFLAGS_OPT) 
+CCFLAGS		:= $(MOST_BUILD_FLAGS) $(TARGET_CCFLAGS) $(REMOVE_CODE_CCFLAGS) $(CCFLAGS_OPT) 
 CCFLAGS		+= -fno-builtin -std=iso9899:199x -Wall -pedantic -Werror
 
 DEFINES		:= $(TARGET_DEFINES) $(DEFINES_OPT)
 
 LIB_PATH	:= $(LIB_PATH_OPT)
-LIB_PATH	+= -L$(MOST_ROOT)/usr/lib/$(MOST_TARGET)
-LIB_PATH	+= -L$(MOST_ROOT)/sys/lib/$(MOST_TARGET)
+LIB_PATH	+= -L$(MOST_ROOT)/usr/lib/$(MOST_BUILD)/$(MOST_TARGET_TYPE)
+LIB_PATH	+= -L$(MOST_ROOT)/sys/lib/$(MOST_BUILD)/$(MOST_TARGET_TYPE)
 LIB_PATH	+= -L$(MOST_CROSS)/lib/$(MOST_LIB_GCC)
 
-LDFLAGS		:= --sort-common --warn-common $(TARGET_LDFLAGS) -T$(PROG_NAME).ld $(LDFLAGS_OPT)
+LDFLAGS		:= --sort-common --warn-common $(TARGET_LDFLAGS) $(REMOVE_CODE_LDFLAGS) -T$(MOST_APP).ld $(LDFLAGS_OPT)
 LDFLAGS		+= --cref -Map $(PROG_NAME).map
 
 # Use absolute path names for files so that gdb can find the files
-WORKING_DIR:=$(shell pwd)/
+WORKING_DIR:=$(shell pwd)
 
 LOCAL_SOURCES		:= $(wildcard src/*.c)
-LOCAL_OBJECTS		:= $(subst src,o/$(MOST_TARGET),$(subst .c,.o,$(LOCAL_SOURCES)))
-LOCAL_ASMFILES		:= $(subst src,s/$(MOST_CPU),$(subst .c,.s,$(LOCAL_SOURCES)))
-LOCAL_SUBMAKES		:= $(subst src,d/$(MOST_TARGET),$(subst .c,.d,$(LOCAL_SOURCES)))
+LOCAL_OBJECTS		:= $(subst src,$(MOST_BUILD)/o/$(MOST_TARGET_TYPE),$(subst .c,.o,$(LOCAL_SOURCES)))
+LOCAL_ASMFILES		:= $(subst src,$(MOST_BUILD)/s/$(MOST_CPU_TYPE),$(subst .c,.s,$(LOCAL_SOURCES)))
+LOCAL_SUBMAKES		:= $(subst src,$(MOST_BUILD)/d/$(MOST_TARGET_TYPE),$(subst .c,.d,$(LOCAL_SOURCES)))
 LOCAL_ASM_SOURCES	:= $(wildcard src/$(MOST_CPU)/*.S)
-LOCAL_ASM_OBJECTS	:= $(subst src/$(MOST_CPU),o/$(MOST_TARGET),$(subst .S,.o,$(LOCAL_ASM_SOURCES)))
+LOCAL_ASM_OBJECTS	:= $(subst src/$(MOST_CPU),$(MOST_BUILD)/o/$(MOST_TARGET_TYPE),$(subst .S,.o,$(LOCAL_ASM_SOURCES)))
 
-SOURCES:=$(foreach ENTRY, $(LOCAL_SOURCES), $(WORKING_DIR)$(ENTRY))
-OBJECTS:=$(foreach ENTRY, $(LOCAL_OBJECTS), $(WORKING_DIR)$(ENTRY))
-ASMFILES:=$(foreach ENTRY, $(LOCAL_ASMFILES), $(WORKING_DIR)$(ENTRY))
-SUBMAKES:=$(foreach ENTRY, $(LOCAL_SUBMAKES), $(WORKING_DIR)$(ENTRY))
-ASM_SOURCES:=$(foreach ENTRY, $(LOCAL_ASM_SOURCES), $(WORKING_DIR)$(ENTRY))
-ASM_OBJECTS:=$(foreach ENTRY, $(LOCAL_ASM_OBJECTS), $(WORKING_DIR)$(ENTRY))
+SOURCES:=$(foreach ENTRY, $(LOCAL_SOURCES), $(WORKING_DIR)/$(ENTRY))
+OBJECTS:=$(foreach ENTRY, $(LOCAL_OBJECTS), $(WORKING_DIR)/$(ENTRY))
+ASMFILES:=$(foreach ENTRY, $(LOCAL_ASMFILES), $(WORKING_DIR)/$(ENTRY))
+SUBMAKES:=$(foreach ENTRY, $(LOCAL_SUBMAKES), $(WORKING_DIR)/$(ENTRY))
+ASM_SOURCES:=$(foreach ENTRY, $(LOCAL_ASM_SOURCES), $(WORKING_DIR)/$(ENTRY))
+ASM_OBJECTS:=$(foreach ENTRY, $(LOCAL_ASM_OBJECTS), $(WORKING_DIR)/$(ENTRY))
 
 .PHONY : default help clean asm obj lib prog bin srec hex info
 
@@ -117,15 +141,15 @@ clean:
 $(BUILD_LOG_FILE):
 	@$(DATE) >$(BUILD_LOG_FILE)
 
-asm : $(BUILD_LOG_FILE) s/$(MOST_CPU) d/$(MOST_TARGET) $(ASMFILES)
+asm : $(BUILD_LOG_FILE) $(MOST_BUILD)/s/$(MOST_CPU_TYPE) $(MOST_BUILD)/d/$(MOST_TARGET_TYPE) $(ASMFILES)
 	$(SHOW_BUILD_LOG)
 
-obj : $(BUILD_LOG_FILE) o/$(MOST_TARGET) d/$(MOST_TARGET) $(OBJECTS) $(ASM_OBJECTS)
+obj : $(BUILD_LOG_FILE) $(MOST_BUILD)/o/$(MOST_TARGET_TYPE) $(MOST_BUILD)/d/$(MOST_TARGET_TYPE) $(OBJECTS) $(ASM_OBJECTS)
 	$(SHOW_BUILD_LOG)
 
-lib : $(BUILD_LOG_FILE) ../../lib/$(MOST_TARGET)
+lib : $(BUILD_LOG_FILE) ../../lib/$(MOST_BUILD)/$(MOST_TARGET_TYPE)
 	@$(ECHO) "archive $(LIB_NAME)"
-	$(BUILD_LOG)$(AR) cr ../../lib/$(MOST_TARGET)/lib_$(LIB_NAME).a $(OBJ_NAMES) $(BUILD_ERR)
+	$(BUILD_LOG)$(AR) cr ../../lib/$(MOST_BUILD)/$(MOST_TARGET_TYPE)/lib_$(LIB_NAME).a $(OBJ_NAMES) $(BUILD_ERR)
 	$(SHOW_BUILD_LOG)
 
 prog : $(BUILD_LOG_FILE)
@@ -158,40 +182,48 @@ info : $(BUILD_LOG_FILE)
 	$(SHOW_BUILD_LOG)
 
 
-$(WORKING_DIR)o/$(MOST_TARGET)/%.o: $(WORKING_DIR)src/%.c
+$(WORKING_DIR)/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/%.o: $(WORKING_DIR)/src/%.c
 	@$(ECHO) "compile $<"
-	$(BUILD_LOG)$(CC) -c $(CCFLAGS) $(INC_PATH) $(DEFINES) -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.c,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
+	$(BUILD_LOG)$(CC) -c $(CCFLAGS) $(INC_PATH) $(DEFINES) -MP -MMD -MF "$(MOST_BUILD)/d/$(MOST_TARGET_TYPE)/$(patsubst %.c,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
 
-$(WORKING_DIR)o/$(MOST_TARGET)/%.o: $(WORKING_DIR)src/$(MOST_CPU)/%.S
+$(WORKING_DIR)/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/%.o: $(WORKING_DIR)/src/$(MOST_CPU)/%.S
 	@$(ECHO) "compile $<"
-	$(BUILD_LOG)$(CC) -c $(CCFLAGS) $(INC_PATH) $(DEFINES) -D__ASSEMBLY__ -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.S,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
+	$(BUILD_LOG)$(CC) -c $(CCFLAGS) $(INC_PATH) $(DEFINES) -D__ASSEMBLY__ -MP -MMD -MF "$(MOST_BUILD)/d/$(MOST_TARGET_TYPE)/$(patsubst %.S,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
 
-$(WORKING_DIR)s/$(MOST_CPU)/%.s : $(WORKING_DIR)src/%.c
+$(WORKING_DIR)/$(MOST_BUILD)/s/$(MOST_CPU_TYPE)/%.s : $(WORKING_DIR)/src/%.c
 	@$(ECHO) "compile $<"
-	$(BUILD_LOG)$(CC) -S $(CCFLAGS) $(INC_PATH) $(DEFINES) -MP -MMD -MF "d/$(MOST_TARGET)/$(patsubst %.c,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
+	$(BUILD_LOG)$(CC) -S $(CCFLAGS) $(INC_PATH) $(DEFINES) -MP -MMD -MF "$(MOST_BUILD)/d/$(MOST_TARGET_TYPE)/$(patsubst %.c,%.d,$(<F))" $< -o $@ $(BUILD_ERR)
 
-s/$(MOST_CPU) : s
-	@$(MAKEDIR) s/$(MOST_CPU)
 
-s :
-	@$(MAKEDIR) s
+$(MOST_BUILD)/s/$(MOST_CPU_TYPE) : $(MOST_BUILD)/s
+	@$(MAKEDIR) $(MOST_BUILD)/s/$(MOST_CPU_TYPE)
 
-o/$(MOST_TARGET) : o
-	@$(MAKEDIR) o/$(MOST_TARGET)
+$(MOST_BUILD)/s : $(MOST_BUILD)
+	@$(MAKEDIR) $(MOST_BUILD)/s
 
-o :
-	@$(MAKEDIR) o
+$(MOST_BUILD)/o/$(MOST_TARGET_TYPE) : $(MOST_BUILD)/o
+	@$(MAKEDIR) $(MOST_BUILD)/o/$(MOST_TARGET_TYPE)
 
-d/$(MOST_TARGET) : d
-	@$(MAKEDIR) d/$(MOST_TARGET)
+$(MOST_BUILD)/o : $(MOST_BUILD)
+	@$(MAKEDIR) $(MOST_BUILD)/o
 
-d :
-	@$(MAKEDIR) d
+$(MOST_BUILD)/d/$(MOST_TARGET_TYPE) : $(MOST_BUILD)/d
+	@$(MAKEDIR) $(MOST_BUILD)/d/$(MOST_TARGET_TYPE)
 
-../../lib/$(MOST_TARGET) : ../../lib
-	@$(MAKEDIR) ../../lib/$(MOST_TARGET)
+$(MOST_BUILD)/d : $(MOST_BUILD)
+	@$(MAKEDIR) $(MOST_BUILD)/d
 
-../../lib :
+$(MOST_BUILD) :
+	@$(MAKEDIR) $(MOST_BUILD)
+	
+
+../../lib/$(MOST_BUILD)/$(MOST_TARGET_TYPE) : ../../lib/$(MOST_BUILD)
+	@$(MAKEDIR) ../../lib/$(MOST_BUILD)/$(MOST_TARGET_TYPE)
+
+../../lib/$(MOST_BUILD) : ../../lib  
+	@$(MAKEDIR) ../../lib/$(MOST_BUILD)
+
+../../lib :  
 	@$(MAKEDIR) ../../lib
 
 -include $(SUBMAKES)	

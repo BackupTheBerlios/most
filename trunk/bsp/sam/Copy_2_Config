@@ -10,8 +10,12 @@
 MOST_GCC:=4.4.3
 
 ## [arm, h8300]
-## target cpu type of your toolchain
+## target cpu model of your toolchain
 MOST_CPU:=arm
+
+## [arm7tdmi, h8300h]
+## target cpu type of your toolchain
+MOST_CPU_TYPE:=arm7tdmi
 
 ## [elf, none-eabi, hms, coff]
 ## target system type of your toolchain
@@ -38,34 +42,32 @@ MOST_BIT:=32
 ## microcontroller architecture
 MOST_ARCH:=at91
 
-## [at91sam7x, h8300h]
-## microcontroller type
-MOST_ARCH_TYPE:=at91sam7x
+## [at91sam7; h8300h]
+## microcontroller model
+MOST_ARCH_MODEL:=at91sam7
 
 ## [at91sam7x256, h83003]
-## microcontroller model
-MOST_ARCH_MODEL:=at91sam7x256
+## microcontroller type
+MOST_ARCH_TYPE:=at91sam7x256
 
-## ------------ Target File -------------
-## ======================================
-
-## [bin, hex, srec]
-## produced binary file type
-MOST_FILE:=bin
-
-## ------------ Build Version -----------
-## ======================================
+## ------------ Target Build Flags -----------
+## ==========================================
 
 ## [-Os]
 ## -Os: build Release Version optimized for size
-MOST_BUILD_RUN = -Os
+MOST_BUILD_RUN_FLAGS:= -Os
 
 ## [-O0 -g]
 ## -O0: build Debug Version with no optimization
 ## -g: compile with debug information
-MOST_BUILD_DEBUG:=--O0 -g
+MOST_BUILD_DEBUG_FLAGS:= -O0 -g
 
-## [$(MOST_BUILD_RUN), $(MOST_BUILD_DEBUG) ]
-MOST_BUILD:=$(MOST_BUILD_RUN)
-#MOST_BUILD:=$(MOST_BUILD_DEBUG)
+## ------------- Target Application ---------
+## ==========================================
 
+## [boot, frame, test]
+#MOST_APP:=boot
+#MOST_APP:=frame
+MOST_APP:=test
+
+-include $(MOST_ROOT)/bsp/$(MOST_BOARD)/usr/$(MOST_APP)/Config

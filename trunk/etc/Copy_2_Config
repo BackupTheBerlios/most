@@ -38,6 +38,8 @@ MOST_BOARD:=sam
 
 -include $(MOST_ROOT)/bsp/$(MOST_BOARD)/Config
 
+MOST_TARGET_TYPE:=$(MOST_TARGET)-$(MOST_CPU_TYPE)
+
 
 ## Cross Tools Configuration
 ## =========================

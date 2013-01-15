@@ -3,14 +3,13 @@
  *
  */
 
-#include <ace/stddef.h>
 #include <ace/stdio.h>
 #include <dev/serial.h>
 #include <dev/serial_settings.h>
 #include <dev/arch/at91/uart.h>
 #include <dev/arch/at91/AT91SAM7X256.h>
 
-#include "arch/uart.h"
+#include <arch/uart.h>
 
 static DEV_serial_t ser0;
 static struct DEV_serial_settings ser0_settings;

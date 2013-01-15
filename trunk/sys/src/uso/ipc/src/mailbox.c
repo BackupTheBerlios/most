@@ -6,7 +6,7 @@
 #include "uso/mailbox.h"
 #include "uso/list.h"
 #include "uso/semaphore.h"
-#include "uso/arch/cpu.h"
+#include "uso/cpu.h"
 #include "uso/heap.h"
 
 /*------------- Implementation ------------------------------------------*/

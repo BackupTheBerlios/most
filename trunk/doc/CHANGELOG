@@ -1,12 +1,42 @@
-VERSION = V-0.1.0-d-3 : commit
+VERSION = V-0.1.0-d-4 : in development
+=====================
+
+DATE = 12.01.2013
+AUTOR = maik
+
+STATE = SAM : compilable and running
+        MDC : compilable and running
+        open, close directory function may be not convenient to walk through the directory tree,
+        maybe introduce a walk function?
+        
+ADD =   ymodem receive,
+        different build directories for run and debug binaries,
+        add Config file for each application,
+        <build all> just builds the configured application,
+        generate function sections and remove unused sections (configurable),
+        cleanup mfs/vfs and add block device interface,
+        cli/add pipe and stdio redirection,
+        add serial receive timeout,
+        serial, tty  IO control function and CTRL-D, 
+        axfr receive and send files,
+        SAM watchdog enabled,
+        SAM user reset ? acctually polled in run_led,
+        just one download mechanism for updating bootloader and application:
+        download is now a block device, it can be written by tftp_g and ym_r,
+        ls command and MFS_resolve(path),
+
+FIX=    SAM for start_Appliction, start_Bootloader -> do remap because remap toggles the memmory mapping,
+        io_spi CS 
+
+
+VERSION = V-0.1.0-d-3 : labeled (V-0-1-0-d-3)
 =====================
 
 DATE = 23.06.2012
 AUTOR = maik
------------------
 
-STATE = SAM : compileable and running
-        MDC : compileable and running (serial eeprom does not work)
+STATE = SAM : compilable and running
+        MDC : compilable and running (serial eeprom does not work)
         
 ADD = ACE DEV: time, rtc,
 	  BSP: Audio out(beep),
@@ -30,6 +60,5 @@ VERSION = V-0.1.0-d-2 : labeled (V-0-1-0-d-2)
 
 DATE = 01.12.2010
 AUTOR = maik
------------------
 
 STATE = SAM, MDC compileable and running, Ubuntu OpenOCD 0.2.0 in development

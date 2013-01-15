@@ -6,6 +6,8 @@
 #include <ace/stdlib.h>
 #include <ace/stdio.h>
 
+USO_mutex_t ACE_lock;
+
 static USO_heap_t *global_heap = NULL;
 static void (*abort) (char *msg, char *file, int line) = NULL;
 static void (*panic) (char *msg, char *file, int line) = NULL;
@@ -18,6 +20,7 @@ ACE_stdlib_init (USO_heap_t * heap,
     global_heap = heap;
     abort = abort_handler;
     panic = panic_handler;
+    USO_mutex_init(&ACE_lock);
 }
 
 extern void *

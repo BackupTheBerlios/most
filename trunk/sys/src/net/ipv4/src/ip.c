@@ -75,7 +75,7 @@ static MFS_descriptor_t *net_interfaces;
 extern void
 NET_ip_init (void)
 {
-    net_interfaces = MFS_sysfs_get_dir (MFS_SYSFS_DIR_NETIF);
+    net_interfaces = MFS_resolve(MFS_get_root(), "sys/net/netif");
 }
 
 static NET_netif_t *
@@ -85,7 +85,7 @@ find_route (NET_ip_addr_t * dest)
     NET_netif_t *netif = NULL;
     while ((desc = MFS_next_entry (net_interfaces, desc)) != NULL)
     {
-        netif = (NET_netif_t *) desc->entry;
+        netif = (NET_netif_t *) desc->represent;
         if (NET_ip_addr_maskcmp (dest, &(netif->ip_addr), &(netif->netmask)))
         {
             return netif;
@@ -123,7 +123,7 @@ find_netif (struct NET_ip_hdr *iphdr)
     NET_netif_t *netif = NULL;
     while ((desc = MFS_next_entry (net_interfaces, desc)) != NULL)
     {
-        netif = (NET_netif_t *) desc->entry;
+        netif = (NET_netif_t *) desc->represent;
         if (NET_ip_addr_isany (&(netif->ip_addr)) ||
             NET_ip_addr_cmp (&(iphdr->dest), &(netif->ip_addr)) ||
             (NET_ip_addr_isbroadcast (&(iphdr->dest), &(netif->netmask)) &&

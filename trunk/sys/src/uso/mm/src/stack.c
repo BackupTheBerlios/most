@@ -4,7 +4,7 @@
  */
 
 #include "uso/stack.h"
-#include "uso/arch/cpu.h"
+#include "uso/cpu.h"
 
 #ifdef USO_STACK
 

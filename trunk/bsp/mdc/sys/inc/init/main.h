@@ -6,6 +6,8 @@
 #ifndef MDC_MAIN_H
 #define MDC_MAIN_H
 
+#include <ace/version.h>
+
 /** @addtogroup init
  *
  * @{

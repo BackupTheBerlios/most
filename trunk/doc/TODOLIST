@@ -1,16 +1,18 @@
-* x-modem protcol and SREC for serial download
-* put for tftp to upload files
 ! TCP
-* global memory management in DEV for serial eeprom ...
-? global interrupt handling in DEV (register interrupt handler, wait for interrupt ?)
-? global exception handling and post mortem dump
 ! filesystems (mmc, ram, flash)
+! CAN, CAN open
+! USB Device
+
+* put for tftp to upload files
+* send for ymodem
 * synchronization CLI, MFS, NET
 * documentation
-! CAN, CAN open
 * Driver cleanup and improvements, spi, adc, pwm 
 * USR -> Grafik GFX library and display improvements
-! USB 
 * cleanup emacs drivers
-* twi driver
-* porting to other platforms (lego nxt, lpc2294 olimex board, ...)
+* i2c(twi) driver
+* porting to other platforms (lpc2294 olimex board, ...)
+* DMA
+
+? global interrupt handling in DEV(USO?) (register interrupt handler, wait for interrupt ?)
+? global exception handling and post mortem dump ? in bsp ?

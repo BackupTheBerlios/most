@@ -1,10 +1,15 @@
+#include <ace/stdio.h>
 #include <ace/stddef.h>
 #include <ace/stdlib.h>
 #include <ace/string.h>
+#include <uso/scheduler.h>
 #include <net/udp_sock.h>
-
-#include "nap/tftp.h"
-#include "nap/debug.h"
+#include <cli/exec.h>
+#include <mfs/directory.h>
+#include <mfs/sysfs.h>
+#include <mfs/block.h>
+#include <nap/tftp.h>
+#include <nap/debug.h>
 
 /********************************************************************************/
 /* Declarations & Defines *******************************************************/
@@ -38,6 +43,7 @@ static struct
     char *error_message;
     int eof;
     int sendcount;
+    MFS_descriptor_t *out;
 } state;
 
 static const char *mode[] = { "netascii", "octet", "mail", };
@@ -69,23 +75,24 @@ static struct tftp_packet *packets = NULL;
 static NET_netbuf_t *send_packet = NULL;
 static NET_netbuf_t *receive_packet = NULL;
 static NET_ip_addr_t *server_addr;
+static NET_ip_addr_t *client_addr;
 static ACE_u16_t server_port;
+static ACE_u16_t client_port = 3279;
 
 static const char *file_name;
-static ACE_bool_t (*callback) (char *data, ACE_size_t length);
+static ACE_bool_t (*callback) (char *data, ACE_size_t length, MFS_descriptor_t *out);
 
 static NET_udp_socket_t sock;
 
 extern int
-NAP_tftp_open (NET_ip_addr_t * client_addr, NET_ip_addr_t * _server_addr)
+NAP_tftp_open (void)
 {
     packets = ACE_malloc (sizeof (struct tftp_packet));
     if (packets != NULL)
     {
-        server_addr = _server_addr;
         USO_buf_pool_init (&pool, packets, 1, sizeof (struct tftp_packet));
         NET_udp_socket_init (&sock);
-        NET_udp_bind (&sock, client_addr, 3279);
+        NET_udp_bind (&sock, client_addr, client_port);
         NET_udp_connect (&sock, server_addr, NAP_TFTP_SERVER_PORT);
         NET_udp_socket_open (&sock);
         NET_udp_recv_timeout (&sock, USO_MSEC_2_TICKS (4000));
@@ -100,7 +107,7 @@ NAP_tftp_open (NET_ip_addr_t * client_addr, NET_ip_addr_t * _server_addr)
 }
 
 extern int
-NAP_tftp_get (const char *filename, ACE_bool_t (*f) (char *, ACE_size_t))
+NAP_tftp_get (const char *filename, ACE_bool_t (*f) (char *, ACE_size_t,MFS_descriptor_t*), MFS_descriptor_t *out)
 {
     file_name = filename;
     callback = f;
@@ -108,6 +115,7 @@ NAP_tftp_get (const char *filename, ACE_bool_t (*f) (char *, ACE_size_t))
     state.block_nr = 0;
     state.eof = 0;
     state.sendcount = 0;
+    state.out = out;
     while (state.action != NULL)
     {
         state.action ();
@@ -179,7 +187,7 @@ send (void)
     DEBUGF (NAP_TFTP_DEBUG, ("TFTP send\n"));
     ACE_err_t err;
     err = NET_udp_send_netbuf (&sock, send_packet);
-    if (err == ACE_ERR_OK)
+    if (err == ACE_OK)
     {
         if (state.eof == 0)
         {
@@ -269,7 +277,7 @@ check_reply (void)
                     {
                         state.eof = 1;
                     }
-                    if (callback (data, length) == TRUE)
+                    if (callback (data, length, state.out) == TRUE)
                     {
                         state.action = init_ack;
                     }
@@ -303,4 +311,69 @@ check_reply (void)
         state.action = init_read_request;
     }
     NET_netbuf_free (receive_packet);
+}
+
+static CLI_exec_t tftp_get;
+
+static ACE_bool_t
+tftp_write_rx_data (char *data, ACE_size_t len, MFS_descriptor_t *out)
+{
+	ACE_size_t written = ACE_fwrite (out, data, len);
+	if (written != len) return FALSE;
+	return TRUE;
+}
+
+static ACE_bool_t
+tftp_put_rx_data (char *data, ACE_size_t len, MFS_descriptor_t *out)
+{
+	if (MFS_put ((MFS_block_t *)out, data, len, 0) == ACE_OK){
+		return TRUE;
+	}
+	return FALSE;
+}
+
+static void
+tftp_get_exec (char *file)
+{
+    if (file)
+    {
+        if (NAP_tftp_open () >= 0)
+        {
+        	MFS_descriptor_t *out = USO_current()->out;
+        	int err = 0;
+        	if (out->type == MFS_STREAM) {
+        		err = NAP_tftp_get (file, tftp_write_rx_data, out);
+        	}
+
+        	if (out->type == MFS_BLOCK) {
+        		err = NAP_tftp_get (file, tftp_put_rx_data, out);
+        	}
+
+        	if (err >= 0)
+            {
+                USO_log_puts (USO_LL_INFO, "Tftp get done\n");
+            }
+            else
+            {
+            	USO_log_puts (USO_LL_ERROR, "Tftp get failed\n");
+            }
+            NAP_tftp_close ();
+        }
+        else
+        {
+        	USO_log_puts (USO_LL_ERROR, "Tftp open failed\n");
+        }
+    }
+    else
+    {
+    	USO_log_puts (USO_LL_ERROR, "Give file name as param\n");
+    }
+}
+
+extern void
+NAP_tftp_install (NET_ip_addr_t * client_address, NET_ip_addr_t * server_address)
+{
+    server_addr = server_address;
+    client_addr = client_address;
+    CLI_exec_init (MFS_resolve(MFS_get_root(), "sys/cli/exe"), &tftp_get, "tftp_g", "TFTP get", tftp_get_exec);
 }

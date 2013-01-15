@@ -1,6 +1,8 @@
 #ifndef SAM_EXCEPTIONS_H
 #define SAM_EXCEPTIONS_H
 
+#include <ace/stddef.h>
+
 /** @addtogroup arch
  *
  * @{
@@ -16,33 +18,43 @@
 /**
  *
  */
-extern void SAM_undefined_instruction (void);
+extern void SAM_default_reset_handler (void) ACE_SECTION_ (".unref");
 
 /**
  *
  */
-extern void SAM_prefetch_abort (void);
+extern void SAM_undefined_instruction (void) ACE_SECTION_ (".unref");
 
 /**
  *
  */
-extern void SAM_data_abort (void);
-
-
-/**
- *
- */
-extern void SAM_default_spurious_handler (void);
+extern void SAM_software_interrupt (void) ACE_SECTION_ (".unref");
 
 /**
  *
  */
-extern void SAM_default_irq_handler (void);
+extern void SAM_prefetch_abort (void) ACE_SECTION_ (".unref");
 
 /**
  *
  */
-extern void SAM_default_fiq_handler (void);
+extern void SAM_data_abort (void) ACE_SECTION_ (".unref");
+
+/**
+ *
+ */
+extern void SAM_default_irq_handler (void) ACE_SECTION_ (".unref");
+
+/**
+ *
+ */
+extern void SAM_default_fiq_handler (void) ACE_SECTION_ (".unref");
+
+/**
+ *
+ */
+extern void SAM_default_spurious_handler (void) ACE_SECTION_ (".unref");
+
 
 
 /**

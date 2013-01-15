@@ -9,8 +9,9 @@
 #include <ace/stddef.h>
 
 #include "uso/list.h"
-#include "uso/arch/cpu.h"
+#include "uso/cpu.h"
 #include "ace/stdio.h"
+#include "cli/interpreter.h"
 #include "mfs/vfs.h"
 
 /** @addtogroup uso
@@ -118,7 +119,9 @@ enum USO_thread_scheduling
 enum USO_thread_flags
 {
     USO_FLAG_DETACH,      /**< Remove thread descriptor and free its resources. */
-    USO_FLAG_FREE_ARG     /**< Release the memory for the thread argument. */
+    USO_FLAG_FREE_ARG,    /**< Release the memory for the thread argument. */
+    USO_FLAG_CLOSE_IN,    /**< close input stream when thread terminates. */
+    USO_FLAG_CLOSE_OUT    /**< close output stream when thread terminates. */
 };
 
 /*
@@ -140,8 +143,8 @@ struct USO_thread
     ACE_bool_t stop;
     ACE_u32_t flags;
     ACE_u32_t signals;
-    ACE_FILE *in;
-    ACE_FILE *out;
+    MFS_descriptor_t *in;
+    MFS_descriptor_t *out;
     USO_stack_t *stack;
     int stack_size;
     USO_stack_t *stack_bot;
@@ -149,6 +152,7 @@ struct USO_thread
     USO_stack_t *stack_max;
     void *message;
     unsigned long ticks;
+    CLI_interpreter_t *cli;
     MFS_descriptor_t *desc;
 };
 
@@ -216,9 +220,19 @@ extern void USO_thread_terminate (USO_thread_t * thread);
  *
  * @param thread : Pointer to thread.
  * @param in : Input stream.
+ */
+extern void USO_thread_in_init (USO_thread_t * thread, MFS_descriptor_t * in);
+
+/**
+ * Initialize, overwrite IO Streams for thread.
+ *
+ * IO Streams inherited by the parent thread.
+ * IO Streams from the Idle thread are NULL.
+ *
+ * @param thread : Pointer to thread.
  * @param out : Output stream.
  */
-extern void USO_thread_ios_init (USO_thread_t * thread, ACE_FILE * in, ACE_FILE * out);
+extern void USO_thread_out_init (USO_thread_t * thread, MFS_descriptor_t * out);
 
 
 /**
@@ -228,6 +242,14 @@ extern void USO_thread_ios_init (USO_thread_t * thread, ACE_FILE * in, ACE_FILE 
  * @param arg : argument.
  */
 extern void USO_thread_arg_init (USO_thread_t * thread, void *arg);
+
+/**
+ * Set cli.
+ *
+ * @param thread : thread.
+ * @param cli : cli.
+ */
+extern void USO_thread_cli_init (USO_thread_t * thread, CLI_interpreter_t *cli);
 
 /**
  * Set thread flags.
@@ -291,7 +313,7 @@ extern char *USO_thread_name (void);
 /**
  * Print thread info header.
  */
-extern void USO_thread_info_head (void);
+extern void USO_thread_info_head (MFS_descriptor_t *dir);
 
 /*------------------------------------------------------------------------*/
 

@@ -8,21 +8,29 @@
 #include <mfs/directory.h>
 #include <arch/digio.h>
 #include <init/bsp_commands.h>
+#include <nap/syslog.h>
+#include <nap/ymodem.h>
+
+#include <init/net.h>
+#include <init/download.h>
+
 #include <boot.h>
-#include <download_app.h>
-#include <download_boot.h>
 
 extern void
 MDC_main (void)
 {
-    USO_log_puts (USO_LL_INFO, MDC_APPLICATION " " ACE_MOST_VERSION "\n");
+    USO_log_puts (USO_LL_INFO, "App: "MDC_APPLICATION" -- 2 -- \n");
     if (DEV_digin_isset (&MDC_switch) == FALSE)
     {
         MDC_start_app ();
     }
     DEV_digout_set (&MDC_red_led);
+
+    NAP_ymodem_install();
+    MDC_net_start(NULL);
+
     MFS_descriptor_t *boot;
-    boot = MFS_create_dir (MFS_sysfs_get_dir (MFS_SYSFS_DIR_ROOT), "boot");
-    MDC_download_app_install (boot);
-    MDC_download_boot_install (boot);
+    boot = MFS_directory_create (MFS_get_root(), "boot");
+
+    MDC_download_install (boot, MDC_APPL_START, MDC_APPL_END);
 }

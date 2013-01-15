@@ -15,7 +15,7 @@
  * @{
  */
 
-#define BOOT_ERR         (ACE_BOOT_ERR_NR - 1)         /**< Not specified bootloader error.  */
+#define BOOT_ERR         (BOOT_ERR_NR - 1)         /**< Not specified bootloader error.  */
 
 /** @}
  */

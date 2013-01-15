@@ -13,53 +13,63 @@ MEMORY
 
 SECTIONS
 {
-	.text :
-	{ 
-		text_start = .;
-		*(.reset)
-		*(.text)
-		*(.rodata)                 /* read-only data (constants) */
-		*(.rodata*)
-		. = ALIGN(4);
- 		text_end = . ;
-	} > flash
+    .text : 
+    {
+        code_start = .;
+        text_start = .;
+        KEEP(*(.reset))
+        KEEP(*(.unref))
+        *(.text)                                
+        *(.text*)                                
+        text_end = .;
+    } > flash
 
-	/* collect all initialized .data sections that go into FLASH  */
-	.data : AT ( ADDR (.text) + SIZEOF (.text) )
-	{ 
-		sram_start = . ;
-		data_start = .;
-		*(.vectors)
-		*(.ramcode)
-		*(.data)
-		data_end = .;
-	} > sram
+    .rodata :
+    {
+        rodata_start = . ;
+        *(.rodata)
+        *(.rodata*)
+        . = ALIGN(4);
+        rodata_end = . ;
+        code_end = . ;
+    } > flash
 
-	/* collect all uninitialized .bss sections that go into FLASH  */
-	.bss (NOLOAD) :
-	{ 
-		. = ALIGN(4);
-		bss_start = .;
-		*(.bss)
-		bss_end = .;
-	} > sram
-	
-	.heap (NOLOAD):
-	{
-		. = ALIGN(4);
-		heap_start = . ;
-		*(.heap)
-		. = sram_start + sram_size - stack_size - 0;
-		heap_end = .;
-	} > sram
+    .data : AT (ADDR(.text) + SIZEOF(.text) + SIZEOF(.rodata)) 
+    {
+        sram_start = .;
+        data_start = .;
+        KEEP(*(.vectors))
+        *(.ramcode)
+        *(.data)
+        *(.data*)
+        data_end = .;
+    } > sram
 
-	.stack (NOLOAD):
-	{
-		stack_start = . ;
-		*(.stack)
-		. = sram_start + sram_size - 0;
-		stack_end = . ;
-		sram_end = . ;
-	} > sram
-	
+    .bss (NOLOAD) :
+    { 
+        . = ALIGN(4);
+        bss_start = .;
+        *(.bss)
+        *(COMMON)
+        bss_end = .;
+    } > sram
+    
+    .heap (NOLOAD):
+    {
+        . = ALIGN(4);
+        heap_start = . ;
+        *(.heap)
+        . = sram_start + sram_size - stack_size - 0;
+        heap_end = .;
+    } > sram
+
+    .stack (NOLOAD):
+    {
+        stack_start = . ;
+        *(.stack)
+        . = sram_start + sram_size - 0;
+        stack_end = . ;
+        sram_end = . ;
+    } > sram
+    
 }

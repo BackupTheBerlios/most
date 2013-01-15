@@ -26,11 +26,6 @@
 /**
  *
  */
-extern void SAM_bootp (void);
-
-/**
- *
- */
 extern void SAM_start_app (void);
 
 /**

@@ -31,12 +31,16 @@ extern long USO_ticks_per_sec;
 /**
  * Convert msec to ticks.
  */
+#define USO_SEC_2_TICKS(USO_sec) ( USO_ticks_per_sec * (USO_sec) )
 #define USO_MSEC_2_TICKS(USO_msec) ( (USO_ticks_per_sec * (USO_msec)) / 1000L  )
+#define USO_USEC_2_TICKS(USO_usec) ( (USO_ticks_per_sec * (USO_usec)) / 1000000L  )
 
 /**
  * Convert ticks to msec.
  */
+#define USO_TICKS_2_SEC(USO_ticks) ( (USO_ticks) / USO_ticks_per_sec )
 #define USO_TICKS_2_MSEC(USO_ticks) ( (1000L * (USO_ticks)) / USO_ticks_per_sec )
+#define USO_TICKS_2_USEC(USO_ticks) ( (1000000L * (USO_ticks)) / USO_ticks_per_sec )
 
 
 /*-------------- Interface -----------------------------------------------*/

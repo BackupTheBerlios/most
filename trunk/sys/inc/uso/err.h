@@ -19,7 +19,7 @@
  * @{
  */
 
-#define USO_ERR         (ACE_USO_ERR_NR - 1)         /**< Not specified USO error.  */
+#define USO_ERR         (USO_ERR_NR - 1)         /**< Not specified USO error.  */
 
 /** @}
  */

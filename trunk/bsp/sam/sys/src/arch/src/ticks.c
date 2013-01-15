@@ -41,7 +41,7 @@ extern void
 SAM_ticks_init (void)
 {
     USO_ticks_per_sec = SAM_TICKS_IN_HZ;
-    DEV_at91_PIT_init (SAM_TICKS_IN_HZ, SAM_MCK_IN_MHZ);
+    DEV_at91_PIT_init (DEV_AT91_PIT_SEC_IN_USEC / SAM_TICKS_IN_HZ, SAM_MCK_IN_MHZ);
     DEV_at91_PIT_enable_IT ();
     DEV_clock_init (get_us);
 }

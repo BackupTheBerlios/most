@@ -2,8 +2,8 @@
 
 LIB_NAME := mfs
 LIB_TYPE := sys
-OBJ_NAMES := vfs/o/$(MOST_TARGET)/*.o\
-			 sysfs/o/$(MOST_TARGET)/*.o
+OBJ_NAMES := vfs/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+			 sysfs/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o
 
 makegoal = make $(1) -C vfs;\
 		   make $(1) -C sysfs;

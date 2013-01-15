@@ -1,8 +1,69 @@
 #include "dev/arch/at91/spi.h"
 
-static int DEV_at91_SPI_dev_config (DEV_spi_dev_t * dev);
 
-static int DEV_at91_SPI_exchange (DEV_spi_dev_t * dev, ACE_u32_t out, ACE_u32_t * in);
+static int
+DEV_at91_SPI_dev_config (DEV_spi_dev_t * dev)
+{
+    DEV_at91_spi_dev_t *at91 = (DEV_at91_spi_dev_t *) dev;
+
+    // TODO slave device handling
+    if (dev->bus->ctrl != DEV_SPI_BUS_CTRL_MASTER)
+        return (-1);
+
+    int ncpha = 0;
+    int cpol = 0;
+    switch (dev->mode)
+    {
+    case 0:
+        ncpha = 1;
+        break;
+    case 1:
+        break;
+    case 2:
+        ncpha = 1;
+        cpol = 1;
+        break;
+    case 3:
+        cpol = 1;
+        break;
+    default:
+        break;
+    }
+
+    // spi chip select register SPI_CSR[device number(0, 1, 2, 3)]
+    at91->bus->base->SPI_CSR[dev->number] = (AT91C_SPI_DLYBCT & (dev->delay_btn_ct << 24)) |      // delay between consecutive transfers
+        (AT91C_SPI_DLYBS & (dev->delay_bfe_sclk << 16)) | // delay before SPCK
+        (AT91C_SPI_SCBR & (dev->sclk << 8)) |   // serial clock baud rate
+        (AT91C_SPI_BITS & ((dev->word_size - 8) << 4)) |        // bits per transfer
+        (AT91C_SPI_CSAAT & ((dev->cs == DEV_SPI_DEV_CS_ACTIVE ? 1 : 0) << 3)) |  // chip select active after transfer
+        (AT91C_SPI_NCPHA & (ncpha << 1)) |      // clock phase
+        (AT91C_SPI_CPOL & cpol);        // clock polarity
+    return 0;
+}
+
+
+
+static int
+DEV_at91_SPI_exchange (DEV_spi_dev_t * dev, ACE_u32_t out, ACE_u32_t * in)
+{
+    DEV_at91_spi_dev_t *at91 = (DEV_at91_spi_dev_t *) dev;
+
+    // wait for the transfer to complete
+    while ((at91->bus->base->SPI_SR & AT91C_SPI_TXEMPTY) == 0);
+
+    // send out
+    at91->bus->base->SPI_TDR = ((AT91C_SPI_PCS & (~(0x01 << dev->number) << 16)) | (out & 0xFFFF));
+
+    if (NULL == in)
+        return 0;
+
+    // wait for the transfer to complete
+    while ((at91->bus->base->SPI_SR & AT91C_SPI_TXEMPTY) == 0);
+
+    // read in
+    *in = (at91->bus->base->SPI_RDR & 0xFFFF);
+    return 0;
+}
 
 extern int
 DEV_at91_SPI_bus_init (DEV_at91_spi_bus_t * at91, int devices)
@@ -82,69 +143,5 @@ DEV_at91_SPI_dev_init (DEV_at91_spi_dev_t * at91)
 {
     DEV_spi_dev_t *dev = (DEV_spi_dev_t *) at91;
     at91->bus = (DEV_at91_spi_bus_t *) (dev->bus);
-    return 0;
-}
-
-static int
-DEV_at91_SPI_dev_config (DEV_spi_dev_t * dev)
-{
-    DEV_at91_spi_dev_t *at91 = (DEV_at91_spi_dev_t *) dev;
-
-    // TODO slave device handling
-    if (dev->bus->ctrl != DEV_SPI_BUS_CTRL_MASTER)
-        return (-1);
-
-    int ncpha = 0;
-    int cpol = 0;
-    switch (dev->mode)
-    {
-    case 0:
-        ncpha = 1;
-        break;
-    case 1:
-        break;
-    case 2:
-        ncpha = 1;
-        cpol = 1;
-        break;
-    case 3:
-        cpol = 1;
-        break;
-    default:
-        break;
-    }
-
-    // spi chip select register SPI_CSR[device number(0, 1, 2, 3)]
-    at91->bus->base->SPI_CSR[dev->number] = (AT91C_SPI_DLYBCT & (dev->delay_b_ct << 24)) |      // delay between consecutive transfers
-        (AT91C_SPI_DLYBS & (dev->delay_b_sclk << 16)) | // delay before SPCK
-        (AT91C_SPI_SCBR & (dev->sclk << 8)) |   // serial clock baud rate
-        (AT91C_SPI_BITS & ((dev->word_size - 8) << 4)) |        // bits per transfer
-        (AT91C_SPI_CSAAT & ((dev->cs_active == DEV_SPI_DEV_CS_ACTIVE ? 1 : 0) << 3)) |  // chip select active after transfer
-        (AT91C_SPI_NCPHA & (ncpha << 1)) |      // clock phase
-        (AT91C_SPI_CPOL & cpol);        // clock polarity
-    return 0;
-}
-
-
-
-static int
-DEV_at91_SPI_exchange (DEV_spi_dev_t * dev, ACE_u32_t out, ACE_u32_t * in)
-{
-    DEV_at91_spi_dev_t *at91 = (DEV_at91_spi_dev_t *) dev;
-
-    // wait for the transfer to complete
-    while ((at91->bus->base->SPI_SR & AT91C_SPI_TXEMPTY) == 0);
-
-    // send out
-    at91->bus->base->SPI_TDR = ((AT91C_SPI_PCS & (~(0x01 << dev->number) << 16)) | (out & 0xFFFF));
-
-    if (NULL == in)
-        return 0;
-
-    // wait for the transfer to complete
-    while ((at91->bus->base->SPI_SR & AT91C_SPI_TXEMPTY) == 0);
-
-    // read in
-    *in = (at91->bus->base->SPI_RDR & 0xFFFF);
     return 0;
 }

@@ -50,6 +50,9 @@
 #define SAM_IRQ_STACK_SIZE          0x80
 #define SAM_TOTAL_STACK_SIZE        0x400
 
+#define SAM_BOOT_BASE    0x100000
+#define SAM_APP_BASE    0x110000
+
 
 /** @}
  */

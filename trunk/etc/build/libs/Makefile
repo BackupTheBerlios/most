@@ -20,7 +20,7 @@ libs :
 
 clean :
 	@$(call makegoal, $@)
-	-$(REMOVE) ../lib/$(MOST_TARGET)
+	-$(REMOVE) ../lib/$(MOST_BUILD)/$(MOST_TARGET_TYPE)
 
 mrproper:
 	@$(call makegoal, $@)

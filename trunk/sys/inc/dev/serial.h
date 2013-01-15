@@ -13,9 +13,10 @@
 #include <mfs/vfs.h>
 #include <mfs/stream.h>
 
-#include "dev/serial_error.h"
-#include "dev/serial_settings.h"
-#include "dev/serial_int_interface.h"
+#include <dev/timer.h>
+#include <dev/serial_error.h>
+#include <dev/serial_settings.h>
+#include <dev/serial_int_interface.h>
 
 /** @addtogroup dev
  * @{
@@ -52,6 +53,9 @@ struct DEV_serial
     USO_mutex_t tx_mutex;
     USO_barrier_t rx_barrier;
     ACE_bool_t block;
+    ACE_bool_t rx_cancel;
+    DEV_timer_t rx_timer;
+    long rx_timeout_sec;
 };
 
 
@@ -76,6 +80,8 @@ extern void DEV_serial_init (DEV_serial_t * serial,
                              void (*close) (void),
                              void (*tx_start) (void), ACE_bool_t block, char *name);
 
+
+extern void DEV_serial_rx_cancel(DEV_serial_t *serial);
 
 /*------------------------------------------------------------------------*/
 

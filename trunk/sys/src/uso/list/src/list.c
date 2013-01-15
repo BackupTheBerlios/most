@@ -4,7 +4,7 @@
  */
 
 #include "uso/list.h"
-#include "uso/heap.h"
+// #include "uso/heap.h"
 
 /*------------- Implementation ------------------------------------------*/
 

@@ -14,9 +14,9 @@ LIB_NAMES_SYS := -l_nap\
 
 LIB_NAMES_USR := -l_tst
 
-OBJ_NAMES := ../../sys/src/arch/o/$(MOST_TARGET)/*.o\
-			../../sys/src/init/o/$(MOST_TARGET)/*.o\
-			src/main/o/$(MOST_TARGET)/*.o
+OBJ_NAMES := ../../sys/src/arch/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+			../../sys/src/init/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
+			src/main/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o
 			
 LDFLAGS_OPT := --relax 
 
@@ -30,4 +30,4 @@ makegoal_inc = make $(1) -C ../../sys/inc/doc;
 
 
 STRIP_FLAGS:= --target=$(MOST_SYSTEM)-$(MOST_CPU)
-STRIP_SECTIONS:= -s -R .noinit -R .stack -R .heap -R .eight 
+STRIP_SECTIONS:= --strip-debug --strip-unneeded -s -R .noinit -R .stack -R .heap -R .eight 

@@ -1,0 +1,23 @@
+## app config
+## Copy this file to a file named <app>/Config
+## and set following lines at your needs!
+
+## ------------ Target File -------------
+## ======================================
+
+## [off, on]
+## produced a section for each function and data and remove unused sections
+## not used for debug build
+MOST_REMOVE_CODE:=off
+
+## [bin, hex]
+## produced binary file type
+MOST_FILE:=bin
+
+## ------------ Build Version -----------
+## ======================================
+
+## [run, debug]
+## build release version or debug version
+MOST_BUILD:=run
+#MOST_BUILD:=debug

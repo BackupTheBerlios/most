@@ -23,7 +23,7 @@ slot_put_event (USO_slot_t * slot, USO_node_t * event, ACE_bool_t block)
 {
     if (TRUE == find_id (slot->id_list, event->data))
     {
-        if (block == TRUE)
+        if (block == FALSE)
             if (USO_post_would_block (&slot->mbox) <= 0)
                 return FALSE;
         USO_post (&slot->mbox, event);

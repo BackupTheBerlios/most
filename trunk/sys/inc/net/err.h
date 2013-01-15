@@ -19,19 +19,19 @@
  * @{
  */
 
-#define NET_ERR         (ACE_NET_ERR_NR - 1)         /**< Not specified NET error.  */
-#define NET_ERR_MEM     (ACE_NET_ERR_NR - 2)         /**< Out of memory error.  */
-#define NET_ERR_BUF     (ACE_NET_ERR_NR - 3)         /**< Buffer error.  */
-#define NET_ERR_VAL     (ACE_NET_ERR_NR - 4)         /**< Illegal value.  */
-#define NET_ERR_ARG     (ACE_NET_ERR_NR - 5)         /**< Illegal argument.  */
-#define NET_ERR_ABRT    (ACE_NET_ERR_NR - 6)         /**< Connection aborted.  */
-#define NET_ERR_RST     (ACE_NET_ERR_NR - 7)         /**< Connection reset.  */
-#define NET_ERR_CLSD    (ACE_NET_ERR_NR - 8)         /**< Connection closed.  */
-#define NET_ERR_CONN    (ACE_NET_ERR_NR - 9)         /**< Not connected.  */
-#define NET_ERR_RTE     (ACE_NET_ERR_NR - 10)         /**< Routing problem.  */
-#define NET_ERR_USE     (ACE_NET_ERR_NR - 11)        /**< Address in use.  */
-#define NET_ERR_BAD     (ACE_NET_ERR_NR - 12)        /**< Bad packet */
-#define NET_ERR_ARP     (ACE_NET_ERR_NR - 13)        /**< ARP Request send */
+#define NET_ERR         (NET_ERR_NR - 1)         /**< Not specified NET error.  */
+#define NET_ERR_MEM     (NET_ERR_NR - 2)         /**< Out of memory error.  */
+#define NET_ERR_BUF     (NET_ERR_NR - 3)         /**< Buffer error.  */
+#define NET_ERR_VAL     (NET_ERR_NR - 4)         /**< Illegal value.  */
+#define NET_ERR_ARG     (NET_ERR_NR - 5)         /**< Illegal argument.  */
+#define NET_ERR_ABRT    (NET_ERR_NR - 6)         /**< Connection aborted.  */
+#define NET_ERR_RST     (NET_ERR_NR - 7)         /**< Connection reset.  */
+#define NET_ERR_CLSD    (NET_ERR_NR - 8)         /**< Connection closed.  */
+#define NET_ERR_CONN    (NET_ERR_NR - 9)         /**< Not connected.  */
+#define NET_ERR_RTE     (NET_ERR_NR - 10)         /**< Routing problem.  */
+#define NET_ERR_USE     (NET_ERR_NR - 11)        /**< Address in use.  */
+#define NET_ERR_BAD     (NET_ERR_NR - 12)        /**< Bad packet */
+#define NET_ERR_ARP     (NET_ERR_NR - 13)        /**< ARP Request send */
 
 /** @}
  */

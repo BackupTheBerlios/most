@@ -7,7 +7,7 @@
 
 #include "uso/heap.h"
 #include "uso/debug.h"
-#include "uso/arch/cpu.h"
+#include "uso/cpu.h"
 
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
@@ -172,40 +172,55 @@ print_heap_list (USO_heap_t * heap)
 #endif
 
 extern void
-USO_debug_heap_list (MFS_entry_t * entry)
+USO_debug_heap_list (MFS_represent_t * represent)
 {
     USO_log_printf (USO_LL_INFO, "\n Debug switch is %s.\n", USO_HEAP_LIST_DEBUG ? "on" : "off");
 #if USO_HEAP_LIST_DEBUG
-    if (entry != NULL)
-        print_heap_list ((USO_heap_t *) entry);
+    if (represent != NULL)
+        print_heap_list ((USO_heap_t *) represent);
 #endif
 }
 
 static void
-info (MFS_entry_t * entry)
+info_head (MFS_descriptor_t * desc)
 {
-    USO_heap_t *heap = (USO_heap_t *) entry;
+    ACE_printf ("%s\t%s\t%s\n", "Total", "Free", "Av search");
+}
+
+static struct MFS_descriptor_op heap_head_descriptor_op = {
+	.open = NULL,
+    .close = NULL,
+    .info = info_head,
+    .control = NULL
+};
+
+extern void
+USO_heap_info_head (MFS_descriptor_t *dir)
+{
+    MFS_descriptor_create (dir, "heap", MFS_INFO, &heap_head_descriptor_op, NULL);
+}
+
+
+static void
+info (MFS_descriptor_t * desc)
+{
+    USO_heap_t *heap = (USO_heap_t *) desc->represent;
 
     ACE_printf ("%lu\t%lu\t%lu\n", heap->total_mem, heap->free_mem, heap->search_average);
 }
 
-extern void
-USO_heap_info_head (void)
-{
-    ACE_printf ("\t%s\t%s\t%s\t%s\n", "Name", "Total", "Free", "Av search");
-}
-
-
-static struct MFS_descriptor_op heap_descriptor_op = {.open = NULL,
+static struct MFS_descriptor_op heap_descriptor_op = {
+	.open = NULL,
     .close = NULL,
-    .info = info
+    .info = info,
+    .control = NULL
 };
 
 extern void
 USO_heap_install (USO_heap_t * heap, char *name)
 {
-    MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_HEAPS), name,
-                     (MFS_entry_t *) heap, MFS_DESC, &heap_descriptor_op);
+    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/uso/heap"), name,
+                     MFS_SYS, &heap_descriptor_op, heap);
 }
 
 extern ACE_bool_t

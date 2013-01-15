@@ -32,7 +32,7 @@
 //------------------------------------------------------------------------------
 
 #include <ace/assert.h>
-#include <uso/arch/cpu.h>
+#include <uso/cpu.h>
 
 #include "dev/arch/at91/efc.h"
 #include "dev/debug.h"
@@ -163,28 +163,23 @@ DEV_at91_EFC_start_command (AT91S_EFC * pEfc, unsigned char command, unsigned sh
     case AT91C_MC_FCMD_PROG_AND_LOCK:
         ACE_ASSERT (0, "Write and lock command cannot be carried out.\n");
         break;
-
     case AT91C_MC_FCMD_START_PROG:
     case AT91C_MC_FCMD_LOCK:
     case AT91C_MC_FCMD_UNLOCK:
         ACE_ASSERT (argument < AT91C_IFLASH_NB_OF_PAGES, "Maximum number of pages\n");
-        break;
-
+    	break;
     case AT91C_MC_FCMD_SET_GP_NVM:
     case AT91C_MC_FCMD_CLR_GP_NVM:
         ACE_ASSERT (argument < EFC_NUM_GPNVMS, "A maximum of GPNVMs are available on the chip.\n");
         break;
-
     case AT91C_MC_FCMD_ERASE_ALL:
-
     case AT91C_MC_FCMD_SET_SECURITY:
         ACE_ASSERT (argument == 0, "Argument is meaningless for the given command\n");
         break;
-
     default:
-        ACE_ASSERT (0, "Unknown command\n");
+    	ACE_ASSERT (0, "Unknown command\n");
+    	/* no break */
     }
-
     // Set FMCN
     switch (command)
     {
@@ -201,6 +196,8 @@ DEV_at91_EFC_start_command (AT91S_EFC * pEfc, unsigned char command, unsigned sh
     case AT91C_MC_FCMD_ERASE_ALL:
         pEfc->EFC_FMR = (pEfc->EFC_FMR & ~AT91C_MC_FMCN) | FMCN_FLASH (lMck);
         break;
+    default:
+    	break;
     }
 
     // Start command

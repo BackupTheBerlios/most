@@ -4,7 +4,7 @@
  */
 
 #include <uso/log.h>
-#include <cli/commands.h>
+#include <cli/exec.h>
 
 #include "tst/ser_test.h"
 

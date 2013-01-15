@@ -25,12 +25,11 @@ asm :
 
 clean : 
 	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/build/Makefile
-	-$(REMOVE) o/$(MOST_TARGET)
-	-$(REMOVE) d/$(MOST_TARGET)
-	-$(REMOVE) s/$(MOST_CPU)
+	-$(REMOVE) $(MOST_BUILD)/o/$(MOST_TARGET_TYPE)
+	-$(REMOVE) $(MOST_BUILD)/d/$(MOST_TARGET_TYPE)
+	-$(REMOVE) $(MOST_BUILD)/s/$(MOST_CPU_TYPE)
 
 mrproper :
 	@make clean --no-print-directory -f $(MOST_ROOT)/etc/build/Makefile
-	-$(REMOVE) o
-	-$(REMOVE) d
-	-$(REMOVE) s
+	-$(REMOVE) run
+	-$(REMOVE) debug

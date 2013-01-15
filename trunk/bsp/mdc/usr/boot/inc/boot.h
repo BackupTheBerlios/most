@@ -8,9 +8,8 @@
 #ifndef MDC_BOOT_H_
 #define MDC_BOOT_H_
 
-#include <ace/version.h>
 #include <init/main.h>
 
-#define MDC_APPLICATION MDC_BOARD"-Boot"
+#define MDC_APPLICATION "Boot"
 
 #endif /* MDC_BOOT_H_ */

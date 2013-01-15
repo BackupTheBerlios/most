@@ -6,6 +6,9 @@
 #ifndef SAM_ETH_H
 #define SAM_ETH_H
 
+#include <ace/stddef.h>
+#include <net/netif.h>
+
 /** @addtogroup arch
  *
  * @{
@@ -19,7 +22,6 @@
  */
 
 
-#include <net/netif.h>
 
 /** Loopback device */
 extern NET_netif_t SAM_lo;
@@ -37,7 +39,7 @@ extern void SAM_eth_init (void);
  */
 extern void SAM_eth_start (void);
 
-extern void SAM_eth_interrupt (void);
+extern void SAM_eth_interrupt (void) ACE_SECTION_ (".unref");
 
 /** @}
  */

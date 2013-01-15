@@ -5,23 +5,119 @@
 
 #include <ace/stdlib.h>
 
-#include "uso/thread.h"
-#include "uso/arch/cpu.h"
-#include "uso/scheduler.h"
-#include "uso/stack.h"
-#include "uso/log.h"
-#include "mfs/sysfs.h"
-#include "mfs/vfs.h"
-#include "mfs/descriptor.h"
-#include "mfs/directory.h"
+#include <uso/thread.h>
+#include <uso/cpu.h>
+#include <uso/scheduler.h>
+#include <uso/stack.h>
+#include <uso/log.h>
+#include <mfs/sysfs.h>
+#include <mfs/vfs.h>
+#include <mfs/descriptor.h>
+#include <mfs/directory.h>
+#include <mfs/stream.h>
 
-/*------------- Implementation ------------------------------------------*/
+static void
+info (MFS_descriptor_t * desc)
+{
+    USO_thread_t *thread = (USO_thread_t *) desc->represent;
+    char *priority, *scheduling, *state, *error;
+    error = "error";
 
-static void info (MFS_entry_t * entry);
+    switch (thread->priority)
+    {
+    case USO_IDLE:
+        priority = "idle";
+        break;
+    case USO_SYSTEM:
+        priority = "sys";
+        break;
+    case USO_USER:
+        priority = "user";
+        break;
+    case USO_INTERRUPT:
+        priority = "int";
+        break;
+    default:
+        priority = error;
+        break;
+    }
 
-static struct MFS_descriptor_op thread_descriptor_op = {.open = NULL,
+    switch (thread->scheduling)
+    {
+    case USO_FIFO:
+        scheduling = "fi";
+        break;
+    case USO_ROUND_ROBIN:
+        scheduling = "ro";
+        break;
+    default:
+        scheduling = error;
+        break;
+    }
+
+    switch (thread->state)
+    {
+    case USO_INIT:
+        state = "init";
+        break;
+    case USO_RUNNING:
+        state = "running";
+        break;
+    case USO_READY:
+        state = "ready";
+        break;
+    case USO_BLOCKED_WAIT:
+        state = "b_wait";
+        break;
+    case USO_BLOCKED_BLOCK:
+        state = "b_block";
+        break;
+    case USO_BLOCKED_LOCK:
+        state = "b_lock";
+        break;
+    case USO_BLOCKED_SLEEP:
+        state = "b_sleep";
+        break;
+    case USO_BLOCKED_SEND:
+        state = "b_send";
+        break;
+    case USO_BLOCKED_RECEIVE:
+        state = "b_receive";
+        break;
+    case USO_BLOCKED_REPLY:
+        state = "b_reply";
+        break;
+    case USO_BLOCKED_CATCH:
+        state = "b_catch";
+        break;
+    case USO_EXIT:
+        state = "exit";
+        break;
+    case USO_DEAD:
+        state = "dead";
+        break;
+    default:
+        state = error;
+        break;
+    }
+
+    ACE_printf ("%s\t%s\t%s\t%lu\t%i\t%i\t%p %p %p %p\n",
+                priority,
+                scheduling,
+                state,
+                thread->ticks,
+                thread->stack_size * sizeof (USO_stack_t),
+                USO_stack_get_free (thread->stack_top, thread->stack_size) * sizeof (USO_stack_t),
+                (void *)thread->stack_top,
+                (void *)thread->stack_max, (void *)thread->cpu.sp, (void *)thread->stack_bot);
+}
+
+
+static struct MFS_descriptor_op thread_descriptor_op = {
+	.open = NULL,
     .close = NULL,
-    .info = info
+    .info = info,
+    .control = NULL
 };
 
 static void
@@ -59,8 +155,9 @@ USO_thread_init (USO_thread_t * thread,
     thread->stack_top = USO_stack_end (stack, stack_size);
     thread->stack_max = USO_stack_beginn (stack, stack_size);
     thread->ticks = 0;
-    thread->desc = MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_THREADS), name,
-                                    (MFS_entry_t *) thread, MFS_DESC, &thread_descriptor_op);
+    thread->cli = NULL;
+    thread->desc = MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/uso/thread"), name,
+                                    MFS_SYS, &thread_descriptor_op, (MFS_represent_t *) thread);
     if (priority != USO_IDLE)
     {
         USO_stack_init (stack, stack_size);
@@ -102,18 +199,31 @@ USO_thread_terminate (USO_thread_t * thread)
     {
         ACE_free (thread->arg);
     }
+    if ((thread->flags & (1 << USO_FLAG_CLOSE_IN)) == (1 << USO_FLAG_CLOSE_IN))
+    {
+    	MFS_close_desc(thread->in);
+    }
+    if ((thread->flags & (1 << USO_FLAG_CLOSE_OUT)) == (1 << USO_FLAG_CLOSE_OUT))
+    {
+    	MFS_close_desc(thread->out);
+    }
     if ((thread->flags & (1 << USO_FLAG_DETACH)) == (1 << USO_FLAG_DETACH))
     {
-        MFS_remove_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_THREADS), thread->desc);
+        MFS_remove_desc (MFS_resolve(MFS_get_root(), "sys/uso/thread"), thread->desc);
         ACE_free (thread->stack);
         ACE_free (thread);
     }
 }
 
 extern void
-USO_thread_ios_init (USO_thread_t * thread, ACE_FILE * in, ACE_FILE * out)
+USO_thread_in_init (USO_thread_t * thread, MFS_descriptor_t * in)
 {
-    thread->in = in;
+	thread->in = in;
+}
+
+extern void
+USO_thread_out_init (USO_thread_t * thread, MFS_descriptor_t * out)
+{
     thread->out = out;
 }
 
@@ -121,6 +231,12 @@ extern void
 USO_thread_arg_init (USO_thread_t * thread, void *arg)
 {
     thread->arg = arg;
+}
+
+extern void
+USO_thread_cli_init (USO_thread_t * thread, CLI_interpreter_t *cli)
+{
+    thread->cli = cli;
 }
 
 extern void
@@ -220,108 +336,23 @@ USO_thread_name (void)
 }
 
 static void
-info (MFS_entry_t * entry)
+info_head (MFS_descriptor_t * desc)
 {
-    USO_thread_t *thread = (USO_thread_t *) entry;
-    char *priority, *scheduling, *state, *error;
-    error = "error";
-
-    switch (thread->priority)
-    {
-    case USO_IDLE:
-        priority = "idle";
-        break;
-    case USO_SYSTEM:
-        priority = "sys";
-        break;
-    case USO_USER:
-        priority = "user";
-        break;
-    case USO_INTERRUPT:
-        priority = "int";
-        break;
-    default:
-        priority = error;
-        break;
-    }
-
-    switch (thread->scheduling)
-    {
-    case USO_FIFO:
-        scheduling = "fi";
-        break;
-    case USO_ROUND_ROBIN:
-        scheduling = "ro";
-        break;
-    default:
-        scheduling = error;
-        break;
-    }
-
-    switch (thread->state)
-    {
-    case USO_INIT:
-        state = "init";
-        break;
-    case USO_RUNNING:
-        state = "running";
-        break;
-    case USO_READY:
-        state = "ready";
-        break;
-    case USO_BLOCKED_WAIT:
-        state = "b_wait";
-        break;
-    case USO_BLOCKED_BLOCK:
-        state = "b_block";
-        break;
-    case USO_BLOCKED_LOCK:
-        state = "b_lock";
-        break;
-    case USO_BLOCKED_SLEEP:
-        state = "b_sleep";
-        break;
-    case USO_BLOCKED_SEND:
-        state = "b_send";
-        break;
-    case USO_BLOCKED_RECEIVE:
-        state = "b_receive";
-        break;
-    case USO_BLOCKED_REPLY:
-        state = "b_reply";
-        break;
-    case USO_BLOCKED_CATCH:
-        state = "b_catch";
-        break;
-    case USO_EXIT:
-        state = "exit";
-        break;
-    case USO_DEAD:
-        state = "dead";
-        break;
-    default:
-        state = error;
-        break;
-    }
-
-    ACE_printf ("%s\t%s\t%s\t%lu\t%i\t%i\t%p %p %p %p\n",
-                priority,
-                scheduling,
-                state,
-                thread->ticks,
-                thread->stack_size * sizeof (USO_stack_t),
-                USO_stack_get_free (thread->stack_top, thread->stack_size) * sizeof (USO_stack_t),
-                (void *)thread->stack_top,
-                (void *)thread->stack_max, (void *)thread->cpu.sp, (void *)thread->stack_bot);
-}
-
-extern void
-USO_thread_info_head (void)
-{
-    ACE_printf ("\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-                "Name",
+    ACE_printf ("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
                 "Prior",
                 "Sched", "State", "Ticks", "S.size", "S.free", "S.top", "S.max", "S.sp", "S.bot");
 }
 
-/*------------------------------------------------------------------------*/
+static struct MFS_descriptor_op thread_head_descriptor_op = {
+	.open = NULL,
+    .close = NULL,
+    .info = info_head,
+    .control = NULL
+};
+
+/**
+ * Print thread info header.
+ */
+extern void USO_thread_info_head (MFS_descriptor_t *dir){
+	MFS_descriptor_create (dir, "thread", MFS_INFO, &thread_head_descriptor_op, NULL);
+}

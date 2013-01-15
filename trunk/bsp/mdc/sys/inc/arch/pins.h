@@ -6,6 +6,7 @@
 #ifndef MDC_H8300_PINS_H
 #define MDC_H8300_PINS_H
 
+#include <ace/stddef.h>
 #include <dev/arch/h8/bits.h>
 
 /** @addtogroup arch
@@ -53,6 +54,17 @@
 #define H8_PC3_CS5       BIT(3)
 #define H8_PC4_CS6       BIT(4)
 #define H8_PC5_CS7       BIT(5)
+
+/**
+ * Initializes the cpu pins.
+ */
+extern void MDC_pins_init (void);
+
+/**
+ * Triggers the external watchdog which should happen at least once every 1.6 sec.
+ */
+extern void MDC_watchdog_trigger (void)
+ACE_SECTION_ (".ramcode");
 
 
 /** @}

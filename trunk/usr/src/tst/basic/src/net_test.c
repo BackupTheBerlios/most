@@ -5,7 +5,7 @@
 
 #include <uso/log.h>
 #include <uso/sleep.h>
-#include <cli/commands.h>
+#include <cli/exec.h>
 #include <nap/syslog.h>
 
 #include "tst/ser_test.h"

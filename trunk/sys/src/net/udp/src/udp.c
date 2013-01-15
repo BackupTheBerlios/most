@@ -142,7 +142,7 @@ NET_udp_input (NET_netif_t * inp, NET_netbuf_t * p)
     }
     USO_post (&sock->rx_que, (USO_node_t *) p);
     NET_udp_socks_unlock ();
-    return ACE_ERR_OK;
+    return ACE_OK;
 }
 
 ACE_err_t

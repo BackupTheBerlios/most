@@ -20,10 +20,6 @@
  * @{
  */
 
-/**
- * Do a bootp request.
- */
-extern void MDC_bootp (void);
 
 /**
  * Start application.

@@ -16,8 +16,7 @@ DEV_at91_ADC_init (void)
     a_pADC->ADC_CR = 0x1;
     a_pADC->ADC_CR = 0x0;
 
-    // Set maximum startup time and hold time
-    a_pADC->ADC_MR = 0x0F1F0F00;
+    a_pADC->ADC_MR = 0x070F0310;
 
 }
 

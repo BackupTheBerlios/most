@@ -1,7 +1,7 @@
 #include <ace/string.h>
 #include <ace/stdlib.h>
 #include <dev/mmc.h>
-#include <cli/commands.h>
+#include <cli/exec.h>
 
 #include "arch/spi.h"
 #include "mmc_test.h"

@@ -56,14 +56,14 @@ time_valid_param (ACE_time_t * time)
         return ACE_ERR_MIN;
     if (time->sec > 59)
         return ACE_ERR_SEC;
-    return ACE_ERR_OK;
+    return ACE_OK;
 }
 
 extern ACE_err_t
 ACE_time_from_param (ACE_time_t * time)
 {
     ACE_err_t err = time_valid_param (time);
-    if (err != ACE_ERR_OK)
+    if (err != ACE_OK)
         return err;
 
     unsigned long t;
@@ -87,7 +87,7 @@ ACE_time_from_param (ACE_time_t * time)
     /* compute total seconds */
     t += (days * SEC_IN_DAY);
     time->time = t;
-    return ACE_ERR_OK;
+    return ACE_OK;
 }
 
 extern ACE_err_t
@@ -135,11 +135,11 @@ extern ACE_err_t
 ACE_time_print (ACE_time_t * time)
 {
     ACE_err_t err = time_valid_param (time);
-    if (err != ACE_ERR_OK)
+    if (err != ACE_OK)
         return err;
 
     ACE_printf ("%04d.%02d.%02d - %02d:%02d:%02d",
                 time->year, time->month, time->day, time->hour, time->min, time->sec);
 
-    return ACE_ERR_OK;
+    return ACE_OK;
 }

@@ -15,7 +15,7 @@
  * @{
  */
 
-#define APP_ERR         (ACE_APP_ERR_NR - 1)         /**< Not specified application error.  */
+#define APP_ERR         (APP_ERR_NR - 1)         /**< Not specified application error.  */
 
 /** @}
  */

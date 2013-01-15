@@ -8,9 +8,8 @@
 #ifndef MDC_PUTBOOT_H_
 #define MDC_PUTBOOT_H_
 
-#include <ace/version.h>
 #include <init/main.h>
 
-#define MDC_APPLICATION MDC_BOARD"-Putboot"
+#define MDC_APPLICATION "Putboot"
 
 #endif /* MDC_PUTBOOT_H_ */

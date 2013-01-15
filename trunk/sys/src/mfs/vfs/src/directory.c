@@ -2,60 +2,18 @@
 #include <ace/stdio.h>
 #include <ace/stdlib.h>
 #include <uso/list.h>
-
-#include "mfs/directory.h"
-#include "mfs/descriptor.h"
-#include "mfs/super.h"
-#include "mfs/stream.h"
+#include <mfs/err.h>
+#include <mfs/directory.h>
 
 
-static void
-dir_open (MFS_entry_t * entry)
-{
-    MFS_directory_t *dir = (MFS_directory_t *) entry;
-    if (dir->operations->open != NULL)
-    {
-        dir->operations->open (dir);
-    }
-}
-
-static void
-dir_close (MFS_entry_t * entry)
-{
-    MFS_directory_t *dir = (MFS_directory_t *) entry;
-    if (dir->operations->close != NULL)
-    {
-        dir->operations->close (dir);
-    }
-}
-
-static void
-dir_info (MFS_entry_t * entry)
-{
-    MFS_directory_t *dir = (MFS_directory_t *) entry;
-    if (dir->info != NULL)
-    {
-        dir->info ();
-    }
-    else
-    {
-        ACE_putc ('\n');
-    }
-}
-
-
-struct MFS_descriptor_op MFS_dir_descriptor_op = {.open = dir_open,
-    .close = dir_close,
-    .info = dir_info
-};
 
 
 extern MFS_descriptor_t *
 MFS_next_entry (MFS_descriptor_t * dir_desc, MFS_descriptor_t * iterator)
 {
-    if ((dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER))
+    if (dir_desc->type == MFS_DIRECTORY)
     {
-        MFS_directory_t *dir = (MFS_directory_t *) dir_desc->entry;
+        MFS_directory_t *dir = (MFS_directory_t *) dir_desc;
         iterator = (MFS_descriptor_t *) USO_next_element (&dir->descriptors,
                                                           (USO_node_t *) iterator);
     }
@@ -66,9 +24,9 @@ extern MFS_descriptor_t *
 MFS_lookup (MFS_descriptor_t * dir_desc, char *name)
 {
     MFS_descriptor_t *desc = NULL;
-    if ((dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER))
+    if (dir_desc->type == MFS_DIRECTORY)
     {
-        MFS_directory_t *dir = (MFS_directory_t *) dir_desc->entry;
+        MFS_directory_t *dir = (MFS_directory_t *) dir_desc;
         while ((desc = (MFS_descriptor_t *) USO_next_element (&dir->descriptors,
                                                               (USO_node_t *) desc)) != NULL)
         {
@@ -81,12 +39,12 @@ MFS_lookup (MFS_descriptor_t * dir_desc, char *name)
     return desc;
 }
 
-static void
-create_desc (MFS_descriptor_t * dir_desc, MFS_descriptor_t * desc)
+extern void
+MFS_create_desc (MFS_descriptor_t * dir_desc, MFS_descriptor_t * desc)
 {
-    if ((dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER))
+    if (dir_desc->type == MFS_DIRECTORY)
     {
-        MFS_directory_t *dir = (MFS_directory_t *) dir_desc->entry;
+        MFS_directory_t *dir = (MFS_directory_t *) dir_desc;
         if (dir->operations->create != NULL)
         {
             dir->operations->create (desc);
@@ -95,129 +53,25 @@ create_desc (MFS_descriptor_t * dir_desc, MFS_descriptor_t * desc)
     }
 }
 
-extern MFS_descriptor_t *
-MFS_create_dir (MFS_descriptor_t * dir_desc, char *name)
-{
-    MFS_descriptor_t *desc = NULL;
-    if ((dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER))
-    {
-        MFS_directory_t *dir = (MFS_directory_t *) dir_desc->entry;
-        MFS_directory_t *new_dir = ACE_malloc (sizeof (MFS_directory_t));
-        if (new_dir != NULL)
-        {
-            MFS_directory_init (new_dir, dir->vfs_op);
-            desc = MFS_descriptor_new ((MFS_entry_t *) new_dir, &MFS_dir_descriptor_op,
-                                       name, MFS_DIRECTORY, dir_desc);
-            if (desc != NULL)
-            {
-                create_desc (dir_desc, desc);
-            }
-            else
-            {
-                ACE_free (new_dir);
-            }
-        }
-    }
-    return desc;
-}
-
-extern MFS_descriptor_t *
-MFS_create_file (MFS_descriptor_t * dir_desc, char *name)
-{
-    MFS_descriptor_t *desc = NULL;
-    if ((dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER))
-    {
-        MFS_directory_t *dir = (MFS_directory_t *) dir_desc->entry;
-        MFS_stream_t *file = ACE_malloc (sizeof (MFS_stream_t));
-        if (file != NULL)
-        {
-            MFS_stream_init (file, MFS_FILE, dir->vfs_op->stream_op, NULL);
-            desc = MFS_descriptor_new ((MFS_entry_t *) file, &MFS_stream_descriptor_op,
-                                       name, MFS_STREAM, dir_desc);
-            if (desc != NULL)
-            {
-                create_desc (dir_desc, desc);
-            }
-            else
-            {
-                ACE_free (file);
-            }
-        }
-    }
-    return desc;
-}
-
-extern MFS_descriptor_t *
-MFS_create_io (MFS_descriptor_t * dir_desc, char *name, struct MFS_stream_op *io_op,
-               MFS_stream_represent_t * represent)
-{
-    MFS_descriptor_t *desc = NULL;
-    if ((dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER))
-    {
-        MFS_stream_t *io = ACE_malloc (sizeof (MFS_stream_t));
-        if (io != NULL)
-        {
-            MFS_stream_init (io, MFS_IO, io_op, represent);
-            desc = MFS_descriptor_new ((MFS_entry_t *) io, &MFS_stream_descriptor_op,
-                                       name, MFS_STREAM, dir_desc);
-            if (desc != NULL)
-            {
-                create_desc (dir_desc, desc);
-            }
-            else
-            {
-                ACE_free (io);
-            }
-        }
-    }
-    return desc;
-}
-
-extern MFS_descriptor_t *
-MFS_create_desc (MFS_descriptor_t * dir_desc, char *name, MFS_entry_t * entry,
-                 enum MFS_entry_type type, struct MFS_descriptor_op *desc_op)
-{
-    MFS_descriptor_t *desc = NULL;
-    if ((dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER))
-    {
-        desc = MFS_descriptor_new (entry, desc_op, name, type, dir_desc);
-        if (desc != NULL)
-        {
-            create_desc (dir_desc, desc);
-        }
-    }
-    return desc;
-}
-
-
-
 extern void
 MFS_remove_desc (MFS_descriptor_t * dir_desc, MFS_descriptor_t * desc)
 {
-    if ((dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER))
+    if (dir_desc->type == MFS_DIRECTORY)
     {
-        MFS_directory_t *dir = (MFS_directory_t *) dir_desc->entry;
+        MFS_directory_t *dir = (MFS_directory_t *) dir_desc;
+        USO_remove (&dir->descriptors, (USO_node_t *) desc);
         if (dir->operations->remove != NULL)
         {
             dir->operations->remove (desc);
         }
-        USO_remove (&dir->descriptors, (USO_node_t *) desc);
-        if ((desc->type == MFS_STREAM) || (desc->type == MFS_DIRECTORY))
-        {
-            ACE_free (desc->entry);
-            ACE_free (desc);
-        }
-        else if (desc->type != MFS_SUPER)
-        {
-            ACE_free (desc);
-        }
+        ACE_free (desc);
     }
 }
 
 extern void
 MFS_remove (MFS_descriptor_t * dir_desc, char *name)
 {
-    if ((dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER))
+    if (dir_desc->type == MFS_DIRECTORY)
     {
         MFS_descriptor_t *desc = MFS_lookup (dir_desc, name);
         if (desc != NULL)
@@ -230,10 +84,10 @@ MFS_remove (MFS_descriptor_t * dir_desc, char *name)
 extern void
 MFS_rename_desc (MFS_descriptor_t * dir_desc, MFS_descriptor_t * desc, char *name)
 {
-    if ((dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER))
+    if (dir_desc->type == MFS_DIRECTORY)
     {
-        MFS_directory_t *dir = (MFS_directory_t *) dir_desc->entry;
-        //MFS_desc_rename(desc, name)
+        MFS_directory_t *dir = (MFS_directory_t *) dir_desc;
+        // todo MFS_desc_rename(desc, name)
         if (dir->operations->rename != NULL)
         {
             dir->operations->rename (desc);
@@ -245,7 +99,7 @@ extern MFS_descriptor_t *
 MFS_rename (MFS_descriptor_t * dir_desc, char *old_name, char *new_name)
 {
     MFS_descriptor_t *desc = NULL;
-    if ((dir_desc->type == MFS_DIRECTORY) || (dir_desc->type == MFS_SUPER))
+    if (dir_desc->type == MFS_DIRECTORY)
     {
         desc = MFS_lookup (dir_desc, old_name);
         if (desc != NULL)
@@ -264,5 +118,40 @@ MFS_directory_init (MFS_directory_t * dir, struct MFS_vfs_op *vfs_op)
     USO_list_init (&dir->descriptors);
     dir->vfs_op = vfs_op;
     dir->operations = vfs_op->dir_op;
-    dir->info = NULL;
+}
+
+extern MFS_descriptor_t *
+MFS_directory_create (MFS_descriptor_t * dir_desc, char *name)
+{
+	MFS_directory_t *new_dir = NULL;
+    if (dir_desc->type == MFS_DIRECTORY)
+    {
+        new_dir = ACE_malloc (sizeof (MFS_directory_t));
+        if (new_dir != NULL)
+        {
+            MFS_directory_t *dir = (MFS_directory_t *) dir_desc;
+           	MFS_descriptor_init((MFS_descriptor_t *)new_dir, NULL, dir->vfs_op->dir_desc_op, name, MFS_DIRECTORY, dir_desc);
+           	MFS_directory_init (new_dir, dir->vfs_op);
+           	MFS_create_desc (dir_desc, (MFS_descriptor_t *)new_dir);
+        }
+    }
+    return (MFS_descriptor_t *)new_dir;
+}
+
+extern MFS_descriptor_t *
+MFS_directory_create_root (char *name, struct MFS_vfs_op *vfs_op)
+{
+    MFS_directory_t *root_dir = ACE_malloc (sizeof (MFS_directory_t));
+    if (root_dir != NULL)
+    {
+        MFS_descriptor_init ( (MFS_descriptor_t *) root_dir, NULL, vfs_op->dir_desc_op, name, MFS_DIRECTORY, NULL);
+       	MFS_directory_init (root_dir, vfs_op);
+    }
+    return (MFS_descriptor_t *) root_dir;
+}
+
+extern void
+MFS_directory_print (MFS_directory_t * dir)
+{
+    ACE_putc ('\n');
 }

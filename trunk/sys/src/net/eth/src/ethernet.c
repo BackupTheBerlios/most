@@ -40,7 +40,7 @@ NET_eth_input (NET_netif_t * netif, NET_netbuf_t * p)
             return;
         }
 
-        if (NET_ip_input (netif, p) < ACE_ERR_OK)
+        if (NET_ip_input (netif, p) < ACE_OK)
         {
             DEBUGF (NET_ETH_DEBUG, ("Eth: ip error.\n"));
         }
@@ -178,7 +178,7 @@ NET_eth_output (NET_netif_t * netif, NET_netbuf_t * p, NET_ip_addr_t * ipaddr)
     {
         NET_netbuf_free (p);
     }
-    return ACE_ERR_OK;
+    return ACE_OK;
 }
 
 extern void

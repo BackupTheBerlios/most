@@ -19,7 +19,8 @@
  * @{
  */
 
-#define MFS_ERR         (ACE_MFS_ERR_NR - 1)         /**< Not specified USO error.  */
+#define MFS_ERR         (MFS_ERR_NR - 1)         /**< Not specified MFS error.  */
+#define MFS_ERR_IN_USE  (MFS_ERR_NR - 2)         /**< Resource is in use.  */
 
 /** @}
  */

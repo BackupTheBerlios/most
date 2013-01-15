@@ -15,7 +15,7 @@
  * @{
  */
 
-#define APP_ERR         (ACE_APP_ERR_NR - 1)         /**< Not specified application error.  */
+#define BOOT_ERR         (BOOT_ERR_NR - 1)         /**< Not specified application error.  */
 
 /** @}
  */

@@ -3,6 +3,7 @@
  *
  */
 
+#include <ace/stdio.h>
 #include <uso/heap.h>
 #include <mfs/sysfs.h>
 #include <mfs/vfs.h>
@@ -12,11 +13,19 @@
 #include "dev/digout.h"
 #include "dev/cpu.h"
 
-static void info (MFS_entry_t * entry);
+static void
+info (MFS_descriptor_t * desc)
+{
+    DEV_digout_t *out = (DEV_digout_t *) desc->represent;
+    ACE_printf ("OUT state: %s , logig: %s\n",
+                out->state == DEV_DIGIO_HIGH ? "1" : "0", out->logig == DEV_DIGIO_POS ? "+" : "-");
+}
 
-static struct MFS_descriptor_op digout_descriptor_op = {.open = NULL,
+static struct MFS_descriptor_op digout_descriptor_op = {
+	.open = NULL,
     .close = NULL,
-    .info = info
+    .info = info,
+	.control = NULL
 };
 
 extern void
@@ -49,8 +58,8 @@ DEV_digout_init (DEV_digout_t * out,
 extern void
 DEV_digout_install (DEV_digout_t * out, char *name)
 {
-    MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_DIGIO), name,
-                     (MFS_entry_t *) out, MFS_DESC, &digout_descriptor_op);
+    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/digio"), name,
+                     MFS_SYS, &digout_descriptor_op, (MFS_represent_t *) out);
 }
 
 extern void
@@ -90,10 +99,3 @@ DEV_blink_nb (DEV_digout_t * out, unsigned long count, unsigned long time_ms)
     }
 }
 
-static void
-info (MFS_entry_t * entry)
-{
-    DEV_digout_t *out = (DEV_digout_t *) entry;
-    ACE_printf ("OUT state: %s , logig: %s\n",
-                out->state == DEV_DIGIO_HIGH ? "1" : "0", out->logig == DEV_DIGIO_POS ? "+" : "-");
-}

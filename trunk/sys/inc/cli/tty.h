@@ -22,18 +22,31 @@
 
 /*------------- Representation ------------------------------------------*/
 
+
+enum CLI_tty_in_transl
+{
+	CLI_TTY_INTRANSL_NONE,
+	CLI_TTY_INTRANSL_CR_2_NL,
+	CLI_TTY_INTRANSL_REMOVE_CR,
+};
+
+enum CLI_tty_out_transl
+{
+	CLI_TTY_OUTTRANSL_NONE,
+	CLI_TTY_OUTTRANSL_NL_2_CR,
+	CLI_TTY_OUTTRANSL_ADD_CR
+};
+
 /** TTY modes. */
 enum CLI_tty_mode
 {
 
-    /** No newline conversion */
-    CLI_TTY_MODE_NL2NL,
+    /** No conversion */
+    CLI_TTY_MODE_RAW,
 
-    /** Newline 2 Carriage return */
-    CLI_TTY_MODE_NL2CR,
+    /** Data are processed */
+    CLI_TTY_MODE_COOKED,
 
-    /** Newline 2 Carriage return & Newline*/
-    CLI_TTY_MODE_NL2CRNL,
 };
 
 /*
@@ -43,12 +56,15 @@ enum CLI_tty_mode
  */
 struct CLI_tty
 {
-    MFS_descriptor_t *io_stream_desc;
-    MFS_stream_t *io_stream;
-    enum MFS_sysfs_dir io_stream_dir;
+    MFS_descriptor_t *io_stream;
+    MFS_descriptor_t *io_stream_dir;
     char *io_stream_name;
-    enum CLI_tty_mode tx_mode;
-    enum CLI_tty_mode rx_mode;
+    enum CLI_tty_mode in_mode;
+    enum CLI_tty_mode out_mode;
+    enum CLI_tty_in_transl in_transl;
+    enum CLI_tty_out_transl out_transl;
+    enum CLI_tty_in_transl in_transl_default;
+    enum CLI_tty_out_transl out_transl_default;
 };
 
 /**
@@ -73,10 +89,11 @@ typedef struct CLI_tty CLI_tty_t;
  */
 
 extern void CLI_tty_init (CLI_tty_t * tty,
-                          enum MFS_sysfs_dir stream_dir,
+                          MFS_descriptor_t *stream_dir,
                           char *stream_name,
-                          enum CLI_tty_mode tx_mode, enum CLI_tty_mode rx_mode, char *name);
-
+                          enum CLI_tty_in_transl in_transl,
+                          enum CLI_tty_out_transl out_transl,
+                          char *name);
 
 /*------------------------------------------------------------------------*/
 

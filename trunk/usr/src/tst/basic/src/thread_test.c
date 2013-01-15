@@ -11,7 +11,7 @@
 #include <uso/scheduler.h>
 #include <uso/thread.h>
 #include <uso/log.h>
-#include <cli/commands.h>
+#include <cli/exec.h>
 
 #include "tst/thread_test.h"
 

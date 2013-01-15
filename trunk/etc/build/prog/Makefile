@@ -8,7 +8,7 @@ export PROG_NAME OBJ_NAMES STRIP_FLAGS STRIP_SECTIONS
 
 OPEN_OCD := openocd -s $(MOST_ROOT)/etc/ocd/ -f $(MOST_ROOT)/bsp/$(MOST_BOARD)/openocd.cfg
 
-.PHONY : default help prog bin srec hex app info obj bin_clean clean mrproper ocd-debug ocd-reset ocd-program
+.PHONY : default help prog bin srec hex app info obj clean mrproper ocd-debug ocd-reset ocd-program
 
 default:
 	@$(ECHO) "Please use <make help> for more information."
@@ -25,15 +25,14 @@ help :
 	@$(ECHO) "app($(MOST_FILE))    : build application"
 	@$(ECHO) "info                 : -> Makefile" 
 	@$(ECHO) "obj                  : -> Makefile" 
-	@$(ECHO) "bin_clean            : remove all generated binary files in current directory" 
-	@$(ECHO) "clean(bin_clean)     : -> Makefile" 
-	@$(ECHO) "mrproper(bin_clean)  : -> Makefile" 
+	@$(ECHO) "clean                : remove $(MOST_BUILD), -> Makefile" 
+	@$(ECHO) "mrproper             : remove run debug,-> Makefile" 
 	@$(ECHO) "ocd-debug            : run ocd debugger" 
 	@$(ECHO) "ocd-reset            : reset targert" 
-	@$(ECHO) "ocd-program          : programm target" 
+	@$(ECHO) "ocd-program          : program target" 
 	@$(ECHO) "------------------------------------------------------------------------------------"
 
-prog : obj
+prog : $(MOST_BUILD) obj
 	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/build/Makefile
 
 bin : prog
@@ -53,20 +52,17 @@ info :
 obj :
 	@$(call makegoal_src, $@)
 
-bin_clean :
-	-$(REMOVE) $(PROG_NAME).map
-	-$(REMOVE) $(PROG_NAME).stripped
-	-$(REMOVE) $(PROG_NAME).$(MOST_SYSTEM)
-	-$(REMOVE) $(PROG_NAME).code
-	-$(REMOVE) $(PROG_NAME).data
-	-$(REMOVE) $(PROG_NAME).bin
-	-$(REMOVE) $(PROG_NAME).srec
-	-$(REMOVE) $(PROG_NAME).hex
+$(MOST_BUILD) :
+	@$(MAKEDIR) $(MOST_BUILD)
+	
 
-clean : bin_clean
+clean :
+	-$(REMOVE) $(MOST_BUILD)
 	@$(call makegoal_src, $@)
 
-mrproper : bin_clean
+mrproper :
+	-$(REMOVE) run
+	-$(REMOVE) debug
 	@$(call makegoal_inc, $@)
 	@$(call makegoal_src, $@)
 
@@ -77,5 +73,5 @@ ocd-reset:
 	$(OPEN_OCD) -f ocd/reset.cfg
 
 ocd-program:
-	$(OPEN_OCD) -f ocd/program.cfg
+	$(OPEN_OCD) -f ocd/$(MOST_BUILD)-program.cfg
 

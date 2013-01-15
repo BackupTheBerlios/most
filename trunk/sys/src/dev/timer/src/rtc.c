@@ -5,6 +5,7 @@
  *      Author: maik
  */
 
+#include <ace/stdio.h>
 #include <ace/time.h>
 #include <ace/err.h>
 #include <mfs/sysfs.h>
@@ -21,11 +22,27 @@ static struct DEV_rtc
 } rtc;
 
 
-static void info (MFS_entry_t * entry);
+static void
+info (MFS_descriptor_t * desc)
+{
+    static ACE_time_t time;
+    time.time = DEV_time_get ();
+    ACE_err_t err = ACE_time_to_param (&time);
+    if (err != ACE_OK)
+    {
+        ACE_printf ("Inval time: %d\n", err);
+        return;
+    }
+    ACE_puts ("Date: ");
+    ACE_time_print (&time);
+    ACE_puts ("\n");
+}
 
-static struct MFS_descriptor_op rtc_descriptor_op = {.open = NULL,
+static struct MFS_descriptor_op rtc_descriptor_op = {
+	.open = NULL,
     .close = NULL,
-    .info = info
+    .info = info,
+    .control = NULL
 };
 
 extern void
@@ -33,8 +50,8 @@ DEV_rtc_init (struct DEV_rtt_interface *rtt)
 {
     rtc.base_time = 0;
     rtc.rtt = rtt;
-    MFS_create_desc (MFS_sysfs_get_dir (MFS_SYSFS_DIR_TIMER), "rtc",
-                     (MFS_entry_t *) & rtc, MFS_DESC, &rtc_descriptor_op);
+    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/clock"), "rtc",
+                     MFS_SYS, &rtc_descriptor_op, (MFS_represent_t *) &rtc);
     rtc.rtt->reset ();
 }
 
@@ -65,18 +82,3 @@ DEV_alarm_set (unsigned long time)
     }
 }
 
-static void
-info (MFS_entry_t * entry)
-{
-    static ACE_time_t time;
-    time.time = DEV_time_get ();
-    ACE_err_t err = ACE_time_to_param (&time);
-    if (err != ACE_ERR_OK)
-    {
-        ACE_printf ("Inval time: %d\n", err);
-        return;
-    }
-    ACE_puts ("Date: ");
-    ACE_time_print (&time);
-    ACE_puts ("\n");
-}

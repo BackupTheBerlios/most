@@ -20,8 +20,10 @@ SECTIONS
 	{
 		_code_start = . ;
 		_text_start = . ;
- 		*(.vectors)                     
-		*(.text)                                
+        KEEP(*(.reset))                     
+        KEEP(*(.unref))                     
+        *(.text)                                
+        *(.text*)                                
 		_text_end = . ;
 	} > rom
 
@@ -29,31 +31,37 @@ SECTIONS
 	{
 		_rodata_start	= . ;
 		*(.rodata)
+        *(.rodata*)
+        . = ALIGN(4);
 		_rodata_end		= . ;
 		_code_end = . ;
 	} > rom
 
-	.data :
+	.data : AT (ADDR(.text) + SIZEOF(.text) + SIZEOF(.rodata))
 	{
 		_ram_start	= . ;
 		_data_start	= . ;
 		_vectors_start = . ;
- 		*(.ramvect)                     
+ 		KEEP(*(.vectors))                     
+        _vectors_end = . ;
 		*(.ramcode)
 		*(.data)
+        *(.data*)
 		_data_end = . ;
 	} > ram
 
 	.bss :
 	{
+        . = ALIGN(4);
 		_bss_start = . ;
 		*(.bss)
-		*(COMMON)
+        *(COMMON)
 		_bss_end = . ;
 	} > ram
 
 	.heap (NOLOAD):
 	{
+        . = ALIGN(4);
 		_heap_start = . ;
 		*(.heap)
 		. = _ram_start  + _ram_size - _stack_size - 0;

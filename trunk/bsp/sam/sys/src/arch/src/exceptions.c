@@ -1,3 +1,4 @@
+#include <ace/stddef.h>
 #include <dev/arch/at91/aic.h>
 #include <dev/arch/at91/debug.h>
 #include <dev/arch/at91/pit.h>
@@ -14,8 +15,10 @@
 #include "arch/rtc.h"
 
 
-#define PAUSE 1000000           /* 1 s = 1000 0000 us */
-#define PULSE 400               /* 400 ms = 2.5  p/s */
+#define PAUSE 2000000           /* 2 s */
+#define PULSE 500               /* 2  p/s */
+
+static void blink (int c) ACE_SECTION_ (".unref");
 
 static void
 blink (int c)
@@ -23,8 +26,15 @@ blink (int c)
     while (1)
     {
         DEV_blink_nb (&SAM_red_led, c, PULSE);
-        DEV_cpudelay (PAUSE);
+        DEV_cpudelay (DEV_USEC_2_LOOPS(PAUSE));
     }
+}
+
+extern void
+SAM_default_reset_handler (void)
+{
+    DEV_at91_DBGU_print_ascii ("Default reset handler!\n");
+    blink (1);
 }
 
 extern void
@@ -35,12 +45,19 @@ SAM_undefined_instruction (void)
 }
 
 extern void
+SAM_software_interrupt (void)
+{
+    DEV_at91_DBGU_print_ascii ("Software interrupt!\n");
+    blink (3);
+}
+
+extern void
 SAM_prefetch_abort (void)
 {
     DEV_at91_DBGU_print_ascii ("Prefetch abort at ");
     DEV_at91_DBGU_print_hex8 (AT91C_BASE_MC->MC_AASR);
     DEV_at91_DBGU_print_ascii ("!\n");
-    blink (3);
+    blink (4);
 }
 
 extern void
@@ -49,14 +66,6 @@ SAM_data_abort (void)
     DEV_at91_DBGU_print_ascii ("Data abort at ");
     DEV_at91_DBGU_print_hex8 (AT91C_BASE_MC->MC_AASR);
     DEV_at91_DBGU_print_ascii ("\n");
-    blink (4);
-}
-
-
-extern void
-SAM_default_spurious_handler (void)
-{
-    DEV_at91_DBGU_print_ascii ("Spurious Interrupt\n");
     blink (5);
 }
 
@@ -64,16 +73,27 @@ extern void
 SAM_default_irq_handler (void)
 {
     DEV_at91_DBGU_print_ascii ("Default IRQ\n");
-    blink (6);
+    blink (7);
 }
 
 extern void
 SAM_default_fiq_handler (void)
 {
     DEV_at91_DBGU_print_ascii ("Default FIQ\n");
-    blink (1);
+    blink (8);
 }
 
+extern void
+SAM_default_spurious_handler (void)
+{
+    DEV_at91_DBGU_print_ascii ("Spurious Interrupt\n");
+    blink (10);
+}
+
+
+
+
+static void sys_interrupt (void) ACE_SECTION_ (".unref");
 
 static void
 sys_interrupt (void)
