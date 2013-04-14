@@ -14,7 +14,7 @@
 extern ACE_bool_t
 CLI_cmd_remove (CLI_interpreter_t * cli)
 {
-    MFS_descriptor_t *desc = cli->desc;
+    MFS_descriptor_t *desc = USO_thread_dir_get(USO_current());
     MFS_remove (desc, cli->argv [0]);
     return TRUE;
 }

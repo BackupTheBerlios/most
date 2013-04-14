@@ -22,9 +22,9 @@ CLI_cmd_exec (CLI_interpreter_t * cli)
     {
     	exec = (CLI_exec_t *)cli->exe_desc->represent;
     }
-    else if (cli->desc->type == MFS_EXEC)
+    else if (USO_thread_dir_get(USO_current())->type == MFS_EXEC)
     {
-        exec = (CLI_exec_t *) cli->desc->represent;
+        exec = (CLI_exec_t *) USO_thread_dir_get(USO_current())->represent;
     }
     if (exec != NULL)
     {

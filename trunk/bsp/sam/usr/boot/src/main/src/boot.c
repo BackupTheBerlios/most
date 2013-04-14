@@ -21,8 +21,9 @@ SAM_main (void)
     }
     DEV_digout_set (&SAM_red_led);
 
+    MFS_descriptor_t *app = MFS_resolve(MFS_get_root(), "app");
     MFS_descriptor_t *boot;
-    boot = MFS_directory_create (MFS_get_root(), "boot");
+    boot = MFS_directory_create (app, "boot");
 
     SAM_download_install (boot, SAM_APPL_START, SAM_APPL_END);
     NAP_ymodem_install();

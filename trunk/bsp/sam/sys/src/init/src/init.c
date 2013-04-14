@@ -30,7 +30,6 @@
 #include <dev/timer.h>
 #include <dev/clock.h>
 #include <dev/cpu.h>
-#include <dev/mmc.h>
 #include <cli/tty.h>
 #include <mfs/sysfs.h>
 #include <mfs/descriptor.h>
@@ -49,6 +48,7 @@
 #include "arch/adc.h"
 #include "arch/pwm.h"
 #include <arch/eth.h>
+#include <arch/mmc.h>
 #include "init/main.h"
 #include "init/init.h"
 #include "init/start.h"
@@ -162,29 +162,16 @@ init (void)
     DEV_cpudelay (DEV_USEC_2_LOOPS (100000L));
     USO_log_printf (USO_LL_INFO, "Loop calib 100ms: %lu.\n", USO_TICKS_2_MSEC(DEV_get_ticks_diff (ticks_count)) );
 
+    SAM_config_init ();
     if (SAM_spi_init () != 0)
     {
         DEV_digout_set (&SAM_red_led);
         USO_log_puts (USO_LL_ERROR, "SPI init failed.\n");
-        SAM_config_init ();
     }
     else
     {
-        if (DEV_mmc_spi_init ((DEV_spi_dev_t *) & SAM_mmc) < ACE_OK)
+        if (SAM_mmc_install () == ACE_OK)
         {
-            DEV_digout_set (&SAM_red_led);
-            USO_log_puts (USO_LL_ERROR, "MMC spi init failed.\n");
-            SAM_config_init ();
-        }
-        else if (DEV_mmc_init () < ACE_OK)
-        {
-            DEV_digout_set (&SAM_red_led);
-            USO_log_puts (USO_LL_ERROR, "MMC card not found.\n");
-            SAM_config_init ();
-        }
-        else
-        {
-            DEV_mmc_install ();
             SAM_config_read ();
         }
     }

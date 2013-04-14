@@ -6,6 +6,7 @@
 #ifndef CLI_TTY_H
 #define CLI_TTY_H
 
+#include <uso/mutex.h>
 #include <ace/stddef.h>
 #include <mfs/vfs.h>
 #include <mfs/stream.h>
@@ -65,6 +66,7 @@ struct CLI_tty
     enum CLI_tty_out_transl out_transl;
     enum CLI_tty_in_transl in_transl_default;
     enum CLI_tty_out_transl out_transl_default;
+    USO_mutex_t lock;
 };
 
 /**

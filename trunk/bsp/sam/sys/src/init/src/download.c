@@ -10,19 +10,13 @@
 #include <uso/cpu.h>
 #include <dev/arch/at91/flashd.h>
 #include <dev/arch/at91/efc.h>
-#include <mfs/block.h>
+#include <mfs/stream.h>
 #include <init/download.h>
 
-#define PAGE_SIZE    AT91C_IFLASH_PAGE_SIZE
-
-#define FLASH_START        (unsigned char *)(0x100000)
-
-static unsigned char *sector_start;
-static unsigned char *sector_end;
-
 struct flash {
-	unsigned char *addr;
-	unsigned long prog_size;
+	unsigned long sector_size;
+	unsigned char *sector_start;
+	unsigned char *sector_end;
 };
 
 typedef struct flash flash_t;
@@ -30,28 +24,26 @@ typedef struct flash flash_t;
 static flash_t flash;
 
 static ACE_err_t
-flash_open (MFS_descriptor_t *block)
+flash_open (MFS_descriptor_t *desc)
 {
-	flash_t *fl = (flash_t *) block->represent;
-	if (block->open_cnt != 1) return DEF_ERR_BUSY;
-	fl->prog_size = 0;
-    fl->addr = sector_start;
+	MFS_stream_t *stream = (MFS_stream_t *) desc;
+	if (desc->open_cnt != 1) return DEF_ERR_BUSY;
+	stream->pos_rx = 0;
     return ACE_OK;
 }
 
 static void
-flash_close (MFS_descriptor_t *block)
+flash_close (MFS_descriptor_t *desc)
 {
-	flash_t *fl = (flash_t *) block->represent;
-    fl->addr = sector_start;
 }
 
 static void
-flash_info (MFS_descriptor_t *block)
+flash_info (MFS_descriptor_t *desc)
 {
-	flash_t *fl = (flash_t *) block->represent;
-    MFS_block_print((MFS_block_t *)block);
-	ACE_printf("Flash ROM: prog_size = %lu, start = %p, end = %p \n", fl->prog_size, fl->addr, sector_end);
+	flash_t *fl = (flash_t *) desc->represent;
+    MFS_stream_print((MFS_stream_t *)desc);
+	ACE_printf("\t Flash: loc = %p,  start = %p, end = %p, max = %lu, block size = %lu\n",
+			SAM_FLASH_START, fl->sector_start, fl->sector_end, fl->sector_end - fl->sector_start, fl->sector_size);
 }
 
 static struct MFS_descriptor_op flash_desc_op = {
@@ -61,52 +53,61 @@ static struct MFS_descriptor_op flash_desc_op = {
     .control = NULL,
 };
 
-static ACE_err_t
-flash_put (MFS_descriptor_t * block, char *buf, ACE_size_t len, ACE_size_t number)
+static ACE_size_t
+flash_write (MFS_stream_t * stream, const char *buf, ACE_size_t len)
 {
-	flash_t *fl = (flash_t *) block->represent;
     unsigned char error;
+    ACE_size_t l;
+    unsigned char *p;
+	flash_t *fl = (flash_t *) ((MFS_descriptor_t *)stream)->represent;
 
-	if ( (fl->addr + len) >= sector_end) {
-		return DEF_ERR_ROM;
+    if (stream->pos_rx == 0) stream->size_tx = 0;
+
+	p =	(fl->sector_start + stream->pos_rx);
+
+	if ( p >= fl->sector_end) {
+		return ACE_EOF;
 	}
 
-    error = DEV_at91_FLASHD_write ((unsigned int)fl->addr, (unsigned char *)buf, (unsigned int)len);
+	if ( (p + len) > fl->sector_end) {
+		l = fl->sector_end - p;
+	} else {
+		l = len;
+	}
+
+    error = DEV_at91_FLASHD_write ((unsigned int)p, (unsigned char *)buf, (unsigned int)l);
     if (error)
     {
-		return DEF_ERR_ROM;
+		return 0; /* todo return error value */
     }
-    fl->addr += len;
-    fl->prog_size += len;
-    return ACE_OK;
+
+    stream->pos_rx += l;
+    stream->size_tx += l;
+    return l;
 }
 
 
-static struct MFS_block_op flash_block_op = {
-    .get = NULL,
-    .put = flash_put,
-    .confirm = NULL
+static struct MFS_stream_op flash_stream_op = {
+    .read = NULL,
+    .write = flash_write,
+    .seek = NULL,
+    .flush = NULL
 };
 
 
 static void
-flash_init (flash_t * fl, MFS_descriptor_t * dir)
+flash_init (flash_t *fl, unsigned char *start, unsigned char *end)
 {
-	MFS_descriptor_t *desc = MFS_block_create (dir, "flash", &flash_desc_op, &flash_block_op, (MFS_represent_t *) fl, MFS_BLOCK_IO);
-	MFS_block_t *block = (MFS_block_t *)desc;
-	block->start = (sector_start - FLASH_START) / PAGE_SIZE;
-	block->end = (sector_end - FLASH_START) / PAGE_SIZE;
-	block->size = PAGE_SIZE;
-	fl->prog_size = 0;
-    fl->addr = (unsigned char *)(sector_start);
+	fl->sector_size = AT91C_IFLASH_PAGE_SIZE;
+	fl->sector_start = start;
+	fl->sector_end = end;
 }
 
 
 extern void
 SAM_download_install (MFS_descriptor_t * dir, unsigned char *start, unsigned char *end)
 {
-	sector_start = start;
-	sector_end = end;
-	flash_init(&flash, dir);
+	flash_init(&flash, start, end);
+	MFS_stream_create (dir, "flash", &flash_desc_op, &flash_stream_op, (MFS_represent_t *) &flash, MFS_FILE);
 }
 

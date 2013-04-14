@@ -37,7 +37,7 @@ struct MFS_stream
 	MFS_descriptor_t desc;
     enum MFS_stream_type type;  /* Stream type. */
     ACE_size_t size_tx;         /* File size, for IO the amount of transmitted characters. */
-    ACE_size_t pos_rx;          /* File position, for IO the amount of received characters. */
+    ACE_size_t pos_rx;               /* File position, for IO the amount of received characters. */
     struct MFS_stream_op *operations;   /* Stream operations. */
 };
 
@@ -94,28 +94,19 @@ extern void MFS_stream_init (MFS_stream_t * stream,
                              struct MFS_stream_op *operations);
 
 /**
- * Create a file.
- * A file is a special kind of stream io.
- * The stream operations for a file are used.
- * @param dir_desc : Directory descriptor in which a new file descriptor is created.
- * @param name : Name of the new file.
- * @return Created file descriptor.
- */
-extern MFS_descriptor_t *MFS_stream_create_file (MFS_descriptor_t * dir_desc, char *name);
-
-/**
- * Create an IO stream.
+ * Create an stream.
  * The IO stream has to implement the stream operation interface.
  * @param dir_desc : Directory descriptor in which a new io descriptor is created.
  * @param name : Name for the io.
  * @param desc_op : descriptor operations for the stream.
  * @param io_op : IO operations for the stream.
  * @param represent : Stream representation.
+ * @param type : io || file.
  * @return Created io descriptor.
  */
-extern MFS_descriptor_t * MFS_stream_create_io (
+extern MFS_descriptor_t * MFS_stream_create (
 		MFS_descriptor_t * dir_desc, char *name, struct MFS_descriptor_op *desc_op,
-		struct MFS_stream_op *io_op, MFS_represent_t * represent);
+		struct MFS_stream_op *io_op, MFS_represent_t * represent, enum MFS_stream_type type);
 
 
 extern void MFS_stream_print (MFS_stream_t * stream);

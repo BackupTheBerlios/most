@@ -6,7 +6,9 @@
 #include <ace/string.h>
 #include <ace/stdlib.h>
 #include <cli/exec.h>
+#include <mfs/sysfs.h>
 #include <mfs/directory.h>
+#include <mfs/block.h>
 #include <dev/mmc.h>
 
 #include "arch/spi.h"
@@ -37,47 +39,65 @@ SAM_config_init (void)
 extern void
 SAM_config_read (void)
 {
-    char *buffer = ACE_malloc (DEV_MMC_BLOCK_SIZE);
-    if (buffer)
+	ACE_ssize_t len;
+	char *data;
+	MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "d1_p1");
+	MFS_block_t *p1 = (MFS_block_t *)desc;
+    if (desc == NULL || desc->type != MFS_BLOCK)
+    	return;
+    unsigned long block = p1->start;
+	len = MFS_get (p1, &data, block);
+	if (data != NULL)
     {
-        memset (buffer, '\0', DEV_MMC_BLOCK_SIZE);
-        DEV_mmc_read_block (0, sizeof (SAM_config), buffer);
-        memcpy (&SAM_config, buffer, sizeof (SAM_config));
-        if ((NET_inet_chksum (&SAM_config,
-                              (ACE_u16_t) (sizeof (SAM_config))) != 0) ||
-            (SAM_config.state != SAM_CONFIG_STATE_SAVED))
-        {
-            SAM_config_init ();
-        }
-        ACE_free (buffer);
+    	if (len >= sizeof (SAM_config)){
+    		memcpy (&SAM_config, data, sizeof (SAM_config));
+        	if ((NET_inet_chksum (&SAM_config,
+                              	  (ACE_u16_t) (sizeof (SAM_config))) != 0) ||
+                (SAM_config.state != SAM_CONFIG_STATE_SAVED))
+        	{
+        		SAM_config_init ();
+        	}
+    	} else {
+    		// check error to short data;
+    	}
+    	MFS_confirm(p1,block);
     }
     else
     {
-        // error out of mem
+        // check error no data
     }
+	MFS_close_desc (desc);
 }
 
 static void
 config_write (void)
 {
+	MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "d1_p1");
+	MFS_block_t *p1 = (MFS_block_t *)desc;
+	if (desc == NULL || desc->type != MFS_BLOCK)
+    	return;
     if (SAM_config.state == SAM_CONFIG_STATE_SAVED)
         return;
     SAM_config.state = SAM_CONFIG_STATE_SAVED;
     SAM_config.checksum = NET_inet_chksum (&SAM_config,
                                            (ACE_u16_t) (sizeof (SAM_config) -
                                                         sizeof (SAM_config.checksum)));
-    char *buffer = ACE_malloc (DEV_MMC_BLOCK_SIZE);
+    char *buffer = ACE_malloc (p1->size);
     if (buffer)
     {
-        memset (buffer, '\0', DEV_MMC_BLOCK_SIZE);
-        memcpy (buffer, &SAM_config, sizeof (SAM_config));
-        DEV_mmc_write_block (0, buffer);
+        memset (buffer, '\0', p1->size);
+        if (sizeof (SAM_config) <= p1->size)
+        {
+        	memcpy (buffer, &SAM_config, sizeof (SAM_config));
+        }
+        MFS_put  (p1, buffer, p1->size, p1->start);
         ACE_free (buffer);
     }
     else
     {
         // error out of mem
     }
+	MFS_close_desc (desc);
 }
 
 static void
@@ -165,6 +185,7 @@ config_set_ip_addr (char *param, NET_ip_addr_t * ipaddr)
     if (param != NULL)
     {
         int a, b, c, d;
+    	USO_lock (&ACE_lock);
         param = ACE_strtok (param, ".");
         a = ACE_atoi (param);
         param = ACE_strtok (NULL, ".");
@@ -174,6 +195,7 @@ config_set_ip_addr (char *param, NET_ip_addr_t * ipaddr)
         param = ACE_strtok (NULL, ".");
         d = ACE_atoi (param);
         NET_ip4_addr (ipaddr, a, b, c, d);
+    	USO_unlock (&ACE_lock);
     }
 }
 

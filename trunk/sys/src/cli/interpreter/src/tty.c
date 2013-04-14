@@ -46,40 +46,40 @@ tty_print (CLI_tty_t * tty)
 }
 
 static ACE_err_t
-tty_open (MFS_descriptor_t * tty_stream)
+tty_open (MFS_descriptor_t * desc)
 {
-    CLI_tty_t *tty = (CLI_tty_t *) tty_stream->represent;
-    USO_cpu_status_t ps = USO_disable ();
-    if (tty_stream->open_cnt == 1){
+    CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
+    USO_lock(&tty->lock);
+    if (desc->open_cnt == 1){
     	tty->io_stream = MFS_open (tty->io_stream_dir, tty->io_stream_name);
     	if (tty->io_stream == NULL)
     	{
     		ACE_PANIC ("TTY:open stream failed");
     	}
     }
-    USO_restore (ps);
+    USO_unlock(&tty->lock);
     return ACE_OK;
 }
 
 static void
-tty_close (MFS_descriptor_t * tty_stream)
+tty_close (MFS_descriptor_t * desc)
 {
-    CLI_tty_t *tty = (CLI_tty_t *) tty_stream->represent;
-    USO_cpu_status_t ps = USO_disable ();
-    if (tty_stream->open_cnt == 0){
+    CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
+    USO_lock(&tty->lock);
+    if (desc->open_cnt == 0){
     	if (tty->io_stream != NULL)
     	{
     		MFS_close_desc (tty->io_stream);
     	}
     }
-    USO_restore (ps);
+    USO_unlock(&tty->lock);
 }
 
 static void
-tty_info (MFS_descriptor_t * tty_stream)
+tty_info (MFS_descriptor_t * desc)
 {
-    CLI_tty_t *tty = (CLI_tty_t *) tty_stream->represent;
-    MFS_stream_print((MFS_stream_t *)tty_stream);
+    CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
+    MFS_stream_print((MFS_stream_t *)desc);
     tty_print (tty);
     if (tty->io_stream != NULL)
     {
@@ -88,9 +88,9 @@ tty_info (MFS_descriptor_t * tty_stream)
 }
 
 static void
-tty_control (MFS_descriptor_t * tty_stream, enum MFS_control_key key, long value)
+tty_control (MFS_descriptor_t * desc, enum MFS_control_key key, long value)
 {
-    CLI_tty_t *tty = (CLI_tty_t *) tty_stream->represent;
+    CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
 	switch (key){
 	case MFS_CTRL_TTY_IN_MODE:
 		tty->in_mode = value;
@@ -122,9 +122,9 @@ static struct MFS_descriptor_op tty_desc_op = {
 };
 
 static ACE_size_t
-tty_read (MFS_descriptor_t * tty_stream, char *buf, ACE_size_t len)
+tty_read (MFS_stream_t *stream, char *buf, ACE_size_t len)
 {
-    CLI_tty_t *tty = (CLI_tty_t *) tty_stream->represent;
+    CLI_tty_t *tty = (CLI_tty_t *) ((MFS_descriptor_t *)stream)->represent;
     ACE_size_t ret = 0;
     int c = ACE_EOF;
     if (tty->io_stream != NULL)
@@ -165,13 +165,15 @@ tty_read (MFS_descriptor_t * tty_stream, char *buf, ACE_size_t len)
             }
         }
     }
+    stream->pos_rx += ret;
+
     return ret;
 }
 
 static ACE_size_t
-tty_write (MFS_descriptor_t * tty_stream, const char *buf, ACE_size_t len)
+tty_write (MFS_stream_t *stream, const char *buf, ACE_size_t len)
 {
-    CLI_tty_t *tty = (CLI_tty_t *) tty_stream->represent;
+    CLI_tty_t *tty = (CLI_tty_t *) ((MFS_descriptor_t *)stream)->represent;
     ACE_size_t ret = 0;
     if (tty->io_stream != NULL)
     {
@@ -207,6 +209,8 @@ tty_write (MFS_descriptor_t * tty_stream, const char *buf, ACE_size_t len)
             }
         }
     }
+    stream->size_tx += ret;
+
     return ret;
 }
 
@@ -235,6 +239,7 @@ CLI_tty_init (CLI_tty_t * tty,
     tty->out_transl_default = out_transl;
     tty->in_mode = CLI_TTY_MODE_COOKED;
     tty->out_mode = CLI_TTY_MODE_COOKED;
-    MFS_stream_create_io (MFS_resolve(MFS_get_root(), "sys/cli"), name, &tty_desc_op,
-                   &tty_stream_op, (MFS_represent_t *) tty);
+    USO_mutex_init(&tty->lock);
+    MFS_stream_create (MFS_resolve(MFS_get_root(), "sys/cli"), name, &tty_desc_op,
+                   &tty_stream_op, (MFS_represent_t *) tty, MFS_STREAM_IO);
 }

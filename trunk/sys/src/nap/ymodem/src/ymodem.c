@@ -9,6 +9,7 @@
 #include <ace/stdlib.h>
 #include <uso/log.h>
 #include <uso/scheduler.h>
+#include <uso/thread.h>
 #include <nap/ymodem.h>
 #include <dev/serial.h>
 #include <cli/tty.h>
@@ -26,21 +27,12 @@ write_packet(char *data, int length, MFS_descriptor_t *desc)
 	return ACE_fwrite (desc, data, length);
 }
 
-static ACE_size_t
-put_packet(char *data, int length, MFS_descriptor_t *desc)
-{
-	if (MFS_put ((MFS_block_t *)desc, data, length, 0) == ACE_OK){
-		return length;
-	}
-	return 0;
-}
-
 static void
 ymr_exec (char *arg)
 {
-	MFS_descriptor_t *desc = MFS_open(CLI_get_dir(USO_current()->cli), arg);
+	MFS_descriptor_t *desc = MFS_open(USO_thread_dir_get(USO_current()), arg);
 	if (desc == NULL) {
-		ACE_printf("%s not fond.\n", arg);
+		ACE_printf("%s not found.\n", arg);
 		return;
 	}
 
@@ -52,10 +44,6 @@ ymr_exec (char *arg)
 
 	if (desc->type == MFS_STREAM) {
 		size = NAP_ymodem_receive(name, write_packet, desc);
-	}
-
-	if (desc->type == MFS_BLOCK) {
-		size = NAP_ymodem_receive(name, put_packet, desc);
 	}
 
 	ACE_printf("%s %lu bytes rx.\n", name ? name : "no_mem", size);

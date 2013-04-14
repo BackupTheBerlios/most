@@ -10,6 +10,8 @@
 
 #include <mfs/vfs.h>
 #include <cli/interpreter.h>
+#include <uso/scheduler.h>
+#include <uso/thread.h>
 
 /** @addtogroup cli
  * @{

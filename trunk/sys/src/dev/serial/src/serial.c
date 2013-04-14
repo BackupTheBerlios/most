@@ -68,12 +68,12 @@ tx_start (DEV_serial_t * serial)
 
 
 static ACE_err_t
-serial_open (MFS_descriptor_t * stream)
+serial_open (MFS_descriptor_t * desc)
 {
-    DEV_serial_t *serial = (DEV_serial_t *) stream->represent;
+    DEV_serial_t *serial = (DEV_serial_t *) desc->represent;
     USO_cpu_status_t ps = USO_disable ();
 
-    if (stream->open_cnt == 1){
+    if (desc->open_cnt == 1){
     	DEV_serial_error_init (&serial->error);
     	USO_pipe_init (&serial->rx_buf, serial->rx_buffer, sizeof (serial->rx_buffer));
     	USO_pipe_init (&serial->tx_buf, serial->tx_buffer, sizeof (serial->tx_buffer));
@@ -90,30 +90,30 @@ serial_open (MFS_descriptor_t * stream)
 }
 
 static void
-serial_close (MFS_descriptor_t * stream)
+serial_close (MFS_descriptor_t * desc)
 {
-    DEV_serial_t *serial = (DEV_serial_t *)stream->represent;
+    DEV_serial_t *serial = (DEV_serial_t *)desc->represent;
     USO_cpu_status_t ps = USO_disable ();
-    if (stream->open_cnt == 0){
+    if (desc->open_cnt == 0){
     	serial->close ();
     }
     USO_restore (ps);
 }
 
 static void
-serial_info (MFS_descriptor_t * stream)
+serial_info (MFS_descriptor_t * desc)
 {
-    DEV_serial_t *serial = (DEV_serial_t *) stream->represent;
-    MFS_stream_print((MFS_stream_t *)stream);
+    DEV_serial_t *serial = (DEV_serial_t *) desc->represent;
+    MFS_stream_print((MFS_stream_t *)desc);
     ACE_printf ("Serial %sblocking IO:\n", serial->block ? "" : "non ");
     DEV_serial_settings_print (serial->settings);
     DEV_serial_error_print (&serial->error);
 }
 
 static void
-serial_control (MFS_descriptor_t *stream, enum MFS_control_key key, long value)
+serial_control (MFS_descriptor_t *desc, enum MFS_control_key key, long value)
 {
-    DEV_serial_t *serial = (DEV_serial_t *) stream->represent;
+    DEV_serial_t *serial = (DEV_serial_t *) desc->represent;
 	switch (key){
 	case MFS_CTRL_SER_RX_TIMEOUT:
 		serial->rx_timeout_sec = value;
@@ -131,28 +131,28 @@ static struct MFS_descriptor_op serial_desc_op = {
 };
 
 static ACE_size_t
-serial_nb_read (MFS_descriptor_t * stream, char *buf, ACE_size_t len)
+serial_nb_read (MFS_stream_t * stream, char *buf, ACE_size_t len)
 {
-    DEV_serial_t *serial = (DEV_serial_t *) stream->represent;
+    DEV_serial_t *serial = (DEV_serial_t *) ((MFS_descriptor_t *)stream)->represent;
     ACE_size_t ret;
     USO_cpu_status_t ps = USO_disable ();
     ret = USO_pipe_read_ns (&serial->rx_buf, buf, len);
-    ((MFS_stream_t *)stream)->pos_rx += ret;
+    stream->pos_rx += ret;
     USO_restore (ps);
     return ret;
 }
 
 static ACE_size_t
-serial_nb_write (MFS_descriptor_t * stream, const char *buf, ACE_size_t len)
+serial_nb_write (MFS_stream_t * stream, const char *buf, ACE_size_t len)
 {
-    DEV_serial_t *serial = (DEV_serial_t *) stream->represent;
+    DEV_serial_t *serial = (DEV_serial_t *) ((MFS_descriptor_t *)stream)->represent;
     ACE_size_t ret;
     USO_cpu_status_t ps = USO_disable ();
     ret = USO_pipe_write_ns (&serial->tx_buf, buf, len);
     if (ret > 0)
     {
         tx_start (serial);
-        ((MFS_stream_t *)stream)->size_tx += ret;
+        stream->size_tx += ret;
     }
     serial->error.tx_buf_overrun += (len - ret);
     USO_restore (ps);
@@ -161,9 +161,9 @@ serial_nb_write (MFS_descriptor_t * stream, const char *buf, ACE_size_t len)
 
 
 static ACE_size_t
-serial_b_read (MFS_descriptor_t * stream, char *buf, ACE_size_t len)
+serial_b_read (MFS_stream_t * stream, char *buf, ACE_size_t len)
 {
-    DEV_serial_t *serial = (DEV_serial_t *) stream->represent;
+    DEV_serial_t *serial = (DEV_serial_t *) ((MFS_descriptor_t *)stream)->represent;
     ACE_size_t ret = len;
     ACE_size_t readed;
     USO_lock (&serial->rx_mutex);
@@ -184,7 +184,7 @@ serial_b_read (MFS_descriptor_t * stream, char *buf, ACE_size_t len)
         }
         USO_restore (ps);
     }
-    ((MFS_stream_t *)stream)->pos_rx += ret - len;
+    stream->pos_rx += ret - len;
     serial->rx_cancel = FALSE;
     DEV_timer_stop (&serial->rx_timer);
     USO_unlock (&serial->rx_mutex);
@@ -192,9 +192,9 @@ serial_b_read (MFS_descriptor_t * stream, char *buf, ACE_size_t len)
 }
 
 static ACE_size_t
-serial_b_write (MFS_descriptor_t * stream, const char *buf, ACE_size_t len)
+serial_b_write (MFS_stream_t * stream, const char *buf, ACE_size_t len)
 {
-    DEV_serial_t *serial = (DEV_serial_t *) stream->represent;
+    DEV_serial_t *serial = (DEV_serial_t *) ((MFS_descriptor_t *)stream)->represent;
     ACE_size_t ret = len;
     ACE_size_t written;
     USO_lock (&serial->tx_mutex);
@@ -214,7 +214,7 @@ serial_b_write (MFS_descriptor_t * stream, const char *buf, ACE_size_t len)
         }
         USO_restore (ps);
     }
-    ((MFS_stream_t *)stream)->size_tx += ret;
+    stream->size_tx += ret;
     USO_unlock (&serial->tx_mutex);
     return ret;
 }
@@ -252,9 +252,9 @@ DEV_serial_init (DEV_serial_t * serial,
     serial->block = block;
     DEV_timer_init(&serial->rx_timer, rx_timeout, serial, DEV_TIMER_INT);
     DEV_timer_install (&serial->rx_timer, "srx_to");
-    MFS_stream_create_io (MFS_resolve(MFS_get_root(), "sys/dev/serial"), name, &serial_desc_op,
+    MFS_stream_create (MFS_resolve(MFS_get_root(), "sys/dev/serial"), name, &serial_desc_op,
                    (serial->block == TRUE) ? &serial_b_stream_op : &serial_nb_stream_op,
-                   (MFS_represent_t *) serial);
+                   (MFS_represent_t *) serial, MFS_STREAM_IO);
 }
 
 extern void

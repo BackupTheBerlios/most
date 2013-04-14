@@ -8,11 +8,10 @@
 
 #include <ace/stddef.h>
 
-#include "uso/list.h"
-#include "uso/cpu.h"
-#include "ace/stdio.h"
-#include "cli/interpreter.h"
-#include "mfs/vfs.h"
+#include <uso/list.h>
+#include <uso/cpu.h>
+#include <ace/stdio.h>
+#include <mfs/vfs.h>
 
 /** @addtogroup uso
  * @{
@@ -124,6 +123,11 @@ enum USO_thread_flags
     USO_FLAG_CLOSE_OUT    /**< close output stream when thread terminates. */
 };
 
+enum USO_thread_signals
+{
+    USO_SIGNAL_STOP       /**< Stop thread. */
+};
+
 /*
  * Thread struct.
  *
@@ -140,19 +144,18 @@ struct USO_thread
     void (*enter) (void *);
     void (*cleanup) (void);
     void *arg;
-    ACE_bool_t stop;
     ACE_u32_t flags;
     ACE_u32_t signals;
-    MFS_descriptor_t *in;
-    MFS_descriptor_t *out;
     USO_stack_t *stack;
-    int stack_size;
+    unsigned long stack_size;
     USO_stack_t *stack_bot;
     USO_stack_t *stack_top;
     USO_stack_t *stack_max;
     void *message;
     unsigned long ticks;
-    CLI_interpreter_t *cli;
+    MFS_descriptor_t *in;
+    MFS_descriptor_t *out;
+    MFS_descriptor_t *dir;
     MFS_descriptor_t *desc;
 };
 
@@ -249,7 +252,9 @@ extern void USO_thread_arg_init (USO_thread_t * thread, void *arg);
  * @param thread : thread.
  * @param cli : cli.
  */
-extern void USO_thread_cli_init (USO_thread_t * thread, CLI_interpreter_t *cli);
+extern void USO_thread_dir_set (USO_thread_t * thread, MFS_descriptor_t *dir);
+
+extern MFS_descriptor_t * USO_thread_dir_get (USO_thread_t * thread);
 
 /**
  * Set thread flags.
@@ -287,7 +292,7 @@ extern void USO_stop (USO_thread_t * thread);
  * @param thread : thread which may catch the signals.
  * @param signals : The signals will be ored to the already set signals.
  */
-extern void USO_raise (USO_thread_t * thread, ACE_u32_t signals);
+extern void USO_raise (USO_thread_t * thread, ACE_u32_t signal);
 
 /**
  * Current thread block until signals are sent.

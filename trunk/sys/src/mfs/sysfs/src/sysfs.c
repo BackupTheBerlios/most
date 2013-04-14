@@ -70,6 +70,10 @@ MFS_sysfs_init (void)
     if ( (root = MFS_directory_create_root ("root", &MFS_sysfs_vfs_op)) == NULL) return FALSE;
 
     if ( (sys = MFS_directory_create (root, "sys")) == NULL) return FALSE;
+    if ( (dir = MFS_directory_create (root, "usr")) == NULL) return FALSE;
+    if ( (dir = MFS_directory_create (root, "mnt")) == NULL) return FALSE;
+    if ( (dir = MFS_directory_create (root, "bsp")) == NULL) return FALSE;
+    if ( (dir = MFS_directory_create (root, "app")) == NULL) return FALSE;
 
     if ( (dir = MFS_directory_create (sys, "uso")) == NULL) return FALSE;
     if ( (sub = MFS_directory_create (dir, "thread")) == NULL) return FALSE;

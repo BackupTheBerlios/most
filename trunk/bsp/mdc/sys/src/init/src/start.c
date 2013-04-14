@@ -78,15 +78,10 @@ start_run (void *nix)
                      CLI_interpreter_run,
                      cli0_stack, ACE_ARRAYSIZE (cli0_stack), USO_USER, USO_ROUND_ROBIN, "cli0");
     USO_thread_arg_init (&cli0_thread, &cli0);
-
     USO_start (&cli0_thread);
 
-
-    MFS_descriptor_t *bsp;
-    bsp = MFS_directory_create (MFS_get_root(), "bsp");
-
-    MDC_bsp_commands_install (bsp);
-    MDC_config_install (bsp);
+    MDC_bsp_commands_install (MFS_resolve(MFS_get_root(), "bsp"));
+    MDC_config_install (MFS_resolve(MFS_get_root(), "bsp"));
 
     DEV_digout_set (&MDC_green_led);
     MDC_main ();

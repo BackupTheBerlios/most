@@ -14,10 +14,10 @@ CLI_cmd_close (CLI_interpreter_t * cli)
 {
     ACE_bool_t done = FALSE;
     MFS_descriptor_t *desc;
-    desc = MFS_close_desc (cli->desc);
+    desc = MFS_close_desc (USO_thread_dir_get(USO_current()));
     if (desc != NULL)
     {
-        cli->desc = desc;
+        USO_thread_dir_set (USO_current(), desc);
         done = TRUE;
     }
     else

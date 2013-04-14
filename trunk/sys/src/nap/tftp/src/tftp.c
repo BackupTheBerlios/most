@@ -323,15 +323,6 @@ tftp_write_rx_data (char *data, ACE_size_t len, MFS_descriptor_t *out)
 	return TRUE;
 }
 
-static ACE_bool_t
-tftp_put_rx_data (char *data, ACE_size_t len, MFS_descriptor_t *out)
-{
-	if (MFS_put ((MFS_block_t *)out, data, len, 0) == ACE_OK){
-		return TRUE;
-	}
-	return FALSE;
-}
-
 static void
 tftp_get_exec (char *file)
 {
@@ -343,10 +334,6 @@ tftp_get_exec (char *file)
         	int err = 0;
         	if (out->type == MFS_STREAM) {
         		err = NAP_tftp_get (file, tftp_write_rx_data, out);
-        	}
-
-        	if (out->type == MFS_BLOCK) {
-        		err = NAP_tftp_get (file, tftp_put_rx_data, out);
         	}
 
         	if (err >= 0)

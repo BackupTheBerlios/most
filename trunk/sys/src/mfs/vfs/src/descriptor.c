@@ -7,8 +7,8 @@
 extern ACE_err_t
 MFS_open_desc (MFS_descriptor_t * desc)
 {
-	desc->open_cnt++;
-    if (desc->operations->open != NULL)
+	desc->open_cnt++; /** todo synchronize desc->open_cnt */
+    if (desc->open_cnt == 1 && desc->operations->open != NULL)
     {
         return desc->operations->open (desc);
     }
@@ -33,9 +33,9 @@ MFS_open (MFS_descriptor_t * dir_desc, char *name)
 extern MFS_descriptor_t *
 MFS_close_desc (MFS_descriptor_t * desc)
 {
-    if (desc->open_cnt > 0){
+    if (desc->open_cnt > 0){ /** todo synchronize desc->open_cnt */
     	desc->open_cnt--;
-    	if (desc->operations->close != NULL)
+    	if (desc->open_cnt == 0 && desc->operations->close != NULL)
     	{
     		desc->operations->close (desc);
     	}
@@ -164,6 +164,6 @@ MFS_descriptor_print (MFS_descriptor_t * desc)
         type = "unknowen";
         break;
     }
-    ACE_printf ("%s \t%s \t%i \t", type, desc->name, desc->open_cnt);
+    ACE_printf ("%s\t%s\t%i\t", type, desc->name, desc->open_cnt);
 }
 

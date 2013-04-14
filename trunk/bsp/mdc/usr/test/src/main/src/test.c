@@ -31,13 +31,14 @@ MDC_main (void)
     NAP_ymodem_install();
     MDC_net_start(NULL);
 
+    MFS_descriptor_t *app = MFS_resolve(MFS_get_root(), "app");
     MFS_descriptor_t *putboot;
-    putboot = MFS_directory_create (MFS_get_root(), "putboot");
+    putboot = MFS_directory_create (app, "putboot");
 
-    MDC_download_install (putboot, 1, 2);
+    MDC_download_install (putboot, MDC_BOOT_START, MDC_BOOT_END);
 
     MFS_descriptor_t *test;
-    test = MFS_directory_create (MFS_get_root(), "test");
+    test = MFS_directory_create (app, "test");
 
     TST_ram_test_install (test);
     TST_ser_test_install (test);

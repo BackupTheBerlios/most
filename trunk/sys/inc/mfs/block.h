@@ -39,8 +39,8 @@ struct MFS_block
 {
 	MFS_descriptor_t desc;
     enum MFS_block_type type;  /* Block type. */
-    ACE_size_t start;         /* number of first block (for DISK). */
-    ACE_size_t end;          /* number of last block (for DISK). */
+    unsigned long start;         /* block number of first block (for DISK). */
+    unsigned long end;           /* logical block number after last block (for DISK). */
     ACE_size_t size;          /* size of one block. */
     struct MFS_block_op *operations;   /* Block operations. */
 };

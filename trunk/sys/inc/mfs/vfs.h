@@ -70,10 +70,10 @@ typedef struct MFS_stream MFS_stream_t;
 /** Stream interface. */
 struct MFS_stream_op
 {
-    ACE_size_t (*read) (MFS_descriptor_t * stream, char *buf, ACE_size_t len);            /**< Read. */
-    ACE_size_t (*write) (MFS_descriptor_t * stream, const char *buf, ACE_size_t len);     /**< Write. */
-    int (*seek) (MFS_descriptor_t * stream, ACE_ssize_t off, ACE_size_t pos);               /**< Seek. */
-    void (*flush) (MFS_descriptor_t * stream);                                              /**< Flush. */
+    ACE_size_t (*read) (MFS_stream_t * stream, char *buf, ACE_size_t len);            /**< Read. */
+    ACE_size_t (*write) (MFS_stream_t * stream, const char *buf, ACE_size_t len);     /**< Write. */
+    int (*seek) (MFS_stream_t * stream, ACE_ssize_t off, ACE_size_t pos);               /**< Seek. */
+    void (*flush) (MFS_stream_t * stream);                                              /**< Flush. */
 };
 
 /** Block type. */
@@ -82,9 +82,9 @@ typedef struct MFS_block MFS_block_t;
 /** Block interface. */
 struct MFS_block_op
 {
-    ACE_ssize_t (*get) (MFS_descriptor_t *block, char **buf, ACE_size_t number);
-    ACE_err_t (*put) (MFS_descriptor_t *block, char *buf, ACE_size_t len, ACE_size_t number);
-    ACE_err_t (*confirm) (MFS_descriptor_t * block, ACE_size_t number);
+    ACE_ssize_t (*get) (MFS_block_t *block, char **buf, ACE_size_t number);
+    ACE_err_t (*put) (MFS_block_t *block, char *buf, ACE_size_t len, ACE_size_t number);
+    ACE_err_t (*confirm) (MFS_block_t * block, ACE_size_t number);
 };
 
 /** Virtual file system interface. */

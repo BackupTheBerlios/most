@@ -26,10 +26,10 @@ CLI_cmd_run (CLI_interpreter_t * cli)
     	exec = (CLI_exec_t *)cli->exe_desc->represent;
     	name = cli->exe_desc->name;
     }
-    else if (cli->desc->type == MFS_EXEC)
+    else if (USO_thread_dir_get(USO_current())->type == MFS_EXEC)
     {
-        exec = (CLI_exec_t *) cli->desc->represent;
-        name = cli->desc->name;
+        exec = (CLI_exec_t *) USO_thread_dir_get(USO_current())->represent;
+        name = USO_thread_dir_get(USO_current())->name;
     }
 
     if (exec != NULL)
@@ -38,7 +38,6 @@ CLI_cmd_run (CLI_interpreter_t * cli)
                                           CLI_RUN_STACK_SIZE, cli->prio, cli->sched, name);
         if (t != NULL)
         {
-            USO_thread_cli_init (t, cli);
         	if (cli->out_desc != NULL){
                 if (MFS_open_desc (cli->out_desc) == ACE_OK){
                 	USO_thread_out_init (t, cli->out_desc);

@@ -15,31 +15,39 @@
 
 
 static ACE_err_t
-pipe_open (MFS_descriptor_t *stream)
+pipe_open (MFS_descriptor_t *desc)
 {
-    CLI_pipe_t *pipe = (CLI_pipe_t *) stream->represent;
+    CLI_pipe_t *pipe = (CLI_pipe_t *) desc->represent;
+    USO_lock (&pipe->sync);
     if (pipe->state == CLI_PIPE_INIT)
     	pipe->state = CLI_PIPE_OPEN;
+    USO_unlock (&pipe->sync);
     return ACE_OK;
 }
 
 static void
-pipe_close (MFS_descriptor_t *stream)
+pipe_close (MFS_descriptor_t *desc)
 {
-	CLI_pipe_t *pipe = (CLI_pipe_t *) stream->represent;
+	CLI_pipe_t *pipe = (CLI_pipe_t *) desc->represent;
+    USO_lock (&pipe->sync);
     if (pipe->state == CLI_PIPE_OPEN)
     	pipe->state = CLI_PIPE_CLOSE;
-    if (stream->open_cnt == 0)
+    if (desc->open_cnt == 0)
     	pipe->state = CLI_PIPE_INIT;
-    USO_go_all(&pipe->barrier);
+    USO_go_all(&pipe->cond_full);
+    USO_go_all(&pipe->cond_empty);
+    USO_unlock (&pipe->sync);
     return;
 }
 
 static void
-pipe_info (MFS_descriptor_t *stream)
+pipe_info (MFS_descriptor_t *desc)
 {
-    MFS_stream_print((MFS_stream_t *)stream);
+	CLI_pipe_t *pipe = (CLI_pipe_t *) desc->represent;
+    USO_lock (&pipe->sync);
+    MFS_stream_print((MFS_stream_t *)desc);
 	ACE_puts("Pipe IO\n");
+    USO_unlock (&pipe->sync);
 }
 
 static struct MFS_descriptor_op pipe_desc_op = {
@@ -50,54 +58,58 @@ static struct MFS_descriptor_op pipe_desc_op = {
 };
 
 static ACE_size_t
-pipe_read (MFS_descriptor_t * stream, char *buf, ACE_size_t len)
+pipe_read (MFS_stream_t *stream, char *buf, ACE_size_t len)
 {
-	CLI_pipe_t *pipe = (CLI_pipe_t *) stream->represent;
+	CLI_pipe_t *pipe = (CLI_pipe_t *) ((MFS_descriptor_t *)stream)->represent;
     ACE_size_t ret = len;
     ACE_size_t readed;
-    USO_lock (&pipe->mutex);
+    USO_lock (&pipe->r_lock);
+    USO_lock (&pipe->sync);
     if (pipe->state != CLI_PIPE_OPEN && pipe->pipe->state == USO_PIPE_EMPTY) return ACE_EOF;
     while (len)
     {
     	while (pipe->pipe->state == USO_PIPE_EMPTY && pipe->state == CLI_PIPE_OPEN){
-            USO_monitor (&pipe->mutex, &pipe->barrier);
+            USO_monitor (&pipe->sync, &pipe->cond_empty);
     	}
         readed = USO_pipe_read_ns (pipe->pipe, buf, len);
         len -= readed;
         buf += readed;
-        USO_go_all(&pipe->barrier);
+        USO_go_all(&pipe->cond_full);
         if (pipe->pipe->state == USO_PIPE_EMPTY && pipe->state != CLI_PIPE_OPEN)
         	break;
     }
     readed = ret - len;
-    ((MFS_stream_t *)stream)->pos_rx += readed;
-    USO_unlock (&pipe->mutex);
+    stream->pos_rx += readed;
+    USO_unlock (&pipe->sync);
+    USO_unlock (&pipe->r_lock);
     return readed;
 }
 
 static ACE_size_t
-pipe_write (MFS_descriptor_t * stream, const char *buf, ACE_size_t len)
+pipe_write (MFS_stream_t * stream, const char *buf, ACE_size_t len)
 {
-	CLI_pipe_t *pipe = (CLI_pipe_t *) stream->represent;
+	CLI_pipe_t *pipe = (CLI_pipe_t *) ((MFS_descriptor_t *)stream)->represent;
     ACE_size_t ret = len;
     ACE_size_t written;
-    USO_lock (&pipe->mutex);
+    USO_lock (&pipe->w_lock);
+    USO_lock (&pipe->sync);
     if (pipe->state != CLI_PIPE_OPEN) return ACE_EOF;
     while (len)
     {
     	while (pipe->pipe->state == USO_PIPE_FULL && pipe->state == CLI_PIPE_OPEN){
-            USO_monitor (&pipe->mutex, &pipe->barrier);
+            USO_monitor (&pipe->sync, &pipe->cond_full);
     	}
         written = USO_pipe_write_ns (pipe->pipe, buf, len);
         len -= written;
         buf += written;
-        USO_go_all(&pipe->barrier);
+        USO_go_all(&pipe->cond_empty);
         if (pipe->state != CLI_PIPE_OPEN)
         	break;
     }
     written = ret - len;
-    ((MFS_stream_t *)stream)->size_tx += written;
-    USO_unlock (&pipe->mutex);
+    stream->size_tx += written;
+    USO_unlock (&pipe->sync);
+    USO_unlock (&pipe->w_lock);
     return written;
 }
 
@@ -114,9 +126,12 @@ extern void
 CLI_pipe_init (CLI_pipe_t * pipe, MFS_descriptor_t *dir, char *name, USO_pipe_t * pipe_ns)
 {
 	pipe->pipe = pipe_ns;
-    USO_mutex_init (&pipe->mutex);
-    USO_barrier_init (&pipe->barrier);
-	pipe->desc = MFS_stream_create_io (dir, name, &pipe_desc_op, &pipe_stream_op, (MFS_represent_t *) pipe);
+    USO_mutex_init (&pipe->sync);
+    USO_mutex_init (&pipe->r_lock);
+    USO_mutex_init (&pipe->w_lock);
+    USO_barrier_init (&pipe->cond_full);
+    USO_barrier_init (&pipe->cond_empty);
+	pipe->desc = MFS_stream_create (dir, name, &pipe_desc_op, &pipe_stream_op, (MFS_represent_t *) pipe, MFS_STREAM_IO);
 	pipe->state = CLI_PIPE_INIT;
 }
 
@@ -141,7 +156,7 @@ extern void
 CLI_pipe_del (MFS_descriptor_t *dir, char *name)
 {
     MFS_descriptor_t *desc = MFS_lookup (dir, name);
-    if (desc != NULL && desc->type == MFS_STREAM)
+    if (desc != NULL && desc->type == MFS_STREAM) /** todo we don't know if this is a pipe struct !!! */
     {
     	CLI_pipe_t *pipe = ((CLI_pipe_t *) desc->represent);
     	if (pipe != NULL && pipe->state == CLI_PIPE_INIT){

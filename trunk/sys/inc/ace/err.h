@@ -73,6 +73,9 @@ typedef int ACE_err_t;
 #define DEF_ERR_TIMEOUT        (DEF_ERR_NR - 6)   /**< Timeout. */
 #define DEF_ERR_BUSY           (DEF_ERR_NR - 7)   /**< Resource is busy. */
 #define DEF_ERR_ROM            (DEF_ERR_NR - 8)   /**< Flash ROM error. */
+#define DEF_ERR_RANGE          (DEF_ERR_NR - 9)   /**< Out of range. */
+#define DEF_ERR_SIZE           (DEF_ERR_NR - 10)   /**< Invalid size. */
+#define DEF_ERR_NULL           (DEF_ERR_NR - 11)   /**< Null pointer. */
 
 
 /** ACE specific error numbers */

@@ -100,11 +100,8 @@ start_run (void *nix)
     USO_thread_arg_init (&cli0_thread, &cli0);
     USO_start (&cli0_thread);
 
-    MFS_descriptor_t *bsp;
-    bsp = MFS_directory_create (MFS_get_root(), "bsp");
-
-    SAM_bsp_commands_install (bsp);
-    SAM_config_install (bsp);
+    SAM_bsp_commands_install (MFS_resolve(MFS_get_root(), "bsp"));
+    SAM_config_install (MFS_resolve(MFS_get_root(), "bsp"));
 
     DEV_digout_set (&SAM_green_led);
     SAM_main ();

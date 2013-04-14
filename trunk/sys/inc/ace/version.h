@@ -33,7 +33,7 @@
 
 #define ACE_MOST "freoMost"
 
-#define ACE_MOST_VERSION "V-0-1-0-d-4"
+#define ACE_MOST_VERSION "V-0-1-0-d-5"
 
 
 #define ACE_MOST_BUILD   ACE_MOST" "ACE_MOST_VERSION" [ "__DATE__" - "__TIME__" ] "
@@ -41,7 +41,11 @@
 /* CVS Log:
  *
  * $Log: version.h,v $
- * Revision 1.4  2013/01/15 15:50:30  maik42
+ * Revision 1.5  2013/04/14 06:11:36  maik42
+ * -flash is changed from block to stream as the low level interface for flash ops already provides more a stream interface than a block interface,
+ * -some cleanup work
+ *
+ * Revision 1.4  2013-01-15 15:50:30  maik42
  * Version V-0-1-0-d-4, for more information see "doc/CHANGELOG"
  *
  * Revision 1.3  2012-07-29 15:58:38  maik42

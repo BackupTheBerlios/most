@@ -41,8 +41,11 @@ enum CLI_pipe_state
 struct CLI_pipe
 {
     USO_pipe_t *pipe;
-    USO_mutex_t mutex;
-    USO_barrier_t barrier;
+    USO_mutex_t sync;
+    USO_mutex_t r_lock;
+    USO_mutex_t w_lock;
+    USO_barrier_t cond_full;
+    USO_barrier_t cond_empty;
     MFS_descriptor_t *desc;
     enum CLI_pipe_state state;
 };

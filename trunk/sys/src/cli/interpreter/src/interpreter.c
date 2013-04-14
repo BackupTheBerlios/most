@@ -7,7 +7,6 @@
 #include <ace/stdio.h>
 #include <ace/ctype.h>
 #include <ace/stdlib.h>
-#include <uso/scheduler.h>
 #include <uso/list.h>
 #include <uso/sleep.h>
 #include <uso/log.h>
@@ -50,7 +49,6 @@ CLI_setup (const char *name)
 extern void
 CLI_interpreter_init (CLI_interpreter_t * cli)
 {
-    cli->desc = MFS_get_root();
     cli->exe_desc = NULL;
     cli->prio = USO_USER;
     cli->sched = USO_ROUND_ROBIN;
@@ -59,7 +57,7 @@ CLI_interpreter_init (CLI_interpreter_t * cli)
 static void
 promt (CLI_interpreter_t * cli)
 {
-    ACE_printf ("%s:%s# ", hostname, cli->desc->name);
+    ACE_printf ("%s:%s# ", hostname, USO_thread_dir_get(USO_current())->name);
 }
 
 
@@ -142,12 +140,6 @@ inc_argv (CLI_interpreter_t * cli, int idx)
     return idx;
 }
 
-extern MFS_descriptor_t*
-CLI_get_dir(CLI_interpreter_t * cli)
-{
-	return cli->desc;
-}
-
 extern void
 CLI_interpreter_run (void *param)
 {
@@ -155,7 +147,7 @@ CLI_interpreter_run (void *param)
     CLI_command_t *command;
     int idx;
     enum CLI_state state = CLI_STATE_NORMAL;
-    USO_thread_cli_init (USO_current(), cli);
+    USO_thread_dir_set (USO_current(), MFS_get_root());
     USO_log_puts (USO_LL_INFO, "Cli is running.\n");
     for (;;)
     {
@@ -187,8 +179,8 @@ CLI_interpreter_run (void *param)
 
         if (cli->argv[0][0] == '('){
         	if (ACE_strlen (cli->argv[0]) >= 2){
-        		if ( cli->desc->type == MFS_DIRECTORY ){
-        			CLI_pipe_new (CLI_PIPE_BUF_SIZE, cli->desc, &cli->argv[0][1]);
+        		if ( USO_thread_dir_get(USO_current())->type == MFS_DIRECTORY ){
+        			CLI_pipe_new (CLI_PIPE_BUF_SIZE, USO_thread_dir_get(USO_current()), &cli->argv[0][1]);
         		}
         	} else {
                 ACE_puts (CLI_err_arg_missing);
@@ -198,19 +190,19 @@ CLI_interpreter_run (void *param)
 
         if (cli->argv[0][0] == ')'){
         	if (ACE_strlen (cli->argv[0]) >= 2){
-        		CLI_pipe_del(cli->desc, &cli->argv[0][1]);
+        		CLI_pipe_del(USO_thread_dir_get(USO_current()), &cli->argv[0][1]);
         	} else {
                 ACE_puts (CLI_err_arg_missing);
         	}
         	continue;
         }
 
-        if (cli->argv[0][0] == '>'){
+        if (cli->argv[0][0] == '<'){
         	if (ACE_strlen (cli->argv[0]) >= 2){
-                MFS_descriptor_t *desc = MFS_lookup (cli->desc, &cli->argv[0][1]);
+                MFS_descriptor_t *desc = MFS_lookup (USO_thread_dir_get(USO_current()), &cli->argv[0][1]);
                 if (desc != NULL && desc->type == MFS_STREAM)
                 {
-                    cli->out_desc = desc;
+                    cli->in_desc = desc;
                 } else {
                     ACE_puts (CLI_err_arg_notfound);
                     continue;
@@ -222,12 +214,12 @@ CLI_interpreter_run (void *param)
             idx = inc_argv (cli, idx);
         }
 
-        if (cli->argv[0][0] == '<'){
+        if (cli->argv[0][0] == '>'){
         	if (ACE_strlen (cli->argv[0]) >= 2){
-                MFS_descriptor_t *desc = MFS_lookup (cli->desc, &cli->argv[0][1]);
+                MFS_descriptor_t *desc = MFS_lookup (USO_thread_dir_get(USO_current()), &cli->argv[0][1]);
                 if (desc != NULL && desc->type == MFS_STREAM)
                 {
-                    cli->in_desc = desc;
+                    cli->out_desc = desc;
                 } else {
                     ACE_puts (CLI_err_arg_notfound);
                     continue;

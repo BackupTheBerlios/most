@@ -143,19 +143,18 @@ USO_thread_init (USO_thread_t * thread,
     thread->arg = NULL;
     thread->priority = priority;
     thread->scheduling = scheduling;
-    thread->stop = FALSE;
+    thread->state = USO_INIT;
     thread->flags = 0;
     thread->signals = 0;
-    thread->in = USO_current ()->in;
-    thread->out = USO_current ()->out;
-    thread->state = USO_INIT;
     thread->stack = stack;
     thread->stack_size = stack_size;
     thread->stack_bot = USO_stack_beginn (stack, stack_size);
     thread->stack_top = USO_stack_end (stack, stack_size);
     thread->stack_max = USO_stack_beginn (stack, stack_size);
     thread->ticks = 0;
-    thread->cli = NULL;
+    thread->in = USO_current ()->in;
+    thread->out = USO_current ()->out;
+    thread->dir = USO_current ()->dir;
     thread->desc = MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/uso/thread"), name,
                                     MFS_SYS, &thread_descriptor_op, (MFS_represent_t *) thread);
     if (priority != USO_IDLE)
@@ -234,9 +233,15 @@ USO_thread_arg_init (USO_thread_t * thread, void *arg)
 }
 
 extern void
-USO_thread_cli_init (USO_thread_t * thread, CLI_interpreter_t *cli)
+USO_thread_dir_set (USO_thread_t * thread, MFS_descriptor_t * dir)
 {
-    thread->cli = cli;
+    thread->dir = dir;
+}
+
+extern MFS_descriptor_t *
+USO_thread_dir_get (USO_thread_t * thread)
+{
+    return thread->dir;
 }
 
 extern void
@@ -257,7 +262,6 @@ USO_start (USO_thread_t * thread)
     USO_cpu_status_t ps = USO_disable ();
     if ((thread->state == USO_INIT) || (thread->state == USO_DEAD))
     {
-        thread->stop = FALSE;
         thread->ticks = 0;
         thread->signals = 0;
         USO_ready (thread);
@@ -268,23 +272,14 @@ USO_start (USO_thread_t * thread)
 extern void
 USO_stop (USO_thread_t * thread)
 {
-    USO_cpu_status_t ps = USO_disable ();
-    if (thread->priority != USO_IDLE)
-    {
-        thread->stop = TRUE;
-        if (thread->state == USO_BLOCKED_CATCH)
-        {
-            USO_ready (thread);
-        }
-    }
-    USO_restore (ps);
+	USO_raise(thread, USO_SIGNAL_STOP);
 }
 
 extern void
-USO_raise (USO_thread_t * thread, ACE_u32_t signals)
+USO_raise (USO_thread_t * thread, ACE_u32_t signal)
 {
     USO_cpu_status_t ps = USO_disable ();
-    thread->signals |= signals;
+    thread->signals |= (1 << signal);
     if (thread->state == USO_BLOCKED_CATCH)
     {
         USO_ready (thread);

@@ -13,13 +13,13 @@ extern ACE_bool_t
 CLI_cmd_open (CLI_interpreter_t * cli)
 {
     ACE_bool_t done = FALSE;
-    MFS_descriptor_t *desc = cli->desc;
+    MFS_descriptor_t *desc = USO_thread_dir_get(USO_current());
     if (cli->argc >= 1)
     {
         desc = MFS_open (desc, cli->argv[0]);
         if (desc != NULL)
         {
-            cli->desc = desc;
+            USO_thread_dir_set (USO_current(), desc);
             done = TRUE;
         }
         else

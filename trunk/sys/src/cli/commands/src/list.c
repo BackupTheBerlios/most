@@ -15,7 +15,7 @@ extern ACE_bool_t
 CLI_cmd_list (CLI_interpreter_t * cli)
 {
     ACE_bool_t info = FALSE;
-    MFS_descriptor_t *desc = cli->desc;
+    MFS_descriptor_t *desc = USO_thread_dir_get(USO_current());
     if (cli->argc >= 1)
     {
         switch (cli->argv[0][0])

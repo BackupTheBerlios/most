@@ -10,8 +10,11 @@
 extern ACE_ssize_t
 MFS_get (MFS_block_t *block, char **buf, ACE_size_t number)
 {
-    if (block->operations->get != NULL){
-    	return block->operations->get((MFS_descriptor_t *)block, buf, number);
+	if (block->type == MFS_DISK){
+		if ( (number < block->start) || (number >= block->end) ) return DEF_ERR_RANGE;
+	}
+	if (block->operations->get != NULL){
+    	return block->operations->get(block, buf, number);
     } else {
     	*buf = NULL;
     	return 0;
@@ -21,13 +24,22 @@ MFS_get (MFS_block_t *block, char **buf, ACE_size_t number)
 extern ACE_err_t
 MFS_put (MFS_block_t *block, char *buf, ACE_size_t len, ACE_size_t number)
 {
-    return (block->operations->put != NULL) ? block->operations->put ((MFS_descriptor_t *)block, buf, len, number) : ACE_OK;
+	if (block->type == MFS_DISK){
+		if ( (number < block->start) || (number >= block->end) ) return DEF_ERR_RANGE;
+	}
+	if (block->size > 0){
+		if (len != block->size) return DEF_ERR_SIZE;
+	}
+    return (block->operations->put != NULL) ? block->operations->put (block, buf, len, number) : ACE_OK;
 }
 
 extern ACE_err_t
 MFS_confirm (MFS_block_t * block, ACE_size_t number)
 {
-    return (block->operations->confirm != NULL) ? block->operations->confirm ((MFS_descriptor_t *)block, number) : ACE_OK;
+	if (block->type == MFS_DISK){
+		if ( (number < block->start) || (number >= block->end) ) return DEF_ERR_RANGE;
+	}
+	return (block->operations->confirm != NULL) ? block->operations->confirm (block, number) : ACE_OK;
 }
 
 extern void

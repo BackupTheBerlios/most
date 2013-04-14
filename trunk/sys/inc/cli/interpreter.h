@@ -33,7 +33,6 @@ extern char CLI_err_sys_fail[];
 
 struct CLI_interpreter
 {
-    MFS_descriptor_t *desc;
     MFS_descriptor_t *out_desc;
     MFS_descriptor_t *in_desc;
     MFS_descriptor_t *exe_desc;
@@ -60,8 +59,6 @@ extern void CLI_setup (const char *name);
  *  @param cli : Pointer to Command line interpreter.
  */
 extern void CLI_interpreter_init (CLI_interpreter_t * cli);
-
-extern MFS_descriptor_t *CLI_get_dir(CLI_interpreter_t * cli);
 
 /**
  *  This function is the entry function for the CLI thread.
