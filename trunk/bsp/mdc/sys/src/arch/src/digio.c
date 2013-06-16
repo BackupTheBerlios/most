@@ -3,7 +3,7 @@
  *
  */
 
-#include <dev/arch/h8/H83003_REG.h>
+#include <dev/arch/h83003/H83003_REG.h>
 
 #include <arch/pins.h>
 #include <arch/digio.h>

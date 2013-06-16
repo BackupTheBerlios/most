@@ -6,7 +6,7 @@
  */
 
 #include "arch/rtc.h"
-#include <dev/arch/at91/rtt.h>
+#include <dev/arch/at91sam7x/rtt.h>
 #include <ace/stddef.h>
 
 static struct DEV_rtt_interface rtt_if;

@@ -110,13 +110,17 @@ pipe_help (enum USO_pipe_state *state, ACE_bool_t rw,
 extern ACE_size_t
 USO_pipe_read_ns (USO_pipe_t * pipe, char *buf, ACE_size_t len)
 {
-    return pipe_help (&pipe->state, TRUE, &pipe->read, pipe->write,
+	/* if we call pipe_help with len = 0, we would change state to USO_PIPE_DATA and would have a full pipe */
+	if (len == 0){ return 0; }
+	return pipe_help (&pipe->state, TRUE, &pipe->read, pipe->write,
                       pipe->start, pipe->end, buf, len);
 }
 
 extern ACE_size_t
 USO_pipe_write_ns (USO_pipe_t * pipe, const char *buf, ACE_size_t len)
 {
+	/* if we call pipe_help with len = 0, we would change state to USO_PIPE_DATA and would have a full pipe */
+	if (len == 0){ return 0; }
     return pipe_help (&pipe->state, FALSE, &pipe->write, pipe->read,
                       pipe->start, pipe->end, (char *)buf, len);
 }

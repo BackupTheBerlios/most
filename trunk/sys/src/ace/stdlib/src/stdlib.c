@@ -26,7 +26,7 @@ ACE_stdlib_init (USO_heap_t * heap,
 extern void *
 ACE_malloc (ACE_size_t size)
 {
-    return USO_mem_alloc (global_heap, size);
+	return USO_mem_alloc (global_heap, size);
 }
 
 extern void

@@ -5,12 +5,24 @@ A description for the setup you will find on http://most.berlios.de/ .
 
 A short description:
 
-Set MOST_ROOT environment variable to the root directory of the MOST project (trunk folder).
-This can be done with the command "source ROOT" in the trunk folder if the project is checked out
-with the name trunk.
+Set the MOST_ROOT environment variable to the root directory of the MOST project (trunk folder).
+For this use in your shell the command "source ROOT" in the trunk folder if the project is checked out
+with the name trunk. You have to do this each time the shell is started.
+If you work with eclipse define the environment variable MOST_ROOT.
 
-Setup the Config files (Copy Copy_2_Config to Config and edit it to your needs)
-in trunk/etc/Config and trunk/bsp/board/Config and trunk/bsp/board/usr/app/Config.
+
+Setup the Config files:
+
+in trunk/etc:
+    copy Copy_2_Config to Config and and select your <board> and the path to your cross compiler.
+    
+in trunk/bsp/<board>:
+    Copy Copy_2_Config to Config and and select your <application>.
+    
+in trunk/bsp/<board>/usr:
+    copy Copy_2_Config to ./<application>/Config
+    
+Add "run, debug and Config" to CVS ignore list.
 
 
 2.) Build.
@@ -19,7 +31,19 @@ in trunk/etc/Config and trunk/bsp/board/Config and trunk/bsp/board/usr/app/Confi
 Just call "make all" in the trunk folder to build the libraries and binary.
 Use "make help" to see all build targets!
 There are a lot of Makefiles in subdirectories to build subparts, use "make help" to see the possible targets.
+"make clean" is removing the builded object and dependency files"
+"make mrproper" is similar to a distclean removing all builded files
 
+The builded binaries are located in trunk/bsp/<board>/usr/<application>/(debug|run)
+The builded libraries are located in the trunk/sys/lib and trunk/usr/lib folders.
+
+Use the make targets in trunk/bsp/<board>/usr/<application>:
+"make app" build the application (the libraries are not rebuilded!)
+"make info" prints information about the builded binaries
+OpenOCD will be also used through this make targets:
+"make ocd-programm" writes the binary to the target
+"make ocd-reset" resets the target
+"make ocd-debug" run ocd-debug server which can be used by gdb ( in eclipse run "make ocd-debug" as external tool)
 
 3.) How the build system works.
 ===============================
@@ -42,3 +66,4 @@ You can build all, a program, just a library or just some objects by using the a
 Makefile.
 
 <make help> will print the available make targets and the make call tree, this means which makefiles are called by the makefile.
+

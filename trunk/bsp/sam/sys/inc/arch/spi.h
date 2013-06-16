@@ -8,7 +8,7 @@
 #ifndef SPI_H_
 #define SPI_H_
 
-#include <dev/arch/at91/spi.h>
+#include <dev/arch/at91sam7x/spi.h>
 
 /** @addtogroup arch
  *

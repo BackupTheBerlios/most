@@ -23,7 +23,7 @@
  * Global variable defining loop circles needed for one msec.
  * The correct value for this determined in the BSP.
  */
-extern unsigned long DEV_loops_per_msec;
+extern unsigned long long DEV_loops_per_msec;
 
 /**
  * Convert usec to loop circles.

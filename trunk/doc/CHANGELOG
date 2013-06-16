@@ -1,14 +1,18 @@
-VERSION = V-0.1.0-d-5 : in development
+VERSION = V-0.1.0-d-6 : commit
 =====================
 
 DATE = 12.01.2013
 AUTOR = maik
 
-STATE =
+STATE =compileable and running
 
-ADD =
+ADD =bsp/la2 (support Olimex board SAM7-LA2),
+     bsp/pc  (suport ibmpc only in Qemu)
+     dev/arch/ibmpc (ibmpc architecture)
+     dev/arch/at91sam7a2 (AT91SAM7-A2 architecture)
 
-FIX =
+FIX =moved dev/arch/at91 to dev/arch/at91sam7x
+     moved dev/arch/h8 to  dev/arch/h83003
 
 
 

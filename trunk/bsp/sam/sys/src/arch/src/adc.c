@@ -5,7 +5,7 @@
  *      Author: maik
  */
 
-#include <dev/arch/at91/adc.h>
+#include <dev/arch/at91sam7x/adc.h>
 #include <dev/adc.h>
 
 #include "arch/spi.h"

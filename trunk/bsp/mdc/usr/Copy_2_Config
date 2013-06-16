@@ -6,9 +6,9 @@
 ## ======================================
 
 ## [off, on]
-## produced a section for each function and data and remove unused sections
+## produced a section for each function and remove unused sections
 ## not used for debug build
-MOST_REMOVE_CODE:=off
+MOST_REMOVE_UNUSED:=off
 
 ## [bin, hex]
 ## produced binary file type

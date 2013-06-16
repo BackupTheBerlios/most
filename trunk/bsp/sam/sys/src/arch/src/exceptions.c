@@ -1,9 +1,9 @@
 #include <ace/stddef.h>
-#include <dev/arch/at91/aic.h>
-#include <dev/arch/at91/debug.h>
-#include <dev/arch/at91/pit.h>
-#include <dev/arch/at91/rtt.h>
-#include <dev/arch/at91/AT91SAM7X256.h>
+#include <dev/arch/at91sam7x/aic.h>
+#include <dev/arch/at91sam7x/debug.h>
+#include <dev/arch/at91sam7x/pit.h>
+#include <dev/arch/at91sam7x/rtt.h>
+#include <dev/arch/at91sam7x/AT91SAM7X256.h>
 #include <dev/cpu.h>
 
 #include "arch/exceptions.h"

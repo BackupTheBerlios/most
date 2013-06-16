@@ -6,8 +6,8 @@
 #ifndef MDC_CPU_H
 #define MDC_CPU_H
 
-#include <dev/arch/h8/H83003_REG.h>
-#include <dev/arch/h8/H83003.h>
+#include <dev/arch/h83003/H83003_REG.h>
+#include <dev/arch/h83003/H83003.h>
 
 
 /** @addtogroup arch

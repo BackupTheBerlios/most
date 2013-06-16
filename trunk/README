@@ -3,8 +3,9 @@ Comments, questions, and bug reports are always welcome.
 Project Website: http://most.berlios.de
 
 1.)GOAL (just a Hobby ?)
-Designing a operating system with a (minimum of functionality?) suitable for 
-embedded system using microcontrollers with a minimum of 64K RAM and 64K FLASH,
+Designing a operating system with a (minimum of functionality?
+full functionality for the microcontroller but as less complex as possible)
+suitable for embedded system using microcontrollers with a minimum of 32K RAM and 64K FLASH,
 but better more.
 
 Statistic: 
@@ -17,7 +18,7 @@ MOST is a collection of libraries and board support packages.
 They are linked together to one binary file.
 The files in the sense of an application using the OS are placed in the
 board support packages usr directory.
-The compiled binaries are also placed in this directory.
+The compiled binaries are also placed in this directory(subdirectory debug | run).
 
 3.)FEATURES
 	* C library functions(ACE).
@@ -29,7 +30,7 @@ The compiled binaries are also placed in this directory.
 	* Network protocols bootp, tftp, syslog (others have to be done)(NAP).
     * Board support packages and bootloaders(BSP SAM(Olimex SAM7_EX256) actual, MDC(MOST Develpent Computer) outdated ).
 	* Api documentation generated with doxygen(in work).
-	* ARM7 (AT91SAM7X256),  H8 (H8/3003)
+	* ARM7 (AT91SAM7X256, AT91SAM7A2),  H8 (H8/3003), PC(Qemu)
 	
 4.)FREE & OPEN	
 MOST is freely available under the LGPL license(see COPYING).
@@ -47,5 +48,10 @@ To write a operating system is not easy and a time consuming task.
 If you are interested in operating systems and embedded development,
 your help will be welcome. On some development boards MOST can be quickly
 installed and you should be able to test it , to change it, to improve it.
+If you are interested write an email to <michael@feiner.at> .
+
+7.) INSTALLATION
+Read the "trunk/doc/INSTALL" file,
+and the "trunk/bsp/<board>/usr/README" file !
 
 Michael Feiner

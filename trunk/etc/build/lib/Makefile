@@ -22,12 +22,15 @@ lib : obj
 	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/build/Makefile
 
 obj :
+	@$(call makegoal_arch, $@)
 	@$(call makegoal, $@)
 
 clean : 
+	@$(call makegoal_arch, $@)
 	@$(call makegoal, $@)
 	-$(REMOVE) ../lib/$(MOST_BUILD)/$(MOST_TARGET_TYPE)/lib_$(LIB_NAME).a
 
 mrproper:
+	@$(call makegoal_arch_mrproper, $@)
 	@$(call makegoal, $@)
 	-$(REMOVE) ../lib/$(MOST_BUILD)/$(MOST_TARGET_TYPE)/lib_$(LIB_NAME).a

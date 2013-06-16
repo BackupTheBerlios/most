@@ -9,8 +9,8 @@
 #include "arch/spi.h"
 #include "arch/pins.h"
 #include "dev/digio.h"
-#include <dev/arch/h8/bitops.h>
-#include <dev/arch/h8/H83003_REG.h>
+#include <dev/arch/h83003/bitops.h>
+#include <dev/arch/h83003/H83003_REG.h>
 
 #define CS_PORT   H8_P6DR
 #define CS_PIN    H8_P60_EE_CS

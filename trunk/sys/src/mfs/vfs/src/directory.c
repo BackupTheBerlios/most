@@ -141,8 +141,9 @@ MFS_directory_create (MFS_descriptor_t * dir_desc, char *name)
 extern MFS_descriptor_t *
 MFS_directory_create_root (char *name, struct MFS_vfs_op *vfs_op)
 {
-    MFS_directory_t *root_dir = ACE_malloc (sizeof (MFS_directory_t));
-    if (root_dir != NULL)
+	MFS_directory_t *root_dir = ACE_malloc (sizeof (MFS_directory_t));
+
+	if (root_dir != NULL)
     {
         MFS_descriptor_init ( (MFS_descriptor_t *) root_dir, NULL, vfs_op->dir_desc_op, name, MFS_DIRECTORY, NULL);
        	MFS_directory_init (root_dir, vfs_op);

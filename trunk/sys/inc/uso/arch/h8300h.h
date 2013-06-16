@@ -20,9 +20,9 @@
 
 #define USO_STACK USO_HI2LOW
 
-typedef unsigned char USO_cpu_status_t;
+typedef volatile unsigned char USO_cpu_status_t;
 typedef unsigned long USO_stack_t;
-typedef unsigned long USO_cpu_register_t;
+typedef volatile unsigned long USO_cpu_register_t;
 
 #define USO_CPU_PS_INIT ((USO_cpu_status_t)0x00)
 

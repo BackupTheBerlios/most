@@ -5,8 +5,8 @@
 
 #include <ace/stddef.h>
 #include <dev/cpu.h>
-#include <dev/arch/at91/AT91SAM7X256.h>
-#include <dev/arch/at91/emac.h>
+#include <dev/arch/at91sam7x/AT91SAM7X256.h>
+#include <dev/arch/at91sam7x/emac.h>
 #include <net/netif.h>
 #include <net/err.h>
 #include <net/ethernet.h>

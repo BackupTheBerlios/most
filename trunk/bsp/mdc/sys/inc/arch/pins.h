@@ -7,7 +7,7 @@
 #define MDC_H8300_PINS_H
 
 #include <ace/stddef.h>
-#include <dev/arch/h8/bits.h>
+#include <dev/arch/h83003/bits.h>
 
 /** @addtogroup arch
  *

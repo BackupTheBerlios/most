@@ -10,15 +10,12 @@
 #include <dev/digin.h>
 #include <dev/timer.h>
 #include <dev/clock.h>
-#include <dev/arch/at91/AT91SAM7X256.h>
-#include <dev/arch/at91/pit.h>
+#include <dev/arch/at91sam7x/AT91SAM7X256.h>
+#include <dev/arch/at91sam7x/pit.h>
 
 #include "init/init.h"
 #include "arch/ticks.h"
 #include "arch/cpu.h"
-
-static unsigned int piv = 0;
-static unsigned int piv_av = 0;
 
 static unsigned int picnt = 0;
 static unsigned int pit_overrun = 0;
@@ -50,17 +47,13 @@ extern void
 SAM_ticks_debug (void)
 {
     ACE_printf ("Ticks interrupt time:\n"
-                "\tPIV cur: %d us, av: %d us\n"
                 "\tPICNT: cur: %d, ovr: %d, ovr_cnt: %d\n",
-                DEV_at91_PIT_ticks_2_usec (piv),
-                DEV_at91_PIT_ticks_2_usec (piv_av), picnt, pit_overrun, ovr_cnt);
+                picnt, pit_overrun, ovr_cnt);
 }
 
 extern void
 SAM_ticks_interrupt (void)
 {
-    static unsigned int cnt = 0;
-    static unsigned int piv_sum = 0;
     static int init = 0;
 
     /* reset counter and clear status flag (interrupt) */
@@ -93,12 +86,4 @@ SAM_ticks_interrupt (void)
     USO_wakeup ();
     USO_preempt ();
 
-    /* Calculate the length of the tick_interrupt,
-     * if a ctx switch has occur this calculation is not correct.
-     */
-    piv = DEV_at91_PIT_get_PIIR (NULL);
-
-    cnt++;
-    piv_sum += piv;
-    piv_av = piv_sum / cnt;
 }

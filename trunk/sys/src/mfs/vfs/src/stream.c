@@ -46,20 +46,20 @@ MFS_stream_init (MFS_stream_t * stream,
 
 extern MFS_descriptor_t *
 MFS_stream_create (MFS_descriptor_t * dir_desc, char *name, struct MFS_descriptor_op *desc_op,
-		           struct MFS_stream_op *io_op, MFS_represent_t * represent, enum MFS_stream_type type)
+		           struct MFS_stream_op *stream_op, MFS_represent_t * represent, enum MFS_stream_type type)
 {
-	MFS_stream_t *io = NULL;
+	MFS_stream_t *stream = NULL;
     if (dir_desc->type == MFS_DIRECTORY)
     {
-        io = ACE_malloc (sizeof (MFS_stream_t));
-        if (io != NULL)
+        stream = ACE_malloc (sizeof (MFS_stream_t));
+        if (stream != NULL)
         {
-        	MFS_descriptor_init((MFS_descriptor_t *)io, represent, desc_op, name, MFS_STREAM, dir_desc);
-            MFS_stream_init (io, type, io_op);
-            MFS_create_desc (dir_desc, (MFS_descriptor_t *)io);
+        	MFS_descriptor_init((MFS_descriptor_t *)stream, represent, desc_op, name, MFS_STREAM, dir_desc);
+            MFS_stream_init (stream, type, stream_op);
+            MFS_create_desc (dir_desc, (MFS_descriptor_t *)stream);
         }
     }
-    return (MFS_descriptor_t *)io;
+    return (MFS_descriptor_t *)stream;
 }
 
 extern void

@@ -8,8 +8,8 @@
 #include <ace/stdio.h>
 #include <ace/string.h>
 #include <uso/cpu.h>
-#include <dev/arch/at91/flashd.h>
-#include <dev/arch/at91/efc.h>
+#include <dev/arch/at91sam7x/flashd.h>
+#include <dev/arch/at91sam7x/efc.h>
 #include <mfs/stream.h>
 #include <init/download.h>
 

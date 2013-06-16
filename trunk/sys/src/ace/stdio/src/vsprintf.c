@@ -283,6 +283,7 @@ ACE_vsprintf (char *buf, const char *fmt, ACE_va_list_t args)
 
         case 'X':
             flags |= LARGE;
+            /* no break */
         case 'x':
             base = 16;
             break;
@@ -290,6 +291,7 @@ ACE_vsprintf (char *buf, const char *fmt, ACE_va_list_t args)
         case 'd':
         case 'i':
             flags |= SIGN;
+            /* no break */
         case 'u':
             break;
 

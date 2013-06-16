@@ -1,0 +1,2 @@
+-include $(MOST_ROOT)/bsp/pc/usr/Makefile
+-include $(MOST_ROOT)/etc/build/prog/Makefile

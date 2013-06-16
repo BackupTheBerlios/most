@@ -99,14 +99,14 @@ extern void MFS_stream_init (MFS_stream_t * stream,
  * @param dir_desc : Directory descriptor in which a new io descriptor is created.
  * @param name : Name for the io.
  * @param desc_op : descriptor operations for the stream.
- * @param io_op : IO operations for the stream.
+ * @param stream_op : operations for the stream.
  * @param represent : Stream representation.
  * @param type : io || file.
- * @return Created io descriptor.
+ * @return Created stream descriptor.
  */
 extern MFS_descriptor_t * MFS_stream_create (
 		MFS_descriptor_t * dir_desc, char *name, struct MFS_descriptor_op *desc_op,
-		struct MFS_stream_op *io_op, MFS_represent_t * represent, enum MFS_stream_type type);
+		struct MFS_stream_op *stream_op, MFS_represent_t * represent, enum MFS_stream_type type);
 
 
 extern void MFS_stream_print (MFS_stream_t * stream);

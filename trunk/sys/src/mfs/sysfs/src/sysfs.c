@@ -1,3 +1,4 @@
+#include <ace/stdlib.h>
 #include <uso/thread.h>
 #include <uso/heap.h>
 #include <cli/command.h>
@@ -10,6 +11,12 @@
 static MFS_descriptor_t *root = NULL;
 
 static void
+sysfs_super_info(MFS_descriptor_t * super)
+{
+	//MFS_super_print ((MFS_super_t *)super);
+}
+
+static void
 sysfs_dir_info(MFS_descriptor_t * dir)
 {
 	MFS_directory_print ((MFS_directory_t *)dir);
@@ -20,6 +27,13 @@ sysfs_stream_info(MFS_descriptor_t * stream)
 {
 	MFS_stream_print ((MFS_stream_t *)stream);
 }
+
+static struct MFS_descriptor_op MFS_sysfs_super_desc_op = {
+	.open = NULL,
+	.close = NULL,
+	.info = sysfs_super_info,
+	.control = NULL
+};
 
 static struct MFS_super_op MFS_sysfs_super_op = {
 	.mount = NULL,
@@ -54,6 +68,7 @@ static struct MFS_stream_op MFS_sysfs_stream_op = {
 };
 
 static struct MFS_vfs_op MFS_sysfs_vfs_op = {
+	.super_desc_op = &MFS_sysfs_super_desc_op,
 	.super_op = &MFS_sysfs_super_op,
 	.dir_desc_op = &MFS_sysfs_directory_desc_op,
 	.dir_op = &MFS_sysfs_directory_op,
@@ -67,7 +82,8 @@ extern ACE_bool_t
 MFS_sysfs_init (void)
 {
 	MFS_descriptor_t *sys, *dir, *sub;
-    if ( (root = MFS_directory_create_root ("root", &MFS_sysfs_vfs_op)) == NULL) return FALSE;
+
+	if ( (root = MFS_directory_create_root ("root", &MFS_sysfs_vfs_op)) == NULL) return FALSE;
 
     if ( (sys = MFS_directory_create (root, "sys")) == NULL) return FALSE;
     if ( (dir = MFS_directory_create (root, "usr")) == NULL) return FALSE;

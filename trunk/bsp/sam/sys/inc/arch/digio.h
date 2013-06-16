@@ -39,6 +39,10 @@ extern DEV_digout_t SAM_lcd_reset;
 /** Ethernet PHY power down. */
 extern DEV_digout_t SAM_phy_power_down;
 
+/** Pin B29. */
+extern DEV_digout_t SAM_pin_B29;
+
+
 
 /** Switch bootloader. */
 extern DEV_digin_t SAM_switch_boot;
@@ -69,6 +73,12 @@ extern DEV_digin_t SAM_joystick_right;
 
 /** Joystick button. */
 extern DEV_digin_t SAM_joystick_center;
+
+/** Pin B27. */
+extern DEV_digin_t SAM_pin_B27;
+
+
+
 
 /** Control panel inputs. */
 extern DEV_diginputs_t SAM_control_in;

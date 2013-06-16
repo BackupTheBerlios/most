@@ -24,17 +24,18 @@ DEV_pwm_init (DEV_pwm_t * pwm, struct DEV_pwm_interface *interface, ACE_u8_t cha
 }
 
 extern void
-DEV_pwm_set_period (DEV_pwm_t * pwm, ACE_u16_t period)
+DEV_pwm_set_period (DEV_pwm_t * pwm, ACE_u16_t period, ACE_u16_t duty)
 {
     pwm->period = period;
-    pwm->interface->set_period (pwm->channel, period);
+    pwm->duty = duty;
+    pwm->interface->set_period (pwm->channel, period, duty);
 }
 
 extern void
 DEV_pwm_set_duty (DEV_pwm_t * pwm, ACE_u16_t duty)
 {
     pwm->duty = duty;
-    pwm->interface->set_duty (pwm->channel, duty);
+    pwm->interface->set_duty (pwm->channel, pwm->period, duty);
 }
 
 extern void

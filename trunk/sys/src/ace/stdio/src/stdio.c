@@ -6,22 +6,18 @@
 #include <ace/string.h>
 #include <ace/stdio.h>
 
-#include "uso/scheduler.h"
-#include "uso/thread.h"
-#include "uso/buf_pool.h"
-#include "mfs/stream.h"
+#include <uso/scheduler.h>
+#include <uso/thread.h>
+#include <mfs/stream.h>
 
 /*------------- Implementation ------------------------------------------*/
 
-#define IOS_BUF_COUNT 3
-#define IOS_BUF_SIZE 0x100
-static USO_buf_pool_t ios_buf_pool;
-static char ios_bufs[IOS_BUF_COUNT][IOS_BUF_SIZE];
+static USO_buf_pool_t *buf_pool;
 
 extern void
-ACE_stdio_init (void)
+ACE_stdio_init (USO_buf_pool_t *ios_buf_pool)
 {
-    USO_buf_pool_init (&ios_buf_pool, ios_bufs, IOS_BUF_COUNT, IOS_BUF_SIZE);
+    buf_pool = ios_buf_pool;
 }
 
 
@@ -78,12 +74,12 @@ ACE_fprintf (ACE_FILE * out, const char *fmt, ...)
     int ret;
     ACE_va_list_t args;
     char *buf;
-    buf = USO_buf_alloc (&ios_buf_pool);
+    buf = USO_buf_alloc (buf_pool);
     ACE_va_start (args, fmt);
     len = ACE_vsprintf (buf, fmt, args);
     ACE_va_end (args);
     ret = ACE_fwrite (out, buf, len);
-    USO_buf_free (&ios_buf_pool, buf);
+    USO_buf_free (buf_pool, buf);
     return (ret < len) ? ACE_EOF : ret;
 }
 
@@ -125,12 +121,12 @@ ACE_printf (const char *fmt, ...)
     int ret;
     ACE_va_list_t args;
     char *buf;
-    buf = USO_buf_alloc (&ios_buf_pool);
+    buf = USO_buf_alloc (buf_pool);
     ACE_va_start (args, fmt);
     len = ACE_vsprintf (buf, fmt, args);
     ACE_va_end (args);
     ret = ACE_fwrite (USO_current ()->out, buf, len);
-    USO_buf_free (&ios_buf_pool, buf);
+    USO_buf_free (buf_pool, buf);
     return (ret < len) ? ACE_EOF : ret;
 }
 

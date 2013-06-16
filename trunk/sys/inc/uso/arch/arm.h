@@ -21,9 +21,9 @@
 
 #define USO_STACK USO_HI2LOW
 
-typedef unsigned long USO_cpu_status_t;
+typedef volatile unsigned long USO_cpu_status_t;
 typedef unsigned long USO_stack_t;
-typedef unsigned long USO_cpu_register_t;
+typedef volatile unsigned long USO_cpu_register_t;
 
 /* Normal user code, no full access to CPSR  */
 #define ARM_MODE_USR     0x10   /* PC, R14...R0, CPSR */

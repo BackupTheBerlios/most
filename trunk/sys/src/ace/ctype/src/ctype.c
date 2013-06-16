@@ -5,7 +5,7 @@
 
 #include "ace/ctype.h"
 
-extern char _ACE_ctmp;
+char _ACE_ctmp;
 
 const unsigned char _ACE_ctype[] = {
     _ACE_C, _ACE_C, _ACE_C, _ACE_C, _ACE_C, _ACE_C, _ACE_C, _ACE_C,     /* 0-7 

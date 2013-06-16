@@ -1,0 +1,12 @@
+Board support package for an IBM compatible PC, just Qemu is supported!
+=======================================================================
+Thanks to the lowlevel tutorial (http://www.lowlevel.eu/wiki/Hauptseite)
+Using the lowlevel tutorial i ported freoMOST to a PC emulated by Qemu.
+This is very rudimental.
+
+Applications:
+kernel: just multithreaded kernel with command line interpreter
+        todo support for processes (mmu) , sys interface, drivers and applications in userspace
+        build binaries and run in ./kernel/debug "qemu -kernel kernel.elf"
+        with "klog +" increase the log level two times (PROTOCOL) and than you will see the printed letters
+        by some running threads.

@@ -22,5 +22,5 @@ clean :
 	@$(call makegoal, clean)
 
 mrproper :
-	@$(call makegoal, mrproper)
+	@$(call makegoal_mrproper, mrproper)
 

@@ -1,0 +1,16 @@
+Board support package for an old board which was used in the beginning of the MOST development.
+================================================================================================
+This board does not support jtag, but it may serve as basis for other old boards which do not support jtag.
+
+Applications:
+putboot:just do be safe if the bootloader is destroyed so that it can be restored without taking out the flash.
+        take out the flash from the socket and put it an external programmer (i use a batronix),
+        programm the putboot.bin to the flash and put the flash back to the socket.
+        use version 0-1-0-d-4 or higher since that version ymodem is used for downloading the bootloader,
+        older version will not work correctly for larger files.
+boot: bootloader for downloading the application via y-modem or tftp
+frame: a frame for building new applications, the applications may be able to update the bootloader
+       since the bootloader can not update himself.
+test: test application
+
+This board and also the h83003 microcontroller is just supported poorly.

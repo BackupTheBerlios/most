@@ -7,8 +7,8 @@
 
 #include <uso/sleep.h>
 #include <uso/barrier.h>
-#include <dev/arch/at91/pwm.h>
-#include <dev/arch/at91/AT91SAM7X256.h>
+#include <dev/arch/at91sam7x/pwm.h>
+#include <dev/arch/at91sam7x/AT91SAM7X256.h>
 
 #include <arch/cpu.h>
 #include <arch/adc.h>
@@ -37,16 +37,15 @@ SAM_pwm_init (void)
 {
     at91_pwm.disable = DEV_at91_PWM_disable_channel;
     at91_pwm.enable = DEV_at91_PWM_enable_channel;
-    at91_pwm.set_duty = DEV_at91_PWM_set_duty_cycle;
     at91_pwm.set_period = DEV_at91_PWM_set_period;
+    at91_pwm.set_duty = DEV_at91_PWM_set_duty_cycle;
 
     DEV_at91_PWM_configure_clocks (1000000, 0, SAM_MCK);
     DEV_at91_PWM_configure_channel (PWM_CHANNEL_SPEAKER, AT91C_PWMC_CPRE_MCKA, 0, AT91C_PWMC_CPOL);
 
     DEV_pwm_init (&speaker, &at91_pwm, PWM_CHANNEL_SPEAKER);
-    DEV_pwm_set_period (&speaker, 63);
+    DEV_pwm_set_period (&speaker, 63, 63);
     DEV_pwm_set_duty (&speaker, 63);
-    DEV_pwm_disable (&speaker);
 }
 
 
@@ -86,7 +85,7 @@ SAM_tone ()
     	else if ( (clean <= -4) || (clean >= 4) ) {clean *= 2;}
     	else if ( (clean <= -2) || (clean >= 2) ) {;}
     	else {clean = 0;}
-    	DEV_pwm_set_duty (&speaker, ((clean + 128) / 4) & 63 );
+        DEV_pwm_set_duty (&speaker, ((clean + 128) / 4) & 63);
     	USO_sleep (USO_USEC_2_TICKS (100));
     }
    	DEV_pwm_disable (&speaker);

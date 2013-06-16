@@ -1,4 +1,4 @@
-#include <dev/arch/at91/AT91SAM7X256.h>
+#include <dev/arch/at91sam7x/AT91SAM7X256.h>
 
 #include "arch/reset.h"
 
@@ -18,8 +18,25 @@
 .section .reset
 .arm
 
+//reset_handler:
+//	ldr     pc, =_low_level_init
+
 reset_handler:
-	ldr     pc, =_low_level_init
+				b     		_low_level_init
+undefvec:
+                b           undefvec            // 0x04 Undefined Instruction
+swivec:
+                b           swivec              // 0x08 Software Interrupt
+pabtvec:
+                b           pabtvec             // 0x0C Prefetch Abort
+dabtvec:
+                b           dabtvec             // 0x10 Data Abort
+rsvdvec:
+                b           rsvdvec             // 0x14 reserved
+irqvec:
+				b         	irqvec    			// 0x18 IRQ
+fiqvec:
+		        b         	fiqvec              // 0x1C FIQ
 
 /*------------------------------------------------------------------------------
  *- Low level Init is performed in a C function: lowlevel_init

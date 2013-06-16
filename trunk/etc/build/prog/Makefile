@@ -4,7 +4,7 @@ LIB_NAMES := $(LIB_NAMES_USR) $(LIB_NAMES_SYS) -lgcc
 
 export LIB_PATH_OPT LIB_NAMES LDFLAGS_OPT
 
-export PROG_NAME OBJ_NAMES STRIP_FLAGS STRIP_SECTIONS
+export PROG_NAME OBJ_NAMES STRIP_FLAGS STRIP_SECTIONS CODE_SECTIONS DATA_SECTIONS
 
 OPEN_OCD := openocd -s $(MOST_ROOT)/etc/ocd/ -f $(MOST_ROOT)/bsp/$(MOST_BOARD)/openocd.cfg
 
@@ -63,7 +63,6 @@ clean :
 mrproper :
 	-$(REMOVE) run
 	-$(REMOVE) debug
-	@$(call makegoal_inc, $@)
 	@$(call makegoal_src, $@)
 
 ocd-debug:

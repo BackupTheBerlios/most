@@ -44,6 +44,7 @@ receive_packet(char *data, int *length)
 			*length = -1;
 			return 0;
 		}
+		/* no break */
 	/* first octet invalid ! (retry) */
 	default:
 		*length = -1;

@@ -1,4 +1,4 @@
-#include <dev/arch/at91/AT91SAM7X256.h>
+#include <dev/arch/at91sam7x/AT91SAM7X256.h>
 
 #include "arch/reset.h"
 

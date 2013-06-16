@@ -16,3 +16,5 @@
 
 ? global interrupt handling in DEV(USO?) (register interrupt handler, wait for interrupt ?)
 ? global exception handling and post mortem dump ? in bsp ?
+? add PC target with process (mmu) support for kernel and a sys interface(uso, vfs) 
+? add PC target with applications and drivers (drivers shall be userspae programms)

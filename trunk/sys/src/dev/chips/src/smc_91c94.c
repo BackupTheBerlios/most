@@ -11,10 +11,10 @@
 #include <uso/sleep.h>
 #include <uso/heap.h>
 #include <dev/cpu.h>
-#include <dev/arch/h8/isa_io.h>
-#include <dev/arch/h8/bitops.h>
-#include <dev/arch/h8/H83003_REG.h>
-#include <dev/arch/h8/H83003.h>
+#include <dev/arch/h83003/ports.h>
+#include <dev/arch/h83003/bitops.h>
+#include <dev/arch/h83003/H83003_REG.h>
+#include <dev/arch/h83003/H83003.h>
 
 #include "dev/chips/smc_91c94.h"
 #include "dev/chips/smc_91c94_def.h"

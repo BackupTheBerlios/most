@@ -10,6 +10,16 @@ makegoal_lib_doc = make $(1) -C sys/inc/doc;\
 makegoal_bsp_src = make $(1) -C bsp/$(MOST_BOARD);
 makegoal_bsp_doc = make $(1) -C bsp/$(MOST_BOARD)/sys/inc/doc;
 
+makegoal_bsp_mrproper = \
+					make $(1) -C bsp/mdc;\
+					make $(1) -C bsp/mdc/sys/inc/doc;\
+					make $(1) -C bsp/sam;\
+					make $(1) -C bsp/sam/sys/inc/doc;\
+					make $(1) -C bsp/la2;\
+					make $(1) -C bsp/la2/sys/inc/doc;\
+					make $(1) -C bsp/pc;\
+					make $(1) -C bsp/pc/sys/inc/doc;
+					
 .PHONY : default help all doc clean mrproper
 
 default:
@@ -44,6 +54,5 @@ clean :
 mrproper :
 	@$(call makegoal_lib_src, mrproper)
 	@$(call makegoal_lib_doc, mrproper)
-	@$(call makegoal_bsp_src, mrproper)
-	@$(call makegoal_bsp_doc, mrproper)
+	@$(call makegoal_bsp_mrproper, mrproper)
 

@@ -18,8 +18,6 @@
  * @{
  */
 
-/*------------- Definitions ------------------------------------------*/
-
 /** Define a function inline. */
 #define ACE_INLINE_          __inline__
 /** Pack structures. */
@@ -30,6 +28,7 @@
 #define ACE_INTERRUPT_       __attribute__ ((interrupt_handler))
 /** Set alignment.*/
 #define ACE_ALIGNED_(alignment) __attribute__ ((aligned (alignment)))
+
 
 /** Null pointer. */
 #define NULL ((void*)0)
@@ -72,6 +71,11 @@ typedef unsigned long ACE_u32_t;
 /** 32 Bit signed. */
 typedef signed long ACE_s32_t;
 
+/** 64 Bit unsigned. */
+typedef unsigned long long ACE_u64_t;
+/** 64 Bit signed. */
+typedef signed long long ACE_s64_t;
+
 
 #define ACE_NUL     ((char)0x00)     /**< null */
 #define ACE_SOH     ((char)0x01)     /**< start of heading */
@@ -90,9 +94,9 @@ typedef signed long ACE_s32_t;
 #define ACE_SO      ((char)0x0E)     /**< shift out */
 #define ACE_SI      ((char)0x0F)     /**< shift in */
 #define ACE_DLE     ((char)0x10)     /**< data link escape */
-#define ACE_DC1     ((char)0x11)     /**< device control 1 */
-#define ACE_DC2     ((char)0x12)     /**< device control 2 */
-#define ACE_DC3     ((char)0x13)     /**< device control 3 */
+#define ACE_DC1     ((char)0x11)     /**< device control 1, XON Ausgabe fortsetzen */
+#define ACE_DC2     ((char)0x12)     /**< device control 2, Reset */
+#define ACE_DC3     ((char)0x13)     /**< device control 3, XOFF Ausgabe anhalten */
 #define ACE_DC4     ((char)0x14)     /**< device control 4 */
 #define ACE_NAK     ((char)0x15)     /**< negative acknowledge */
 #define ACE_SYN     ((char)0x16)     /**< synchronous idle */
@@ -124,9 +128,9 @@ typedef signed long ACE_s32_t;
 #define ACE_CTRL_N     ((char)0x0E)     /**< shift out */
 #define ACE_CTRL_O     ((char)0x0F)     /**< shift in */
 #define ACE_CTRL_P     ((char)0x10)     /**< data link escape */
-#define ACE_CTRL_Q     ((char)0x11)     /**< device control 1 */
-#define ACE_CTRL_R     ((char)0x12)     /**< device control 2 */
-#define ACE_CTRL_S     ((char)0x13)     /**< device control 3 */
+#define ACE_CTRL_Q     ((char)0x11)     /**< device control 1, XON Ausgabe fortsetzen  */
+#define ACE_CTRL_R     ((char)0x12)     /**< device control 2, Reset */
+#define ACE_CTRL_S     ((char)0x13)     /**< device control 3, XOFF Ausgabe anhalten */
 #define ACE_CTRL_T     ((char)0x14)     /**< device control 4 */
 #define ACE_CTRL_U     ((char)0x15)     /**< negative acknowledge */
 #define ACE_CTRL_V     ((char)0x16)     /**< synchronous idle */
@@ -134,9 +138,7 @@ typedef signed long ACE_s32_t;
 #define ACE_CTRL_X     ((char)0x18)     /**< cancel */
 #define ACE_CTRL_Y     ((char)0x19)     /**< end of medium */
 #define ACE_CTRL_Z     ((char)0x1A)     /**< substitute */
-#define ACE_CTRL_SPACE   ((char)0x1C)     /**< file separator */
 
-/*------------------------------------------------------------------------*/
 
 /** @}
  */

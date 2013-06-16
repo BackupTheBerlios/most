@@ -6,8 +6,8 @@
 #include <ace/stdio.h>
 #include <dev/serial.h>
 #include <dev/serial_settings.h>
-#include <dev/arch/at91/uart.h>
-#include <dev/arch/at91/AT91SAM7X256.h>
+#include <dev/arch/at91sam7x/uart.h>
+#include <dev/arch/at91sam7x/AT91SAM7X256.h>
 
 #include <arch/uart.h>
 

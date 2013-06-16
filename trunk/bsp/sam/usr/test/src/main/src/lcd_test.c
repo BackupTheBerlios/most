@@ -26,6 +26,7 @@ enum lcd_event
     LCD_event_start = SAM_LCD_EVENT_BASE,
     LCD_event_enter,
     LCD_event_logo,
+    LCD_event_ad4,
     LCD_event_trim,
     LCD_event_temp,
     LCD_event_mic,
@@ -36,6 +37,7 @@ enum lcd_state
 {
     LCD_STATE_IDLE,
     LCD_STATE_LOGO,
+    LCD_STATE_AD4,
     LCD_STATE_TRIM,
     LCD_STATE_TEMP,
     LCD_STATE_MIC,
@@ -52,6 +54,7 @@ static const long lcd_event_ids[] = {
     LCD_event_start,
     LCD_event_enter,
     LCD_event_logo,
+    LCD_event_ad4,
     LCD_event_trim,
     LCD_event_temp,
     LCD_event_mic,
@@ -165,6 +168,18 @@ play_audio (void)
 }
 
 static void
+get_ad4 (void)
+{
+    ACE_u32_t v = DEV_adc_get (&adc, DEV_ADC_CHN_4);
+
+    char *s = print_value (v, "AD 4");
+
+    display_value (s);
+
+    USO_sleep (USO_MSEC_2_TICKS (50));
+}
+
+static void
 get_trim (void)
 {
     ACE_u32_t v = DEV_adc_get (&adc, DEV_ADC_CHN_6);
@@ -265,7 +280,7 @@ lcd_test_exec (char *nix)
                 free = send_event (e, LCD_event_logo);
                 break;
             case SAM_switch_1_pressed:
-                free = change_state (e, LCD_STATE_TRIM);
+                free = change_state (e, LCD_STATE_AD4);
                 break;
             case SAM_joystick_center_pressed:
                 free = change_state (e, LCD_STATE_IDLE);
@@ -277,6 +292,35 @@ lcd_test_exec (char *nix)
                 break;
             }
             break;
+
+        case LCD_STATE_AD4:
+        	switch (event)
+        	{
+        	case LCD_event_enter:
+        		display_menu ("AD 4");
+        		free = send_event (e, LCD_event_ad4);
+        		break;
+        	case LCD_event_ad4:
+        		get_ad4 ();
+        		free = send_event (e, LCD_event_ad4);
+        		break;
+        	case SAM_switch_2_pressed:
+        		free = change_state (e, LCD_STATE_LOGO);
+        		break;
+        	case SAM_joystick_left_pressed:
+        		free = change_state (e, LCD_STATE_CARD);
+        		break;
+        	case SAM_switch_1_pressed:
+        	case SAM_joystick_right_pressed:
+        		free = change_state (e, LCD_STATE_TRIM);
+        		break;
+        	default:
+                    /*
+                     * unused event
+                     */
+        		break;
+        	}
+        	break;
 
         case LCD_STATE_TRIM:
             switch (event)
@@ -293,7 +337,7 @@ lcd_test_exec (char *nix)
                 free = change_state (e, LCD_STATE_LOGO);
                 break;
             case SAM_joystick_left_pressed:
-                free = change_state (e, LCD_STATE_CARD);
+                free = change_state (e, LCD_STATE_AD4);
                 break;
             case SAM_switch_1_pressed:
             case SAM_joystick_right_pressed:

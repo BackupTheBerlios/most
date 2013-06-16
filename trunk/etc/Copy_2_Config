@@ -1,49 +1,54 @@
-## most config
-## Copy this file to a file renamed "Config" 
-## and set following lines at your needs!
+## MOST Config
+## Copy this file to a file renamed to "Config" in the same directory 
+## and set(uncomment) following lines at your needs!
 
 
 ## HOST Configuration
 ## ==================
 
-## [linux]
+## select your host OS
 MOST_HOST_SYSTEM:=linux
 
-## [i386, amd64]
+## select your host cpu
+#MOST_HOST_CPU:=i386
 MOST_HOST_CPU:=amd64
 
+## do not edit
 MOST_HOST:=$(MOST_HOST_CPU)-$(MOST_HOST_SYSTEM)
 
 
 ## Build Tool Configuration
 ## ========================
 
-## [off, on]
-## off: write build log to stdout (for build with Eclipse or Emacs-> jump to error)
-## on: write build errors to file "build.log"
+## off: write build errors to stdout (for build with Eclipse or Emacs-> jump to error)
+## on: write build errors to file trunk/build.log (easy to see errors)
 MOST_BUILD_LOG_FILE:=off
+#MOST_BUILD_LOG_FILE:=on
 
-## [off, on]
-## off: turn off full build messages and just print short messages (easier to read)
-## on: print full build messages (for build with Eclipse or Emacs-> jump to error)
-MOST_BUILD_LOG:=on
+## off: just print short build messages to stdout (easier to read)
+## on: also print full gcc build messages to stdout (detailed information)
+#MOST_BUILD_MSG:=off
+MOST_BUILD_MSG:=on
 
 
 ## TARGET Configuration
 ## ====================
 
-## [mdc, sam]
-MOST_BOARD:=sam
+## select your board
 #MOST_BOARD:=mdc
+#MOST_BOARD:=sam
+#MOST_BOARD:=la2
+MOST_BOARD:=pc
 
 -include $(MOST_ROOT)/bsp/$(MOST_BOARD)/Config
 
+## do not edit
 MOST_TARGET_TYPE:=$(MOST_TARGET)-$(MOST_CPU_TYPE)
 
 
 ## Cross Tools Configuration
 ## =========================
 
-## Path to your Cross Toolchain
-MOST_CROSS:=/home/maik/work/cross/bin/$(MOST_HOST)/$(MOST_TARGET)/$(MOST_GCC)
+## configure the path to your Cross Toolchain
+MOST_CROSS:=/home/maik/work/cross/bin/$(MOST_HOST)/$(MOST_TARGET)/$(MOST_GCC)$(MOST_GCC_PATCH)
 

@@ -15,10 +15,17 @@ static void
 info (MFS_descriptor_t * desc)
 {
     DEV_digin_t *in = (DEV_digin_t *) desc->represent;
+
+    char *signal;
+	enum DEV_digio_edge edge = DEV_digin_ischanged (in);
+	if (edge == DEV_DIGIO_RAISE) signal = "_|";
+	else if (edge == DEV_DIGIO_FALL) signal = "|_";
+	else signal = "--";
+
     ACE_printf ("IN state: %s , logig: %s, edge: %s, deb_t: %d, deb_cnt: %d\n",
                 in->state == DEV_DIGIO_HIGH ? "1" : "0",
                 in->logig == DEV_DIGIO_POS ? "+" : "-",
-                in->edge == DEV_DIGIO_POS ? "_|" : "|_", in->debounce_time, in->debounce_count);
+                signal, in->debounce_time, in->debounce_count);
 }
 
 static struct MFS_descriptor_op digin_descriptor_op = {

@@ -1,7 +1,7 @@
 -include $(MOST_ROOT)/etc/Config
 
 ifneq ($(MOST_BOARD),mdc)
-$(error Wrong board defined!)
+$(warning Wrong board defined!)
 endif
 
 LIB_NAMES_SYS := -l_nap\
@@ -26,8 +26,8 @@ LIB_NAMES_OPT :=
 makegoal_src = make $(1) -C ../../sys/src;\
 	       make $(1) -C src;
 
-makegoal_inc = make $(1) -C ../../sys/inc/doc;
-
-
 STRIP_FLAGS:= --target=$(MOST_SYSTEM)-$(MOST_CPU)
-STRIP_SECTIONS:= --strip-debug --strip-unneeded -s -R .noinit -R .stack -R .heap -R .eight 
+STRIP_SECTIONS:= --strip-debug -s -R .bss -R .stack -R .heap -R .comment -R .eight 
+
+CODE_SECTIONS:=-j .text -j .rodata
+DATA_SECTIONS:=-j .data

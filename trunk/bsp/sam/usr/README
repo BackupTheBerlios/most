@@ -1,4 +1,14 @@
-Sam_I_Am Howto:
+Board support package for the Olimex SAM7-EX256 board!
+=======================================================
+This bsp extends the olimex board with some io according to my needs!
+
+Applications:
+boot: bootloader for downloading the application via y-modem or tftp
+frame: a frame for building new applications, the applications may be able to update the bootloader
+       since the bootloader can not update himself.
+test: test application
+
+Sam_I_Am Howto (this may be not up to date):
 ===============
 
 Sam_I_Am is an open Samba tool for linux.
@@ -29,32 +39,36 @@ OpenOCD Howto:
 ==============
 
 Support for parallel(wiggler) and usb(olimex-arm-usb-ocd) interface.
+(but you should be able to use each interface supported by openocd)
 
 compile OpenOCD:
 --enable-parport
 --enable-parport-ppdev
 --enable-ft2232_ftd2xx
 --with-ftd2xx=/path/to/ftdd2xx
-
 the ftd2xx library is used, this library must also be installed to /usr/lib.
 
-configuration files are placed in MOST_ROOT/etc/ocd and MOST_ROOT/bsp/board/ocd.
-correct the Makefile to your needed configuration.
+so in debian or ubuntu i install just openocd with the installer and thats it!
 
-use make ocd-start for startting ocd
-use make ocd-stop for stopping ocd
-use make debug-telnet
-use make debug-gdb
+I do not use the original configuration files coming with openocd but you may use it
+Configuration files are placed in MOST_ROOT/etc/ocd/ and MOST_ROOT/bsp/<board>/openocd.cfg
+and MOST_ROOT/bsp/<board>/usr/<application>/ocd/ .
+
+use <app>/make ocd-program for writing the binary to the target.
+use <app>/make ocd-reset for reseting the target.
+use <app>/make ocd-debug for running the ocd-serer which will be used by gdb.
+                         (in eclipse run make ocd-debug as an external tool) 
+use gdb with emacs (copy the .gdbinit file to ./debug and start emacs in the debug directory)
+use gdb in eclipse (debug: remote application)
 
 in emacs use  "ALT-x gdb" for running gdb.
 correct name to your arm-gdb instead of the linux gdb
+as gdb file the <app>.elf file is used, the <app>.stripped and <app>.bin files do not contain debug information.
 
-gdb version 6.8 must be used to load the memmory map for:
-programming the flash with the load command (load test.elf)
-and to use hardware breakpoints.
 
-as gdb file the test.unstripped file is used as the test.elf file does not contain debug information.
-
+???
+use make debug-telnet
+use make debug-gdb 
 the flash can also be programmed with:
 telnet:
 flash write_image erase test.bin 0x100000 bin
@@ -62,8 +76,17 @@ flash write_bank 0 test.bin 0x110000 (for example) the flash is erased automatic
 gdb:
 monitor flash write_image erase test.bin 0x100000 bin
 monitor flash write_bank 0 test.bin 0x110000 (for example) the flash is erased automatically)
-
 see also .gdbinit
+???
+
+????
+gdb version 6.8 must be used to load the memmory map for:
+programming the flash with the load command (load <app>.elf)
+and to use hardware breakpoints.
+???
+
 
 For debuging in the flash only 2 hardware breakpoints can be used!
-Better place the code for debugging in the ramcode section!
+(before setting a new breakpoint, delete the old one)
+You can place the code for debugging in the ramcode section!
+

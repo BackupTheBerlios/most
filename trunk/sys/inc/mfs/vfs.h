@@ -90,6 +90,7 @@ struct MFS_block_op
 /** Virtual file system interface. */
 struct MFS_vfs_op
 {
+    struct MFS_descriptor_op *super_desc_op;     /**< Super descriptor interface. */
     struct MFS_super_op *super_op;               /**< Super interface. */
     struct MFS_descriptor_op *dir_desc_op;       /**< Directory descriptor interface. */
     struct MFS_directory_op *dir_op;             /**< Directory interface. */

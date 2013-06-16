@@ -7,7 +7,7 @@
 #include <ace/stdio.h>
 #include <dev/serial.h>
 #include <dev/serial_settings.h>
-#include <dev/arch/h8/sci.h>
+#include <dev/arch/h83003/sci.h>
 
 #include "arch/sci.h"
 

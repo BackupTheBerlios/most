@@ -80,22 +80,6 @@ FLASH_29F040_segment_size (void)
     return SECTOR_SIZE;
 }
 
-#if 0
-ACE_INLINE_ static unsigned char
-silicon_id (int adi)
-{
-    write_command (BASE_ADDR + H555, CMD_INFO);
-    return read (BASE_ADDR + adi);
-}
-
-ACE_INLINE_ static unsigned char
-protect_verify (volatile unsigned char *sector_addr)
-{
-    write_command (BASE_ADDR + H555, CMD_INFO);
-    return read (sector_addr + NOT_ADI);
-}
-#endif
-
 ACE_INLINE_ static unsigned char
 read (volatile unsigned char *addr)
 {
@@ -122,6 +106,14 @@ reset (void)
     write (BASE_ADDR + HXXX, CMD_RESET);
 }
 
+#if 0
+ACE_INLINE_ static unsigned char
+silicon_id (int adi)
+{
+    write_command (BASE_ADDR + H555, CMD_INFO);
+    return read (BASE_ADDR + adi);
+}
+
 ACE_INLINE_ static void
 suspend (void)
 {
@@ -142,18 +134,28 @@ chip_erase (void)
 }
 
 ACE_INLINE_ static void
+unlock (void)
+{
+    write_command (BASE_ADDR + H555, CMD_ERASE);
+    write_command (BASE_ADDR + H555, CMD_UNLOCK);
+}
+
+ACE_INLINE_ static unsigned char
+protect_verify (volatile unsigned char *sector_addr)
+{
+    write_command (BASE_ADDR + H555, CMD_INFO);
+    return read (sector_addr + NOT_ADI);
+}
+#endif
+
+
+ACE_INLINE_ static void
 sector_erase (volatile unsigned char *sector_addr)
 {
     write_command (BASE_ADDR + H555, CMD_ERASE);
     write_command (sector_addr, CMD_SECTOR);
 }
 
-ACE_INLINE_ static void
-unlock (void)
-{
-    write_command (BASE_ADDR + H555, CMD_ERASE);
-    write_command (BASE_ADDR + H555, CMD_UNLOCK);
-}
 
 ACE_INLINE_ static void
 program (volatile unsigned char *addr, unsigned char data)

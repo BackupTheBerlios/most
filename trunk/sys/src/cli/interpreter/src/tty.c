@@ -51,11 +51,6 @@ tty_open (MFS_descriptor_t * desc)
     CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
     USO_lock(&tty->lock);
     if (desc->open_cnt == 1){
-    	tty->io_stream = MFS_open (tty->io_stream_dir, tty->io_stream_name);
-    	if (tty->io_stream == NULL)
-    	{
-    		ACE_PANIC ("TTY:open stream failed");
-    	}
     }
     USO_unlock(&tty->lock);
     return ACE_OK;
@@ -67,10 +62,6 @@ tty_close (MFS_descriptor_t * desc)
     CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
     USO_lock(&tty->lock);
     if (desc->open_cnt == 0){
-    	if (tty->io_stream != NULL)
-    	{
-    		MFS_close_desc (tty->io_stream);
-    	}
     }
     USO_unlock(&tty->lock);
 }
@@ -81,9 +72,13 @@ tty_info (MFS_descriptor_t * desc)
     CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
     MFS_stream_print((MFS_stream_t *)desc);
     tty_print (tty);
-    if (tty->io_stream != NULL)
+    if (tty->in_stream != NULL)
     {
-        MFS_info_desc (tty->io_stream);
+        MFS_info_desc (tty->in_stream);
+    }
+    if (tty->out_stream != NULL)
+    {
+        MFS_info_desc (tty->out_stream);
     }
 }
 
@@ -109,7 +104,8 @@ tty_control (MFS_descriptor_t * desc, enum MFS_control_key key, long value)
 		tty->out_transl = tty->out_transl_default;
 		break;
 	default:
-		MFS_control_desc(tty->io_stream, key, value);
+		MFS_control_desc(tty->in_stream, key, value);
+		MFS_control_desc(tty->out_stream, key, value);
 		break;
 	}
 }
@@ -127,17 +123,17 @@ tty_read (MFS_stream_t *stream, char *buf, ACE_size_t len)
     CLI_tty_t *tty = (CLI_tty_t *) ((MFS_descriptor_t *)stream)->represent;
     ACE_size_t ret = 0;
     int c = ACE_EOF;
-    if (tty->io_stream != NULL)
+    if (tty->in_stream != NULL)
     {
         if ( tty->in_mode == CLI_TTY_MODE_RAW )
         {
-            return ACE_fread (tty->io_stream, buf, len);
+            return ACE_fread (tty->in_stream, buf, len);
         }
         else
         {
             while (len > 0)
             {
-                c = ACE_fgetc (tty->io_stream);
+                c = ACE_fgetc (tty->in_stream);
                 if ( (c == ACE_EOF) || (c == ACE_CTRL_D) )
                 {
                     break;
@@ -175,11 +171,11 @@ tty_write (MFS_stream_t *stream, const char *buf, ACE_size_t len)
 {
     CLI_tty_t *tty = (CLI_tty_t *) ((MFS_descriptor_t *)stream)->represent;
     ACE_size_t ret = 0;
-    if (tty->io_stream != NULL)
+    if (tty->out_stream != NULL)
     {
         if ( tty->out_mode == CLI_TTY_MODE_RAW )
         {
-            return ACE_fwrite (tty->io_stream, (char *)buf, len);
+            return ACE_fwrite (tty->out_stream, (char *)buf, len);
         }
         else
         {
@@ -196,14 +192,14 @@ tty_write (MFS_stream_t *stream, const char *buf, ACE_size_t len)
                     	break;
                     case CLI_TTY_OUTTRANSL_ADD_CR:
                         c = '\r';
-                        ACE_fputc (tty->io_stream, c);
+                        ACE_fputc (tty->out_stream, c);
                         c = '\n';
                     	break;
                     default:
                     	break;
                     }
                 }
-                ACE_fputc (tty->io_stream, c);
+                ACE_fputc (tty->out_stream, c);
                 len--;
                 ret++;
             }
@@ -225,14 +221,13 @@ static struct MFS_stream_op tty_stream_op = {
 
 extern void
 CLI_tty_init (CLI_tty_t * tty,
-              MFS_descriptor_t *io_stream_dir,
-              char *io_stream_name,
+              MFS_descriptor_t *in_stream,
+              MFS_descriptor_t *out_stream,
               enum CLI_tty_in_transl in_transl,
               enum CLI_tty_out_transl out_transl, char *name)
 {
-    tty->io_stream = NULL;
-    tty->io_stream_dir = io_stream_dir;
-    tty->io_stream_name = io_stream_name;
+    tty->in_stream = in_stream;
+    tty->out_stream = out_stream;
     tty->in_transl = in_transl;
     tty->out_transl = out_transl;
     tty->in_transl_default = in_transl;

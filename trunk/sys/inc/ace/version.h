@@ -33,7 +33,7 @@
 
 #define ACE_MOST "freoMost"
 
-#define ACE_MOST_VERSION "V-0-1-0-d-5"
+#define ACE_MOST_VERSION "V-0-1-0-d-6"
 
 
 #define ACE_MOST_BUILD   ACE_MOST" "ACE_MOST_VERSION" [ "__DATE__" - "__TIME__" ] "
@@ -41,7 +41,10 @@
 /* CVS Log:
  *
  * $Log: version.h,v $
- * Revision 1.5  2013/04/14 06:11:36  maik42
+ * Revision 1.6  2013/06/16 18:10:43  maik42
+ * add support for new targets PC(Qemu) and Olimex SAM7-LA2 (AT91SAM7-A2)
+ *
+ * Revision 1.5  2013-04-14 06:11:36  maik42
  * -flash is changed from block to stream as the low level interface for flash ops already provides more a stream interface than a block interface,
  * -some cleanup work
  *

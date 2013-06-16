@@ -20,7 +20,7 @@
 #include <cli/exec.h>
 #include <dev/mmc.h>
 #include <dev/timer.h>
-#include <dev/arch/at91/rst.h>
+#include <dev/arch/at91sam7x/rst.h>
 
 #include <arch/cpu.h>
 #include <arch/spi.h>

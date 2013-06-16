@@ -1,0 +1,72 @@
+## LA2 Config
+## Copy this file to a file named Config in the same directory
+## and set following lines at your needs!
+
+## ------------ Target System ---------------
+## ==========================================
+
+## gcc version number of your toolchain
+#MOST_GCC:=3.4.6
+MOST_GCC:=4.4.3
+
+## for patched gcc extend your path name to distinguish it from the original
+MOST_GCC_PATCH:=
+#MOST_GCC_PATCH:=-h8
+
+## target cpu of your toolchain
+#MOST_CPU:=h8300
+MOST_CPU:=arm
+
+## target cpu type of your toolchain
+#MOST_CPU_TYPE:=h8300h
+MOST_CPU_TYPE:=arm7tdmi
+
+## target system type of your toolchain
+#MOST_SYSTEM:=coff
+MOST_SYSTEM:=elf
+#MOST_SYSTEM:=hms
+#MOST_SYSTEM:=none-eabi
+
+## do not change
+MOST_TARGET:=$(MOST_CPU)-$(MOST_SYSTEM)
+
+## libgcc in your cross toolchain
+MOST_LIB_GCC:=gcc/$(MOST_TARGET)/$(MOST_GCC)
+
+## byte order of your target system
+MOST_ENDIAN:=little
+#MOST_ENDIAN:=big
+
+## ------------ Target Architecture   ---------------
+## ==================================================
+
+## microcontroller architecture
+#MOST_ARCH:=h83003
+#MOST_ARCH:=at91sam7s
+#MOST_ARCH:=at91sam7x
+MOST_ARCH:=at91sam7a2
+
+## microcontroller architecture configuration
+MOST_ARCH_CFG:=
+#MOST_ARCH_CFG:=at91sam7x256
+#MOST_ARCH_CFG:=at91sam7s256
+
+## ------------ Target Build Flags -----------
+## ==========================================
+
+## -Os: build Release Version optimized for size
+MOST_BUILD_RUN_FLAGS:= -Os
+
+## -O0: build Debug Version with no optimization
+## -g: compile with debug information
+MOST_BUILD_DEBUG_FLAGS:= -O0 -g
+
+## ------------- Target Application ---------
+## ==========================================
+
+## select your bsp/<board>/usr/<app>
+MOST_APP:=boot
+#MOST_APP:=frame
+#MOST_APP:=test
+
+-include $(MOST_ROOT)/bsp/$(MOST_BOARD)/usr/$(MOST_APP)/Config

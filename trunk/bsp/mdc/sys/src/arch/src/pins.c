@@ -5,10 +5,10 @@
  *      Author: maik
  */
 
-#include <dev/arch/h8/H83003_REG.h>
-#include <dev/arch/h8/H83003.h>
+#include <dev/arch/h83003/H83003_REG.h>
+#include <dev/arch/h83003/H83003.h>
 #include <arch/pins.h>
-#include <dev/arch/h8/bitops.h>
+#include <dev/arch/h83003/bitops.h>
 
 extern void
 MDC_pins_init (void)

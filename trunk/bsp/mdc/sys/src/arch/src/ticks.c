@@ -8,9 +8,9 @@
 #include <dev/digin.h>
 #include <dev/timer.h>
 #include <dev/clock.h>
-#include <dev/arch/h8/H83003_REG.h>
-#include <dev/arch/h8/H83003.h>
-#include <dev/arch/h8/bitops.h>
+#include <dev/arch/h83003/H83003_REG.h>
+#include <dev/arch/h83003/H83003.h>
+#include <dev/arch/h83003/bitops.h>
 
 #include "arch/ticks.h"
 #include "arch/cpu.h"

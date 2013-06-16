@@ -8,7 +8,7 @@
 #define DEV_LOOPS_PER_MSEC 1000L        /* Default */
 
 /** this value can be overwritten by the BSP */
-unsigned long DEV_loops_per_msec = DEV_LOOPS_PER_MSEC;
+unsigned long long DEV_loops_per_msec = DEV_LOOPS_PER_MSEC;
 
 extern void
 DEV_cpudelay (unsigned long loop)

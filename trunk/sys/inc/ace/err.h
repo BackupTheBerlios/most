@@ -57,7 +57,8 @@ typedef int ACE_err_t;
 /* Board */
 #define BSP_ERR_NR         (BOARD_ERR_NR - 0)    /**< BSP error numbers */
 #define BOOT_ERR_NR        (BOARD_ERR_NR - 100)  /**< Bootloader error numbers */
-#define APP_ERR_NR         (BOARD_ERR_NR - 200)  /**< Application error numbers */
+#define KERNEL_ERR_NR      (BOARD_ERR_NR - 200)  /**< Kernel error numbers */
+#define APP_ERR_NR         (BOARD_ERR_NR - 300)  /**< Application error numbers */
 
 /* End: Error number ranges ! ----------------------------- */
 
@@ -65,7 +66,7 @@ typedef int ACE_err_t;
 /* Begin: Error numbers ! ----------------------------- */
 
 /** Default error numbers */
-#define DEF_ERR                (DEF_ERR_NR - 1)   /**< Not specified error. */
+#define DEF_ERR_EOF            (DEF_ERR_NR - 1)   /**< End of File. */
 #define DEF_ERR_MEM            (DEF_ERR_NR - 2)   /**< Out of memory. */
 #define DEF_ERR_BUF            (DEF_ERR_NR - 3)   /**< Buffer overflow. */
 #define DEF_ERR_VAL            (DEF_ERR_NR - 4)   /**< Value invalid. */

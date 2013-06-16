@@ -6,10 +6,12 @@
 #ifndef ACE_STDIO_H
 #define ACE_STDIO_H
 
-#include "uso/list.h"
-#include "mfs/vfs.h"
+#include <uso/list.h>
+#include <uso/buf_pool.h>
+#include <mfs/vfs.h>
 
-#include "ace/stdarg.h"
+#include <ace/stdarg.h>
+#include <ace/err.h>
 
 /** @addtogroup ace
  *
@@ -26,7 +28,7 @@
 /*---------------- Definitions ------------------------------------------*/
 
 /** End of file. */
-#define ACE_EOF (-1)
+#define ACE_EOF    DEF_ERR_EOF     /* same as default error end of file to avoid conflicts */
 
 /** File type. */
 typedef MFS_descriptor_t ACE_FILE;
@@ -57,7 +59,7 @@ extern int ACE_vsprintf (char *buf, const char *fmt, ACE_va_list_t args);
 /**
  * Initalize list and buffers. Must be called befor you can use the stdio functions.
  */
-extern void ACE_stdio_init (void);
+extern void ACE_stdio_init (USO_buf_pool_t *ios_buf_pool);
 
 /**
  * Read from IO stream.

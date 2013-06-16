@@ -49,10 +49,11 @@ extern char bss_start, bss_end; /* Defined in *.ld! */
 extern char heap_start, heap_end;       /* Defined in *.ld! */
 extern char stack_start;        /* stack_end defined in *.ld!, stack size must match IDLE_STACK_SIZE */
 
-static MFS_descriptor_t *ttyS0 = NULL;
+static MFS_descriptor_t *ser0 = NULL;
 static MFS_descriptor_t *ser1 = NULL;
+static MFS_descriptor_t *tty0 = NULL;
 
-static CLI_tty_t tty_ser0;
+static CLI_tty_t tty_0;
 
 static USO_heap_t heap;
 
@@ -101,21 +102,22 @@ abort_handler (char *msg, char *file, int line)
     blink_red (10);
 }
 
+#define IOS_BUF_COUNT 3
+#define IOS_BUF_SIZE 0x100
+static USO_buf_pool_t ios_buf_pool;
+static char ios_bufs[IOS_BUF_COUNT][IOS_BUF_SIZE];
+
 static void
 init (void)
 {
     /* System initialization without kernel logging */
 
-    ACE_stdio_init ();
+    USO_buf_pool_init (&ios_buf_pool, ios_bufs, IOS_BUF_COUNT, IOS_BUF_SIZE);
+    ACE_stdio_init (&ios_buf_pool);
     USO_sleep_init ();
     DEV_timers_init ();
 
     FLASH_29F040_set_wtd_trigger (MDC_watchdog_trigger);
-    CLI_tty_init (&tty_ser0,
-                  MFS_resolve(MFS_get_root(), "sys/dev/serial"), "ser0",
-                  CLI_TTY_INTRANSL_CR_2_NL,
-                  CLI_TTY_OUTTRANSL_ADD_CR,
-                  "ttyS0");
     MDC_sci_init_0 ();
     MDC_sci_init_1 ();
     MDC_ticks_init ();
@@ -124,10 +126,22 @@ init (void)
 
     /* Initialize kernel logging */
 
-    ttyS0 = MFS_open (MFS_resolve(MFS_get_root(), "sys/cli"), "ttyS0");
-    if (ttyS0 == NULL)
+    ser0 = MFS_open (MFS_resolve(MFS_get_root(), "sys/dev/serial"), "ser0");
+    if (ser0 == NULL)
     {
-        ACE_PANIC ("Open ttyS0 fail");
+        ACE_PANIC ("Open ser0 fail");
+    }
+
+    CLI_tty_init (&tty_0,
+                  ser0, ser0,
+                  CLI_TTY_INTRANSL_CR_2_NL,
+                  CLI_TTY_OUTTRANSL_ADD_CR,
+                  "tty0");
+
+    tty0 = MFS_open (MFS_resolve(MFS_get_root(), "sys/cli"), "tty0");
+    if (tty0 == NULL)
+    {
+        ACE_PANIC ("Open tty0 fail");
     }
 
     ser1 = MFS_open (MFS_resolve(MFS_get_root(), "sys/dev/serial"), "ser1");
@@ -136,10 +150,10 @@ init (void)
         ACE_PANIC ("Open ser1 fail");
     }
 
-    USO_log_init (ttyS0, USO_LL_INFO);
+    USO_log_init (tty0, USO_LL_INFO);
     USO_enable ();
     blink_green ();
-    USO_log_puts (USO_LL_INFO, "\nInit: Kernel log on ser0.\n");
+    USO_log_puts (USO_LL_INFO, "\nInit: Kernel log on tty0.\n");
 
     /* Kernel logging on*/
 
@@ -171,11 +185,11 @@ init (void)
 
 
 
-    /* ttyS0 is stdio for start thread,
+    /* tty0 is stdio for start thread,
      * all other threads started(derived) from start thread
-     * will also use ttyS0 as stdio as long they don't change it.
+     * will also use tty0 as stdio as long they don't change it.
      */
-    MDC_start (ttyS0);
+    MDC_start (tty0);
     USO_log_puts (USO_LL_INFO, "Idle.\n");
 }
 
