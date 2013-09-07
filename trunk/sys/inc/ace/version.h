@@ -33,7 +33,7 @@
 
 #define ACE_MOST "freoMost"
 
-#define ACE_MOST_VERSION "V-0-1-0-d-6"
+#define ACE_MOST_VERSION "V-0-1-0-d-7"
 
 
 #define ACE_MOST_BUILD   ACE_MOST" "ACE_MOST_VERSION" [ "__DATE__" - "__TIME__" ] "
@@ -41,8 +41,16 @@
 /* CVS Log:
  *
  * $Log: version.h,v $
- * Revision 1.6  2013/06/16 18:10:43  maik42
- * add support for new targets PC(Qemu) and Olimex SAM7-LA2 (AT91SAM7-A2)
+ * Revision 1.7  2013/09/07 09:15:13  maik42
+ * bsp/la2: bootloader (y-modem is working, eth still missing),
+ *              add frame and test app.
+ * build: check bin file size
+ * add user libraries for sensors and actors
+ * add lcd character display
+ * for detailed info see doc/CHANGELOG
+ *
+ * Revision 1.6  2013-06-16 18:10:43  maik42
+ * Version V-0-1-0-d-6, add support for new targets PC(Qemu) and Olimex SAM7-LA2 (AT91SAM7-A2)
  *
  * Revision 1.5  2013-04-14 06:11:36  maik42
  * -flash is changed from block to stream as the low level interface for flash ops already provides more a stream interface than a block interface,

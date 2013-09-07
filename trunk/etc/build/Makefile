@@ -165,7 +165,11 @@ bin : $(BUILD_LOG_FILE)
 	@$(ECHO) "generate $(PROG_NAME).bin"
 	$(BUILD_MSG)$(OBJCOPY) -O binary $(CODE_SECTIONS) $(PROG_NAME).stripped $(PROG_NAME).code $(BUILD_ERR)
 	$(BUILD_MSG)$(OBJCOPY) -O binary $(DATA_SECTIONS) $(PROG_NAME).stripped $(PROG_NAME).data $(BUILD_ERR)
-	$(BUILD_MSG)cat $(PROG_NAME).code $(PROG_NAME).data > $(PROG_NAME).bin $(BUILD_ERR)
+	$(BUILD_MSG)$(CAT) $(PROG_NAME).code $(PROG_NAME).data > $(PROG_NAME).bin $(BUILD_ERR)
+	$(BUILD_MSG)$(LS) $(PROG_NAME).bin $(BUILD_ERR)
+	@$(ECHO) "check size of $(PROG_NAME).bin (< $(MAX_BIN_SIZE))"
+	$(BUILD_MSG)$(TEST) -z "$$($(FIND) $(PROG_NAME).bin -size +$(MAX_BIN_SIZE))" $(BUILD_ERR)
+	@$(ECHO) "size of $(PROG_NAME).bin OK"
 	$(SHOW_BUILD_LOG)
 
 srec : $(BUILD_LOG_FILE)

@@ -14,7 +14,7 @@
 void
 SAM_main (void)
 {
-    USO_log_puts (USO_LL_INFO, "App: "SAM_APPLICATION" -- 1 -- \n");
+    USO_log_puts (USO_LL_INFO, "App: "SAM_APPLICATION"\n");
 
     MFS_descriptor_t *app = MFS_resolve(MFS_get_root(), "app");
     MFS_descriptor_t *putboot;

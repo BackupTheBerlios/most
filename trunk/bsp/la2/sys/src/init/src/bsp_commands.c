@@ -79,6 +79,46 @@ ticks_debug_exec (char *nix)
     LA2_ticks_debug ();
 }
 
+static CLI_exec_t start_boot;
+
+extern void
+LA2_start_boot (void)
+{
+    USO_sleep (USO_MSEC_2_TICKS (100));
+    USO_disable ();
+    if (!LA2_WDT_DISABLE)
+    {
+        LA2_wdt_trigger ();
+    }
+    LA2_jump_boot ();
+}
+
+static void
+start_boot_exec (char *nix)
+{
+    LA2_start_boot ();
+}
+
+static CLI_exec_t start_app;
+
+extern void
+LA2_start_app (void)
+{
+    USO_sleep (USO_MSEC_2_TICKS (100));
+    USO_disable ();
+    if (!LA2_WDT_DISABLE)
+    {
+        LA2_wdt_trigger ();
+    }
+    LA2_jump_app ();
+}
+
+static void
+start_app_exec (char *nix)
+{
+    LA2_start_app ();
+}
+
 extern void
 LA2_bsp_commands_install (MFS_descriptor_t * bsp)
 {
@@ -86,4 +126,6 @@ LA2_bsp_commands_install (MFS_descriptor_t * bsp)
                    exception_stack_check_exec);
     CLI_exec_init (bsp, &heap_debug, "heap_D", "Debug heap list", heap_debug_exec);
     CLI_exec_init (bsp, &ticks_debug, "tick_D", "Debug ticks interrupt", ticks_debug_exec);
+    CLI_exec_init (bsp, &start_boot, "start_B", "Start boot", start_boot_exec);
+    CLI_exec_init (bsp, &start_app, "start_A", "Start app", start_app_exec);
 }

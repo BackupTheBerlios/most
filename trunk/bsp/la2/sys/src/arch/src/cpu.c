@@ -38,3 +38,9 @@ extern void LA2_cpu_init(void)
         pGic->SPU  = (int) LA2_default_spurious_handler ;
 }
 
+extern void
+LA2_wdt_trigger (void)
+{
+    /* todo */
+}
+

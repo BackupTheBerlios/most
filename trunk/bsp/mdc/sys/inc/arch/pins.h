@@ -35,9 +35,13 @@
 #define H8_P70_JUMPER_1  BIT(0)
 #define H8_P71_JUMPER_2  BIT(1)
 #define H8_P72_JUMPER_3  BIT(2)
+#define H8_P73_JUMPER_4  BIT(3)
 #define H8_P76_BUTTON    BIT(6)
 #define H8_P77_EE_DI     BIT(7)
 
+#define H8_P81_CS3_IRQ1  BIT(1)
+#define H8_P82_CS2_IRQ2  BIT(2)
+#define H8_P83_CS1_IRQ3  BIT(3)
 #define H8_P84_CS0       BIT(4)
 
 #define H8_PA1_RESETETH  BIT(1)

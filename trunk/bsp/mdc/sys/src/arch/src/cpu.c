@@ -34,7 +34,9 @@ MDC_cpu_init (void)
         H8_ABWCR_ABW4 | H8_ABWCR_ABW5 | H8_ABWCR_ABW6 | H8_ABWCR_ABW7;
 
     /*
-     * The 55ns FlashRAM can operate in two state access mode   (125ns)
+     * Area 0 (Flash) 2 state mode: The 55ns FlashRAM can operate in two state access mode   (125ns)
+     * Area 5 (Ethernet) 2 state mode:
+     * Area 7 (Ram) 2 state mode:
      */
     H8_ASTCR = H8_ASTCR_AST1 | H8_ASTCR_AST2 | H8_ASTCR_AST3 | H8_ASTCR_AST4 | H8_ASTCR_AST6;
 
@@ -47,7 +49,7 @@ MDC_cpu_init (void)
      * All bits in the wait state control enable register (WCER) must be set to 1 and the WMS1 bit in
      * the wait control register must be 0 to have pin 0 of port 6 as I/O.
      */
-    H8_WCR = H8_WCR_RESERVE | H8_WCR_STATE_2;   // 2 wait states inserted
+    H8_WCR = H8_WCR_RESERVE | H8_WCR_STATE_3;   // 3 wait states inserted
     H8_WCER = H8_WCER_WCE0 | H8_WCER_WCE1 | H8_WCER_WCE2 | H8_WCER_WCE3 |
         H8_WCER_WCE4 | H8_WCER_WCE5 | H8_WCER_WCE6 | H8_WCER_WCE7;
 

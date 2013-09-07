@@ -44,6 +44,9 @@
 #include <arch/rtc.h>
 #include <arch/uart.h>
 #include <arch/pwm.h>
+#include <arch/spi.h>
+#include <arch/mmc.h>
+#include <arch/adc.h>
 #include <init/init.h>
 #include <init/config.h>
 #include <init/events.h>
@@ -159,9 +162,26 @@ init (void)
     USO_log_printf (USO_LL_INFO, "Loop calib 100ms: %lu.\n", USO_TICKS_2_MSEC(DEV_get_ticks_diff (ticks_count)) );
 
     LA2_config_init ();
+
+    if (LA2_spi_init () != 0)
+    {
+        DEV_digout_set (&LA2_red_led);
+        USO_log_puts (USO_LL_ERROR, "SPI init failed.\n");
+    }
+    else
+    {
+        if (LA2_mmc_install () == ACE_OK)
+        {
+            LA2_config_read ();
+        } else {
+            DEV_digout_set (&LA2_red_led);
+        }
+    }
+
     LA2_events_init ();
     LA2_pwm_init ();
-
+    LA2_adc_install ();
+    
     /* ttyS0 is stdio for start thread,
      * all other threads started(derived) from start thread
      * will also use ttyS0 as stdio as long they don't change it.
@@ -169,31 +189,6 @@ init (void)
     LA2_start (tty0);
 
     USO_log_puts (USO_LL_INFO, "Idle.\n");
-
- #if 0
-
-
-    /* Initialize kernel logging */
-
-
-    if (SAM_spi_init () != 0)
-    {
-        DEV_digout_set (&SAM_red_led);
-        USO_log_puts (USO_LL_ERROR, "SPI init failed.\n");
-    }
-    else
-    {
-        if (SAM_mmc_install () == ACE_OK)
-        {
-            SAM_config_read ();
-        }
-    }
-    SAM_eth_init ();            /* must be called after SAM_config_read() */
-    /* todo emac interrupt init has to be done here otherwise in hangs ??? */
-    SAM_emac_interrupt_init ();
-
-#endif
-
 }
 
 extern void

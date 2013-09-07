@@ -8,7 +8,7 @@
 #ifndef BSP_COMMANDS_H_
 #define BSP_COMMANDS_H_
 
-#include "mfs/vfs.h"
+#include <mfs/vfs.h>
 
 /** @addtogroup init
  *
@@ -22,6 +22,17 @@
  * @{
  */
 
+/**
+ *
+ */
+extern void
+LA2_start_boot (void);
+
+/**
+ *
+ */
+extern void
+LA2_start_app (void);
 
 /**
  *

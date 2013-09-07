@@ -7,7 +7,7 @@
 #include <uso/log.h>
 #include <dev/cpu.h>
 #include <cli/exec.h>
-#include <dpy/nokia6100/nokia6100.h>
+#include <dpy/nokia6100.h>
 
 #include <test.h>
 #include <lcd_test.h>

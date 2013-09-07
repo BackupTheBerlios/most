@@ -3,7 +3,7 @@
  *
  */
 
-#include "dev/cpu.h"
+#include <dev/cpu.h>
 
 #define DEV_LOOPS_PER_MSEC 1000L        /* Default */
 

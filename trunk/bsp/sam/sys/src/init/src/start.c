@@ -55,14 +55,19 @@ run_led_run (void *nix)
         {
             SAM_wdt_trigger (); /* trigger watchdog only if it is not disabled (WDD) */
         }
-        /* todo, user reset is not done automatically ?????, so check for it !!! */
+        /* todo, user reset is not done automatically (even if it is configured
+         * it is recoqnized but not executed)?????, so check for it !!!
+         * is my board defect ?
+         * also if VDC = 10 V , a user reset occurs sporadic without pressing button
+         * if VDC = 12 V it is working (no user reset) -> also resets, dont exe user reset!
+         */
         if (DEV_at91_RST_is_user_reset_detected (AT91C_BASE_RSTC))
         {
-        	USO_log_printf (USO_LL_WARNING, "user reset detected, 0x%08lx %s!", DEV_at91_RST_status (AT91C_BASE_RSTC),
-        			DEV_at91_RST_is_busy (AT91C_BASE_RSTC) ? "busy": "not busy");
-        	USO_sleep (USO_MSEC_2_TICKS (1000));
-        	DEV_at91_RST_peripheral_reset (AT91C_BASE_RSTC);
-        	DEV_at91_RST_processor_reset (AT91C_BASE_RSTC);
+            USO_log_printf (USO_LL_WARNING, "user reset detected, 0x%08lx %s!", DEV_at91_RST_status (AT91C_BASE_RSTC),
+                            DEV_at91_RST_is_busy (AT91C_BASE_RSTC) ? "busy": "not busy");
+            //USO_sleep (USO_MSEC_2_TICKS (1000));
+            //DEV_at91_RST_peripheral_reset (AT91C_BASE_RSTC);
+            //DEV_at91_RST_processor_reset (AT91C_BASE_RSTC);
         }
         DEV_digout_toggle (&SAM_run_led);
         SAM_events_create ();

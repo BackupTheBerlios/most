@@ -14,10 +14,8 @@
 #include <mfs/descriptor.h>
 #include <mfs/directory.h>
 
-#include "dev/timer.h"
+#include <dev/timer.h>
 
-
-/*------------- Implementation ------------------------------------------*/
 
 static USO_list_t onTimer;
 static USO_list_t elapsedTimer;
@@ -35,7 +33,7 @@ info (MFS_descriptor_t * desc)
 }
 
 static struct MFS_descriptor_op timer_descriptor_op = {
-	.open = NULL,
+    .open = NULL,
     .close = NULL,
     .info = info,
     .control = NULL
@@ -66,7 +64,7 @@ consume (void)
 static void
 timers_run (void *nix)
 {
-    USO_log_puts (USO_LL_INFO, "Timers is running.\n");
+    USO_log_puts (USO_LL_INFO, "Timer is running.\n");
     for (;;)
     {
         DEV_timer_t *timer = consume ();
@@ -78,7 +76,7 @@ extern void
 DEV_timers_start (int timers_stack_size)
 {
     timers_thread = USO_thread_new (timers_run,
-                                    timers_stack_size, USO_INTERRUPT, USO_FIFO, "timers");
+                                    timers_stack_size, USO_INTERRUPT, USO_FIFO, "timer");
     USO_start (timers_thread);
 }
 
@@ -104,14 +102,14 @@ DEV_timer_init (DEV_timer_t * timer, void (*f) (void *), void *param, enum DEV_t
 extern void
 DEV_timer_install (DEV_timer_t * timer, char *name)
 {
-    timer->desc = MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/clock/timer"), name,
+    timer->desc = MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/timer/timer"), name,
                                     MFS_SYS, &timer_descriptor_op, (MFS_represent_t *) timer);
 }
 
 extern void
 DEV_timer_remove (DEV_timer_t * timer)
 {
-    MFS_remove_desc (MFS_resolve(MFS_get_root(), "sys/dev/clock/timer"), timer->desc);
+    MFS_remove_desc (MFS_resolve(MFS_get_root(), "sys/dev/timer/timer"), timer->desc);
 }
 
 extern void
@@ -155,5 +153,3 @@ DEV_timer_fire (void)
     }
 }
 
-
-/*------------------------------------------------------------------------*/

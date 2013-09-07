@@ -334,3 +334,100 @@ void CSP_SPIPioSet(CSP_SPI_T *const spi, U32_T pio_mask)
    CSP_SPI_SET_SODR(spi, pio_mask);
 }
 
+
+
+static int
+SAM7A2_spi_dev_config (DEV_spi_dev_t * dev)
+{
+    SAM7A2_spi_dev_t *at91 = (SAM7A2_spi_dev_t *) dev;
+
+    // TODO slave device handling
+    if (dev->bus->ctrl != DEV_SPI_BUS_CTRL_MASTER)
+        return (-1);
+
+    int ncpha = 0;
+    int cpol = 0;
+    switch (dev->mode)
+    {
+    case 0:
+        ncpha = 1;
+        break;
+    case 1:
+        break;
+    case 2:
+        ncpha = 1;
+        cpol = 1;
+        break;
+    case 3:
+        cpol = 1;
+        break;
+    default:
+        break;
+    }
+
+    //8bit, CPOL=0, ClockPhase=1, SCLK = 200kHz
+    at91->bus->spi->CS[1].CSR  = NCPHA + SCBR(0x55);
+
+    return 0;
+}
+
+
+
+static int
+SAM7A2_spi_exchange (DEV_spi_dev_t * dev, ACE_u32_t out, ACE_u32_t * in)
+{
+    SAM7A2_spi_dev_t *at91 = (SAM7A2_spi_dev_t *) dev;
+
+    while((at91->bus->spi->SR & TDRE) == 0);  // Wait for the transfer to complete
+    // SPI0->TDR = (data & 0xFFFF);              // Send the data
+    at91->bus->spi->TDR = out;
+
+    while((at91->bus->spi->SR & RDRF) == 0);  // Wait until the character can be read
+    // spib = ((SPI0->RDR) & 0xFFFF);      // Get the data received
+    *in = (at91->bus->spi->RDR);
+    return 0;
+}
+
+extern int
+SAM7A2_spi_bus_init (SAM7A2_spi_bus_t * at91, int devices)
+{
+
+    DEV_spi_bus_t *bus = (DEV_spi_bus_t *) at91;
+
+    bus->exchange = NULL;
+    bus->dev_cfg = NULL;
+    at91->devices = devices;
+    at91->spi = (CSP_SPI_T *)SPI0_BASE_ADDRESS;
+
+    if (DEV_SPI_BUS_CTRL_MASTER == bus->ctrl)
+    {
+        CSP_SPIPioInit(at91->spi,
+                        (devices | MOSI | MISO | SPCK),
+                        (devices | MOSI | SPCK));
+        CSP_SPIPioSet(at91->spi, (devices | MOSI | SPCK));
+    }
+    else if (DEV_SPI_BUS_CTRL_SLAVE == bus->ctrl)
+    {
+        // TODO slave configuration
+        return (-1);
+    }
+    else
+        return (-1);
+
+    bus->exchange = SAM7A2_spi_exchange;
+    bus->dev_cfg = SAM7A2_spi_dev_config;
+
+    CSP_SPIInit(at91->spi, MSTR | PCS1);
+    CSP_SPIEnable(at91->spi);
+    
+    return 0;
+}
+
+extern int
+SAM7A2_spi_dev_init (SAM7A2_spi_dev_t * at91)
+{
+    DEV_spi_dev_t *dev = (DEV_spi_dev_t *) at91;
+    at91->bus = (SAM7A2_spi_bus_t *) (dev->bus);
+    return 0;
+}
+

@@ -8,7 +8,7 @@ stack_size	= 1K;
 
 MEMORY
 {
-	flash(rx)		: o = 0x40000000, l = 1M
+	flash(rx)		: o = 0x40000000, l = 128K
 	cram(rwx)       : o = 0x00000000, l = 16K
 	sram(rwx)		: o = 0x48000000, l = 2M
 }

@@ -25,9 +25,12 @@
 * 004  MOD  15/03/02   Christophe GARDIN  Add Macros
 *----------------------------------------------------------------------------*/
 
+
+
 #ifndef CSP_SPI_H
 #define CSP_SPI_H
 
+#include <dev/spi.h>
 
 /******************************************************************************
 ************************** SPI Structure Definition ***************************
@@ -293,6 +296,33 @@ extern void CSP_SPIPioInit(CSP_SPI_T *const spi, U32_T pio_mask, U32_T output_pi
 extern U32_T CSP_SPIPioGetStatus(CSP_SPI_T *const spi);
 extern void CSP_SPIPioSet(CSP_SPI_T *const spi, U32_T pio_mask);
 extern void CSP_SPIPioClear(CSP_SPI_T *const spi, U32_T pio_mask);
+
+struct SAM7A2_spi_bus
+{
+    DEV_spi_bus_t bus;
+    CSP_SPI_T *spi;
+    int id;
+    int ctrl;
+    int devices;
+};
+
+typedef struct SAM7A2_spi_bus SAM7A2_spi_bus_t;
+
+
+
+struct SAM7A2_spi_dev
+{
+    DEV_spi_dev_t dev;
+    SAM7A2_spi_bus_t *bus;
+};
+
+typedef struct SAM7A2_spi_dev SAM7A2_spi_dev_t;
+
+
+
+extern int SAM7A2_spi_bus_init (SAM7A2_spi_bus_t * bus, int devices);
+
+extern int SAM7A2_spi_dev_init (SAM7A2_spi_dev_t * dev);
 
 
 #endif   /* CSP_SPI_H */

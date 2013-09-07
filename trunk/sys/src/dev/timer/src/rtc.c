@@ -13,7 +13,7 @@
 #include <mfs/descriptor.h>
 #include <mfs/directory.h>
 
-#include "dev/rtc.h"
+#include <dev/rtc.h>
 
 static struct DEV_rtc
 {
@@ -50,7 +50,7 @@ DEV_rtc_init (struct DEV_rtt_interface *rtt)
 {
     rtc.base_time = 0;
     rtc.rtt = rtt;
-    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/clock"), "rtc",
+    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/timer"), "rtc",
                      MFS_SYS, &rtc_descriptor_op, (MFS_represent_t *) &rtc);
     rtc.rtt->reset ();
 }

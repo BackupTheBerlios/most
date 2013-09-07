@@ -7,6 +7,8 @@
 #include <nap/ymodem.h>
 #include <arch/digio.h>
 #include <init/events.h>
+#include <init/download.h>
+#include <init/bsp_commands.h>
 
 #include <boot.h>
 #include <err.h>
@@ -25,13 +27,22 @@ void
 LA2_main (void)
 {
 
-    USO_log_puts (USO_LL_INFO, "App: "LA2_APPLICATION" -- 4 -- \n");
+    USO_log_puts (USO_LL_INFO, "App: "LA2_APPLICATION" -- Check Download = 1 -- \n");
 
-    DEV_digout_set (&LA2_green_led);
+    if (DEV_digin_isset (&LA2_switch) == FALSE)
+    {
+        USO_log_puts (USO_LL_INFO, "Start App !\n");
+        LA2_start_app ();
+    }
+    DEV_digout_set (&LA2_red_led);
+
+    NAP_ymodem_install();
 
     MFS_descriptor_t *app = MFS_resolve(MFS_get_root(), "app");
     MFS_descriptor_t *boot;
     boot = MFS_directory_create (app, "boot");
+
+    LA2_download_install (boot, LA2_APPL_START, LA2_APPL_END);
 
     USO_slot_init (&LA2_event_slots, &boot_slot, boot_event_ids, BOOT_SLOT_SIZE);
 
@@ -44,21 +55,20 @@ LA2_main (void)
         switch (event)
         {
         case LA2_card_inserted:
-        	ACE_printf("card_inserted\n");
+            ACE_printf("card_inserted\n");
             if (DEV_digin_isset (&LA2_card_write) == TRUE)
             {
-            	ACE_printf("card is write enabled\n");
+                ACE_printf("card is write enabled\n");
             } else {
-            	ACE_printf("card is write protected\n");
+                ACE_printf("card is write protected\n");
             }
-
-        	break;
+            break;
         case LA2_card_removed:
-        	ACE_printf("card_removed\n");
-        	break;
+            ACE_printf("card_removed\n");
+            break;
         default:
-        	ACE_printf("unknown event\n");
-        	break;
+            ACE_printf("unknown event\n");
+            break;
         }
 
         free = USO_slots_put_event (&LA2_event_slots, &boot_slot, e, FALSE);

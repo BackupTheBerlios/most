@@ -22,18 +22,18 @@
  */
 
 
-/* Sector 0: putboot, Sector 1: boot, Sector 2-7: app, end: 8 */
-#define MDC_FLASH_START  	0
+/* Sector 0: putboot, Sector 1 - 2: boot, Sector 3-7: app, end: 8 */
+#define MDC_FLASH_START     0
 #define MDC_PUTBOOT_SIZE    1
-#define MDC_BOOT_SIZE  		1
-#define MDC_APPL_SIZE  		6
+#define MDC_BOOT_SIZE       2
+#define MDC_APPL_SIZE       5
 
-#define MDC_PUTBOOT_START 	MDC_FLASH_START
-#define MDC_PUTBOOT_END 	(MDC_PUTBOOT_START + MDC_PUTBOOT_SIZE)
-#define MDC_BOOT_START 		MDC_PUTBOOT_END
-#define MDC_BOOT_END   	 	(MDC_BOOT_START + MDC_BOOT_SIZE)
-#define MDC_APPL_START    	MDC_BOOT_END
-#define MDC_APPL_END      	(MDC_APPL_START + MDC_APPL_SIZE)
+#define MDC_PUTBOOT_START   MDC_FLASH_START
+#define MDC_PUTBOOT_END     (MDC_PUTBOOT_START + MDC_PUTBOOT_SIZE)
+#define MDC_BOOT_START      MDC_PUTBOOT_END
+#define MDC_BOOT_END        (MDC_BOOT_START + MDC_BOOT_SIZE)
+#define MDC_APPL_START      MDC_BOOT_END
+#define MDC_APPL_END        (MDC_APPL_START + MDC_APPL_SIZE)
 
 /**
  * Install application download commands.

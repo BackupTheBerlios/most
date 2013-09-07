@@ -23,7 +23,7 @@
  */
 
 
-struct PRI_slot
+struct USO_slot
 {
     USO_node_t node;
     USO_mailbox_t mbox;
@@ -33,7 +33,7 @@ struct PRI_slot
 /**
  *
  */
-typedef struct PRI_slot USO_slot_t;
+typedef struct USO_slot USO_slot_t;
 
 /**
  *

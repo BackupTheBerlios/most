@@ -9,7 +9,7 @@
 * documentation
 * Driver cleanup and improvements, spi, adc, pwm 
 * USR -> Grafik GFX library and display improvements
-* cleanup emacs drivers
+* cleanup mac drivers
 * i2c(twi) driver
 * porting to other platforms (lpc2294 olimex board, ...)
 * DMA

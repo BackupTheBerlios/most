@@ -1,6 +1,6 @@
-#include "dev/arch/at91sam7x/AT91SAM7X256.h"
-#include "dev/arch/at91sam7x/adc.h"
-#include "dev/adc.h"
+#include <dev/arch/at91sam7x/AT91SAM7X256.h>
+#include <dev/arch/at91sam7x/adc.h>
+#include <dev/adc.h>
 
 AT91PS_ADC a_pADC = AT91C_BASE_ADC;
 AT91PS_PMC a_pPMC = AT91C_BASE_PMC;
@@ -22,7 +22,7 @@ DEV_at91_ADC_init (void)
 
 
 extern ACE_u32_t
-DEV_at91_ADC_get (enum DEV_adc_channel channel)
+DEV_at91_ADC_get (void *rep, enum DEV_adc_channel channel)
 {
 
     // variable
@@ -62,6 +62,11 @@ DEV_at91_ADC_get (enum DEV_adc_channel channel)
         break;
     case DEV_ADC_CHN_7:
         result = a_pADC->ADC_CDR7;
+        break;
+    case DEV_ADC_CHN_MAX:
+        /* no break */
+    default:
+        result = 0;
         break;
     }
 

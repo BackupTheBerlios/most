@@ -93,6 +93,10 @@
 #define GIC_IVR             (256)
 #define GIC_EOICR           (304)
 
+#define LA2_BOOT_BASE    0x40000000
+#define LA2_APP_BASE     0x40020000
+
+
 /** @}
  */
 

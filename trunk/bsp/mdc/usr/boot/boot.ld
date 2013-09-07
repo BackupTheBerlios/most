@@ -7,7 +7,7 @@ _stack_size	= 1K;
 
 MEMORY
 {
-	rom(rx)		: o = 0x010000, l = 64K
+	rom(rx)		: o = 0x010000, l = 128K
 	ram(rw)		: o = 0xe00000, l = 128K
 	tiny(rw)	: o = 0xff8000, l = 0x0007f00
 	eight(rw)	: o = 0xffff00, l = 0x0000100

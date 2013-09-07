@@ -6,6 +6,8 @@
 #ifndef ACE_STDDEF_H
 #define ACE_STDDEF_H
 
+#include <ace/cpu.h>
+
 /** @addtogroup ace
  *
  * @{
@@ -29,6 +31,16 @@
 /** Set alignment.*/
 #define ACE_ALIGNED_(alignment) __attribute__ ((aligned (alignment)))
 
+/** long call */
+#ifdef ACE_CPU
+#if ACE_CPU == ACE_CPU_ARM
+#define ACE_LONG_CALL_          __attribute__((__long_call__))
+#else
+#define ACE_LONG_CALL_
+#endif
+#else
+#error "ACE_CPU not defined!"
+#endif
 
 /** Null pointer. */
 #define NULL ((void*)0)
@@ -39,6 +51,8 @@
 #define ACE_MIN(a,b) ((a) <= (b) ? (a) : (b))
 /** Maximum from (a,b). */
 #define ACE_MAX(a,b) ((a) >= (b) ? (a) : (b))
+/** Maximum from (a,b). */
+#define ACE_AMOUNT(a) ((a) >= 0 ? (a) : (-a))
 
 /** Boolean enumeration. */
 enum ACE_bool
@@ -112,32 +126,32 @@ typedef signed long long ACE_s64_t;
 #define ACE_Space   ((char)0x20)     /**< space */
 #define ACE_DEL     ((char)0x7F)     /**< delete */
 
-#define ACE_CTRL_A     ((char)0x01)     /**< start of heading */
-#define ACE_CTRL_B     ((char)0x02)     /**< start of text */
-#define ACE_CTRL_C     ((char)0x03)     /**< end of text */
-#define ACE_CTRL_D     ((char)0x04)     /**< end of transmission */
-#define ACE_CTRL_E     ((char)0x05)     /**< enquiry */
-#define ACE_CTRL_F     ((char)0x06)     /**< acknowledge */
-#define ACE_CTRL_G     ((char)0x07)     /**< bell */
-#define ACE_CTRL_H     ((char)0x08)     /**< backspace */
-#define ACE_CTRL_I     ((char)0x09)     /**< horizontal tab */
-#define ACE_CTRL_J     ((char)0x0A)     /**< line feed, NL new line */
-#define ACE_CTRL_K     ((char)0x0B)     /**< vertical tab */
-#define ACE_CTRL_L     ((char)0x0C)     /**< form feed, NP new page */
-#define ACE_CTRL_M     ((char)0x0D)     /**< carriage return */
-#define ACE_CTRL_N     ((char)0x0E)     /**< shift out */
-#define ACE_CTRL_O     ((char)0x0F)     /**< shift in */
-#define ACE_CTRL_P     ((char)0x10)     /**< data link escape */
-#define ACE_CTRL_Q     ((char)0x11)     /**< device control 1, XON Ausgabe fortsetzen  */
-#define ACE_CTRL_R     ((char)0x12)     /**< device control 2, Reset */
-#define ACE_CTRL_S     ((char)0x13)     /**< device control 3, XOFF Ausgabe anhalten */
-#define ACE_CTRL_T     ((char)0x14)     /**< device control 4 */
-#define ACE_CTRL_U     ((char)0x15)     /**< negative acknowledge */
-#define ACE_CTRL_V     ((char)0x16)     /**< synchronous idle */
-#define ACE_CTRL_W     ((char)0x17)     /**< end of trans. block */
-#define ACE_CTRL_X     ((char)0x18)     /**< cancel */
-#define ACE_CTRL_Y     ((char)0x19)     /**< end of medium */
-#define ACE_CTRL_Z     ((char)0x1A)     /**< substitute */
+#define ACE_CTRL_A     ACE_SOH       /**< start of heading */
+#define ACE_CTRL_B     ACE_STX       /**< start of text */
+#define ACE_CTRL_C     ACE_ETX       /**< end of text */
+#define ACE_CTRL_D     ACE_EOT       /**< end of transmission */
+#define ACE_CTRL_E     ACE_ENQ       /**< enquiry */
+#define ACE_CTRL_F     ACE_ACK       /**< acknowledge */
+#define ACE_CTRL_G     ACE_BELL      /**< bell */
+#define ACE_CTRL_H     ACE_BS        /**< backspace */
+#define ACE_CTRL_I     ACE_TAB       /**< horizontal tab */
+#define ACE_CTRL_J     ACE_LF        /**< line feed, NL new line */
+#define ACE_CTRL_K     ACE_VT        /**< vertical tab */
+#define ACE_CTRL_L     ACE_FF        /**< form feed, NP new page */
+#define ACE_CTRL_M     ACE_CR        /**< carriage return */
+#define ACE_CTRL_N     ACE_SO        /**< shift out */
+#define ACE_CTRL_O     ACE_SI        /**< shift in */
+#define ACE_CTRL_P     ACE_DLE       /**< data link escape */
+#define ACE_CTRL_Q     ACE_DC1       /**< device control 1, XON Ausgabe fortsetzen  */
+#define ACE_CTRL_R     ACE_DC2       /**< device control 2, Reset */
+#define ACE_CTRL_S     ACE_DC3       /**< device control 3, XOFF Ausgabe anhalten */
+#define ACE_CTRL_T     ACE_DC4       /**< device control 4 */
+#define ACE_CTRL_U     ACE_NAK       /**< negative acknowledge */
+#define ACE_CTRL_V     ACE_SYN       /**< synchronous idle */
+#define ACE_CTRL_W     ACE_ETB       /**< end of trans. block */
+#define ACE_CTRL_X     ACE_CAN       /**< cancel */
+#define ACE_CTRL_Y     ACE_EM        /**< end of medium */
+#define ACE_CTRL_Z     ACE_SUB       /**< substitute */
 
 
 /** @}

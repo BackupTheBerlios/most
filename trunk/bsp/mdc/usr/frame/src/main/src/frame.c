@@ -9,13 +9,18 @@
 
 #include <init/net.h>
 #include <init/download.h>
+#include <arch/lcd.h>
 
 #include <frame.h>
 
 extern void
 MDC_main (void)
 {
-    USO_log_puts (USO_LL_INFO, "App: "MDC_APPLICATION" -- 1 -- \n");
+    USO_log_puts (USO_LL_INFO, "App: "MDC_APPLICATION"\n");
+
+    MDC_lcd_init();
+    MDC_lcd_backlight_on(TRUE);
+    DPY_ks0070b_put_string(&lcd, MDC_APPLICATION);
 
     NAP_ymodem_install();
     MDC_net_start(NULL);

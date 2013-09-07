@@ -1,7 +1,34 @@
-VERSION = V-0.1.0-d-6 : commit
+VERSION = V-0.1.0-d-7 : commit
 =====================
 
-DATE = 12.01.2013
+DATE = 07.09.2013
+AUTOR = maik
+
+STATE = compileable and running, SAM7_EX256 board is broken(pluged EXT connector wrong and got +5V to GND and +3,3V to reset,
+        boot from flash does not work and some other (reset, pwm ?) seems to be broken.) :(. 
+
+ADD = bsp/la2 adc, pwm, flash support, bootloader is now working (only with y-modem, eth still missing)
+      bsp/la2/usr/test line following robot(in development)
+      bsp/mdc   HW random number generator
+      usr/dpy   LCD character display
+      usr/sen   create library for sensors
+      usr/act   create liberty for actors
+      
+FIX = check size of bin file (if it fits to reserved flash region) as the linker script check only the size of the text segment
+      but the bin file is the text segment (text, rodata) concatenated with the data segment.
+      Also increased the reserved flash size for the bootloader (mdc: putboot = 64k, boot = 128k, app = 320k,
+      sam: boot = 80k, app = 176k, la2: boot = 128k, app = 896k), for you the size of the bootloader may be to big but
+      for me currently it is ok as i am interested in development and don't need a small bootloader for a special purpose.
+      Also the object files from the bsp/sys (arch/init) are defined in the application Makefile explicit and independently,
+      as the applications may need different objects. So the size of the binary can be reduced
+      (gcc links all defined objects to the binary even if they are not used,
+      (this is not valid for the objects from the static libraries) ). 
+
+
+VERSION = V-0.1.0-d-6 : labeled (V-0-1-0-d-6)
+=====================
+
+DATE = 16.06.2013
 AUTOR = maik
 
 STATE =compileable and running

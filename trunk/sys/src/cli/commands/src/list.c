@@ -41,7 +41,7 @@ CLI_cmd_list (CLI_interpreter_t * cli)
             break;
         case 'a':
             info = TRUE;
-            desc = MFS_resolve(MFS_get_root(), "sys/dev/clock/timer");
+            desc = MFS_resolve(MFS_get_root(), "sys/dev/timer/timer");
             break;
         default:
             break;

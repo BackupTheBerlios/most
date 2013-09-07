@@ -192,7 +192,7 @@ USO_thread_terminate (USO_thread_t * thread)
     thread->state = USO_DEAD;
     if (thread->cleanup != NULL)
     {
-        thread->cleanup ();
+        thread->cleanup (thread->arg);
     }
     if ((thread->flags & (1 << USO_FLAG_FREE_ARG)) == (1 << USO_FLAG_FREE_ARG))
     {
@@ -251,7 +251,7 @@ USO_thread_flags_set (USO_thread_t * thread, ACE_u32_t flags)
 }
 
 extern void
-USO_cleanup_install (void (*cleanup) (void))
+USO_cleanup_install (void (*cleanup) (void *))
 {
     USO_current ()->cleanup = cleanup;
 }

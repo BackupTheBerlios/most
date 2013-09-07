@@ -11,9 +11,9 @@
 #include <mfs/block.h>
 #include <dev/mmc.h>
 
-#include "arch/spi.h"
-#include "arch/eth.h"
-#include "init/config.h"
+#include <arch/spi.h>
+#include <arch/eth.h>
+#include <init/config.h>
 
 struct SAM_configuration SAM_config;
 
@@ -39,43 +39,43 @@ SAM_config_init (void)
 extern void
 SAM_config_read (void)
 {
-	ACE_ssize_t len;
-	char *data;
-	MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "d1_p1");
-	MFS_block_t *p1 = (MFS_block_t *)desc;
+    ACE_ssize_t len;
+    char *data;
+    MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "cfg");
+    MFS_block_t *p1 = (MFS_block_t *)desc;
     if (desc == NULL || desc->type != MFS_BLOCK)
-    	return;
+        return;
     unsigned long block = p1->start;
-	len = MFS_get (p1, &data, block);
-	if (data != NULL)
+    len = MFS_get (p1, &data, block);
+    if (data != NULL)
     {
-    	if (len >= sizeof (SAM_config)){
-    		memcpy (&SAM_config, data, sizeof (SAM_config));
-        	if ((NET_inet_chksum (&SAM_config,
-                              	  (ACE_u16_t) (sizeof (SAM_config))) != 0) ||
+        if (len >= sizeof (SAM_config)){
+            memcpy (&SAM_config, data, sizeof (SAM_config));
+            if ((NET_inet_chksum (&SAM_config,
+                            (ACE_u16_t) (sizeof (SAM_config))) != 0) ||
                 (SAM_config.state != SAM_CONFIG_STATE_SAVED))
-        	{
-        		SAM_config_init ();
-        	}
-    	} else {
-    		// check error to short data;
-    	}
-    	MFS_confirm(p1,block);
+            {
+                SAM_config_init ();
+            }
+        } else {
+            // check error to short data;
+        }
+        MFS_confirm(p1,block);
     }
     else
     {
         // check error no data
     }
-	MFS_close_desc (desc);
+    MFS_close_desc (desc);
 }
 
 static void
 config_write (void)
 {
-	MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "d1_p1");
-	MFS_block_t *p1 = (MFS_block_t *)desc;
-	if (desc == NULL || desc->type != MFS_BLOCK)
-    	return;
+    MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "cfg");
+    MFS_block_t *p1 = (MFS_block_t *)desc;
+    if (desc == NULL || desc->type != MFS_BLOCK)
+        return;
     if (SAM_config.state == SAM_CONFIG_STATE_SAVED)
         return;
     SAM_config.state = SAM_CONFIG_STATE_SAVED;
@@ -97,7 +97,7 @@ config_write (void)
     {
         // error out of mem
     }
-	MFS_close_desc (desc);
+    MFS_close_desc (desc);
 }
 
 static void
@@ -185,7 +185,7 @@ config_set_ip_addr (char *param, NET_ip_addr_t * ipaddr)
     if (param != NULL)
     {
         int a, b, c, d;
-    	USO_lock (&ACE_lock);
+        USO_lock (&ACE_lock);
         param = ACE_strtok (param, ".");
         a = ACE_atoi (param);
         param = ACE_strtok (NULL, ".");
@@ -194,8 +194,8 @@ config_set_ip_addr (char *param, NET_ip_addr_t * ipaddr)
         c = ACE_atoi (param);
         param = ACE_strtok (NULL, ".");
         d = ACE_atoi (param);
+        USO_unlock (&ACE_lock);
         NET_ip4_addr (ipaddr, a, b, c, d);
-    	USO_unlock (&ACE_lock);
     }
 }
 

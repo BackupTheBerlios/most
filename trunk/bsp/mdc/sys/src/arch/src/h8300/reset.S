@@ -24,7 +24,7 @@ _mark_stack_empty:
 	.global _MDC_jump_app	
 
 _MDC_jump_app:		
-	jmp	    0x20000
+	jmp	    0x30000
 
 	.section	.ramcode
 	.global _MDC_jump_boot	

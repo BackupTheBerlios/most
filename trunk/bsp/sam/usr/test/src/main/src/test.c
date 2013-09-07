@@ -7,6 +7,7 @@
 #include <nap/syslog.h>
 #include <nap/ymodem.h>
 
+#include <arch/digio.h>
 #include <init/net.h>
 #include <init/download.h>
 
@@ -17,18 +18,23 @@
 #include <tst/thread_test.h>
 #include <tst/ram_test.h>
 #include <tst/net_test.h>
+#include <tst/mmc_test.h>
+#include <tst/digio_test.h>
+#include <tst/debug_test.h>
 
-#include <lcd_test.h>
-#include <mmc_test.h>
-#include <digio_test.h>
-#include <debug_test.h>
 #include <flash_test.h>
+#include <lcd_test.h>
 
+static DEV_digout_t *runninglight[] = {
+    &SAM_green_led,
+    &SAM_red_led,
+    NULL
+};
 
 void
 SAM_main (void)
 {
-    USO_log_puts (USO_LL_INFO, "App: "SAM_APPLICATION" -- 5 -- \n");
+    USO_log_puts (USO_LL_INFO, "App: "SAM_APPLICATION"\n");
     USO_log_printf (USO_LL_INFO, "Sizeof(char, short, int, long) = %d %d %d %d.\n", sizeof (char), sizeof (short), sizeof (int), sizeof (long));
 
     MFS_descriptor_t * app = MFS_resolve(MFS_get_root(), "app");
@@ -46,9 +52,10 @@ SAM_main (void)
     TST_ser_test_install (test);
     TST_thread_test_install (test);
     TST_net_test_install (test);
-    digio_test_install (test);
-    mmc_test_install (test);
+    TST_debug_test_install (test);
+    TST_mmc_test_install (test);
+    TST_digio_test_init (&SAM_switch_1 ,runninglight);
+    TST_digio_test_install (test);
     lcd_test_install (test);
-    debug_test_install (test);
     flash_test_install (test);
 }

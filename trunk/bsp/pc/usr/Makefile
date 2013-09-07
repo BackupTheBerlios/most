@@ -1,30 +1,36 @@
--include $(MOST_ROOT)/etc/Config
-
 ifneq ($(MOST_BOARD),pc)
 $(warning Wrong board defined!)
 endif
 
-LIB_NAMES_SYS :=\
-		 -l_cli\
-		 -l_nap\
-		 -l_net\
-		 -l_mfs\
-		 -l_dev\
-		 -l_uso\
-		 -l_ace
+LIB_NAMES_SYS := -l_nap\
+                 -l_cli\
+                 -l_mfs\
+                 -l_net\
+                 -l_dev\
+                 -l_uso\
+                 -l_ace
 
-LIB_NAMES_USR :=\
-		 -l_dpy\
-        -l_tst
+MAIN_PATH := src/main/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)
+
+OBJ_NAMES := $(ARCH_PATH)/reset.o\
+             $(ARCH_PATH)/vectors.o\
+             $(ARCH_PATH)/cpu.o\
+             $(ARCH_PATH)/debug.o\
+             $(ARCH_PATH)/exceptions.o\
+             $(ARCH_PATH)/mm_paging.o\
+             $(ARCH_PATH)/mm_phys.o\
+             $(ARCH_PATH)/pic.o\
+             $(ARCH_PATH)/ticks.o\
+             $(INIT_PATH)/init.o\
+             $(INIT_PATH)/start.o\
+             $(MAIN_PATH)/*.o
+
+OBJ_NAMES += $(OBJ_NAMES_APP)
 
 LDFLAGS_OPT := -Ttext=0x100000
 
 LIB_PATH_OPT := 
 LIB_NAMES_OPT :=
-
-OBJ_NAMES := 	../../sys/src/arch/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
-		../../sys/src/init/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o\
-		src/main/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)/*.o	
 
 makegoal_src = make $(1) -C ../../sys/src;\
 		make $(1) -C src;

@@ -142,7 +142,7 @@ struct USO_thread
     enum USO_thread_priority priority;
     enum USO_thread_scheduling scheduling;
     void (*enter) (void *);
-    void (*cleanup) (void);
+    void (*cleanup) (void *);
     void *arg;
     ACE_u32_t flags;
     ACE_u32_t signals;
@@ -270,7 +270,7 @@ extern void USO_thread_flags_set (USO_thread_t * thread, ACE_u32_t flags);
  *
  * @param cleanup : Cleanup handler function.
  */
-extern void USO_cleanup_install (void (*cleanup) (void));
+extern void USO_cleanup_install (void (*cleanup) (void*));
 
 /**
  * Start thread.

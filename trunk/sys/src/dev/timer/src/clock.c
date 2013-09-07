@@ -12,7 +12,7 @@
 #include <mfs/descriptor.h>
 #include <mfs/directory.h>
 
-#include "dev/clock.h"
+#include <dev/clock.h>
 
 static struct DEV_clock
 {
@@ -40,7 +40,7 @@ DEV_clock_init (unsigned long (*get_usec) (void))
 {
     clock.ticks = 0;
     clock.get_us = get_usec;
-    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/clock"), "clock",
+    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/timer"), "clock",
                      MFS_SYS, &clock_descriptor_op, (MFS_represent_t *) &clock);
 }
 

@@ -155,6 +155,7 @@ config_set_ip_addr (char *param, NET_ip_addr_t * ipaddr)
     if (param != NULL)
     {
         int a, b, c, d;
+        USO_lock (&ACE_lock);
         param = ACE_strtok (param, ".");
         a = ACE_atoi (param);
         param = ACE_strtok (NULL, ".");
@@ -163,6 +164,7 @@ config_set_ip_addr (char *param, NET_ip_addr_t * ipaddr)
         c = ACE_atoi (param);
         param = ACE_strtok (NULL, ".");
         d = ACE_atoi (param);
+        USO_unlock (&ACE_lock);
         NET_ip4_addr (ipaddr, a, b, c, d);
     }
 }

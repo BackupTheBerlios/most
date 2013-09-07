@@ -5,6 +5,6 @@
 #include "dev/adc.h"
 
 extern void DEV_at91_ADC_init (void);
-extern ACE_u32_t DEV_at91_ADC_get (enum DEV_adc_channel channel);
+extern ACE_u32_t DEV_at91_ADC_get (void *rep, enum DEV_adc_channel channel);
 
 #endif

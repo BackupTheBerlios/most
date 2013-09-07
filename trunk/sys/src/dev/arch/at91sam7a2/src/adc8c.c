@@ -56,7 +56,7 @@ void CSP_ADC8CInit(CSP_ADC8C_T *const adc, U32_T mode)
    CSP_ADC8C_SET_MR(adc, mode);
                         
    /* Configure CAPTURE PDC Rx Line */
-   CSP_PDCInitRx((U32_T)adc, (U32_T) &(adc->DR), SIZE_HALFWORD);
+   //CSP_PDCInitRx((U32_T)adc, (U32_T) &(adc->DR), SIZE_HALFWORD);
 }
 
 
@@ -192,4 +192,28 @@ void CSP_ADC8CStopConversion(CSP_ADC8C_T *const adc)
    CSP_ADC8C_SET_CR(adc, STOP);
 }
 
-
+extern ACE_u32_t
+SAM7A2_adc_get(void *rep, enum DEV_adc_channel channel)
+{
+    CSP_ADC8C_T *const adc = rep;
+    
+    /* Clear Number of Conversion */
+    CSP_ADC8C_SET_MR(adc, (CSP_ADC8C_GET_MR(adc) & ~NBRCH));
+   
+    /* Clear Input Configuration */
+    CSP_ADC8C_SET_CMR(adc, 0);
+       
+    /* Set New Input Configuration */
+    CSP_ADC8C_SET_CMR(adc, channel);
+    
+    /* wait for ready bit */
+    while ( (CSP_ADC8C_GET_SR(adc) & READY) != READY);
+    
+    CSP_ADC8C_SET_CR(adc, START);
+    
+    /* wait for end of conversion */
+    /* todo use interrupt ! */
+    while ( (CSP_ADC8C_GET_SR(adc) & EOC) != EOC);
+    
+    return CSP_ADC8C_GET_DR(adc);
+}

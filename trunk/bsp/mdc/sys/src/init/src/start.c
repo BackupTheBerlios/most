@@ -15,17 +15,15 @@
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
 #include <cli/exec.h>
-#include <nap/bootp.h>
-#include <nap/syslog.h>
 
-#include "arch/pins.h"
-#include "arch/digio.h"
-#include "arch/ticks.h"
-#include "arch/eth.h"
-#include "init/start.h"
-#include "init/main.h"
-#include "init/config.h"
-#include "init/bsp_commands.h"
+#include <arch/eth.h>
+#include <arch/pins.h>
+#include <arch/digio.h>
+#include <arch/ticks.h>
+#include <init/start.h>
+#include <init/main.h>
+#include <init/config.h>
+#include <init/bsp_commands.h>
 
 #define TIMERS_STACK_SIZE     (0x200/sizeof(USO_stack_t))
 #define RUNLED_STACK_SIZE     (0x200/sizeof(USO_stack_t))

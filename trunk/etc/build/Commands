@@ -3,3 +3,7 @@ MAKEDIR := mkdir -p
 ECHO := echo
 WC := wc -l
 DATE := date
+CAT := cat
+TEST := test
+FIND := find
+LS := ls -la

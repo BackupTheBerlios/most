@@ -20,13 +20,13 @@
 #include <cli/tty.h>
 #include <mfs/sysfs.h>
 
+#include <arch/eth.h>
 #include <arch/cpu.h>
 #include <arch/pins.h>
 #include <arch/spi.h>
 #include <arch/sci.h>
 #include <arch/digio.h>
 #include <arch/ticks.h>
-#include <arch/eth.h>
 #include <init/init.h>
 #include <init/start.h>
 #include <init/config.h>
@@ -182,8 +182,6 @@ init (void)
     }
 
     MDC_eth_init ();            /* must be called after ee_config_read() */
-
-
 
     /* tty0 is stdio for start thread,
      * all other threads started(derived) from start thread

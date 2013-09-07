@@ -21,10 +21,10 @@
  * @{
  */
 
-/* Bootloader: 64K 0x100000 - 0x110000, Application : 3*64K = 192K 0x110000 - 0x140000 */
+/* Bootloader: 80K 0x100000 - 0x114000, Application : 176K 0x114000 - 0x140000 */
 #define SAM_FLASH_START       ((unsigned char *)0x100000)
-#define SAM_BOOT_SIZE         ((unsigned long)0x010000)
-#define SAM_APPL_SIZE         ((unsigned long)0x030000)
+#define SAM_BOOT_SIZE         ((unsigned long)0x014000)
+#define SAM_APPL_SIZE         ((unsigned long)0x02C000)
 
 #define SAM_BOOT_START        SAM_FLASH_START
 #define SAM_BOOT_END          (SAM_BOOT_START + SAM_BOOT_SIZE)

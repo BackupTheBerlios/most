@@ -29,6 +29,9 @@
 #ifndef CSP_ADC8C_H
 #define CSP_ADC8C_H
 
+#include <dev/adc.h>
+
+
 
 /******************************************************************************
 ************************* ADC8C Structure Definition **************************
@@ -272,5 +275,7 @@ extern void CSP_ADC8CStopConversion(CSP_ADC8C_T *const adc);
 extern void CSP_ADC8CEnable(CSP_ADC8C_T *const adc);
 extern void CSP_ADC8CDisable(CSP_ADC8C_T *const adc);
 
+extern ACE_u32_t
+SAM7A2_adc_get(void *rep, enum DEV_adc_channel channel);
 
 #endif   /* CSP_ADC8C_H */

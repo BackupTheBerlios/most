@@ -35,9 +35,6 @@ extern unsigned long long DEV_loops_per_msec;
 /**
  * Spin the CPU.
  *
- * this is not finished, there should be a parameter for the speed the cpu is running.
- * and loop should be a fixed timing.
- * this function is used for initializing hardware were you have to wait short time.
  *
  * @param loop : Spin the cpu n loops.  
  */

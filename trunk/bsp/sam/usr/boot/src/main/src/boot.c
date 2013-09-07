@@ -14,7 +14,7 @@
 void
 SAM_main (void)
 {
-    USO_log_puts (USO_LL_INFO, "App: "SAM_APPLICATION" -- 4 -- \n");
+    USO_log_puts (USO_LL_INFO, "App: "SAM_APPLICATION"\n");
     if (DEV_digin_isset (&SAM_switch_boot) == FALSE)
     {
         SAM_start_app ();

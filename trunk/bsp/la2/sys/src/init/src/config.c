@@ -11,7 +11,7 @@
 #include <mfs/block.h>
 #include <dev/mmc.h>
 
-//#include <arch/spi.h>
+#include <arch/spi.h>
 //#include <arch/eth.h>
 #include <init/config.h>
 
@@ -39,59 +39,59 @@ LA2_config_init (void)
 extern void
 LA2_config_read (void)
 {
-#if 0
-	ACE_ssize_t len;
-	char *data;
-	MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "d1_p1");
-	MFS_block_t *p1 = (MFS_block_t *)desc;
+#if 1
+    ACE_ssize_t len;
+    char *data;
+    MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "cfg");
+    MFS_block_t *p1 = (MFS_block_t *)desc;
     if (desc == NULL || desc->type != MFS_BLOCK)
-    	return;
+        return;
     unsigned long block = p1->start;
-	len = MFS_get (p1, &data, block);
-	if (data != NULL)
+    len = MFS_get (p1, &data, block);
+    if (data != NULL)
     {
-    	if (len >= sizeof (SAM_config)){
-    		memcpy (&SAM_config, data, sizeof (SAM_config));
-        	if ((NET_inet_chksum (&SAM_config,
-                              	  (ACE_u16_t) (sizeof (SAM_config))) != 0) ||
-                (SAM_config.state != SAM_CONFIG_STATE_SAVED))
-        	{
-        		SAM_config_init ();
-        	}
-    	} else {
-    		// check error to short data;
-    	}
-    	MFS_confirm(p1,block);
+        if (len >= sizeof (LA2_config)){
+            memcpy (&LA2_config, data, sizeof (LA2_config));
+            if ((NET_inet_chksum (&LA2_config,
+                            (ACE_u16_t) (sizeof (LA2_config))) != 0) ||
+                (LA2_config.state != LA2_CONFIG_STATE_SAVED))
+            {
+                LA2_config_init ();
+            }
+        } else {
+            // check error to short data;
+        }
+        MFS_confirm(p1,block);
     }
     else
     {
         // check error no data
     }
-	MFS_close_desc (desc);
+    MFS_close_desc (desc);
 #endif
 }
 
 static void
 config_write (void)
 {
-#if 0
-	MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "d1_p1");
-	MFS_block_t *p1 = (MFS_block_t *)desc;
-	if (desc == NULL || desc->type != MFS_BLOCK)
-    	return;
-    if (SAM_config.state == SAM_CONFIG_STATE_SAVED)
+#if 1
+    MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "cfg");
+    MFS_block_t *p1 = (MFS_block_t *)desc;
+    if (desc == NULL || desc->type != MFS_BLOCK)
         return;
-    SAM_config.state = SAM_CONFIG_STATE_SAVED;
-    SAM_config.checksum = NET_inet_chksum (&SAM_config,
-                                           (ACE_u16_t) (sizeof (SAM_config) -
-                                                        sizeof (SAM_config.checksum)));
+    if (LA2_config.state == LA2_CONFIG_STATE_SAVED)
+        return;
+    LA2_config.state = LA2_CONFIG_STATE_SAVED;
+    LA2_config.checksum = NET_inet_chksum (&LA2_config,
+                                           (ACE_u16_t) (sizeof (LA2_config) -
+                                                        sizeof (LA2_config.checksum)));
     char *buffer = ACE_malloc (p1->size);
     if (buffer)
     {
         memset (buffer, '\0', p1->size);
-        if (sizeof (SAM_config) <= p1->size)
+        if (sizeof (LA2_config) <= p1->size)
         {
-        	memcpy (buffer, &SAM_config, sizeof (SAM_config));
+            memcpy (buffer, &LA2_config, sizeof (LA2_config));
         }
         MFS_put  (p1, buffer, p1->size, p1->start);
         ACE_free (buffer);
@@ -100,7 +100,7 @@ config_write (void)
     {
         // error out of mem
     }
-	MFS_close_desc (desc);
+    MFS_close_desc (desc);
 #endif
 }
 
@@ -133,7 +133,7 @@ extern void
 LA2_config_ip (void)
 {
 #if 0
-	NET_netif_set_ipaddr (&SAM_eth0, &SAM_config.ip_addr);
+    NET_netif_set_ipaddr (&SAM_eth0, &SAM_config.ip_addr);
     NET_netif_set_netmask (&SAM_eth0, &SAM_config.netmask);
     NET_netif_set_gateway (&SAM_eth0, &SAM_config.gateway);
 #endif
@@ -191,7 +191,7 @@ config_set_ip_addr (char *param, NET_ip_addr_t * ipaddr)
     if (param != NULL)
     {
         int a, b, c, d;
-    	USO_lock (&ACE_lock);
+        USO_lock (&ACE_lock);
         param = ACE_strtok (param, ".");
         a = ACE_atoi (param);
         param = ACE_strtok (NULL, ".");
@@ -200,8 +200,8 @@ config_set_ip_addr (char *param, NET_ip_addr_t * ipaddr)
         c = ACE_atoi (param);
         param = ACE_strtok (NULL, ".");
         d = ACE_atoi (param);
+        USO_unlock (&ACE_lock);
         NET_ip4_addr (ipaddr, a, b, c, d);
-    	USO_unlock (&ACE_lock);
     }
 }
 

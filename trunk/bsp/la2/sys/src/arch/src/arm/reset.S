@@ -158,6 +158,18 @@ _branch_LA2_init:
         bx      r0
 
 
+    .globl LA2_jump_app
+    .align 4
+LA2_jump_app:
+       ldr      pc, =LA2_APP_BASE
+
+
+
+    .globl LA2_jump_boot
+    .align 4
+LA2_jump_boot:
+        ldr      pc, =LA2_BOOT_BASE
+
 
 /*------------------------------------------------------------------------------
  *- Litteral pools

@@ -9,11 +9,16 @@
 # -psl : put the type of a procedure on the line before its name
 # -nfca : do not format any comments
 
+indent_opt="-gnu -i4 -bli0 -nut -l100 -ncs -psl -nfca"
+
 echo "Input search directory : "
 read search_dir
 
-indent_opt="-gnu -i4 -bli0 -nut -l100 -ncs -psl -nfca"
+echo "Convert all files of specified name in search directory"
+echo "Input file name(\*.c, \*.h, Makefile, ...): "
+read search_file_name
 
-find $MOST_ROOT/${search_dir} -name \*.c -print -exec indent ${indent_opt} {} \;
-find $MOST_ROOT/${search_dir} -name \*.h -print -exec indent ${indent_opt} {} \;
+
+find $MOST_ROOT/${search_dir} -name ${search_file_name} -print -exec indent ${indent_opt} {} \;
+
 echo "finished"
