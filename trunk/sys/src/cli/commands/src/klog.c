@@ -8,17 +8,11 @@
 #include <cli/command.h>
 #include <uso/log.h>
 
-extern ACE_bool_t
+extern ACE_err_t
 CLI_cmd_klog (CLI_interpreter_t * cli)
 {
-    if (cli->argc <= 0)
+    switch (cli->p.arg[0])
     {
-        USO_log_show ();
-    }
-    else
-    {
-        switch (cli->argv[0][0])
-        {
         case '+':
             USO_log_inc ();
             break;
@@ -28,8 +22,7 @@ CLI_cmd_klog (CLI_interpreter_t * cli)
         default:
             USO_log_show ();
             break;
-        }
     }
-    return TRUE;
+    return ACE_OK;
 }
 

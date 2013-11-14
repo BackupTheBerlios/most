@@ -73,61 +73,85 @@ serial_open (MFS_descriptor_t * desc)
     DEV_serial_t *serial = (DEV_serial_t *) desc->represent;
     USO_cpu_status_t ps = USO_disable ();
 
+    if (desc->open_cnt == 0){
+        DEV_serial_error_init (&serial->error);
+        USO_pipe_init (&serial->rx_buf, serial->rx_buffer, sizeof (serial->rx_buffer));
+        USO_pipe_init (&serial->tx_buf, serial->tx_buffer, sizeof (serial->tx_buffer));
+        serial->tx_busy = FALSE;
+        USO_mutex_init (&serial->rx_mutex);
+        USO_mutex_init (&serial->tx_mutex);
+        USO_barrier_init (&serial->rx_barrier);
+        serial->open (serial->settings);
+        serial->rx_cancel = FALSE;
+        serial->rx_timeout_sec = 0;
+    }
+    
+    USO_restore (ps);
+    return ACE_OK;
+}
+
+static ACE_err_t
+serial_close (MFS_descriptor_t * desc)
+{
+    DEV_serial_t *serial = (DEV_serial_t *)desc->represent;
+    USO_cpu_status_t ps = USO_disable ();
     if (desc->open_cnt == 1){
-    	DEV_serial_error_init (&serial->error);
-    	USO_pipe_init (&serial->rx_buf, serial->rx_buffer, sizeof (serial->rx_buffer));
-    	USO_pipe_init (&serial->tx_buf, serial->tx_buffer, sizeof (serial->tx_buffer));
-    	serial->tx_busy = FALSE;
-    	USO_mutex_init (&serial->rx_mutex);
-    	USO_mutex_init (&serial->tx_mutex);
-    	USO_barrier_init (&serial->rx_barrier);
-    	serial->open (serial->settings);
-    	serial->rx_cancel = FALSE;
-    	serial->rx_timeout_sec = 0;
+        serial->close ();
     }
     USO_restore (ps);
     return ACE_OK;
 }
 
 static void
-serial_close (MFS_descriptor_t * desc)
+serial_info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
-    DEV_serial_t *serial = (DEV_serial_t *)desc->represent;
-    USO_cpu_status_t ps = USO_disable ();
-    if (desc->open_cnt == 0){
-    	serial->close ();
+    DEV_serial_t *serial = (DEV_serial_t *) desc->represent;
+    switch (number){
+        case 0:
+        case 1:
+        case 2:
+            MFS_stream_info((MFS_stream_t *)desc, number, entry);
+            break;
+        case 3:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "blocking IO";
+            entry->value.l = serial->block;
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
     }
-    USO_restore (ps);
+    // todo
+    //DEV_serial_settings_print (serial->settings);
+    //DEV_serial_error_print (&serial->error);
 }
 
 static void
-serial_info (MFS_descriptor_t * desc)
+serial_control (MFS_descriptor_t *desc, int number, MFS_ctrl_entry_t *entry)
 {
     DEV_serial_t *serial = (DEV_serial_t *) desc->represent;
-    MFS_stream_print((MFS_stream_t *)desc);
-    ACE_printf ("Serial %sblocking IO:\n", serial->block ? "" : "non ");
-    DEV_serial_settings_print (serial->settings);
-    DEV_serial_error_print (&serial->error);
-}
-
-static void
-serial_control (MFS_descriptor_t *desc, enum MFS_control_key key, long value)
-{
-    DEV_serial_t *serial = (DEV_serial_t *) desc->represent;
-	switch (key){
-	case MFS_CTRL_SER_RX_TIMEOUT:
-		serial->rx_timeout_sec = value;
-		break;
-	default:
-		break;
-	}
+    switch (number){
+        case 0:
+            if (entry->type == MFS_CTRL_INFO){
+                ACE_sprintf(entry->value.s, "1 l rx_timeout\n");
+            }
+            break;
+        case DEV_SER_CTRL_RX_TIMEOUT:
+            if (entry->type == MFS_CTRL_LONG){
+                serial->rx_timeout_sec = entry->value.l;
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 static struct MFS_descriptor_op serial_desc_op = {
-	.open = serial_open,
+    .open = serial_open,
     .close = serial_close,
     .info = serial_info,
-    .control = serial_control
+    .control = serial_control,
+    .delete = NULL
 };
 
 static ACE_size_t
@@ -227,15 +251,15 @@ static struct MFS_stream_op serial_b_stream_op = {
 };
 
 static struct MFS_stream_op serial_nb_stream_op = {
-	.read = serial_nb_read,
-	.write = serial_nb_write,
+    .read = serial_nb_read,
+    .write = serial_nb_write,
     .seek = NULL,
     .flush = NULL
 };
 
 static void rx_timeout(void * serial)
 {
-	DEV_serial_rx_cancel((DEV_serial_t *)serial);
+    DEV_serial_rx_cancel((DEV_serial_t *)serial);
 }
 
 extern void
@@ -252,14 +276,16 @@ DEV_serial_init (DEV_serial_t * serial,
     serial->block = block;
     DEV_timer_init(&serial->rx_timer, rx_timeout, serial, DEV_TIMER_INT);
     DEV_timer_install (&serial->rx_timer, "srx_to");
-    MFS_stream_create (MFS_resolve(MFS_get_root(), "sys/dev/serial"), name, &serial_desc_op,
+    MFS_descriptor_t *dir = MFS_resolve("/sys/dev/serial");
+    MFS_stream_create (dir, name, &serial_desc_op,
                    (serial->block == TRUE) ? &serial_b_stream_op : &serial_nb_stream_op,
                    (MFS_represent_t *) serial, MFS_STREAM_IO);
+    MFS_close_desc(dir);
 }
 
 extern void
 DEV_serial_rx_cancel(DEV_serial_t *serial)
 {
-	serial->rx_cancel = TRUE;
+    serial->rx_cancel = TRUE;
     USO_go (&serial->rx_barrier);
 }

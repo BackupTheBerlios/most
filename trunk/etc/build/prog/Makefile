@@ -50,6 +50,8 @@ info :
 	@make $@ --no-print-directory -f $(MOST_ROOT)/etc/build/Makefile
 
 obj :
+	@$(ECHO) "touch $(MOST_ROOT)/sys/inc/ace/version.h"
+	@$(TOUCH) $(MOST_ROOT)/sys/inc/ace/version.h
 	@$(call makegoal_src, $@)
 
 $(MOST_BUILD) :

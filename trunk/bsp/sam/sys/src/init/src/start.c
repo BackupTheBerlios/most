@@ -45,7 +45,7 @@ static USO_stack_t cli0_stack[CLI_STACK_SIZE];
 
 static CLI_interpreter_t cli0;
 
-static void
+static ACE_err_t
 run_led_run (void *nix)
 {
     USO_log_puts (USO_LL_INFO, "Run led is running.\n");
@@ -73,9 +73,10 @@ run_led_run (void *nix)
         SAM_events_create ();
         USO_sleep (USO_MSEC_2_TICKS (100));
     }
+    return DEF_ERR_SYS;
 }
 
-static void
+static ACE_err_t
 start_run (void *nix)
 {
     USO_log_puts (USO_LL_INFO, "is running.\n");
@@ -105,18 +106,21 @@ start_run (void *nix)
     USO_thread_arg_init (&cli0_thread, &cli0);
     USO_start (&cli0_thread);
 
-    SAM_bsp_commands_install (MFS_resolve(MFS_get_root(), "bsp"));
-    SAM_config_install (MFS_resolve(MFS_get_root(), "bsp"));
-
+    MFS_descriptor_t *dir = MFS_resolve("/bsp");
+    SAM_bsp_commands_install (dir);
+    SAM_config_install (dir);
+    MFS_close_desc(dir);
+    
     DEV_digout_set (&SAM_green_led);
     SAM_main ();
+    return ACE_OK;
 }
 
 extern void
 SAM_start (ACE_FILE * stdio)
 {
     USO_log_puts (USO_LL_INFO, "Start ");
-    USO_thread_t *start_thread = USO_thread_new ((void (*)(void *))start_run,
+    USO_thread_t *start_thread = USO_thread_new (start_run,
                                                  START_STACK_SIZE,
                                                  USO_USER,
                                                  USO_ROUND_ROBIN,

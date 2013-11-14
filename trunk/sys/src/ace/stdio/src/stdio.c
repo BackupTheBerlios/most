@@ -83,7 +83,6 @@ ACE_fprintf (ACE_FILE * out, const char *fmt, ...)
     return (ret < len) ? ACE_EOF : ret;
 }
 
-
 extern ACE_size_t
 ACE_read (char *buf, ACE_size_t len)
 {

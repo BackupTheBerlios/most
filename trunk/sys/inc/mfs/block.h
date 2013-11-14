@@ -37,7 +37,7 @@ enum MFS_block_type
 /* Block structure. */
 struct MFS_block
 {
-	MFS_descriptor_t desc;
+    MFS_descriptor_t desc;
     enum MFS_block_type type;  /* Block type. */
     unsigned long start;         /* block number of first block (for DISK). */
     unsigned long end;           /* logical block number after last block (for DISK). */
@@ -78,14 +78,14 @@ extern ACE_err_t MFS_confirm (MFS_block_t * block, ACE_size_t number);
  * @param represent :
  */
 extern void MFS_block_init (
-		MFS_block_t * block,
-		enum MFS_block_type type,
-		struct MFS_block_op *operations);
+                MFS_block_t * block,
+                enum MFS_block_type type,
+                struct MFS_block_op *operations);
 
-extern MFS_descriptor_t *MFS_block_create (MFS_descriptor_t * dir_desc, char *name, struct MFS_descriptor_op *desc_op,
-					  struct MFS_block_op *io_op, MFS_represent_t * represent, enum MFS_block_type type);
+extern MFS_descriptor_t *MFS_block_create (MFS_descriptor_t * dir, char *name, struct MFS_descriptor_op *desc_op,
+                struct MFS_block_op *io_op, MFS_represent_t * represent, enum MFS_block_type type);
 
-extern void MFS_block_print (MFS_block_t * block);
+extern void MFS_block_info (MFS_block_t * block, int number, MFS_info_entry_t *entry);
 
 /** @}
  */

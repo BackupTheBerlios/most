@@ -43,12 +43,12 @@ void
 LA2_main (void)
 {
 
-    USO_log_puts (USO_LL_INFO, "App: "LA2_APPLICATION" -- Check Download = 1 -- \n");
+    USO_log_puts (USO_LL_INFO, "App: "LA2_APPLICATION"\n");
     USO_log_printf (USO_LL_INFO, "Sizeof(char, short, int, long) = %d %d %d %d.\n", sizeof (char), sizeof (short), sizeof (int), sizeof (long));
 
     NAP_ymodem_install();
 
-    MFS_descriptor_t *app = MFS_resolve(MFS_get_root(), "app");
+    MFS_descriptor_t *app = MFS_resolve("/app");
     MFS_descriptor_t *putboot;
     putboot = MFS_directory_create (app, "putboot");
 
@@ -67,6 +67,7 @@ LA2_main (void)
 
     LFR_init ();
     LFR_install(app);
+    MFS_close_desc(app);
 
     USO_slot_init (&LA2_event_slots, &test_slot, test_event_ids, TEST_SLOT_SIZE);
 

@@ -7,46 +7,26 @@
 #include <ace/stddef.h>
 #include <ace/stdlib.h>
 #include <uso/cpu.h>
+#include <dev/serial.h>
 #include <mfs/stream.h>
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
 #include <cli/tty.h>
 #include <cli/err.h>
 
-static void
-tty_print (CLI_tty_t * tty)
+static ACE_err_t
+tty_open (MFS_descriptor_t * desc)
 {
-	char *in_mode;
-	char *out_mode;
-    switch (tty->in_mode)
-    {
-    case CLI_TTY_MODE_RAW:
-        in_mode = "RAW";
-        break;
-    case CLI_TTY_MODE_COOKED:
-        in_mode = "COOKED";
-        break;
-    default:
-        in_mode = "?";
-        break;
+    CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
+    USO_lock(&tty->lock);
+    if (desc->open_cnt == 0){
     }
-    switch (tty->out_mode)
-    {
-    case CLI_TTY_MODE_RAW:
-        out_mode = "RAW";
-        break;
-    case CLI_TTY_MODE_COOKED:
-        out_mode = "COOKED";
-        break;
-    default:
-        out_mode = "?";
-        break;
-    }
-    ACE_printf ("TTY: in_mode: %s, out_mode %s, in_transl: %i, out_transl: %i\n", in_mode, out_mode, tty->in_transl, tty->out_transl);
+    USO_unlock(&tty->lock);
+    return ACE_OK;
 }
 
 static ACE_err_t
-tty_open (MFS_descriptor_t * desc)
+tty_close (MFS_descriptor_t * desc)
 {
     CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
     USO_lock(&tty->lock);
@@ -57,64 +37,106 @@ tty_open (MFS_descriptor_t * desc)
 }
 
 static void
-tty_close (MFS_descriptor_t * desc)
+tty_info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
     CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
-    USO_lock(&tty->lock);
-    if (desc->open_cnt == 0){
-    }
-    USO_unlock(&tty->lock);
+    switch (number){
+        case 0:
+        case 1:
+        case 2:
+            MFS_stream_info((MFS_stream_t *)desc, number, entry);
+            break;
+        case 3:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "in_mode";
+            entry->value.s = (tty->in_mode == CLI_TTY_MODE_RAW) ? "RAW" : "COOKED";
+            break;
+        case 4:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "in_transl";
+            entry->value.l = tty->in_transl;
+            break;
+        case 5:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "in_stream";
+            entry->value.s = tty->in_stream->name;
+            break;
+        case 6:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "out_mode";
+            entry->value.s = (tty->out_mode == CLI_TTY_MODE_RAW) ? "RAW" : "COOKED";
+            break;
+        case 7:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "out_transl";
+            entry->value.l = tty->out_transl;
+            break;
+        case 8:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "out_stream";
+            entry->value.s = tty->out_stream->name;
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
+   }
 }
 
 static void
-tty_info (MFS_descriptor_t * desc)
+tty_control (MFS_descriptor_t * desc, int number, MFS_ctrl_entry_t *entry)
 {
     CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
-    MFS_stream_print((MFS_stream_t *)desc);
-    tty_print (tty);
-    if (tty->in_stream != NULL)
-    {
-        MFS_info_desc (tty->in_stream);
+    switch (number){
+        case 0:
+            if (entry->type == MFS_CTRL_INFO){
+                ACE_sprintf(entry->value.s, "1 l in_mode\n"
+                                            "2 l out_mode\n"
+                                            "3 l in_transl\n"
+                                            "4 l out_transl\n"
+                                            "5   def_transl\n"
+                                            "6 l rx_timeout");
+            }
+            break;
+        case CLI_TTY_CTRL_IN_MODE:
+            if (entry->type == MFS_CTRL_LONG){
+                tty->in_mode = entry->value.l;
+            }
+            break;
+        case CLI_TTY_CTRL_OUT_MODE:
+            if (entry->type == MFS_CTRL_LONG){
+                tty->out_mode = entry->value.l;
+            }
+            break;
+        case CLI_TTY_CTRL_IN_TRANSL:
+            if (entry->type == MFS_CTRL_LONG){
+                tty->in_transl = entry->value.l;
+            }
+            break;
+        case CLI_TTY_CTRL_OUT_TRANSL:
+            if (entry->type == MFS_CTRL_LONG){
+                tty->out_transl = entry->value.l;
+            }
+            break;
+        case CLI_TTY_CTRL_DEFAULT_TRANSL:
+            tty->in_transl = tty->in_transl_default;
+            tty->out_transl = tty->out_transl_default;
+            break;
+        case CLI_TTY_CTRL_RX_TIMEOUT:
+            if (entry->type == MFS_CTRL_LONG){
+                MFS_control_desc(tty->in_stream, DEV_SER_CTRL_RX_TIMEOUT, entry);
+            }
+            break;
+        default:
+            break;
     }
-    if (tty->out_stream != NULL)
-    {
-        MFS_info_desc (tty->out_stream);
-    }
-}
-
-static void
-tty_control (MFS_descriptor_t * desc, enum MFS_control_key key, long value)
-{
-    CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
-	switch (key){
-	case MFS_CTRL_TTY_IN_MODE:
-		tty->in_mode = value;
-		break;
-	case MFS_CTRL_TTY_OUT_MODE:
-		tty->out_mode = value;
-		break;
-	case MFS_CTRL_TTY_IN_TRANSL:
-		tty->in_transl = value;
-		break;
-	case MFS_CTRL_TTY_OUT_TRANSL:
-		tty->out_transl = value;
-		break;
-	case MFS_CTRL_TTY_DEFAULT_TRANSL:
-		tty->in_transl = tty->in_transl_default;
-		tty->out_transl = tty->out_transl_default;
-		break;
-	default:
-		MFS_control_desc(tty->in_stream, key, value);
-		MFS_control_desc(tty->out_stream, key, value);
-		break;
-	}
 }
 
 static struct MFS_descriptor_op tty_desc_op = {
     .open = tty_open,
     .close = tty_close,
     .info = tty_info,
-    .control = tty_control
+    .control = tty_control,
+    .delete = NULL
 };
 
 static ACE_size_t
@@ -139,22 +161,22 @@ tty_read (MFS_stream_t *stream, char *buf, ACE_size_t len)
                     break;
                 }
                 switch (tty->in_transl) {
-                case CLI_TTY_INTRANSL_NONE:
-                	*buf++ = c;
-                	break;
-                case CLI_TTY_INTRANSL_CR_2_NL:
-                	*buf++ = (c != '\r') ? c : '\n';
-                	break;
-                case CLI_TTY_INTRANSL_REMOVE_CR:
-                	if (c != '\r') *buf++ = c;
-                	else {
-                		len++;
-                		ret--;
-                	}
-                	break;
-                default:
-                	*buf++ = c;
-                	break;
+                    case CLI_TTY_INTRANSL_NONE:
+                        *buf++ = c;
+                        break;
+                    case CLI_TTY_INTRANSL_CR_2_NL:
+                        *buf++ = (c != '\r') ? c : '\n';
+                        break;
+                    case CLI_TTY_INTRANSL_REMOVE_CR:
+                        if (c != '\r') *buf++ = c;
+                        else {
+                            len++;
+                            ret--;
+                        }
+                        break;
+                    default:
+                        *buf++ = c;
+                        break;
                 }
                 len--;
                 ret++;
@@ -186,17 +208,17 @@ tty_write (MFS_stream_t *stream, const char *buf, ACE_size_t len)
                 {
                     switch (tty->out_transl) {
                     case CLI_TTY_OUTTRANSL_NONE:
-                    	break;
+                        break;
                     case CLI_TTY_OUTTRANSL_NL_2_CR:
                         c = '\r';
-                    	break;
+                        break;
                     case CLI_TTY_OUTTRANSL_ADD_CR:
                         c = '\r';
                         ACE_fputc (tty->out_stream, c);
                         c = '\n';
-                    	break;
+                        break;
                     default:
-                    	break;
+                        break;
                     }
                 }
                 ACE_fputc (tty->out_stream, c);
@@ -235,6 +257,8 @@ CLI_tty_init (CLI_tty_t * tty,
     tty->in_mode = CLI_TTY_MODE_COOKED;
     tty->out_mode = CLI_TTY_MODE_COOKED;
     USO_mutex_init(&tty->lock);
-    MFS_stream_create (MFS_resolve(MFS_get_root(), "sys/cli"), name, &tty_desc_op,
+    MFS_descriptor_t *dir = MFS_resolve("/sys/cli");
+    MFS_stream_create (dir, name, &tty_desc_op,
                    &tty_stream_op, (MFS_represent_t *) tty, MFS_STREAM_IO);
+    MFS_close_desc(dir);
 }

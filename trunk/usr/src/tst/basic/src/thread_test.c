@@ -18,7 +18,7 @@
 static CLI_exec_t thread_test;
 static CLI_exec_t scheduler_test;
 
-static void
+static ACE_err_t
 thread_test_exec (char *text)
 {
     for (;;)
@@ -28,12 +28,13 @@ thread_test_exec (char *text)
         {;
         }
     }
+    return CLI_ERR_NOT_REACHED;
 }
 
 #define SCHEDULE_COUNT 100
 #define SLEEP_TIME_MSEC 10
 
-static void
+static ACE_err_t
 scheduler_test_exec (char *nix)
 {
     unsigned long ticks = USO_current ()->ticks;
@@ -43,6 +44,7 @@ scheduler_test_exec (char *nix)
     }
     ACE_printf ("Sched time usec: %lu\n",
                 (USO_TICKS_2_MSEC (USO_current ()->ticks - ticks) * 1000) / SCHEDULE_COUNT);
+    return ACE_OK;
 }
 
 extern void

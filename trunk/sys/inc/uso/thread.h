@@ -7,7 +7,7 @@
 #define USO_THREAD_H
 
 #include <ace/stddef.h>
-
+#include <ace/err.h>
 #include <uso/list.h>
 #include <uso/cpu.h>
 #include <ace/stdio.h>
@@ -107,6 +107,7 @@ enum USO_thread_scheduling
 
 /**
  * FLAG_DETACH:
+ * only use this flag if thread is allocated with new.
  * Release the resources of an allocated thread which has finished:
  * Remove its file descriptor and release the stack memory.
  *
@@ -141,7 +142,7 @@ struct USO_thread
     enum USO_thread_state state;
     enum USO_thread_priority priority;
     enum USO_thread_scheduling scheduling;
-    void (*enter) (void *);
+    ACE_err_t (*enter) (void *);
     void (*cleanup) (void *);
     void *arg;
     ACE_u32_t flags;
@@ -155,8 +156,9 @@ struct USO_thread
     unsigned long ticks;
     MFS_descriptor_t *in;
     MFS_descriptor_t *out;
-    MFS_descriptor_t *dir;
+    MFS_descriptor_t *work;
     MFS_descriptor_t *desc;
+    ACE_err_t error;
 };
 
 /** 
@@ -184,7 +186,7 @@ typedef struct USO_thread USO_thread_t;
  * @param name : Name for the thread.
  */
 extern void USO_thread_init (USO_thread_t * thread,
-                             void (*enter) (void *),
+                             ACE_err_t (*enter) (void *),
                              USO_stack_t * stack,
                              int stack_size,
                              enum USO_thread_priority priority,
@@ -203,7 +205,7 @@ extern void USO_thread_init (USO_thread_t * thread,
  * @param name : Name for the thread.
  * @return : Pointer to thread.
  */
-extern USO_thread_t *USO_thread_new (void (*enter) (void *),
+extern USO_thread_t *USO_thread_new (ACE_err_t (*enter) (void *),
                                      int stack_size,
                                      enum USO_thread_priority priority,
                                      enum USO_thread_scheduling scheduling, char *name);
@@ -252,9 +254,9 @@ extern void USO_thread_arg_init (USO_thread_t * thread, void *arg);
  * @param thread : thread.
  * @param cli : cli.
  */
-extern void USO_thread_dir_set (USO_thread_t * thread, MFS_descriptor_t *dir);
+extern void USO_thread_work_set (USO_thread_t * thread, MFS_descriptor_t *work);
 
-extern MFS_descriptor_t * USO_thread_dir_get (USO_thread_t * thread);
+extern MFS_descriptor_t * USO_thread_work_get (USO_thread_t * thread);
 
 /**
  * Set thread flags.
@@ -303,7 +305,7 @@ extern ACE_u32_t USO_catch (void);
 /**
  * Current thread will exit and finish.
  */
-extern void USO_exit (void);
+extern void USO_exit (ACE_err_t);
 
 /**
  * Give other threads a chance to run.
@@ -314,11 +316,6 @@ extern void USO_yield (void);
  * Return name of current thread.
  */
 extern char *USO_thread_name (void);
-
-/**
- * Print thread info header.
- */
-extern void USO_thread_info_head (MFS_descriptor_t *dir);
 
 /*------------------------------------------------------------------------*/
 

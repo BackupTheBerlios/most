@@ -10,7 +10,7 @@
 
 static CLI_exec_t sert;
 
-static void
+static ACE_err_t
 ser_test_exec (char *nix)
 {
     int i;
@@ -18,6 +18,7 @@ ser_test_exec (char *nix)
     {
         USO_log_printf (USO_LL_INFO, "Serial Test %d.\n", i);
     }
+    return ACE_OK;
 }
 
 extern void

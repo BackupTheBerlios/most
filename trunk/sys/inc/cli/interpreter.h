@@ -7,6 +7,7 @@
 #define CLI_INTERPRETER_H
 
 #include <cli/exec.h>
+#include <cli/parser.h>
 #include <mfs/vfs.h>
 
 /** @addtogroup cli
@@ -19,26 +20,15 @@
  * @{
  */
 
-extern char CLI_err_arg_missing[];
-extern char CLI_err_arg_notfound[];
-extern char CLI_err_type_inval[];
-extern char CLI_err_open_fail[];
-extern char CLI_err_cmd_fail[];
-extern char CLI_err_sys_fail[];
-
-/** Maximal token size for the CLI. */
-#define CLI_TOKEN_SIZE (ACE_MAX(MFS_PATH_SIZE,32))
-/** Maximal amount of tokens for the CLI. */
-#define CLI_TOKEN_COUNTER 4
+/** Maximal size for the command line. */
+#define CLI_LINE_SIZE         256
 
 struct CLI_interpreter
 {
+    CLI_parser_t p;
     MFS_descriptor_t *out_desc;
     MFS_descriptor_t *in_desc;
-    MFS_descriptor_t *exe_desc;
-    char token_buffer[CLI_TOKEN_COUNTER][CLI_TOKEN_SIZE];
-    char *argv[CLI_TOKEN_COUNTER];
-    int argc;
+    char line_buffer[CLI_LINE_SIZE];
     int prio;
     int sched;
 };
@@ -64,7 +54,7 @@ extern void CLI_interpreter_init (CLI_interpreter_t * cli);
  *  This function is the entry function for the CLI thread.
  *  @param cli : CLI_interpreter_t passed as argument to the entry function.
  */
-extern void CLI_interpreter_run (void *cli);
+extern ACE_err_t CLI_interpreter_run (void *cli);
 
 /** @}
  */

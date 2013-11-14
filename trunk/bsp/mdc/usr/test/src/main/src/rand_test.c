@@ -27,7 +27,7 @@ calc_i(ACE_u32_t r)
     return r % MAX_NUMBERS;
 }
 
-static void
+static ACE_err_t
 rand_exec (char *arg)
 {
     ACE_u32_t hwr, swr;
@@ -47,6 +47,7 @@ rand_exec (char *arg)
     for (int i = 0 ; i < MAX_NUMBERS; ++i){
         ACE_printf("N: %i  HW-P: %lu    SW-P: %lu\n", i, hw_counter[i], sw_counter[i]);
     }
+    return ACE_OK;
 }
 
 extern void

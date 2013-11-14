@@ -48,7 +48,7 @@ USO_transform (void (*init) (void), USO_stack_t * stack, int stack_size)
     USO_thread_init (&idle_thread, NULL, stack, stack_size, USO_IDLE, USO_FIFO, "idle");
     USO_thread_in_init (&idle_thread, NULL);
     USO_thread_out_init (&idle_thread, NULL);
-    USO_thread_dir_set (&idle_thread, NULL);
+    USO_thread_work_set (&idle_thread, NULL);
     current_thread = &idle_thread;
     old_thread = &idle_thread;
     init ();

@@ -47,7 +47,7 @@ MDC_main (void)
     NAP_ymodem_install();
     MDC_net_start(NULL);
 
-    MFS_descriptor_t *app = MFS_resolve(MFS_get_root(), "app");
+    MFS_descriptor_t *app = MFS_resolve("/app");
     MFS_descriptor_t *putboot;
     putboot = MFS_directory_create (app, "putboot");
 
@@ -68,4 +68,6 @@ MDC_main (void)
     lcd_bl_test_install (test);
     rand_test_install (test);
     lcd_test_install (test);
+
+    MFS_close_desc(app);
 }

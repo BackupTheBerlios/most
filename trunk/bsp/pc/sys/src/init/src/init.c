@@ -59,7 +59,10 @@ static USO_heap_t heap;
 static void
 abort_handler (char *msg, char *file, int line)
 {
-    USO_log_printf (USO_LL_PANIC, "Abort: %s, file: %s, line: %i.\n", msg, file, line);
+    PC_dbg_puts("!!! Abort !!!\n");
+    PC_dbg_puts(msg);
+    PC_dbg_puts(file);
+    for (;;);
 }
 
 static void
@@ -67,6 +70,7 @@ panic_handler (char *msg, char *file, int line)
 {
     PC_dbg_puts("!!!Don't PANIC: !!!\n");
     PC_dbg_puts(msg);
+    for (;;);
 }
 
 
@@ -80,9 +84,11 @@ static char ios_bufs[IOS_BUF_COUNT][IOS_BUF_SIZE];
 static void
 init (void)
 {
-	/* System initialization without kernel logging */
+    /* System initialization without kernel logging */
 
-	USO_buf_pool_init (&ios_buf_pool, ios_bufs, IOS_BUF_COUNT, IOS_BUF_SIZE);
+    PC_dbg_puts("init2\n");
+
+    USO_buf_pool_init (&ios_buf_pool, ios_bufs, IOS_BUF_COUNT, IOS_BUF_SIZE);
     ACE_stdio_init (&ios_buf_pool);
     USO_sleep_init ();
     DEV_timers_init ();
@@ -91,17 +97,23 @@ init (void)
     PC_ticks_init();
     //PC_rtc_init ();
 
-    con0 = MFS_open (MFS_resolve(MFS_get_root(), "sys/dev/serial"), "con0");
+    PC_dbg_puts("init con\n");
+
+    con0 = MFS_resolve("/sys/dev/serial/con0");
     if (con0 == NULL)
     {
         ACE_PANIC ("Open con0 fail");
     }
 
-    kbd0 = MFS_open (MFS_resolve(MFS_get_root(), "sys/dev/serial"), "kbd0");
+    PC_dbg_puts("init kbd\n");
+
+    kbd0 = MFS_resolve("/sys/dev/serial/kbd0");
     if (kbd0 == NULL)
     {
         ACE_PANIC ("Open kbd0 fail");
     }
+
+    PC_dbg_puts("init tty\n");
 
     CLI_tty_init (&tty_0,
                   kbd0, con0,
@@ -109,13 +121,15 @@ init (void)
                   CLI_TTY_OUTTRANSL_ADD_CR,
                   "tty0");
 
-    tty0 = MFS_open (MFS_resolve(MFS_get_root(), "sys/cli"), "tty0");
+    tty0 = MFS_resolve("/sys/cli/tty0");
     if (tty0 == NULL)
     {
         ACE_PANIC ("Open tty0 fail");
     }
 
-    USO_log_init (tty0, USO_LL_INFO);
+    PC_dbg_puts("init log\n");
+
+    USO_log_init (tty0, USO_LL_DEBUG);
     USO_enable ();
     USO_log_puts (USO_LL_INFO, "\nInit: Kernel log on con0.\n");
 
@@ -127,25 +141,28 @@ init (void)
     USO_log_printf (USO_LL_INFO, "Loop calib 100ms: %lu.\n", USO_TICKS_2_MSEC(DEV_get_ticks_diff (ticks_count)) );
 
     PC_keyboard_start ();
-    PC_start_kernel (tty0, tty0);
+
+    PC_dbg_puts("start\n");
+
+    PC_start (tty0, tty0);
 
     USO_log_puts (USO_LL_INFO, "Idle.\n");
 
     for (;;)
     {
-    	DEV_cpudelay(DEV_USEC_2_LOOPS(1000000));
+        DEV_cpudelay(DEV_USEC_2_LOOPS(1000000));
         USO_log_puts (USO_LL_PROTOCOL, "I");
     }
 
 }
 
-void PC_init_kernel(struct multiboot_info *mb_info)
+void PC_init(struct multiboot_info *mb_info)
 {
     /* C setup: not initialized variables */
     //memset (&bss_start, 0, &bss_end - &bss_start); do not do this , it will overwrite the init_stack
 
-	PC_dbg_clr();
-    PC_dbg_puts("init_kernel\n");
+    PC_dbg_clr();
+    PC_dbg_puts("init\n");
 
     PC_pmm_init(mb_info);
     PC_vmm_init();
@@ -155,8 +172,12 @@ void PC_init_kernel(struct multiboot_info *mb_info)
 
     DEV_loops_per_msec = PC_LOOPS_PER_MSEC;
 
-	/* Abort handler initialization */
+    PC_dbg_puts("init stdlib\n");
+
+    /* Abort handler initialization */
     ACE_stdlib_init (&heap, abort_handler, panic_handler);
+
+    PC_dbg_puts("init heap\n");
 
     /* Heap initialization */
     if (USO_heap_init (&heap, &heap_buffer[0], &heap_buffer[HEAP_SIZE]) == FALSE)
@@ -164,16 +185,22 @@ void PC_init_kernel(struct multiboot_info *mb_info)
         ACE_PANIC ("Heap init failed!");
     }
 
+    PC_dbg_puts("init sysfs\n");
+
     /* SYS FS needs heap */
     if (MFS_sysfs_init () == FALSE)
     {
         ACE_PANIC ("Sysfs init failed!");
     }
 
+    PC_dbg_puts("install heap\n");
+
     USO_heap_install (&heap, "heap0");
 
 
     //USO_stack_init (&init_stack_start, INIT_STACK_SIZE);
+
+    PC_dbg_puts("transform\n");
 
     /* Go multithreading */
     USO_transform (init, &init_stack_start, INIT_STACK_SIZE);

@@ -23,19 +23,28 @@
 
 /*------------- Representation ------------------------------------------*/
 
+enum CLI_tty_control_key
+{
+    CLI_TTY_CTRL_IN_MODE = 1,        /**< Set tty receive mode. */
+    CLI_TTY_CTRL_OUT_MODE,           /**< Set tty transmit mode. */
+    CLI_TTY_CTRL_IN_TRANSL,          /**< Set tty receive translation. */
+    CLI_TTY_CTRL_OUT_TRANSL,         /**< Set tty transmit translation. */
+    CLI_TTY_CTRL_DEFAULT_TRANSL,     /**< Set tty translation to default. */
+    CLI_TTY_CTRL_RX_TIMEOUT          /**< Set serial receive timeout in sec. */
+};
 
 enum CLI_tty_in_transl
 {
-	CLI_TTY_INTRANSL_NONE,
-	CLI_TTY_INTRANSL_CR_2_NL,
-	CLI_TTY_INTRANSL_REMOVE_CR,
+    CLI_TTY_INTRANSL_NONE,
+    CLI_TTY_INTRANSL_CR_2_NL,
+    CLI_TTY_INTRANSL_REMOVE_CR,
 };
 
 enum CLI_tty_out_transl
 {
-	CLI_TTY_OUTTRANSL_NONE,
-	CLI_TTY_OUTTRANSL_NL_2_CR,
-	CLI_TTY_OUTTRANSL_ADD_CR
+    CLI_TTY_OUTTRANSL_NONE,
+    CLI_TTY_OUTTRANSL_NL_2_CR,
+    CLI_TTY_OUTTRANSL_ADD_CR
 };
 
 /** TTY modes. */

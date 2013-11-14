@@ -42,41 +42,64 @@ static ACE_err_t
 flash_open (MFS_descriptor_t *desc)
 {
     MFS_stream_t *stream = (MFS_stream_t*)desc;
-    if (desc->open_cnt != 1) return DEF_ERR_BUSY;
-    stream->pos_rx = 0;
+    if (desc->open_cnt == 0){
+        stream->pos_rx = 0;
+    }
     return ACE_OK;
 }
 
 static void
-flash_close (MFS_descriptor_t *desc)
-{
-}
-
-static void
-flash_info (MFS_descriptor_t *desc)
+flash_info (MFS_descriptor_t *desc, int number, MFS_info_entry_t *entry)
 {
     flash_t *fl = (flash_t *) desc->represent;
-    MFS_stream_print((MFS_stream_t *)desc);
-    ACE_printf("\t Flash:\n"
-               "\t loc = %p,\n"
-               "\t start = %p,\n"
-               "\t end = %p,\n"
-               "\t max = %lu,\n"
-               "\t block size = %lu,\n"
-               "\t flash %s\n",
-                    LA2_FLASH_START,
-                    fl->sector_start,
-                    fl->sector_end,
-                    fl->sector_end - fl->sector_start,
-                    fl->sector_size,
-                    fl->erased == TRUE ? "erased" : "written");
+    switch (number){
+        case 0:
+        case 1:
+        case 2:
+            MFS_stream_info((MFS_stream_t *)desc, number, entry);
+            break;
+        case 3:
+            entry->type = MFS_INFO_PTR;
+            entry->name = "loc";
+            entry->value.p = LA2_FLASH_START;
+            break;
+        case 4:
+            entry->type = MFS_INFO_PTR;
+            entry->name = "start";
+            entry->value.p = fl->sector_start;
+            break;
+        case 5:
+            entry->type = MFS_INFO_PTR;
+            entry->name = "end";
+            entry->value.p = fl->sector_end;
+            break;
+        case 6:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "max";
+            entry->value.z = fl->sector_end - fl->sector_start;
+            break;
+        case 7:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "block";
+            entry->value.z = fl->sector_size;
+            break;
+        case 8:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "state";
+            entry->value.s = (fl->erased == TRUE) ? "erased" : "written";
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
+   }
 }
 
 static struct MFS_descriptor_op flash_desc_op = {
     .open = flash_open,
-    .close = flash_close,
+    .close = NULL,
     .info = flash_info,
     .control = NULL,
+    .delete = NULL
 };
 
 static ACE_size_t
@@ -164,7 +187,7 @@ flash_init (flash_t *fl, unsigned char *start, unsigned char *end)
 }
 
 
-static void
+static ACE_err_t
 erase_flash_exec (char *nix)
 {
     int i = flash.sector_index; 
@@ -175,19 +198,21 @@ erase_flash_exec (char *nix)
         ACE_printf ("Erase flash sector %p error %d\n", addr, error);
         if (error)
         {
-            return;
+            return DEF_ERR_ROM;
         }
     }
     flash.erased = TRUE;
+    return ACE_OK;
 }
 
-static void
+static ACE_err_t
 print_flash_id_exec (char *nix)
 {
     unsigned short mf, device;
     enum FLASH_26LV800BTC_err_code error;
     error = FLASH_26LV800BTC_get_id_is (&mf, &device);
     ACE_printf ("Flash err = %d, mf id = %X, device id = %X\n", error, mf, device);
+    return ACE_OK;
 }
 
 extern void

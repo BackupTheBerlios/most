@@ -11,14 +11,15 @@
 #include <mfs/descriptor.h>
 #include <mfs/sysfs.h>
 
-extern ACE_bool_t
-CLI_cmd_run_flag (CLI_interpreter_t * cli)
+extern ACE_err_t
+CLI_cmd_flag (CLI_interpreter_t * cli)
 {
-    if (cli->argc >= 1)
+    ACE_err_t err = ACE_OK;
+    if (cli->p.arg[0] != '\0')
     {
         int prio = USO_USER;
         int sched = USO_ROUND_ROBIN;
-        switch (cli->argv[0][0])
+        switch (cli->p.arg[0])
         {
         case 'u':
             prio = USO_USER;
@@ -32,7 +33,7 @@ CLI_cmd_run_flag (CLI_interpreter_t * cli)
         default:
             break;
         }
-        switch (cli->argv[0][1])
+        switch (cli->p.arg[1])
         {
         case 'f':
             sched = USO_FIFO;
@@ -74,12 +75,12 @@ CLI_cmd_run_flag (CLI_interpreter_t * cli)
             sched = "roro";
             break;
         default:
-        	sched = "?";
+            sched = "?";
             break;
         }
-        ACE_printf ("run flags: prio=%s sched=%s\n", prio, sched);
+        ACE_printf ("cli flags: prio=%s sched=%s\n", prio, sched);
     }
-    return TRUE;
+    return err;
 }
 
 

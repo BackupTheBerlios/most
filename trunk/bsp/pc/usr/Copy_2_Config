@@ -12,7 +12,7 @@ MOST_REMOVE_UNUSED:=off
 
 ## [bin, hex]
 ## produced binary file type
-MOST_FILE:=bin
+MOST_FILE:=prog
 
 ## ------------ Build Version -----------
 ## ======================================

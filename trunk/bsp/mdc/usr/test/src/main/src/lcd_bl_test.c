@@ -13,7 +13,7 @@
 
 static CLI_exec_t backlight;
 
-static void
+static ACE_err_t
 backlight_exec (char *arg)
 {
     if (arg[0] == '+'){
@@ -23,6 +23,7 @@ backlight_exec (char *arg)
     } else {
         ACE_printf("use +(on)|-(off)");
     }
+    return ACE_OK;
 }
 
 extern void

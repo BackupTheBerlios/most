@@ -7,3 +7,4 @@ CAT := cat
 TEST := test
 FIND := find
 LS := ls -la
+TOUCH := touch

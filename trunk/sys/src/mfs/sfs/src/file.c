@@ -27,25 +27,30 @@ static ACE_err_t
 file_open (MFS_descriptor_t * desc)
 {
     SFS_file_t *file = (SFS_file_t *) desc->represent;
-
-    USO_pipe_init (&file->buf, file->buffer, sizeof (file->buffer));
-    USO_mutex_init (&file->lock);
-
-    return ACE_OK;
+    if (desc->open_cnt == 0){
+        USO_pipe_init (&file->buf, file->buffer, sizeof (file->buffer));
+        USO_mutex_init (&file->lock);
+        return ACE_OK;
+    }
+    return DEF_ERR_IN_USE;
 }
 
 
-static void
+static ACE_err_t
 file_close (MFS_descriptor_t * desc)
 {
     //MFS_sfs_file_t *file = (MFS_sfs_file_t *) desc->represent;
+    if (desc->open_cnt == 1){
+    }
+    return ACE_OK;
 }
 
 static struct MFS_descriptor_op file_desc_op = {
-	.open = file_open,
+    .open = file_open,
     .close = file_close,
     .info = NULL,
-    .control = NULL
+    .control = NULL,
+    .delete = NULL
 };
 
 

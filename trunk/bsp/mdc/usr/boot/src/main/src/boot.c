@@ -34,9 +34,9 @@ MDC_main (void)
     NAP_ymodem_install();
     MDC_net_start(NULL);
 
-    MFS_descriptor_t *app = MFS_resolve(MFS_get_root(), "app");
+    MFS_descriptor_t *app = MFS_resolve("/app");
     MFS_descriptor_t *boot;
     boot = MFS_directory_create (app, "boot");
-
     MDC_download_install (boot, MDC_APPL_START, MDC_APPL_END);
+    MFS_close_desc(app);
 }

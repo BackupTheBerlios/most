@@ -12,10 +12,11 @@
 
 static CLI_exec_t eraseEE;
 
-static void
+static ACE_err_t
 eraseEE_exec (char *nix)
 {
     EE_93C46_eraseall (&ee);
+    return ACE_OK;
 }
 
 
@@ -23,10 +24,11 @@ static CLI_exec_t write1EE;
 
 static char name1[] = "AABBCCDDEEFFU";
 
-static void
+static ACE_err_t
 write1EE_exec (char *nix)
 {
     EE_93C46_write (&ee, 0, sizeof (name1), (unsigned short *) name1);
+    return ACE_OK;
 }
 
 
@@ -34,23 +36,24 @@ static CLI_exec_t write2EE;
 
 static char name2[] = "MMIICCHHAAEEU";
 
-static void
+static ACE_err_t
 write2EE_exec (char *nix)
 {
     EE_93C46_write (&ee, 0, sizeof (name2), (unsigned short *) name2);
+    return ACE_OK;
 }
 
 static CLI_exec_t readEE;
 
 static char name[32];
 
-static void
+static ACE_err_t
 readEE_exec (char *nix)
 {
     EE_93C46_read (&ee, 0, 14, (unsigned short *)name);
     name[31] = 0;
     ACE_printf ("%s.\n", name);
-
+    return ACE_OK;
 }
 
 extern void

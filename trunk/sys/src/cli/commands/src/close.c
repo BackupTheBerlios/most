@@ -9,21 +9,21 @@
 #include <cli/command.h>
 #include <mfs/descriptor.h>
 
-extern ACE_bool_t
+extern ACE_err_t
 CLI_cmd_close (CLI_interpreter_t * cli)
 {
-    ACE_bool_t done = FALSE;
+    ACE_err_t err = ACE_OK; 
     MFS_descriptor_t *desc;
-    desc = MFS_close_desc (USO_thread_dir_get(USO_current()));
+    desc = MFS_close_desc (USO_thread_work_get(USO_current()));
     if (desc != NULL)
     {
-        USO_thread_dir_set (USO_current(), desc);
-        done = TRUE;
+        MFS_open_desc(desc);
+        USO_thread_work_set (USO_current(), desc);
     }
     else
     {
-        ACE_puts (CLI_err_sys_fail);
+        err = CLI_ERR_NO_PARENT;
     }
-    return done;
+    return err;
 }
 

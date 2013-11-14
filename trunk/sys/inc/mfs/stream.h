@@ -26,7 +26,7 @@ extern struct MFS_descriptor_op MFS_stream_descriptor_op;
 /** Stream types. */
 enum MFS_stream_type
 {
-    MFS_FILE,           /**< FILE. */
+    MFS_FILE,                  /**< FILE. */
     MFS_STREAM_IO              /**< IO. */
 };
 
@@ -34,7 +34,7 @@ enum MFS_stream_type
 /* Stream structure. */
 struct MFS_stream
 {
-	MFS_descriptor_t desc;
+    MFS_descriptor_t desc;
     enum MFS_stream_type type;  /* Stream type. */
     ACE_size_t size_tx;         /* File size, for IO the amount of transmitted characters. */
     ACE_size_t pos_rx;               /* File position, for IO the amount of received characters. */
@@ -105,11 +105,11 @@ extern void MFS_stream_init (MFS_stream_t * stream,
  * @return Created stream descriptor.
  */
 extern MFS_descriptor_t * MFS_stream_create (
-		MFS_descriptor_t * dir_desc, char *name, struct MFS_descriptor_op *desc_op,
-		struct MFS_stream_op *stream_op, MFS_represent_t * represent, enum MFS_stream_type type);
+                MFS_descriptor_t * dir, char *name, struct MFS_descriptor_op *desc_op,
+                struct MFS_stream_op *stream_op, MFS_represent_t * represent, enum MFS_stream_type type);
 
 
-extern void MFS_stream_print (MFS_stream_t * stream);
+extern void MFS_stream_info (MFS_stream_t * stream, int number, MFS_info_entry_t *entry);
 
 /** @}
  */

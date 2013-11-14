@@ -31,16 +31,19 @@ SAM_bootp (void)
     }
 }
 
-static void
+static ACE_err_t
 bootp_exec (char *nix)
 {
     SAM_bootp ();
+    return ACE_OK;
 }
 
 static void
 net_basic_install (void)
 {
-    CLI_exec_init (MFS_resolve(MFS_get_root(), "bsp"), &bootp, "bootp", "Bootp request", bootp_exec);
+    MFS_descriptor_t *dir =  MFS_resolve("/bsp");
+    CLI_exec_init (dir, &bootp, "bootp", "Bootp request", bootp_exec);
+    MFS_close_desc(dir);
     NAP_tftp_install(&SAM_config.ip_addr, &SAM_config.server);
 }
 

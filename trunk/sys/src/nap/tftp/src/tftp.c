@@ -318,43 +318,45 @@ static CLI_exec_t tftp_get;
 static ACE_bool_t
 tftp_write_rx_data (char *data, ACE_size_t len, MFS_descriptor_t *out)
 {
-	ACE_size_t written = ACE_fwrite (out, data, len);
-	if (written != len) return FALSE;
-	return TRUE;
+    ACE_size_t written = ACE_fwrite (out, data, len);
+    if (written != len) return FALSE;
+    return TRUE;
 }
 
-static void
+static ACE_err_t
 tftp_get_exec (char *file)
 {
+    ACE_err_t err = ACE_OK;;
     if (file)
     {
         if (NAP_tftp_open () >= 0)
         {
-        	MFS_descriptor_t *out = USO_current()->out;
-        	int err = 0;
-        	if (out->type == MFS_STREAM) {
-        		err = NAP_tftp_get (file, tftp_write_rx_data, out);
-        	}
+            MFS_descriptor_t *out = USO_current()->out;
+            int err = 0;
+            if (out->type == MFS_STREAM) {
+                err = NAP_tftp_get (file, tftp_write_rx_data, out);
+            }
 
-        	if (err >= 0)
+            if (err >= 0)
             {
                 USO_log_puts (USO_LL_INFO, "Tftp get done\n");
             }
             else
             {
-            	USO_log_puts (USO_LL_ERROR, "Tftp get failed\n");
+                USO_log_puts (USO_LL_ERROR, "Tftp get failed\n");
             }
             NAP_tftp_close ();
         }
         else
         {
-        	USO_log_puts (USO_LL_ERROR, "Tftp open failed\n");
+            USO_log_puts (USO_LL_ERROR, "Tftp open failed\n");
         }
     }
     else
     {
-    	USO_log_puts (USO_LL_ERROR, "Give file name as param\n");
+        err = DEF_ERR_ARG;
     }
+    return err;
 }
 
 extern void
@@ -362,5 +364,7 @@ NAP_tftp_install (NET_ip_addr_t * client_address, NET_ip_addr_t * server_address
 {
     server_addr = server_address;
     client_addr = client_address;
-    CLI_exec_init (MFS_resolve(MFS_get_root(), "sys/cli/exe"), &tftp_get, "tftp_g", "TFTP get", tftp_get_exec);
+    MFS_descriptor_t *dir = MFS_resolve("/sys/cli/exe");
+    CLI_exec_init (dir, &tftp_get, "tftp_g", "TFTP get", tftp_get_exec);
+    MFS_close_desc(dir);
 }

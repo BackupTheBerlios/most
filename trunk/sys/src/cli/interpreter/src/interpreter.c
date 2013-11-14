@@ -13,28 +13,16 @@
 #include <mfs/descriptor.h>
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
+#include <cli/err.h>
 #include <cli/interpreter.h>
+#include <cli/parser.h>
 #include <cli/command.h>
 #include <cli/exec.h>
 #include <cli/pipe.h>
-
-char CLI_err_arg_missing[] = "arg missing.\n";
-char CLI_err_arg_notfound[] = "arg not found.\n";
-char CLI_err_type_inval[] = "type invalid.\n";
-char CLI_err_open_fail[] = "open fail.\n";
-char CLI_err_cmd_fail[] = "cmd fail.\n";
-char CLI_err_sys_fail[] = "sys fail.\n";
-
-#define CLI_PIPE_BUF_SIZE (512)
-
-enum CLI_state
-{
-	CLI_STATE_NORMAL,
-	CLI_STATE_SUB,
-	CLI_STATE_EXEC
-};
+#include <cli/debug.h>
 
 #define CLI_RX_POLLING_TIME USO_MSEC_2_TICKS(250)
+#define CLI_RUN_STACK_SIZE    (0x400/sizeof(USO_stack_t))
 
 static const char *hostname;
 
@@ -49,7 +37,8 @@ CLI_setup (const char *name)
 extern void
 CLI_interpreter_init (CLI_interpreter_t * cli)
 {
-    cli->exe_desc = NULL;
+    cli->in_desc = NULL;
+    cli->out_desc = NULL;
     cli->prio = USO_USER;
     cli->sched = USO_ROUND_ROBIN;
 }
@@ -57,17 +46,18 @@ CLI_interpreter_init (CLI_interpreter_t * cli)
 static void
 promt (CLI_interpreter_t * cli)
 {
-    ACE_printf ("%s:%s# ", hostname, USO_thread_dir_get(USO_current())->name);
+    ACE_printf ("%s:%s# ", hostname, USO_thread_work_get(USO_current())->name);
 }
 
 
 
-static int
-parse (CLI_interpreter_t * cli, char *buf)
+static ACE_err_t
+read_line (CLI_interpreter_t * cli, char *buf)
 {
-    char *token = buf;
-    ++cli->argc;
-    for (;;)
+    ACE_err_t ret;
+    ret = CLI_ERR_LINESIZE;
+    int i;
+    for (i = 0; i < sizeof (cli->line_buffer) - 1; ++i)
     {
         int c = ACE_getc ();
         if (c == ACE_EOF)
@@ -76,219 +66,162 @@ parse (CLI_interpreter_t * cli, char *buf)
         }
         else
         {
-            if (ACE_isprint (c))
-            {
-                ACE_putc ((unsigned char)c);
-            }
             if (c == '\n')
             {
-                *token = '\0';
-                return (token - buf);
+                ret = ACE_OK;
+                break;
             }
             else if (c == '\b')
             {
-                if (token > buf)
+                if (i > 0)
                 {
                     ACE_putc ((unsigned char)c);
                     ACE_putc ((unsigned char)' ');
                     ACE_putc ((unsigned char)c);
-                    token--;
-                }
-                else if (cli->argc > 1)
-                {
-                    cli->argc--;
-                    return (-1);
+                    --i;
                 }
             }
-            else if (ACE_isgraph (c))
+            else if (ACE_isprint(c))
             {
-                if (token < buf + CLI_TOKEN_SIZE - 1)
-                {
-                    *token++ = c;
-                }
-            }
-            else if (c == ' ')
-            {
-                *token = '\0';
-                if (cli->argc < CLI_TOKEN_COUNTER)
-                {
-                    if (parse (cli, cli->token_buffer[cli->argc]) < 0)
-                        ACE_putc ((unsigned char)'\b');
-                    else
-                        return (token - buf);
-                }
-                else
-                    return (token - buf);
-            }
-        }
-    }
-    return 0;
-}
-
-static int
-inc_argv (CLI_interpreter_t * cli, int idx)
-{
-    if (cli->argc > 0)
-    {
-        --cli->argc;
-    }
-    ++idx;
-    for (int i = 0; i < cli->argc; ++i)
-    {
-        cli->argv[i] = cli->token_buffer[idx + i];
-    }
-    return idx;
-}
-
-extern void
-CLI_interpreter_run (void *param)
-{
-    CLI_interpreter_t *cli = (CLI_interpreter_t *) param;
-    CLI_command_t *command;
-    int idx;
-    enum CLI_state state = CLI_STATE_NORMAL;
-    USO_thread_dir_set (USO_current(), MFS_get_root());
-    USO_log_puts (USO_LL_INFO, "Cli is running.\n");
-    for (;;)
-    {
-    	cli->out_desc = NULL;
-    	cli->in_desc = NULL;
-    	state = CLI_STATE_NORMAL;
-        for (int i = 0; i < CLI_TOKEN_COUNTER; ++i)
-        {
-            cli->token_buffer[i][0] = '\0';
-            cli->argv[i] = cli->token_buffer[i];
-        }
-        cli->argc = 0;
-        idx = 0;
-
-        promt (cli);
-        (void)parse (cli, cli->token_buffer[cli->argc]);
-        ACE_putc ('\n');
-
-        if (ACE_strlen (cli->argv[0]) <= 0)
-            continue;
-
-        if (cli->argv[0][0] == '#')
-        {
-            if (ACE_strlen (cli->argv[0]) >= 3){
-            	ACE_putc (ACE_atoxc (&cli->argv[0][1]));
-            }
-        	continue;
-        }
-
-        if (cli->argv[0][0] == '('){
-        	if (ACE_strlen (cli->argv[0]) >= 2){
-        		if ( USO_thread_dir_get(USO_current())->type == MFS_DIRECTORY ){
-        			CLI_pipe_new (CLI_PIPE_BUF_SIZE, USO_thread_dir_get(USO_current()), &cli->argv[0][1]);
-        		}
-        	} else {
-                ACE_puts (CLI_err_arg_missing);
-        	}
-        	continue;
-        }
-
-        if (cli->argv[0][0] == ')'){
-        	if (ACE_strlen (cli->argv[0]) >= 2){
-        		CLI_pipe_del(USO_thread_dir_get(USO_current()), &cli->argv[0][1]);
-        	} else {
-                ACE_puts (CLI_err_arg_missing);
-        	}
-        	continue;
-        }
-
-        if (cli->argv[0][0] == '<'){
-        	if (ACE_strlen (cli->argv[0]) >= 2){
-                MFS_descriptor_t *desc = MFS_lookup (USO_thread_dir_get(USO_current()), &cli->argv[0][1]);
-                if (desc != NULL && desc->type == MFS_STREAM)
-                {
-                    cli->in_desc = desc;
-                } else {
-                    ACE_puts (CLI_err_arg_notfound);
-                    continue;
-                }
-        	} else {
-                ACE_puts (CLI_err_arg_missing);
-            	continue;
-        	}
-            idx = inc_argv (cli, idx);
-        }
-
-        if (cli->argv[0][0] == '>'){
-        	if (ACE_strlen (cli->argv[0]) >= 2){
-                MFS_descriptor_t *desc = MFS_lookup (USO_thread_dir_get(USO_current()), &cli->argv[0][1]);
-                if (desc != NULL && desc->type == MFS_STREAM)
-                {
-                    cli->out_desc = desc;
-                } else {
-                    ACE_puts (CLI_err_arg_notfound);
-                    continue;
-                }
-        	} else {
-                ACE_puts (CLI_err_arg_missing);
-            	continue;
-        	}
-            idx = inc_argv (cli, idx);
-        }
-
-        if (cli->argv[0][0] == '.')
-        {
-            cli->argv[0] = &cli->argv[0][1];
-            if (CLI_cmd_open (cli) == FALSE)
-            {
-                ACE_puts (CLI_err_open_fail);
-                continue;
-            }
-            state = CLI_STATE_SUB;
-            idx = inc_argv (cli, idx);
-        }
-
-        command = CLI_find_cmd (cli->argv[0]);
-        if ( (command == NULL) && (state == CLI_STATE_NORMAL) )
-        {
-            if (cli->argv[0][0] == '&')
-            {
-                cli->argv[0] = &cli->argv[0][1];
-                command = CLI_find_cmd ("run");
+                *buf++ = c;
+                ACE_putc ((unsigned char)c);
             }
             else
             {
-                command = CLI_find_cmd ("exec");
+                ret = CLI_ERR_LINEINVAL;
+                break;
             }
-            cli->exe_desc = CLI_find_exe(cli->argv[0]);
-            if (cli->exe_desc == NULL){
-            	if (CLI_cmd_open (cli) == FALSE)
-            	{
-            		ACE_puts (CLI_err_open_fail);
-            		continue;
-            	}
-            }
-            state = CLI_STATE_EXEC;
+        }
+    }
+    *buf = '\0';
+    return ret;
+}
+
+
+extern ACE_err_t
+CLI_interpreter_run (void *arg)
+{
+    ACE_err_t err;
+    CLI_interpreter_t *cli = (CLI_interpreter_t *) arg;
+    MFS_descriptor_t *desc = NULL;
+    USO_thread_t *t;
+    
+    USO_thread_work_set (USO_current(), MFS_get_root());
+    USO_log_puts (USO_LL_INFO, "Cli is running.\n");
+
+    for (;;)
+    {
+        t = NULL;
+        promt (cli);
+
+        if ( (err = read_line(cli, cli->line_buffer)) != ACE_OK){
+            ACE_printf("\n CLI: read line err: %i\n", err);
+            continue;
+        } else {
+            ACE_putc ('\n');
         }
 
-        idx = inc_argv (cli, idx);
-        if (command != NULL)
-        {
-            if (command->f (cli) == FALSE)
+        DEBUGF (CLI_INT_DEBUG, ("Cli: cmd line = %s.\n", cli->line_buffer));
+        
+        if ( (err = CLI_parse (&cli->p, cli->line_buffer)) != ACE_OK){
+            if (err != CLI_ERR_LINEEMPTY){
+                ACE_printf("\n CLI: syntax err : %i\n", err);
+            }
+            continue;
+        }
+
+        DEBUGF (CLI_INT_DEBUG, ("Cli: in=%s, cmd=%s, arg=(%s) out=%s run=%i.\n",
+                        cli->p.in, cli->p.cmd, cli->p.arg, cli->p.out, cli->p.run));
+
+        if (cli->p.in[0] != '\0'){
+            desc = MFS_open (USO_thread_work_get(USO_current()), cli->p.in);
+            if (desc != NULL && desc->type == MFS_STREAM)
             {
-                ACE_puts (CLI_err_cmd_fail);
+                cli->in_desc = USO_current()->in;
+                USO_thread_in_init (USO_current(), desc);
+            } else {
+                ACE_printf ("CLI: in %s not found\n", cli->p.in);
+                continue;
             }
         }
-        else
-        {
-            ACE_puts (CLI_err_sys_fail);
+
+        if (cli->p.out[0] != '\0'){
+            desc = MFS_open (USO_thread_work_get(USO_current()), cli->p.out);
+            if (desc != NULL && desc->type == MFS_STREAM)
+            {
+                cli->out_desc = USO_current()->out;
+                USO_thread_out_init (USO_current(), desc);
+            } else {
+                ACE_printf ("CLI: out %s not found\n", cli->p.out);
+                continue;
+            }
         }
-        if (state == CLI_STATE_EXEC)
-        {
-        	if (cli->exe_desc == NULL)
-        		CLI_cmd_close (cli);
-        	else
-        		cli->exe_desc = NULL;
+
+        desc = CLI_find_cmd (cli->p.cmd);
+        if (desc != NULL){
+            CLI_command_t *cmd = (CLI_command_t *) desc->represent;
+            err = cmd->f (cli);
+            if (err < ACE_OK)
+            {
+                ACE_printf ("CLI: cmd fail: %i\n", err);
+            }
+        } else {
+            desc = CLI_find_exe(cli->p.cmd);
+            if (desc != NULL){
+                CLI_exec_t *exec = (CLI_exec_t *) desc->represent;
+                if (cli->p.run == FALSE)
+                {
+                    err = exec->f (cli->p.arg);
+                    if (err < ACE_OK)
+                    {
+                        ACE_printf ("CLI: exe fail: %i\n", err);
+                    }
+                }
+                else
+                {
+                    t = USO_thread_new ((ACE_err_t (*)(void *))exec->f, CLI_RUN_STACK_SIZE, cli->prio, cli->sched, desc->name);
+                    if (t != NULL)
+                    {
+                        if (cli->out_desc != NULL){
+                            USO_thread_flags_set (t, 1 << USO_FLAG_CLOSE_OUT);
+                        }
+                        if (cli->in_desc != NULL){
+                            USO_thread_flags_set (t, 1 << USO_FLAG_CLOSE_IN);
+                        }
+                        USO_thread_flags_set (t, 1 << USO_FLAG_DETACH);
+                        ACE_size_t len = ACE_strlen (cli->p.arg) + 1;
+                        char *arg = ACE_malloc (len);
+                        if (arg)
+                        {
+                            memcpy (arg, cli->p.arg, len);
+                            USO_thread_arg_init (t, arg);
+                            USO_thread_flags_set (t, 1 << USO_FLAG_FREE_ARG);
+                        } else {
+                            ACE_puts("CLI: Arg out of mem\n");
+                        }
+                        USO_start (t);
+                    } else {
+                        ACE_puts("CLI: Thread out of mem\n");
+                    }
+                }
+                MFS_close_desc(desc); /* also close if exec is run in new thread ? */
+            } else {
+                ACE_printf ("CLI: cmd %s not found\n", cli->p.cmd);
+            }
         }
-        else if (state == CLI_STATE_SUB)
-        {
-            CLI_cmd_close (cli);
+
+        if (cli->out_desc != NULL){
+            USO_thread_out_init (USO_current(), cli->out_desc);
+            if (t == NULL) MFS_close_desc(cli->out_desc);
+            cli->out_desc = NULL;
+        }
+
+        if (cli->in_desc != NULL){
+            USO_thread_in_init (USO_current(), cli->in_desc);
+            if (t == NULL) MFS_close_desc(cli->in_desc);
+            cli->in_desc = NULL;
         }
 
     }
+    return DEF_ERR_SYS;
 }

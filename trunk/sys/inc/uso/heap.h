@@ -83,10 +83,6 @@ extern void USO_mem_free (USO_heap_t * heap, void *block);
  */
 extern void USO_debug_heap_list (MFS_represent_t * represent);
 
-/**
- * Print info header.
- */
-extern void USO_heap_info_head (MFS_descriptor_t *dir);
 
 /*------------------------------------------------------------------------*/
 

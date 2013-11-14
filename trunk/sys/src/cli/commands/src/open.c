@@ -9,29 +9,23 @@
 #include <cli/command.h>
 #include <mfs/descriptor.h>
 
-extern ACE_bool_t
+extern ACE_err_t
 CLI_cmd_open (CLI_interpreter_t * cli)
 {
-    ACE_bool_t done = FALSE;
-    MFS_descriptor_t *desc = USO_thread_dir_get(USO_current());
-    if (cli->argc >= 1)
+    ACE_err_t err = ACE_OK;
+    MFS_descriptor_t *desc, *curr;
+    curr = USO_thread_work_get (USO_current());
+    desc = MFS_open (curr, cli->p.arg);
+    if (desc != NULL)
     {
-        desc = MFS_open (desc, cli->argv[0]);
-        if (desc != NULL)
-        {
-            USO_thread_dir_set (USO_current(), desc);
-            done = TRUE;
-        }
-        else
-        {
-            ACE_puts (CLI_err_arg_notfound);
-        }
+        USO_thread_work_set (USO_current(), desc);
+        MFS_close_desc(curr);
     }
     else
     {
-        ACE_puts (CLI_err_arg_missing);
+        err = DEF_ERR_ARG;
     }
-    return done;
+    return err;
 }
 
 

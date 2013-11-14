@@ -37,7 +37,7 @@ static struct stack_data stack[] = {
 
 static CLI_exec_t exception_stack_check;
 
-static void
+static ACE_err_t
 exception_stack_check_exec (char *nix)
 {
     USO_stack_t *sp = (USO_stack_t *) & stack_start;
@@ -55,6 +55,7 @@ exception_stack_check_exec (char *nix)
                     sp + ((stack[i].size - 1) / sizeof (USO_stack_t)));
         sp += (stack[i].size / sizeof (USO_stack_t));
     }
+    return ACE_OK;
 }
 
 
@@ -72,10 +73,11 @@ SAM_start_boot (void)
     SAM_jump_boot ();
 }
 
-static void
+static ACE_err_t
 start_boot_exec (char *nix)
 {
     SAM_start_boot ();
+    return CLI_ERR_NOT_REACHED;
 }
 
 static CLI_exec_t start_app;
@@ -92,30 +94,40 @@ SAM_start_app (void)
     SAM_jump_app ();
 }
 
-static void
+static ACE_err_t
 start_app_exec (char *nix)
 {
     SAM_start_app ();
+    return CLI_ERR_NOT_REACHED;
 }
 
 static CLI_exec_t heap_debug;
 
-static void
-heap_debug_exec (char *heap)
+static ACE_err_t
+heap_debug_exec (char *arg)
 {
-	MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "sys/uso/heap"), heap);
-	if (desc != NULL)
-		USO_debug_heap_list (desc->represent);
-	else
-		ACE_puts ("heap not found.\n");
+    ACE_err_t err = ACE_OK;
+    MFS_descriptor_t *desc = MFS_walk_in (MFS_resolve("/sys/uso/heap"), arg, TRUE);
+    if (arg != NULL){
+        if (desc != NULL) {
+            USO_debug_heap_list (desc->represent);
+        } else {
+            err = CLI_ERR_NOT_FOUND;
+        }
+        MFS_close_desc(desc);
+    } else {
+        err = DEF_ERR_ARG;
+    }
+    return err;
 }
 
 static CLI_exec_t ticks_debug;
 
-static void
+static ACE_err_t
 ticks_debug_exec (char *nix)
 {
     SAM_ticks_debug ();
+    return ACE_OK;
 }
 
 extern void

@@ -216,14 +216,13 @@ config_clear_flags (char *param)
 static CLI_exec_t conf;
 static CLI_exec_t set;
 
-static void
-conf_exec (char *param)
+static ACE_err_t
+conf_exec (char *arg)
 {
-    if (param != NULL)
+    ACE_err_t err = ACE_OK;
+    if (arg != NULL)
     {
-        char a = *param;
-        param++;
-        switch (a)
+        switch (arg[0])
         {
         case 'r':
             MDC_config_read ();
@@ -237,63 +236,71 @@ conf_exec (char *param)
         case 'i':
             MDC_config_ip ();
             break;
+        case '?':
+            ACE_puts ("r read | w write | s show | i (conf ip-stack).\n");
+            break;
         default:
-            ACE_puts ("inval param, type <conf> for help.\n");
+            err = DEF_ERR_ARG;
             break;
         }
     } else {
-        ACE_puts ("r (read), w (write), s (show), i (conf ip-stack).\n");
+        err = DEF_ERR_ARG;
     }
+    return err;
 }
 
-static void
-set_exec (char *param)
+static ACE_err_t
+set_exec (char *arg)
 {
-    if (param != NULL)
+    ACE_err_t err = ACE_OK;
+    if (arg != NULL)
     {
         MDC_config.state = MDC_CONFIG_STATE_ALTERED;
-        char a = *param;
-        param++;
+        char a = *arg++;
         switch (a)
         {
         case 'd':
             MDC_config_init ();
             break;
         case 'h':
-            config_set_hostname (param);
+            config_set_hostname (arg);
             break;
         case 'e':
-            config_set_eth_addr (param);
+            config_set_eth_addr (arg);
             break;
         case 'i':
-            config_set_ip_addr (param, &MDC_config.ip_addr);
+            config_set_ip_addr (arg, &MDC_config.ip_addr);
             break;
         case 'n':
-            config_set_ip_addr (param, &MDC_config.netmask);
+            config_set_ip_addr (arg, &MDC_config.netmask);
             break;
         case 'g':
-            config_set_ip_addr (param, &MDC_config.gateway);
+            config_set_ip_addr (arg, &MDC_config.gateway);
             break;
         case 's':
-            config_set_ip_addr (param, &MDC_config.server);
+            config_set_ip_addr (arg, &MDC_config.server);
             break;
         case 'f':
-            config_set_filename (param);
+            config_set_filename (arg);
             break;
         case 'z':
-            config_set_flags (param);
+            config_set_flags (arg);
             break;
         case 'y':
-            config_clear_flags (param);
+            config_clear_flags (arg);
+            break;
+        case '?':
+            ACE_puts ("d (default), h<hostname>, e<eth_addr>, i<ip_addr>, n<netmask>,\n"
+                      "g<gateway>, s<server>, f<file>, y<set flags>, z<clear flags>.\n");
             break;
         default:
-            ACE_puts ("invalid param, type <set> for help.\n");
+            err = DEF_ERR_ARG;
             break;
         }
     } else {
-        ACE_puts ("d (default), h<hostname>, e<eth_addr>, i<ip_addr>, n<netmask>,\n"
-                  "g<gateway>, s<server>, f<file>, y<set flags>, z<clear flags>.\n");
+        err = DEF_ERR_ARG;
     }
+    return err;
 }
 
 extern void

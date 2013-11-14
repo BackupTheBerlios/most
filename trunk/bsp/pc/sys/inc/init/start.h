@@ -24,7 +24,7 @@
 /**
  * Start all services.
  */
-extern void PC_start_kernel (ACE_FILE * stdout, ACE_FILE * stdin);
+extern void PC_start (ACE_FILE * stdout, ACE_FILE * stdin);
 
 /** @}
  */

@@ -64,7 +64,7 @@ extern ACE_err_t ACE_time_to_param (ACE_time_t * time);
  *
  * @return error.
  */
-extern ACE_err_t ACE_time_print (ACE_time_t * time);
+extern ACE_err_t ACE_time_print (ACE_time_t * time, char *buf);
 
 /** @}
  */

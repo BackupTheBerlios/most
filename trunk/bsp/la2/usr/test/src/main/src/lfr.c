@@ -290,7 +290,7 @@ set_motor_display(void)
     DPY_led_bar_set(&motor_display, green_range, yellow, red);
 }
 
-static void
+static ACE_err_t
 lfr_run (void *arg)
 {
     USO_log_puts (USO_LL_INFO, "LFR running.\n");
@@ -353,6 +353,7 @@ lfr_run (void *arg)
         }
         USO_sleep(USO_MSEC_2_TICKS(LFR_INTERVAL_MS));
     }
+    return DEF_ERR_SYS;
 }
 
 
@@ -389,32 +390,38 @@ parse (char* arg){
     return u;
 }
 
-static void
+static ACE_err_t
 mstart_exec (char *nix)
 {
     ACT_2dc_mc_start(&mc);
+    return ACE_OK;
 }
 
-static void
+static ACE_err_t
 mstop_exec (char *nix)
 {
     ACT_2dc_mc_stop(&mc);
+    return ACE_OK;
 }
 
-static void
+static ACE_err_t
 mgo_exec (char *arg)
 {
     if (arg != NULL) {
         ACT_2dc_mc_go(&mc, parse(arg));
+        return ACE_OK;
     }
+    return DEF_ERR_ARG;
 }
 
-static void
+static ACE_err_t
 mturn_exec (char *arg)
 {
     if (arg != NULL) {
         ACT_2dc_mc_turn(&mc, mc.cur_speed, parse(arg));
+        return ACE_OK;
     }
+    return DEF_ERR_ARG;
 }
 
 extern void LFR_install(MFS_descriptor_t *dir)

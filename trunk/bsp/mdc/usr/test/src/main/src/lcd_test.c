@@ -15,11 +15,12 @@
 static CLI_exec_t lcd_test;
 
 
-static void
+static ACE_err_t
 lcd_exec (char *arg)
 {
     MDC_lcd_init();
     DPY_ks0070b_put_string(&lcd, "Hello world!");
+    return ACE_OK;
 }
 
 extern void

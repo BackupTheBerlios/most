@@ -5,9 +5,9 @@
 
 #include <ace/stdio.h>
 
-#include "uso/heap.h"
-#include "uso/debug.h"
-#include "uso/cpu.h"
+#include <uso/heap.h>
+#include <uso/debug.h>
+#include <uso/cpu.h>
 
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
@@ -181,46 +181,47 @@ USO_debug_heap_list (MFS_represent_t * represent)
 #endif
 }
 
-static void
-info_head (MFS_descriptor_t * desc)
-{
-    ACE_printf ("%s\t%s\t%s\n", "Total", "Free", "Av search");
-}
-
-static struct MFS_descriptor_op heap_head_descriptor_op = {
-	.open = NULL,
-    .close = NULL,
-    .info = info_head,
-    .control = NULL
-};
-
-extern void
-USO_heap_info_head (MFS_descriptor_t *dir)
-{
-    MFS_descriptor_create (dir, "heap", MFS_INFO, &heap_head_descriptor_op, NULL);
-}
-
 
 static void
-info (MFS_descriptor_t * desc)
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
     USO_heap_t *heap = (USO_heap_t *) desc->represent;
-
-    ACE_printf ("%lu\t%lu\t%lu\n", heap->total_mem, heap->free_mem, heap->search_average);
+    switch (number){
+        case 0:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "Total";
+            entry->value.z = heap->total_mem;
+            break;
+        case 1:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "Free";
+            entry->value.z = heap->free_mem;
+            break;
+        case 2:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "AV search";
+            entry->value.z = heap->search_average;
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
+    }
 }
 
 static struct MFS_descriptor_op heap_descriptor_op = {
-	.open = NULL,
+    .open = NULL,
     .close = NULL,
     .info = info,
-    .control = NULL
+    .control = NULL,
+    .delete = NULL
 };
 
 extern void
 USO_heap_install (USO_heap_t * heap, char *name)
 {
-    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/uso/heap"), name,
-                     MFS_SYS, &heap_descriptor_op, heap);
+    MFS_descriptor_t *dir = MFS_resolve("/sys/uso/heap");
+    MFS_descriptor_create (dir, name, MFS_SYS, &heap_descriptor_op, heap);
+    MFS_close_desc(dir);
 }
 
 extern ACE_bool_t

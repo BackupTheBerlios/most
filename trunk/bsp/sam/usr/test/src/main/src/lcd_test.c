@@ -158,7 +158,7 @@ card_inserted (void)
 static void
 play_mic (void)
 {
-	SAM_tone ();
+    SAM_tone ();
 }
 
 static void
@@ -234,7 +234,7 @@ send_event (USO_node_t * e, enum SAM_event event)
 }
 
 
-static void
+static ACE_err_t
 lcd_test_exec (char *nix)
 {
     SAM_event_create (LCD_event_start);
@@ -294,60 +294,60 @@ lcd_test_exec (char *nix)
             break;
 
         case LCD_STATE_AD4:
-        	switch (event)
-        	{
-        	case LCD_event_enter:
-        		display_menu ("AD 4");
-        		free = send_event (e, LCD_event_ad4);
-        		break;
-        	case LCD_event_ad4:
-        		get_ad4 ();
-        		free = send_event (e, LCD_event_ad4);
-        		break;
-        	case SAM_switch_2_pressed:
-        		free = change_state (e, LCD_STATE_LOGO);
-        		break;
-        	case SAM_joystick_left_pressed:
-        		free = change_state (e, LCD_STATE_CARD);
-        		break;
-        	case SAM_switch_1_pressed:
-        	case SAM_joystick_right_pressed:
-        		free = change_state (e, LCD_STATE_TRIM);
-        		break;
-        	default:
+            switch (event)
+            {
+                case LCD_event_enter:
+                    display_menu ("AD 4");
+                    free = send_event (e, LCD_event_ad4);
+                    break;
+                case LCD_event_ad4:
+                    get_ad4 ();
+                    free = send_event (e, LCD_event_ad4);
+                    break;
+                case SAM_switch_2_pressed:
+                    free = change_state (e, LCD_STATE_LOGO);
+                    break;
+                case SAM_joystick_left_pressed:
+                    free = change_state (e, LCD_STATE_CARD);
+                    break;
+                case SAM_switch_1_pressed:
+                case SAM_joystick_right_pressed:
+                    free = change_state (e, LCD_STATE_TRIM);
+                    break;
+                default:
                     /*
                      * unused event
                      */
-        		break;
-        	}
-        	break;
+                    break;
+            }
+            break;
 
         case LCD_STATE_TRIM:
             switch (event)
             {
-            case LCD_event_enter:
-                display_menu ("TRIM");
-                free = send_event (e, LCD_event_trim);
-                break;
-            case LCD_event_trim:
-                get_trim ();
-                free = send_event (e, LCD_event_trim);
-                break;
-            case SAM_switch_2_pressed:
-                free = change_state (e, LCD_STATE_LOGO);
-                break;
-            case SAM_joystick_left_pressed:
-                free = change_state (e, LCD_STATE_AD4);
-                break;
-            case SAM_switch_1_pressed:
-            case SAM_joystick_right_pressed:
-                free = change_state (e, LCD_STATE_TEMP);
-                break;
-            default:
-                /*
-                 * unused event 
-                 */
-                break;
+                case LCD_event_enter:
+                    display_menu ("TRIM");
+                    free = send_event (e, LCD_event_trim);
+                    break;
+                case LCD_event_trim:
+                    get_trim ();
+                    free = send_event (e, LCD_event_trim);
+                    break;
+                case SAM_switch_2_pressed:
+                    free = change_state (e, LCD_STATE_LOGO);
+                    break;
+                case SAM_joystick_left_pressed:
+                    free = change_state (e, LCD_STATE_AD4);
+                    break;
+                case SAM_switch_1_pressed:
+                case SAM_joystick_right_pressed:
+                    free = change_state (e, LCD_STATE_TEMP);
+                    break;
+                default:
+                    /*
+                     * unused event 
+                     */
+                    break;
             }
             break;
 
@@ -482,6 +482,8 @@ lcd_test_exec (char *nix)
         if (free == FALSE)
             USO_buf_free (&SAM_event_pool, e);
     }
+
+    return CLI_ERR_NOT_REACHED;
 }
 
 extern void

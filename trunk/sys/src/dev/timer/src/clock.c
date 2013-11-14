@@ -21,17 +21,36 @@ static struct DEV_clock
 } clock;
 
 static void
-info (MFS_descriptor_t * desc)
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
-    ACE_printf ("f = %d HZ, ticks: %lu, usec: %d\n", USO_MSEC_2_TICKS (1000), clock.ticks,
-                DEV_get_usec ());
+    switch (number){
+        case 0:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "heartbeat Hz";
+            entry->value.l = USO_MSEC_2_TICKS (1000);
+            break;
+        case 1:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "ticks";
+            entry->value.z = clock.ticks;
+            break;
+        case 2:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "usec";
+            entry->value.z = DEV_get_usec ();
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
+    }
 }
 
 static struct MFS_descriptor_op clock_descriptor_op = {
-	.open = NULL,
+    .open = NULL,
     .close = NULL,
     .info = info,
-    .control = NULL
+    .control = NULL,
+    .delete = NULL
 };
 
 
@@ -40,8 +59,10 @@ DEV_clock_init (unsigned long (*get_usec) (void))
 {
     clock.ticks = 0;
     clock.get_us = get_usec;
-    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/timer"), "clock",
+    MFS_descriptor_t *dir = MFS_resolve("/sys/dev/timer");
+    MFS_descriptor_create (dir, "clock",
                      MFS_SYS, &clock_descriptor_op, (MFS_represent_t *) &clock);
+    MFS_close_desc(dir);
 }
 
 extern void

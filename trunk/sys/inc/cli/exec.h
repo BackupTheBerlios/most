@@ -8,7 +8,8 @@
 #ifndef EXEC_H_
 #define EXEC_H_
 
-#include "mfs/vfs.h"
+#include <cli/err.h>
+#include <mfs/vfs.h>
 
 /** @addtogroup cli
  * @{
@@ -27,7 +28,7 @@
 struct CLI_exec
 {
     char *description;
-    void (*f) (char *);
+    ACE_err_t (*f) (char *);
 };
 
 /** Executeable type. */
@@ -45,15 +46,15 @@ typedef struct CLI_exec CLI_exec_t;
  *  @param f : Function which will be executed with the commands exec or run.
  */
 extern void CLI_exec_init (MFS_descriptor_t * dir, CLI_exec_t * exec,
-                           char *name, char *description, void (*f) (char *));
+                           char *name, char *description, ACE_err_t (*f) (char *));
 
 extern void CLI_executes_install (void);
 
 extern MFS_descriptor_t *CLI_find_exe (char* name);
 
-extern void CLI_exe_copy (char *arg);
-extern void CLI_exe_axfr_r (char *arg);
-extern void CLI_exe_axfr_s (char *arg);
+extern ACE_err_t CLI_exe_copy (char *arg);
+extern ACE_err_t CLI_exe_axfr_r (char *arg);
+extern ACE_err_t CLI_exe_axfr_s (char *arg);
 
 /** @}
  */

@@ -29,7 +29,7 @@
  * If the function ends, the start thread terminates and
  * its recources are freed.
  */
-extern void PC_kernel_main (void);
+extern void PC_main (void);
 
 /** @}
  */

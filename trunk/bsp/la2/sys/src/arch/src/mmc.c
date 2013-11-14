@@ -45,26 +45,23 @@ char get_bufs[LA2_GET_BUFS][DEV_MMC_BLOCK_SIZE];
 static ACE_err_t
 mmc_open (MFS_descriptor_t *desc)
 {
-    if (desc->open_cnt != 1) return DEF_ERR_BUSY;
+    if (desc->open_cnt == 0){
+    }
     return ACE_OK;
 }
 
 static void
-mmc_close (MFS_descriptor_t *desc)
+mmc_info (MFS_descriptor_t *desc, int number, MFS_info_entry_t *entry)
 {
-}
-
-static void
-mmc_info (MFS_descriptor_t *desc)
-{
-    MFS_block_print((MFS_block_t *)desc);
+    MFS_block_info((MFS_block_t *)desc, number, entry);
 }
 
 static struct MFS_descriptor_op mmc_desc_op = {
     .open = mmc_open,
-    .close = mmc_close,
+    .close = NULL,
     .info = mmc_info,
     .control = NULL,
+    .delete = NULL
 };
 
 static ACE_err_t
@@ -142,6 +139,7 @@ extern ACE_err_t
 LA2_mmc_install(void)
 {
     ACE_err_t ret;
+    MFS_descriptor_t *dir;
     if ( (ret = DEV_mmc_spi_init ((DEV_spi_dev_t *) &LA2_mmc)) < ACE_OK)
     {
         USO_log_puts (USO_LL_ERROR, "MMC spi init failed.\n");
@@ -153,6 +151,7 @@ LA2_mmc_install(void)
         return ret;
     }
     DEV_mmc_install ();
-    disc_install(MFS_resolve(MFS_get_root(), "bsp"));
+    disc_install(dir = MFS_resolve("/bsp"));
+    MFS_close_desc (dir);
     return ACE_OK;
 }

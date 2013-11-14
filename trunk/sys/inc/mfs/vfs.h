@@ -20,16 +20,57 @@
  */
 
 #define MFS_PATH_SIZE 64
+#define MFS_INFO_MAX_ENTRIES 32
 
-enum MFS_control_key
+enum MFS_info_type
 {
-    MFS_CTRL_TTY_IN_MODE,            /**< Set tty receive mode. */
-    MFS_CTRL_TTY_OUT_MODE,           /**< Set tty transmit mode. */
-    MFS_CTRL_TTY_IN_TRANSL,          /**< Set tty receive translation. */
-    MFS_CTRL_TTY_OUT_TRANSL,         /**< Set tty transmit translation. */
-    MFS_CTRL_TTY_DEFAULT_TRANSL,     /**< Set tty translation to default. */
-    MFS_CTRL_SER_RX_TIMEOUT        	 /**< Set serial receive timeout in sec. */
+    MFS_INFO_NOT_AVAIL,           /**< entry is not available, name and value are not valid */
+    MFS_INFO_LONG,                /**< signed 32 bit integer value */
+    MFS_INFO_SIZE,                /**< ACE_size_t (unsigned long) */
+    MFS_INFO_PTR,                 /**< pointer */
+    MFS_INFO_STRING               /**< char *,-> c string (terminated with 0) */
 };
+
+union MFS_info_value
+{
+    long l;
+    ACE_size_t z;
+    void *p;
+    char *s;
+};
+
+struct MFS_info_entry
+{
+    enum MFS_info_type type;
+    char *name;
+    union MFS_info_value value;
+};
+
+typedef struct MFS_info_entry MFS_info_entry_t;
+
+enum MFS_ctrl_type
+{
+    MFS_CTRL_INFO,            /**< get ctrl entries info in value.s */
+    MFS_CTRL_LONG,            /**< signed 32 bit integer value */
+    MFS_CTRL_SIZE,            /**< ACE_size_t (unsigned long) */
+    MFS_CTRL_STRING           /**< char *,-> c string (terminated with 0) */
+};
+
+union MFS_ctrl_value
+{
+    long l;
+    ACE_size_t z;
+    char *s;
+};
+
+struct MFS_ctrl_entry
+{
+    enum MFS_ctrl_type type;
+    union MFS_ctrl_value value;
+};
+
+typedef struct MFS_ctrl_entry MFS_ctrl_entry_t;
+
 
 /** Descriptor type. */
 typedef struct MFS_descriptor MFS_descriptor_t;
@@ -37,10 +78,11 @@ typedef struct MFS_descriptor MFS_descriptor_t;
 /** Descriptor interface. */
 struct MFS_descriptor_op
 {
-	ACE_err_t (*open) (MFS_descriptor_t * desc);                                       /**< Open. */
-    void (*close) (MFS_descriptor_t * desc);                                           /**< Close. */
-    void (*info) (MFS_descriptor_t * desc);                                            /**< Info. */
-    void (*control) (MFS_descriptor_t * desc, enum MFS_control_key key, long value);   /**< Control */
+    ACE_err_t (*open) (MFS_descriptor_t * desc);                                       /**< Open. */
+    ACE_err_t (*close) (MFS_descriptor_t * desc);                                      /**< Close. */
+    void (*info) (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry);       /**< Info. */
+    void (*control) (MFS_descriptor_t * desc, int number, MFS_ctrl_entry_t *entry);    /**< Control */
+    ACE_err_t (*delete) (MFS_descriptor_t *desc);                                      /**< Must implement delete if descripter shall be removeable */
 };
 
 /** Super type. */

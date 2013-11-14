@@ -26,7 +26,7 @@
  * This function is called from the cpu reset vector routine after the stack is initialized.
  * This is the right place to initialize your system.
  */
-extern void PC_init_kernel (struct multiboot_info *mb_info);
+extern void PC_init (struct multiboot_info *mb_info);
 
 /** @}
  */

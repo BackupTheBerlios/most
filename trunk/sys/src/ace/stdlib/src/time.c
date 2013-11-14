@@ -132,13 +132,13 @@ ACE_time_to_param (ACE_time_t * time)
 }
 
 extern ACE_err_t
-ACE_time_print (ACE_time_t * time)
+ACE_time_print (ACE_time_t * time, char *buf)
 {
     ACE_err_t err = time_valid_param (time);
     if (err != ACE_OK)
         return err;
 
-    ACE_printf ("%04d.%02d.%02d - %02d:%02d:%02d",
+    ACE_sprintf (buf, "%04d.%02d.%02d - %02d:%02d:%02d",
                 time->year, time->month, time->day, time->hour, time->min, time->sec);
 
     return ACE_OK;

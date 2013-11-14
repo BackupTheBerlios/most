@@ -12,33 +12,28 @@
 #include <mfs/sysfs.h>
 
 
-extern ACE_bool_t
+extern ACE_err_t
 CLI_cmd_info (CLI_interpreter_t * cli)
 {
-    ACE_bool_t done = FALSE;
-    MFS_descriptor_t *desc = USO_thread_dir_get(USO_current());
-    if (cli->argc >= 1)
+    ACE_err_t err = ACE_OK;
+    MFS_descriptor_t *desc;
+    if (cli->p.arg[0] != '\0')
     {
-    	if (cli->argv[0][0] == '/')
-    	{
-    		desc = MFS_get_root();
-    	}
-        desc = MFS_resolve (desc, cli->argv[0]);
+        desc = MFS_resolve (cli->p.arg);
         if (desc != NULL)
         {
-            MFS_info_desc (desc);
-            done = TRUE;
+            MFS_print_info (desc);
+            MFS_close_desc (desc);
         }
         else
         {
-            ACE_puts (CLI_err_arg_notfound);
+            err = DEF_ERR_ARG;
         }
     }
     else
     {
-        MFS_info_desc (desc);
-        done = TRUE;
+        MFS_print_info (USO_thread_work_get(USO_current()));
     }
-    return done;
+    return err;
 }
 

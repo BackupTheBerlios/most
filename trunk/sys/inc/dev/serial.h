@@ -31,6 +31,11 @@
 
 /*------------- Representation ------------------------------------------*/
 
+enum DEV_ser_control_key
+{
+    DEV_SER_CTRL_RX_TIMEOUT = 1              /**< Set serial receive timeout in sec. */
+};
+
 /*
  * Serial Struct
  * 

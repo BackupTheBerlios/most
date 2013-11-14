@@ -10,7 +10,7 @@
 
 static CLI_exec_t mmc_test;
 
-static void
+static ACE_err_t
 mmc_test_exec (char *nix)
 {
     int err = FALSE;
@@ -18,11 +18,11 @@ mmc_test_exec (char *nix)
     char *buffer_B;
     char *data = NULL;
 
-    MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "tst");
+    MFS_descriptor_t *desc = MFS_resolve("/bsp/mmc/tst");
     MFS_block_t *p2 = (MFS_block_t *)desc;
 
     if (desc == NULL || desc->type != MFS_BLOCK)
-        return;
+        return CLI_ERR_NOT_FOUND;
 
     buffer_A = ACE_malloc (p2->size);
     buffer_B = ACE_malloc (p2->size);
@@ -34,7 +34,7 @@ mmc_test_exec (char *nix)
         if (buffer_B != NULL)
             ACE_free (buffer_B);
         ACE_puts ("TEST MMC out of mem!\n");
-        return;
+        return DEF_ERR_MEM;
     }
 
     // Fill first Block (0) with 'A'
@@ -74,6 +74,7 @@ mmc_test_exec (char *nix)
     ACE_free (buffer_B);
     MFS_close_desc (desc);
 
+    return ACE_OK;
 }
 
 

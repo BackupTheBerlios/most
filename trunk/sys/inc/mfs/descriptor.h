@@ -7,6 +7,7 @@
 #define MFS_DESCRIPTOR_H
 
 #include <uso/list.h>
+#include <uso/mutex.h>
 #include <mfs/vfs.h>
 #include <mfs/err.h>
 
@@ -37,7 +38,6 @@ enum MFS_desc_type
     MFS_STREAM,              /**< IO stream, files, serial io, ... .*/
     MFS_BLOCK,               /**< Block device */
     MFS_EXEC,                /**< Executable (C function registered as exec). */
-    MFS_INFO,                /**< Provide just the descriptor interface, open, close and info. */
     MFS_SYS,                 /**< System descriptor. */
     MFS_USR                  /**< User descriptor. */
 };
@@ -54,6 +54,7 @@ struct MFS_descriptor
     enum MFS_desc_type type;                        /**< Kind of descriptor(entry). */
     MFS_descriptor_t *parent;                        /**< Parent descriptor. */
     int open_cnt;                                     /**< Open counter. */
+    USO_mutex_t lock;                                 /**< sync lock */
 };
 
 /**
@@ -64,13 +65,13 @@ extern ACE_err_t MFS_open_desc (MFS_descriptor_t * desc);
 
 /**
  * Lookup for the name in the directory, if a descriptor is found call its open operation.
- * @param dir_desc : Directory.
+ * @param dir_desc : Directory. Directory is closed if descriptor is opened.
  * @param name : Name of descriptor for lookup.
  * @return Found and opened descriptor or NULL.
  */
-extern MFS_descriptor_t *MFS_open (MFS_descriptor_t * dir_desc, char *name);
+extern MFS_descriptor_t *MFS_open (MFS_descriptor_t * dir, char *name);
 
-extern MFS_descriptor_t *MFS_resolve (MFS_descriptor_t *desc, char *path);
+extern MFS_descriptor_t *MFS_resolve (char *path);
 
 /**
  * Call the descriptors close operation.
@@ -79,20 +80,24 @@ extern MFS_descriptor_t *MFS_resolve (MFS_descriptor_t *desc, char *path);
  */
 extern MFS_descriptor_t *MFS_close_desc (MFS_descriptor_t * desc);
 
+extern MFS_descriptor_t *MFS_walk_in (MFS_descriptor_t * dir, char *name, ACE_bool_t close);
+
+extern MFS_descriptor_t *MFS_walk_out (MFS_descriptor_t * desc, ACE_bool_t close);
+
 /**
  * Call the descriptors info operation.
  * @param desc : Descriptor.
  */
-extern void MFS_info_desc (MFS_descriptor_t * desc);
+extern void MFS_info_desc (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry);
+
 
 /**
- * Lookup for the name in the directory, if a descriptor is found call its info operation.
- * @param dir_desc : Directory.
- * @param name : Name of descriptor for lookup.
+ * @param desc
  */
-extern void MFS_info (MFS_descriptor_t * dir_desc, char *name);
+extern void MFS_print_info (MFS_descriptor_t * desc);
 
-extern void MFS_control_desc (MFS_descriptor_t * dir_desc, enum MFS_control_key key, long value);
+
+extern void MFS_control_desc (MFS_descriptor_t * desc, int number, MFS_ctrl_entry_t *entry);
 
 /**
  * Initialize a descriptor.
@@ -103,10 +108,11 @@ extern void MFS_control_desc (MFS_descriptor_t * dir_desc, enum MFS_control_key 
  * @param type : Kind of entry.
  * @param parent : Parent descriptor.
  */
-extern void MFS_descriptor_init (MFS_descriptor_t * desc,
-							     MFS_represent_t *represent,
-                                 struct MFS_descriptor_op *operations,
-                                 char *name, enum MFS_desc_type type, MFS_descriptor_t * parent);
+extern void MFS_descriptor_init (
+                MFS_descriptor_t * desc,
+                MFS_represent_t *represent,
+                struct MFS_descriptor_op *operations,
+                char *name, enum MFS_desc_type type, MFS_descriptor_t * parent);
 
 /**
  * Initialize a descriptor.
@@ -119,17 +125,17 @@ extern void MFS_descriptor_init (MFS_descriptor_t * desc,
  * @return Created descriptor.
  */
 extern MFS_descriptor_t * MFS_descriptor_create (
-		MFS_descriptor_t * dir_desc,
-		char *name,
-		enum MFS_desc_type type,
-		struct MFS_descriptor_op *desc_op,
-		MFS_represent_t * represent);
+                MFS_descriptor_t * dir_desc,
+                char *name,
+                enum MFS_desc_type type,
+                struct MFS_descriptor_op *desc_op,
+                MFS_represent_t * represent);
 
 /**
  * Print information about the descriptor.
  * @param desc : Descriptor.
  */
-extern void MFS_descriptor_print (MFS_descriptor_t * desc);
+extern void MFS_descriptor_print (MFS_descriptor_t * desc, ACE_bool_t info, ACE_bool_t head);
 
 
 /** @}

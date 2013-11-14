@@ -160,30 +160,33 @@ void IBMPC_keyboard_irq_handler(IBMPC_keyboard_t *kbd) {
     }
 
     if (keycode != 0) {
-    	buf |= keycode;
-    	if (break_code == TRUE){
-    		buf |= (1<<8);
-    	}
+        buf |= keycode;
+        if (break_code == TRUE){
+            buf |= (1<<8);
+        }
         //USO_log_printf(USO_LL_INFO, " B:%04X ", buf);
-    	if (USO_pipe_write_ns (&kbd->keycode_pipe, (char *)&buf, sizeof (buf)) < sizeof (buf))
-    	{
-    		// todo kbd->error.keycode_buf_overrun++;
-    	}
-    	USO_go (&kbd->keycode_avail);
+        if (USO_pipe_write_ns (&kbd->keycode_pipe, (char *)&buf, sizeof (buf)) < sizeof (buf))
+        {
+            // todo kbd->error.keycode_buf_overrun++;
+        }
+        USO_go (&kbd->keycode_avail);
     }
 }
 
 static ACE_err_t keyboard_open(MFS_descriptor_t * desc)
 {
-    //IBMPC_keyboard_t *kbd = (IBMPC_keyboard_t *) desc->represent;
+    if (desc->open_cnt == 0){
+        //IBMPC_keyboard_t *kbd = (IBMPC_keyboard_t *) desc->represent;
+    }
     return ACE_OK;
 }
 
 static struct MFS_descriptor_op keyboard_desc_op = {
-	.open = keyboard_open,
-    .close = NULL,
-    .info = NULL,
-    .control = NULL
+                .open = keyboard_open,
+                .close = NULL,
+                .info = NULL,
+                .control = NULL,
+                .delete = NULL
 };
 
 static ACE_size_t
@@ -194,10 +197,10 @@ keyboard_read (MFS_stream_t * stream, char *buf, ACE_size_t len)
     ret = 0;
     while (ret == 0){
         USO_cpu_status_t ps = USO_disable ();
-    	ret = USO_pipe_read_ns (&kbd->data_pipe, buf, len);
-    	if (ret == 0){
-    		USO_block (&kbd->data_avail);
-    	}
+        ret = USO_pipe_read_ns (&kbd->data_pipe, buf, len);
+        if (ret == 0){
+            USO_block (&kbd->data_avail);
+        }
         USO_restore (ps);
     }
     stream->pos_rx += ret;
@@ -215,42 +218,44 @@ static struct MFS_stream_op keyboard_stream_op = {
 extern void
 IBMPC_keyboard_init (IBMPC_keyboard_t *kbd)
 {
-	USO_pipe_init (&kbd->keycode_pipe, kbd->keycode_buffer, sizeof (kbd->keycode_buffer));
-	USO_barrier_init (&kbd->keycode_avail);
-	USO_pipe_init (&kbd->data_pipe, kbd->data_buffer, sizeof (kbd->data_buffer));
-	USO_barrier_init (&kbd->data_avail);
-	kbd->thread = NULL;
+    USO_pipe_init (&kbd->keycode_pipe, kbd->keycode_buffer, sizeof (kbd->keycode_buffer));
+    USO_barrier_init (&kbd->keycode_avail);
+    USO_pipe_init (&kbd->data_pipe, kbd->data_buffer, sizeof (kbd->data_buffer));
+    USO_barrier_init (&kbd->data_avail);
+    kbd->thread = NULL;
 }
 
 extern void
 IBMPC_keyboard_install (IBMPC_keyboard_t *kbd, char *name)
 {
-	IBMPC_keyboard_init (kbd);
-	MFS_stream_create (MFS_resolve(MFS_get_root(), "sys/dev/serial"), name, &keyboard_desc_op,
+    IBMPC_keyboard_init (kbd);
+    MFS_descriptor_t * dir = MFS_resolve("/sys/dev/serial");
+    MFS_stream_create (dir, name, &keyboard_desc_op,
                    &keyboard_stream_op, (MFS_represent_t *) kbd, MFS_STREAM_IO);
+    MFS_close_desc(dir);
 }
 
 
 
-static void
+static ACE_err_t
 keyboard_run (void *param)
 {
-	IBMPC_keyboard_t *kbd = (IBMPC_keyboard_t*) param;
+    IBMPC_keyboard_t *kbd = (IBMPC_keyboard_t*) param;
     USO_log_puts (USO_LL_INFO, "Keyboard is running.\n");
     for (;;)
     {
-    	USO_cpu_status_t ps;
+        USO_cpu_status_t ps;
         static ACE_u16_t keycode;
         ACE_bool_t break_code;
         static char char_buf[32];
-    	ACE_size_t len = 0;
+        ACE_size_t len = 0;
         while (len == 0){
             ps = USO_disable ();
-        	len = USO_pipe_read_ns (&kbd->keycode_pipe,(char *) &keycode, sizeof(keycode));
-        	if (len == 1){ ACE_PANIC ("keybuf out of sync\n"); }
-        	if (len == 0){
-        		USO_block (&kbd->keycode_avail);
-        	}
+            len = USO_pipe_read_ns (&kbd->keycode_pipe,(char *) &keycode, sizeof(keycode));
+            if (len == 1){ ACE_PANIC ("keybuf out of sync\n"); }
+            if (len == 0){
+                USO_block (&kbd->keycode_avail);
+            }
             USO_restore (ps);
         }
         break_code = ( (keycode & 0x0100) == 0x0100) ? TRUE : FALSE;
@@ -259,11 +264,12 @@ keyboard_run (void *param)
         ps = USO_disable ();
         if (USO_pipe_write_ns (&kbd->data_pipe, char_buf, len) < len)
         {
-        	// todo kbd->error.data_buf_overrun++;
+            // todo kbd->error.data_buf_overrun++;
         }
-    	USO_go (&kbd->data_avail);
+        USO_go (&kbd->data_avail);
         USO_restore (ps);
     }
+    return DEF_ERR_SYS;
 }
 
 
@@ -274,7 +280,7 @@ IBMPC_keyboard_start (IBMPC_keyboard_t *kbd, int keyboard_stack_size)
                                     keyboard_stack_size, USO_INTERRUPT, USO_FIFO, "keybd");
     if (kbd->thread != NULL){
         USO_thread_arg_init (kbd->thread, kbd);
-    	USO_start (kbd->thread);
-    	keyboard_init();
+        USO_start (kbd->thread);
+        keyboard_init();
     }
 }

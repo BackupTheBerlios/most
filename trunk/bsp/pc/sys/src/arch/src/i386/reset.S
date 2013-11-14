@@ -23,30 +23,30 @@
 .section .text
 
 // Init ist eine Funktion aus init.c
-.extern PC_init_kernel
+.extern PC_init
 
 // reset_kernel muss global sein, damit der Linker es findet und als Einsprungspunkt
 // benutzen kann (alle Labels, die nicht global sind, sind nur in dieser Datei
 // sichtbar)
-.global reset_kernel
-reset_kernel:
+.global reset
+reset:
 
     // Stack mit A5 Werten initialisieren
-	mov init_stack_value, %eax
-	mov $init_stack_start, %ecx
-	mov $init_stack_end, %edx
+    mov init_stack_value, %eax
+    mov $init_stack_start, %ecx
+    mov $init_stack_end, %edx
 write:
-	mov %eax, (%ecx)
-	add  $4, %ecx
-	cmp %ecx, %edx
-	jnz write
+    mov %eax, (%ecx)
+    add  $4, %ecx
+    cmp %ecx, %edx
+    jnz write
 
     // Stack Pointer initialisieren
-	mov %edx, %esp
+    mov %edx, %esp
 
     // C-Code aufrufen und Multiboot-Infostruktur als Parameter uebergeben
     push %ebx
-    call PC_init_kernel
+    call PC_init
 
     // Falls wir jemals aus init zurueckkommen sollten, gehen wir in eine
     // Endlosschleife

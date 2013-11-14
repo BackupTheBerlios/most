@@ -6,7 +6,8 @@
 #ifndef USO_DEBUG_H
 #define USO_DEBUG_H
 
-#include "uso/log.h"
+#include <ace/assert.h>
+#include <uso/log.h>
 
 /** @addtogroup uso
  * @{
@@ -22,24 +23,8 @@
 
 /*------------- Definitions ------------------------------------------*/
 
-#define DEBUGGING 1
 
-#if DEBUGGING
-
-/**
- * Debug function switched on and of at compiletime.
- */
-#define DEBUGF(debug, x) do { if(debug){ USO_debug x; } } while(0)
-
-#define USO_DEBUGGING        1     /**< Enable debugging for USO library. */
-#define DEV_DEBUGGING        1     /**< Enable debugging for DEV library. */
-#define NET_DEBUGGING        0     /**< Enable debugging for NET library. */
-#define NAP_DEBUGGING        0     /**< Enable debugging for NAP library. */
-#define CLI_DEBUGGING        0     /**< Enable debugging for CLI library. */
-#define BSP_DEBUGGING        1     /**< Enable debugging for Board Support Packages. */
-#define USR_DEBUGGING        0     /**< Enable debugging for USR libraries. */
-
-#else
+#if ACE_NDEBUG
 
 #define DEBUGF(debug, x)
 
@@ -50,6 +35,21 @@
 #define CLI_DEBUGGING        0
 #define BSP_DEBUGGING        0
 #define USR_DEBUGGING        0
+
+#else
+
+/**
+ * Debug function switched on and of at compile time.
+ */
+#define DEBUGF(debug, x) do { if(debug){ USO_debug x; } } while(0)
+
+#define USO_DEBUGGING        1     /**< Enable debugging for USO library. */
+#define DEV_DEBUGGING        1     /**< Enable debugging for DEV library. */
+#define NET_DEBUGGING        0     /**< Enable debugging for NET library. */
+#define NAP_DEBUGGING        0     /**< Enable debugging for NAP library. */
+#define CLI_DEBUGGING        1     /**< Enable debugging for CLI library. */
+#define BSP_DEBUGGING        1     /**< Enable debugging for Board Support Packages. */
+#define USR_DEBUGGING        0     /**< Enable debugging for USR libraries. */
 
 #endif
 

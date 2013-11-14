@@ -33,7 +33,7 @@ cleanup (void *nix)
     }
 }
 
-static void
+static ACE_err_t
 digio_test_exec (char *nix)
 {
     int i;
@@ -55,6 +55,7 @@ digio_test_exec (char *nix)
         if (DEV_digin_isset (stop) == TRUE)
             break;
     }
+    return ACE_OK;
 }
 
 extern void

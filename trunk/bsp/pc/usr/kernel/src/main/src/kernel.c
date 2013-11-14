@@ -10,15 +10,16 @@
 #include <err.h>
 
 void
-PC_kernel_main (void)
+PC_main (void)
 {
 
-    USO_log_puts (USO_LL_INFO, "Kernel: "PC_KERNEL" -- V 0.0.0 -- \n");
+    USO_log_puts (USO_LL_INFO, "App: "PC_KERNEL"\n");
 
-    MFS_descriptor_t *app = MFS_resolve(MFS_get_root(), "app");
+    MFS_descriptor_t *app = MFS_resolve("/app");
     MFS_descriptor_t *core;
     core = MFS_directory_create (app, "core");
-
+    MFS_close_desc(app);
+    
     for (;;)
     {
         USO_sleep (USO_MSEC_2_TICKS (1500));

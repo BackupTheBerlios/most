@@ -1,4 +1,28 @@
-VERSION = V-0.1.0-d-7 : commit
+VERSION = V-0-1-0-d-8 : commit
+=====================
+
+DATE = 14.11.2013
+AUTOR = maik
+
+STATE = all targets and apps are compileable(no fresh checkout)
+
+ADD = descripter control functionality, change descriptor info interface, descriptor_op delete function
+
+FIX = BSP PC: Copy_2_Config template files
+      CLI and VFS improvments
+      commandline has now a gramma: INSTREAM < COMMAND (ARG) > OUTSTREAM &
+      INSTREAM <      :is optional, redirect stdin to INSTREAM
+      COMMAND         :is mandatory name of the command
+      (ARG)           :the optional argument must be enclosed in brackets (this is unusual, but the arg is given to the command as once)
+      > OUTSTREAM     :is optional, redirect stdout to OUTSTREAM
+      &               :is optional, start exec in own thread
+      the arg string is now parsed in the exec and commands instead of the interpreter,
+      so also to exec more than one arg can be given.
+      the pipe is now created with the new(create) command.
+      exec and run commands are removed
+
+
+VERSION = V-0.1.0-d-7 : labeled (V-0-1-0-d-7)
 =====================
 
 DATE = 07.09.2013
@@ -12,7 +36,7 @@ ADD = bsp/la2 adc, pwm, flash support, bootloader is now working (only with y-mo
       bsp/mdc   HW random number generator
       usr/dpy   LCD character display
       usr/sen   create library for sensors
-      usr/act   create liberty for actors
+      usr/act   create library for actors
       
 FIX = check size of bin file (if it fits to reserved flash region) as the linker script check only the size of the text segment
       but the bin file is the text segment (text, rodata) concatenated with the data segment.

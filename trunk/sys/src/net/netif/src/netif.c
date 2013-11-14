@@ -38,30 +38,69 @@ NET_netif_set_default (NET_netif_t * netif)
 }
 
 static void
-print_ipaddr (char *name, NET_ip_addr_t ipaddr)
+print_ipaddr (char *buf, NET_ip_addr_t ipaddr)
 {
     long addr = ACE_ntohl (ipaddr.addr);
-    ACE_printf ("\n\t%s: %3ld.%3ld.%3ld.%3ld",
-                name, addr >> 24 & 0xff, addr >> 16 & 0xff, addr >> 8 & 0xff, addr & 0xff);
+    ACE_sprintf (buf, "%3ld.%3ld.%3ld.%3ld",
+                addr >> 24 & 0xff, addr >> 16 & 0xff, addr >> 8 & 0xff, addr & 0xff);
 }
 
 static void
-info (MFS_descriptor_t * desc)
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
+    static char buf[32];
     NET_netif_t *netif = (NET_netif_t *) desc->represent;
-
-    print_ipaddr ("ip_addr", netif->ip_addr);
-    print_ipaddr ("netmask", netif->netmask);
-    print_ipaddr ("gateway", netif->gateway);
-    ACE_printf ("\n\tTX: %lu drop %u RX: %lu drop %u\n",
-                netif->tx, netif->tx_drop, netif->rx, netif->rx_drop);
+    switch (number){
+        case 0:
+            print_ipaddr (buf, netif->ip_addr);
+            entry->type = MFS_INFO_STRING;
+            entry->name = "ip addr";
+            entry->value.s = buf;
+            break;
+        case 1:
+            print_ipaddr (buf, netif->netmask);
+            entry->type = MFS_INFO_STRING;
+            entry->name = "netmask";
+            entry->value.s = buf;
+            break;
+        case 2:
+            print_ipaddr (buf, netif->gateway);
+            entry->type = MFS_INFO_STRING;
+            entry->name = "gateway";
+            entry->value.s = buf;
+            break;
+        case 3:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "tx";
+            entry->value.z = netif->tx;
+            break;
+        case 4:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "tx_drop";
+            entry->value.z = netif->tx_drop;
+            break;
+        case 5:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "rx";
+            entry->value.z = netif->rx;
+            break;
+        case 6:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "rx_drop";
+            entry->value.z = netif->rx_drop;
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
+    }
 }
 
 static struct MFS_descriptor_op netif_descriptor_op = {
-	.open = NULL,
+    .open = NULL,
     .close = NULL,
     .info = info,
-    .control = NULL
+    .control = NULL,
+    .delete = NULL
 };
 
 extern void
@@ -75,6 +114,7 @@ NET_netif_init (NET_netif_t * netif, char *name)
     NET_ip_addr_set (&(netif->ip_addr), &NET_ip_addr_any);
     NET_ip_addr_set (&(netif->netmask), &NET_ip_addr_any);
     NET_ip_addr_set (&(netif->gateway), &NET_ip_addr_any);
-    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/net/netif"),
-                     name, MFS_SYS, &netif_descriptor_op, (MFS_represent_t *) netif);
+    MFS_descriptor_t *dir = MFS_resolve("/sys/net/netif");
+    MFS_descriptor_create (dir, name, MFS_SYS, &netif_descriptor_op, (MFS_represent_t *) netif);
+    MFS_close_desc(dir);
 }

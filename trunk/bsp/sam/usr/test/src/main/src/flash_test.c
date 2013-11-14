@@ -17,7 +17,7 @@ static volatile unsigned int *lastPageData;
 
 static CLI_exec_t lockfl;
 
-static void
+static ACE_err_t
 lockfl_exec (char *nix)
 {
     unsigned char error;
@@ -44,11 +44,12 @@ lockfl_exec (char *nix)
     pageLocked =
         DEV_at91_FLASHD_is_locked (lastPageAddress, lastPageAddress + AT91C_IFLASH_PAGE_SIZE);
     ACE_printf ("Lock status = %d\n", pageLocked);
+    return ACE_OK;
 }
 
 static CLI_exec_t printfl;
 
-static void
+static ACE_err_t
 printfl_exec (char *nix)
 {
     int i;
@@ -62,12 +63,13 @@ printfl_exec (char *nix)
         }
     }
     ACE_printf (" done\n");
+    return ACE_OK;
 }
 
 
 static CLI_exec_t writefl;
 
-static void
+static ACE_err_t
 writefl_exec (char *nix)
 {
     unsigned char error;
@@ -81,6 +83,7 @@ writefl_exec (char *nix)
     }
     error = DEV_at91_FLASHD_write (lastPageAddress, buffer, AT91C_IFLASH_PAGE_SIZE);
     ACE_printf ("Flash programmed: err = 0x%02X\n", error);
+    return ACE_OK;
 }
 
 extern void

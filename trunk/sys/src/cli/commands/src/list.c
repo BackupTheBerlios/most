@@ -11,55 +11,63 @@
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
 
-extern ACE_bool_t
+extern ACE_err_t
 CLI_cmd_list (CLI_interpreter_t * cli)
 {
+    ACE_err_t err = ACE_OK;
     ACE_bool_t info = FALSE;
-    MFS_descriptor_t *desc = USO_thread_dir_get(USO_current());
-    if (cli->argc >= 1)
+    ACE_bool_t close = FALSE;
+    MFS_descriptor_t *desc = NULL;
+    if (cli->p.arg[0] != '\0')
     {
-        switch (cli->argv[0][0])
+        switch (cli->p.arg[0])
         {
         case 'i':
             info = TRUE;
+            desc = USO_thread_work_get(USO_current());
             break;
         case 't':
             info = TRUE;
-            desc = MFS_resolve(MFS_get_root(), "sys/uso/thread");
+            close = TRUE;
+            desc = MFS_resolve("/sys/uso/thread");
             break;
         case 'm':
             info = TRUE;
-            desc = MFS_resolve(MFS_get_root(), "sys/uso/heap");
+            close = TRUE;
+            desc = MFS_resolve("/sys/uso/heap");
             break;
         case 'c':
             info = TRUE;
-            desc = MFS_resolve(MFS_get_root(), "sys/cli/cmd");
+            close = TRUE;
+            desc = MFS_resolve("/sys/cli/cmd");
             break;
         case 'e':
             info = TRUE;
-            desc = MFS_resolve(MFS_get_root(), "sys/cli/exe");
+            close = TRUE;
+            desc = MFS_resolve("/sys/cli/exe");
             break;
         case 'a':
             info = TRUE;
-            desc = MFS_resolve(MFS_get_root(), "sys/dev/timer/timer");
+            close = TRUE;
+            desc = MFS_resolve("/sys/dev/timer/timer");
             break;
         default:
             break;
         }
+    } else {
+        desc = USO_thread_work_get(USO_current());
     }
     MFS_descriptor_t *iterator = NULL;
-    while ((iterator = MFS_next_entry (desc, iterator)) != NULL)
-    {
-        MFS_descriptor_print (iterator);
-        if (info == TRUE)
-        {
-            MFS_info_desc (iterator);
+    if (desc){
+        if ((iterator = MFS_next_entry (desc, iterator)) != NULL) {
+            MFS_descriptor_print (iterator, info, TRUE);
+            while ((iterator = MFS_next_entry (desc, iterator)) != NULL)
+            {
+                MFS_descriptor_print (iterator, info, FALSE);
+            }
         }
-        else
-        {
-            ACE_putc ('\n');
-        }
+        if (close) MFS_close_desc(desc);
     }
-    return TRUE;
+    return err;
 }
 

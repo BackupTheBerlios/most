@@ -23,26 +23,35 @@ static struct DEV_rtc
 
 
 static void
-info (MFS_descriptor_t * desc)
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
-    static ACE_time_t time;
-    time.time = DEV_time_get ();
-    ACE_err_t err = ACE_time_to_param (&time);
-    if (err != ACE_OK)
-    {
-        ACE_printf ("Inval time: %d\n", err);
-        return;
+    static char buf[32];
+    switch (number){
+        case 0:{
+            static ACE_time_t time;
+            time.time = DEV_time_get ();
+            ACE_err_t err = ACE_time_to_param (&time);
+            if (err == ACE_OK)
+            {
+                ACE_time_print (&time, buf);
+                entry->type = MFS_INFO_STRING;
+                entry->name = "time";
+                entry->value.s = buf;
+            }
+            break;}
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
     }
-    ACE_puts ("Date: ");
-    ACE_time_print (&time);
-    ACE_puts ("\n");
+
 }
 
 static struct MFS_descriptor_op rtc_descriptor_op = {
-	.open = NULL,
+    .open = NULL,
     .close = NULL,
     .info = info,
-    .control = NULL
+    .control = NULL,
+    .delete = NULL
 };
 
 extern void
@@ -50,8 +59,10 @@ DEV_rtc_init (struct DEV_rtt_interface *rtt)
 {
     rtc.base_time = 0;
     rtc.rtt = rtt;
-    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/timer"), "rtc",
+    MFS_descriptor_t *dir = MFS_resolve("/sys/dev/timer");
+    MFS_descriptor_create (dir, "rtc",
                      MFS_SYS, &rtc_descriptor_op, (MFS_represent_t *) &rtc);
+    MFS_close_desc(dir);
     rtc.rtt->reset ();
 }
 

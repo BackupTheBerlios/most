@@ -24,19 +24,37 @@ static USO_semaphore_t cond;
 static USO_thread_t *timers_thread = NULL;
 
 static void
-info (MFS_descriptor_t * desc)
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
     DEV_timer_t *timer = (DEV_timer_t *) desc->represent;
-    ACE_printf ("Timer state: %s , ticks: %lu, ctx: %s\n",
-                timer->state == DEV_TIMER_ON ? "ON" : "OFF",
-                timer->ticks, timer->ctx == DEV_TIMER_INT ? "INT" : "THREAD");
+    switch (number){
+        case 0:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "state";
+            entry->value.s = timer->state == DEV_TIMER_ON ? "ON" : "OFF";
+            break;
+        case 1:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "ticks";
+            entry->value.z = timer->ticks;
+            break;
+        case 2:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "context";
+            entry->value.s = timer->ctx == DEV_TIMER_INT ? "INT" : "THREAD";
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
+    }
 }
 
 static struct MFS_descriptor_op timer_descriptor_op = {
     .open = NULL,
     .close = NULL,
     .info = info,
-    .control = NULL
+    .control = NULL,
+    .delete = NULL
 };
 
 static void
@@ -61,7 +79,7 @@ consume (void)
     return timer;
 }
 
-static void
+static ACE_err_t
 timers_run (void *nix)
 {
     USO_log_puts (USO_LL_INFO, "Timer is running.\n");
@@ -70,6 +88,7 @@ timers_run (void *nix)
         DEV_timer_t *timer = consume ();
         timer->f (timer->param);
     }
+    return DEF_ERR_SYS;
 }
 
 extern void
@@ -102,14 +121,18 @@ DEV_timer_init (DEV_timer_t * timer, void (*f) (void *), void *param, enum DEV_t
 extern void
 DEV_timer_install (DEV_timer_t * timer, char *name)
 {
-    timer->desc = MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/timer/timer"), name,
+    MFS_descriptor_t *dir = MFS_resolve("/sys/dev/timer/timer");
+    timer->desc = MFS_descriptor_create (dir, name,
                                     MFS_SYS, &timer_descriptor_op, (MFS_represent_t *) timer);
+    MFS_close_desc(dir);
 }
 
 extern void
 DEV_timer_remove (DEV_timer_t * timer)
 {
-    MFS_remove_desc (MFS_resolve(MFS_get_root(), "sys/dev/timer/timer"), timer->desc);
+    MFS_descriptor_t *dir = MFS_resolve("/sys/dev/timer/timer");
+    MFS_remove_desc (dir, timer->desc);
+    MFS_close_desc(dir);
 }
 
 extern void

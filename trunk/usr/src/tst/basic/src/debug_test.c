@@ -22,7 +22,7 @@ static CLI_exec_t assert_test;
 
 ACE_SECTION_ (".ramcode")
 static void
-ACE_LONG_CALL_ debug_test_cycle (void)
+ACE_LONG_CALL_ debug_test_cycle (void) 
 {
     static int cycle = 0;
     int a, b;
@@ -30,9 +30,9 @@ ACE_LONG_CALL_ debug_test_cycle (void)
     ++cycle;
     b = cycle;
     a += b;
-}
+} 
 
-static void
+static ACE_err_t
 debug_test_exec (char *nix)
 {
     for (int i = 0; i < 100; ++i)
@@ -40,12 +40,14 @@ debug_test_exec (char *nix)
         debug_test_cycle ();
         USO_sleep (USO_MSEC_2_TICKS (1000));
     }
+    return ACE_OK;
 }
 
 
-static void
+static ACE_err_t
 exception_test_exec (char *arg)
 {
+    ACE_err_t err = ACE_OK;
     if (arg != NULL){
         if (arg[0] == 'a'){
             int value;
@@ -70,11 +72,13 @@ exception_test_exec (char *arg)
     } else {
         ACE_puts ("u (undefined 2), p (prefetch 4), a (abort 5)\n");
     }
+    return err;
 }
 
-static void
+static ACE_err_t
 assert_test_exec (char *arg)
 {
+    ACE_err_t err = ACE_OK;
     if (arg != NULL){
         if (arg[0] == 'a'){
             ACE_ASSERT (0, "Assert test\n");
@@ -85,6 +89,7 @@ assert_test_exec (char *arg)
     } else {
         ACE_puts ("a ASSERT, p PANIK\n");
     }
+    return err;
 }
 
 extern void

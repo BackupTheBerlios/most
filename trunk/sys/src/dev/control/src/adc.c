@@ -33,13 +33,21 @@ DEV_adc_get (DEV_adc_t * adc, enum DEV_adc_channel channel)
 }
 
 static void
-info (MFS_descriptor_t * desc)
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
     DEV_adc_t *adc = (DEV_adc_t *) desc->represent;
-    for (int i = 0; i < DEV_ADC_CHN_MAX; ++i){
-        if (1 << i & adc->channel_mask){
-            ACE_printf ("\n\tADC ch %i: %lu \n", i, DEV_adc_get(adc, i));
+    if (number < DEV_ADC_CHN_MAX) {
+        entry->type = MFS_INFO_SIZE;
+        if (1 << number & adc->channel_mask){
+            entry->name = "value";
+            entry->value.z = DEV_adc_get(adc, number);
+        } else {
+            entry->name = "disabled";
+            entry->value.z = 0;
         }
+        
+    } else {
+        entry->type = MFS_INFO_NOT_AVAIL;
     }
 }
 
@@ -47,18 +55,23 @@ static struct MFS_descriptor_op adc_descriptor_op = {
     .open = NULL,
     .close = NULL,
     .info = info,
-    .control = NULL
+    .control = NULL,
+    .delete = NULL
 };
 
 extern void
 DEV_adc_install (DEV_adc_t * adc, char *name)
 {
-    adc->desc = MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/control"), name,
+    MFS_descriptor_t * dir = MFS_resolve("/sys/dev/control");
+    adc->desc = MFS_descriptor_create (dir, name,
                                     MFS_SYS, &adc_descriptor_op, (MFS_represent_t *) adc);
+    MFS_close_desc(dir);
 }
 
 extern void
 DEV_adc_remove (DEV_adc_t * adc)
 {
-    MFS_remove_desc (MFS_resolve(MFS_get_root(), "sys/dev/control"), adc->desc);
+    MFS_descriptor_t * dir = MFS_resolve("/sys/dev/control");
+    MFS_remove_desc (dir, adc->desc);
+    MFS_close_desc(dir);
 }

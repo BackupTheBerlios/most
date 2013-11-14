@@ -33,7 +33,7 @@
 
 #define ACE_MOST "freoMost"
 
-#define ACE_MOST_VERSION "V-0-1-0-d-7"
+#define ACE_MOST_VERSION "V-0-1-0-d-8"
 
 
 #define ACE_MOST_BUILD   ACE_MOST" "ACE_MOST_VERSION" [ "__DATE__" - "__TIME__" ] "
@@ -41,7 +41,11 @@
 /* CVS Log:
  *
  * $Log: version.h,v $
- * Revision 1.7  2013/09/07 09:15:13  maik42
+ * Revision 1.8  2013/11/14 17:46:29  maik42
+ * V-0-1-0-d-8, see CHANGELOG
+ *
+ * Revision 1.7  2013-09-07 09:15:13  maik42
+ * Version V-0-1-0-d-7:
  * bsp/la2: bootloader (y-modem is working, eth still missing),
  *              add frame and test app.
  * build: check bin file size

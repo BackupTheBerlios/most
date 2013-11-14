@@ -13,17 +13,18 @@ static volatile unsigned char *const sector = (volatile unsigned char *)0x50000;
 
 static CLI_exec_t erasefl;
 
-static void
+static ACE_err_t
 erasefl_exec (char *nix)
 {
     enum FLASH_29F040_err_code err;
     err = FLASH_29F040_sector_erase_s (sector);
     ACE_printf ("Flash erased = %d.\n", err);
+    return ACE_OK;
 }
 
 static CLI_exec_t printfl;
 
-static void
+static ACE_err_t
 printfl_exec (char *nix)
 {
     int i;
@@ -36,18 +37,20 @@ printfl_exec (char *nix)
              *(data + 5), *(data + 6), *(data + 7), *data, *(data + 1),
              *(data + 2), *(data + 3), *(data + 4), *(data + 5), *(data + 6), *(data + 7));
     }
+    return ACE_OK;
 }
 
 static unsigned char fldata[] = "Dieser String dient ausschlieslich zum Testen der Flash Routinen!";
 
 static CLI_exec_t writefl;
 
-static void
+static ACE_err_t
 writefl_exec (char *nix)
 {
     enum FLASH_29F040_err_code err;
     err = FLASH_29F040_programm_s (sector, fldata, sizeof (fldata));
     ACE_printf ("Flash programmed = %d.\n", err);
+    return ACE_OK;
 }
 
 extern void

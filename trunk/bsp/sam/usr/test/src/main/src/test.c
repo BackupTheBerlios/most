@@ -37,7 +37,7 @@ SAM_main (void)
     USO_log_puts (USO_LL_INFO, "App: "SAM_APPLICATION"\n");
     USO_log_printf (USO_LL_INFO, "Sizeof(char, short, int, long) = %d %d %d %d.\n", sizeof (char), sizeof (short), sizeof (int), sizeof (long));
 
-    MFS_descriptor_t * app = MFS_resolve(MFS_get_root(), "app");
+    MFS_descriptor_t * app = MFS_resolve("/app");
     MFS_descriptor_t *putboot;
     putboot = MFS_directory_create (app, "putboot");
 
@@ -58,4 +58,5 @@ SAM_main (void)
     TST_digio_test_install (test);
     lcd_test_install (test);
     flash_test_install (test);
+    MFS_close_desc(app);
 }

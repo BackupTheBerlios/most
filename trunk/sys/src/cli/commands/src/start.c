@@ -12,29 +12,23 @@
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
 
-extern ACE_bool_t
+extern ACE_err_t
 CLI_cmd_start (CLI_interpreter_t * cli)
 {
-    ACE_bool_t done = FALSE;
-    MFS_descriptor_t *desc = MFS_resolve(MFS_get_root(), "sys/uso/thread");
-    if (cli->argc >= 1)
+    ACE_err_t err = ACE_OK;
+    MFS_descriptor_t *dir, *desc;
+    dir = MFS_resolve("/sys/uso/thread");
+    desc = MFS_lookup (dir, cli->p.arg);
+    MFS_close_desc(dir);
+    if (desc != NULL && desc->type == MFS_SYS)
     {
-        desc = MFS_lookup (desc, cli->argv[0]);
-        if (desc != NULL && desc->type == MFS_SYS)
-        {
-            USO_start ((USO_thread_t *) desc->represent);
-            done = TRUE;
-        }
-        else
-        {
-            ACE_puts (CLI_err_arg_notfound);
-        }
+        USO_start ((USO_thread_t *) desc->represent);
     }
     else
     {
-        ACE_puts (CLI_err_arg_missing);
+        err = DEF_ERR_ARG;
     }
-    return done;
+    return err;
 }
 
 

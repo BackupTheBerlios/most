@@ -12,7 +12,7 @@
 
 static CLI_exec_t ramt;
 
-static void
+static ACE_err_t
 ram_test_exec (char *nix)
 {
     for (;;)
@@ -28,6 +28,7 @@ ram_test_exec (char *nix)
             break;
         }
     }
+    return ACE_OK;
 }
 
 extern void

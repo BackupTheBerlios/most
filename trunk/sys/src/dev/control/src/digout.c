@@ -14,18 +14,32 @@
 #include <dev/cpu.h>
 
 static void
-info (MFS_descriptor_t * desc)
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
     DEV_digout_t *out = (DEV_digout_t *) desc->represent;
-    ACE_printf ("OUT state: %s , logig: %s\n",
-                out->state == DEV_DIGIO_HIGH ? "1" : "0", out->logig == DEV_DIGIO_POS ? "+" : "-");
+    switch (number){
+        case 0:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "state";
+            entry->value.s = out->state == DEV_DIGIO_HIGH ? "1" : "0";
+            break;
+        case 1:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "logic";
+            entry->value.s = out->logig == DEV_DIGIO_POS ? "+" : "-";
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
+    }
 }
 
 static struct MFS_descriptor_op digout_descriptor_op = {
     .open = NULL,
     .close = NULL,
     .info = info,
-    .control = NULL
+    .control = NULL,
+    .delete = NULL
 };
 
 extern void
@@ -58,8 +72,9 @@ DEV_digout_init (DEV_digout_t * out,
 extern void
 DEV_digout_install (DEV_digout_t * out, char *name)
 {
-    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/control/out"), name,
-                     MFS_SYS, &digout_descriptor_op, (MFS_represent_t *) out);
+    MFS_descriptor_t * dir = MFS_resolve("/sys/dev/control/out");
+    MFS_descriptor_create (dir, name, MFS_SYS, &digout_descriptor_op, (MFS_represent_t *) out);
+    MFS_close_desc(dir);
 }
 
 extern void

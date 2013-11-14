@@ -12,7 +12,7 @@
 #include <dev/digin.h>
 
 static void
-info (MFS_descriptor_t * desc)
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
     DEV_digin_t *in = (DEV_digin_t *) desc->represent;
 
@@ -22,17 +22,44 @@ info (MFS_descriptor_t * desc)
     else if (edge == DEV_DIGIO_FALL) signal = "|_";
     else signal = "--";
 
-    ACE_printf ("IN state: %s , logig: %s, edge: %s, deb_t: %d, deb_cnt: %d\n",
-                in->state == DEV_DIGIO_HIGH ? "1" : "0",
-                in->logig == DEV_DIGIO_POS ? "+" : "-",
-                signal, in->debounce_time, in->debounce_count);
+    switch (number){
+        case 0:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "state";
+            entry->value.s = in->state == DEV_DIGIO_HIGH ? "1" : "0";
+            break;
+        case 1:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "logic";
+            entry->value.s = in->logig == DEV_DIGIO_POS ? "+" : "-";
+            break;
+        case 2:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "edge";
+            entry->value.s = signal;
+            break;
+        case 3:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "deb time";
+            entry->value.l = in->debounce_time;
+            break;
+        case 4:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "deb cnt";
+            entry->value.l = in->debounce_count;
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
+    }
 }
 
 static struct MFS_descriptor_op digin_descriptor_op = {
     .open = NULL,
     .close = NULL,
     .info = info,
-    .control = NULL
+    .control = NULL,
+    .delete = NULL
 };
 
 
@@ -64,8 +91,9 @@ DEV_digin_init (DEV_diginputs_t * inputs,
 extern void
 DEV_digin_install (DEV_digin_t * in, char *name)
 {
-    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/control/in"), name,
-                     MFS_SYS, &digin_descriptor_op, (MFS_represent_t *) in);
+    MFS_descriptor_t * dir = MFS_resolve("/sys/dev/control/in");
+    MFS_descriptor_create (dir, name, MFS_SYS, &digin_descriptor_op, (MFS_represent_t *) in);
+    MFS_close_desc(dir);
 }
 
 static void

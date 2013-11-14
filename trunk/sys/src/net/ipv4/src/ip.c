@@ -75,7 +75,7 @@ static MFS_descriptor_t *net_interfaces;
 extern void
 NET_ip_init (void)
 {
-    net_interfaces = MFS_resolve(MFS_get_root(), "sys/net/netif");
+    net_interfaces = MFS_resolve("/sys/net/netif");
 }
 
 static NET_netif_t *

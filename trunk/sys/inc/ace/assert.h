@@ -42,7 +42,7 @@
         }
 
 /** Check for NULL pointer */
-#define ACE_SANITY_CHECK(pointer)  ACE_ASSERT(pointer, "sanity error (null pointer)")
+#define ACE_SANITY_CHECK(pointer)  ACE_ASSERT(pointer, "null pointer")
 
 #endif
 

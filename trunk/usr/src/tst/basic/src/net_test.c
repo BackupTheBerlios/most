@@ -12,7 +12,7 @@
 
 static CLI_exec_t nett;
 
-static void
+static ACE_err_t
 net_test_exec (char *nix)
 {
     for (int i = 0; i < 100; ++i)
@@ -20,6 +20,7 @@ net_test_exec (char *nix)
         USO_sleep (USO_MSEC_2_TICKS (5000));
         NAP_syslog_printf (NAP_SYSLOG_DEBUG, NAP_SYSLOG_LOCAL1, "Syslog test %d.", i);
     }
+    return ACE_OK;
 }
 
 extern void

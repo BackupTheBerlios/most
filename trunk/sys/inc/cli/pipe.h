@@ -58,7 +58,5 @@ extern void CLI_pipe_init (CLI_pipe_t * pipe, MFS_descriptor_t *dir, char *name,
 
 extern CLI_pipe_t *CLI_pipe_new (ACE_size_t size, MFS_descriptor_t *dir, char *name);
 
-extern void CLI_pipe_del (MFS_descriptor_t *dir, char *name);
-
 
 #endif /* CLI_PIPE_H_ */

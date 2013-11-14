@@ -7,16 +7,27 @@
 
 #include <ace/stdio.h>
 #include <cli/command.h>
+#include <cli/arg.h>
 #include <mfs/descriptor.h>
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
 
-extern ACE_bool_t
+extern ACE_err_t
 CLI_cmd_remove (CLI_interpreter_t * cli)
 {
-    MFS_descriptor_t *desc = USO_thread_dir_get(USO_current());
-    MFS_remove (desc, cli->argv [0]);
-    return TRUE;
+    ACE_err_t err = ACE_OK;
+    int argc;
+    char *argv[CLI_MAX_ARG];
+    argc = CLI_arg_parse(cli->p.arg, argv);
+
+    MFS_descriptor_t *dir = USO_thread_work_get(USO_current());
+    if (argc >= 1) {
+        err = MFS_remove (dir, argv[0]);
+    } else {
+        err = DEF_ERR_ARG;
+    }
+
+    return err;
 }
 
 

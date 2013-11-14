@@ -496,7 +496,7 @@ static void con_putc_ansi(const char c)
                 {
                     break;
                 }
-                // fall through
+                /* no break */
 
             case INVALID:
                 for(i = 0; i < ansi_buf_ofs; i++)
@@ -545,8 +545,8 @@ static void con_flush_ansi_escape_code_sequence(void)
  */
 static ACE_size_t console_write(MFS_stream_t *stream, const char *s, ACE_size_t n)
 {
-	ACE_size_t ret;
-	ret = n;
+    ACE_size_t ret;
+    ret = n;
     while(*s && n--)
     {
         con_putc_ansi(*s);
@@ -562,28 +562,33 @@ static ACE_size_t console_write(MFS_stream_t *stream, const char *s, ACE_size_t 
  */
 static ACE_err_t console_open(MFS_descriptor_t * desc)
 {
-    con_color._color = 0x07;
-    con_clear_screen();
+    if (desc->open_cnt == 0){
+        con_color._color = 0x07;
+        con_clear_screen();
+    }
     return ACE_OK;
 }
 
 static struct MFS_descriptor_op console_desc_op = {
-	.open = console_open,
-    .close = NULL,
-    .info = NULL,
-    .control = NULL
+                .open = console_open,
+                .close = NULL,
+                .info = NULL,
+                .control = NULL,
+                .delete = NULL
 };
 
 static struct MFS_stream_op console_stream_op = {
-    .read = NULL,
-    .write = console_write,
-    .seek = NULL,
-    .flush = NULL
+                .read = NULL,
+                .write = console_write,
+                .seek = NULL,
+                .flush = NULL
 };
 
 extern void
 IBMPC_console_install (IBMPC_console_t *con, char *name)
 {
-    MFS_stream_create (MFS_resolve(MFS_get_root(), "sys/dev/serial"), name, &console_desc_op,
+    MFS_descriptor_t * dir = MFS_resolve("/sys/dev/serial");
+    MFS_stream_create (dir, name, &console_desc_op,
                    &console_stream_op, (MFS_represent_t *) con, MFS_STREAM_IO);
+    MFS_close_desc(dir);
 }

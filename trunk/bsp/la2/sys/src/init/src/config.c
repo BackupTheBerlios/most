@@ -39,10 +39,9 @@ LA2_config_init (void)
 extern void
 LA2_config_read (void)
 {
-#if 1
     ACE_ssize_t len;
     char *data;
-    MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "cfg");
+    MFS_descriptor_t *desc = MFS_resolve("/bsp/mmc/cfg");
     MFS_block_t *p1 = (MFS_block_t *)desc;
     if (desc == NULL || desc->type != MFS_BLOCK)
         return;
@@ -68,14 +67,12 @@ LA2_config_read (void)
         // check error no data
     }
     MFS_close_desc (desc);
-#endif
 }
 
 static void
 config_write (void)
 {
-#if 1
-    MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "bsp/mmc"), "cfg");
+    MFS_descriptor_t *desc = MFS_resolve("/bsp/mmc/cfg");
     MFS_block_t *p1 = (MFS_block_t *)desc;
     if (desc == NULL || desc->type != MFS_BLOCK)
         return;
@@ -101,7 +98,6 @@ config_write (void)
         // error out of mem
     }
     MFS_close_desc (desc);
-#endif
 }
 
 static void
@@ -252,14 +248,13 @@ config_clear_flags (char *param)
 static CLI_exec_t conf;
 static CLI_exec_t set;
 
-static void
-conf_exec (char *param)
+static ACE_err_t
+conf_exec (char *arg)
 {
-    if (param != NULL)
+    ACE_err_t err = ACE_OK;
+    if (arg != NULL)
     {
-        char a = *param;
-        param++;
-        switch (a)
+        switch (arg[0])
         {
         case 'r':
             LA2_config_read ();
@@ -273,63 +268,72 @@ conf_exec (char *param)
         case 'i':
             LA2_config_ip ();
             break;
+        case '?':
+            ACE_puts ("r (read), w (write), s (show), i (conf ip-stack).\n");
+            break;
         default:
-            ACE_puts ("inval param, type <conf> for help.\n");
+            err = DEF_ERR_ARG;
             break;
         }
     } else {
-        ACE_puts ("r (read), w (write), s (show), i (conf ip-stack).\n");
+        err = DEF_ERR_ARG;
     }
+    return err;
 }
 
-static void
-set_exec (char *param)
+static ACE_err_t
+set_exec (char *arg)
 {
-    if (param != NULL)
+    ACE_err_t err = ACE_OK;
+    if (arg != NULL)
     {
         LA2_config.state = LA2_CONFIG_STATE_ALTERED;
-        char a = *param;
-        param++;
+        char a = *arg;
+        arg++;
         switch (a)
         {
         case 'd':
             LA2_config_init ();
             break;
         case 'h':
-            config_set_hostname (param);
+            config_set_hostname (arg);
             break;
         case 'e':
-            config_set_eth_addr (param);
+            config_set_eth_addr (arg);
             break;
         case 'i':
-            config_set_ip_addr (param, &LA2_config.ip_addr);
+            config_set_ip_addr (arg, &LA2_config.ip_addr);
             break;
         case 'n':
-            config_set_ip_addr (param, &LA2_config.netmask);
+            config_set_ip_addr (arg, &LA2_config.netmask);
             break;
         case 'g':
-            config_set_ip_addr (param, &LA2_config.gateway);
+            config_set_ip_addr (arg, &LA2_config.gateway);
             break;
         case 's':
-            config_set_ip_addr (param, &LA2_config.server);
+            config_set_ip_addr (arg, &LA2_config.server);
             break;
         case 'f':
-            config_set_filename (param);
+            config_set_filename (arg);
             break;
         case 'y':
-            config_set_flags (param);
+            config_set_flags (arg);
             break;
         case 'z':
-            config_clear_flags (param);
+            config_clear_flags (arg);
+            break;
+        case '?':
+            ACE_puts ("d default | h<hostname> | e<eth_addr> | i<ip addr> | n<netmask> |\n"
+                      "g<gateway> | s<server> | f<file> | y<set_flags> | z<clear_flags>.\n");
             break;
         default:
-            ACE_puts ("invalid param, type <set> for help.\n");
+            err = DEF_ERR_ARG;
             break;
         }
     } else {
-        ACE_puts ("d (default), h<hostname>, e<eth_addr>, i<ip_addr>, n<netmask>,\n"
-                  "g<gateway>, s<server>, f<file>, y<set flags>, z<clear flags>.\n");
+        err = DEF_ERR_ARG;
     }
+    return err;
 }
 
 extern void

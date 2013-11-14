@@ -40,7 +40,7 @@ struct MFS_directory
  * @param iterator : Current descriptor or NULL to initialize iterator to list head.
  * @return Next descriptor or NULL if there is no descriptor.
  */
-extern MFS_descriptor_t *MFS_next_entry (MFS_descriptor_t * dir_desc, MFS_descriptor_t * iterator);
+extern MFS_descriptor_t *MFS_next_entry (MFS_descriptor_t * dir, MFS_descriptor_t * iterator);
 
 /**
  * Find a descriptor for a given name in the directory.
@@ -48,10 +48,10 @@ extern MFS_descriptor_t *MFS_next_entry (MFS_descriptor_t * dir_desc, MFS_descri
  * @param name : Search for a descriptor of the given name.
  * @return Found descriptor or NULL if no descriptor is found.
  */
-extern MFS_descriptor_t *MFS_lookup (MFS_descriptor_t * dir_desc, char *name);
+extern MFS_descriptor_t *MFS_lookup (MFS_descriptor_t * dir, char *name);
 
 
-extern void MFS_create_desc (MFS_descriptor_t * dir_desc, MFS_descriptor_t * desc);
+extern void MFS_create_desc (MFS_descriptor_t * dir, MFS_descriptor_t * desc);
 
 
 /**
@@ -59,14 +59,14 @@ extern void MFS_create_desc (MFS_descriptor_t * dir_desc, MFS_descriptor_t * des
  * @param dir_desc : Directory from which the descriptor is removed.
  * @param desc : Descriptor to be removed.
  */
-extern void MFS_remove_desc (MFS_descriptor_t * dir_desc, MFS_descriptor_t * desc);
+extern ACE_err_t MFS_remove_desc (MFS_descriptor_t * dir, MFS_descriptor_t * desc);
 
 /**
  * Search for name and if descriptor is found remove it from directory list.
  * @param dir_desc : Directory from which the descriptor is removed.
  * @param name : Name of the descriptor which should be removed.
  */
-extern void MFS_remove (MFS_descriptor_t * dir_desc, char *name);
+extern ACE_err_t MFS_remove (MFS_descriptor_t * dir, char *name);
 
 
 /**
@@ -75,7 +75,7 @@ extern void MFS_remove (MFS_descriptor_t * dir_desc, char *name);
  * @param desc : Descriptor which should be renamed.
  * @param name : New name for the descriptor.
  */
-extern void MFS_rename_desc (MFS_descriptor_t * dir_desc, MFS_descriptor_t * desc, char *name);
+extern void MFS_rename_desc (MFS_descriptor_t * dir, MFS_descriptor_t * desc, char *name);
 
 /**
  * Search for name and rename descriptor if found.
@@ -83,7 +83,7 @@ extern void MFS_rename_desc (MFS_descriptor_t * dir_desc, MFS_descriptor_t * des
  * @param old_name : Descriptor name for which is searched for.
  * @param new_name : New name for the descriptor.
  */
-extern MFS_descriptor_t *MFS_rename (MFS_descriptor_t * dir_desc, char *old_name, char *new_name);
+extern MFS_descriptor_t *MFS_rename (MFS_descriptor_t * dir, char *old_name, char *new_name);
 
 
 /**
@@ -100,11 +100,13 @@ extern void MFS_directory_init (MFS_directory_t * dir, struct MFS_vfs_op *vfs_op
  * @param name : Name of the new directory.
  * @return Created directory descriptor.
  */
-extern MFS_descriptor_t *MFS_directory_create (MFS_descriptor_t * dir_desc, char *name);
+extern MFS_descriptor_t *MFS_directory_create (MFS_descriptor_t * dir, char *name);
 
 extern MFS_descriptor_t *MFS_directory_create_root (char *name, struct MFS_vfs_op *vfs_op);
 
-extern void MFS_directory_print (MFS_directory_t * dir);
+extern MFS_descriptor_t *MFS_directory_create_file (MFS_descriptor_t * dir, char *name);
+
+extern void MFS_directory_info (MFS_directory_t * dir, int number, MFS_info_entry_t *entry);
 
 /** @}
  */

@@ -16,10 +16,15 @@
 #include <mfs/directory.h>
 #include <mfs/stream.h>
 
+
+
 static void
-info (MFS_descriptor_t * desc)
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
     USO_thread_t *thread = (USO_thread_t *) desc->represent;
+
+    
+    
     char *priority, *scheduling, *state, *error;
     error = "error";
 
@@ -101,35 +106,88 @@ info (MFS_descriptor_t * desc)
         break;
     }
 
-    ACE_printf ("%s\t%s\t%s\t%lu\t%i\t%i\t%p %p %p %p\n",
-                priority,
-                scheduling,
-                state,
-                thread->ticks,
-                thread->stack_size * sizeof (USO_stack_t),
-                USO_stack_get_free (thread->stack_top, thread->stack_size) * sizeof (USO_stack_t),
-                (void *)thread->stack_top,
-                (void *)thread->stack_max, (void *)thread->cpu.sp, (void *)thread->stack_bot);
+    
+    switch (number){
+        case 0:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "Prior";
+            entry->value.s = priority;
+            break;
+        case 1:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "Sched";
+            entry->value.s = scheduling;
+            break;
+        case 2:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "State";
+            entry->value.s = state;
+            break;
+        case 3:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "Ticks";
+            entry->value.z = thread->ticks;
+            break;
+        case 4:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "Error";
+            entry->value.l = thread->error;
+            break;
+        case 5:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "S.size";
+            entry->value.z = thread->stack_size * sizeof (USO_stack_t);
+            break;
+        case 6:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "S.free";
+            entry->value.z = USO_stack_get_free (thread->stack_top, thread->stack_size) * sizeof (USO_stack_t);
+            break;
+        case 7:
+            entry->type = MFS_INFO_PTR;
+            entry->name = "S.top";
+            entry->value.p = (void *)thread->stack_top;
+            break;
+        case 8:
+            entry->type = MFS_INFO_PTR;
+            entry->name = "S.max";
+            entry->value.p = (void *)thread->stack_max;
+            break;
+        case 9:
+            entry->type = MFS_INFO_PTR;
+            entry->name = "S.sp";
+            entry->value.p = (void *)thread->cpu.sp;
+            break;
+        case 10:
+            entry->type = MFS_INFO_PTR;
+            entry->name = "S.bot";
+            entry->value.p = (void *)thread->stack_bot;
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
+    }
 }
 
 
 static struct MFS_descriptor_op thread_descriptor_op = {
-	.open = NULL,
-    .close = NULL,
-    .info = info,
-    .control = NULL
+                .open = NULL,
+                .close = NULL,
+                .info = info,
+                .control = NULL,
+                .delete = NULL
 };
 
 static void
 thread_wrapper (void)
 {
-    USO_current ()->enter (USO_current ()->arg);
-    USO_exit ();
+    USO_thread_t *t = USO_current();
+    USO_exit (t->enter (t->arg));
 }
 
 extern void
 USO_thread_init (USO_thread_t * thread,
-                 void (*enter) (void *),
+                 ACE_err_t (*enter) (void *),
                  USO_stack_t * stack,
                  int stack_size,
                  enum USO_thread_priority priority,
@@ -154,9 +212,11 @@ USO_thread_init (USO_thread_t * thread,
     thread->ticks = 0;
     thread->in = USO_current ()->in;
     thread->out = USO_current ()->out;
-    thread->dir = USO_current ()->dir;
-    thread->desc = MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/uso/thread"), name,
-                                    MFS_SYS, &thread_descriptor_op, (MFS_represent_t *) thread);
+    thread->work = USO_current ()->work;
+    thread->error = ACE_OK;
+    MFS_descriptor_t *dir = MFS_resolve("/sys/uso/thread");
+    thread->desc = MFS_descriptor_create (dir, name, MFS_SYS, &thread_descriptor_op, (MFS_represent_t *) thread);
+    MFS_close_desc(dir);
     if (priority != USO_IDLE)
     {
         USO_stack_init (stack, stack_size);
@@ -164,7 +224,7 @@ USO_thread_init (USO_thread_t * thread,
 }
 
 extern USO_thread_t *
-USO_thread_new (void (*enter) (void *),
+USO_thread_new (ACE_err_t (*enter) (void *),
                 int stack_size,
                 enum USO_thread_priority priority,
                 enum USO_thread_scheduling scheduling, char *name)
@@ -200,15 +260,17 @@ USO_thread_terminate (USO_thread_t * thread)
     }
     if ((thread->flags & (1 << USO_FLAG_CLOSE_IN)) == (1 << USO_FLAG_CLOSE_IN))
     {
-    	MFS_close_desc(thread->in);
+        MFS_close_desc(thread->in);
     }
     if ((thread->flags & (1 << USO_FLAG_CLOSE_OUT)) == (1 << USO_FLAG_CLOSE_OUT))
     {
-    	MFS_close_desc(thread->out);
+        MFS_close_desc(thread->out);
     }
     if ((thread->flags & (1 << USO_FLAG_DETACH)) == (1 << USO_FLAG_DETACH))
     {
-        MFS_remove_desc (MFS_resolve(MFS_get_root(), "sys/uso/thread"), thread->desc);
+        MFS_descriptor_t *dir = MFS_resolve("/sys/uso/thread");
+        MFS_remove_desc (dir, thread->desc);
+        MFS_close_desc(dir);
         ACE_free (thread->stack);
         ACE_free (thread);
     }
@@ -217,7 +279,7 @@ USO_thread_terminate (USO_thread_t * thread)
 extern void
 USO_thread_in_init (USO_thread_t * thread, MFS_descriptor_t * in)
 {
-	thread->in = in;
+    thread->in = in;
 }
 
 extern void
@@ -233,15 +295,15 @@ USO_thread_arg_init (USO_thread_t * thread, void *arg)
 }
 
 extern void
-USO_thread_dir_set (USO_thread_t * thread, MFS_descriptor_t * dir)
+USO_thread_work_set (USO_thread_t * thread, MFS_descriptor_t * work)
 {
-    thread->dir = dir;
+    thread->work = work;
 }
 
 extern MFS_descriptor_t *
-USO_thread_dir_get (USO_thread_t * thread)
+USO_thread_work_get (USO_thread_t * thread)
 {
-    return thread->dir;
+    return thread->work;
 }
 
 extern void
@@ -272,7 +334,7 @@ USO_start (USO_thread_t * thread)
 extern void
 USO_stop (USO_thread_t * thread)
 {
-	USO_raise(thread, USO_SIGNAL_STOP);
+    USO_raise(thread, USO_SIGNAL_STOP);
 }
 
 extern void
@@ -314,10 +376,12 @@ USO_yield (void)
 }
 
 extern void
-USO_exit (void)
+USO_exit (ACE_err_t err)
 {
+    USO_thread_t *t = USO_current();
     USO_disable ();
-    USO_current ()->state = USO_EXIT;
+    t->error = err;
+    t->state = USO_EXIT;
     USO_schedule (USO_next2run ());
     /*
      * never reached 
@@ -330,24 +394,3 @@ USO_thread_name (void)
     return USO_current ()->desc->name;
 }
 
-static void
-info_head (MFS_descriptor_t * desc)
-{
-    ACE_printf ("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-                "Prior",
-                "Sched", "State", "Ticks", "S.size", "S.free", "S.top", "S.max", "S.sp", "S.bot");
-}
-
-static struct MFS_descriptor_op thread_head_descriptor_op = {
-	.open = NULL,
-    .close = NULL,
-    .info = info_head,
-    .control = NULL
-};
-
-/**
- * Print thread info header.
- */
-extern void USO_thread_info_head (MFS_descriptor_t *dir){
-	MFS_descriptor_create (dir, "thread", MFS_INFO, &thread_head_descriptor_op, NULL);
-}

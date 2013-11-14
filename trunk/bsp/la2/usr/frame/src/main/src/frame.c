@@ -25,14 +25,15 @@ void
 LA2_main (void)
 {
 
-    USO_log_puts (USO_LL_INFO, "App: "LA2_APPLICATION" -- Check Download = 1 -- \n");
+    USO_log_puts (USO_LL_INFO, "App: "LA2_APPLICATION"\n");
 
     DEV_digout_set (&LA2_green_led);
 
-    MFS_descriptor_t *app = MFS_resolve(MFS_get_root(), "app");
+    MFS_descriptor_t *app = MFS_resolve("/app");
     MFS_descriptor_t *frame;
     frame = MFS_directory_create (app, "frame");
-
+    MFS_close_desc(app);
+    
     USO_slot_init (&LA2_event_slots, &frame_slot, frame_event_ids, FRAME_SLOT_SIZE);
 
     for (;;)

@@ -143,7 +143,7 @@ init (void)
 
     blink_green ();
 
-    ser0 = MFS_open (MFS_resolve(MFS_get_root(), "sys/dev/serial"), "ser0");
+    ser0 = MFS_resolve("/sys/dev/serial/ser0");
     if (ser0 == NULL)
     {
         ACE_PANIC ("Open ser0 fail");
@@ -156,13 +156,13 @@ init (void)
                   CLI_TTY_OUTTRANSL_ADD_CR,
                   "tty0");
 
-    tty0 = MFS_open (MFS_resolve(MFS_get_root(), "sys/cli"), "tty0");
+    tty0 = MFS_resolve("/sys/cli/tty0");
     if (tty0 == NULL)
     {
         ACE_PANIC ("Open tty0 fail");
     }
 
-    ser1 = MFS_open (MFS_resolve(MFS_get_root(), "sys/dev/serial"), "ser1");
+    ser1 = MFS_resolve("/sys/dev/serial/ser1");
     if (ser1 == NULL)
     {
         ACE_PANIC ("Open ser1 fail");

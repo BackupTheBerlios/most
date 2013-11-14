@@ -21,7 +21,7 @@ MOST_CPU:=i386
 ## target cpu type of your toolchain
 #MOST_CPU_TYPE:=h8300h
 #MOST_CPU_TYPE:=arm7tdmi
-MOST_CPU_TYPE:=
+MOST_CPU_TYPE:=elf_i386
 
 ## target system type of your toolchain
 #MOST_SYSTEM:=coff

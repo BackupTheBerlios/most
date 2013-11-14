@@ -1,7 +1,4 @@
 #include <ace/stdlib.h>
-#include <uso/thread.h>
-#include <uso/heap.h>
-#include <cli/command.h>
 #include <mfs/sysfs.h>
 #include <mfs/descriptor.h>
 #include <mfs/super.h>
@@ -10,29 +7,55 @@
 
 static MFS_descriptor_t *root = NULL;
 
-static void
-sysfs_super_info(MFS_descriptor_t * super)
-{
-    //MFS_super_print ((MFS_super_t *)super);
-}
 
 static void
-sysfs_dir_info(MFS_descriptor_t * dir)
+sysfs_dir_info(MFS_descriptor_t * dir, int number, MFS_info_entry_t *entry)
 {
-    MFS_directory_print ((MFS_directory_t *)dir);
+    MFS_directory_info ((MFS_directory_t *)dir, number, entry);
 }
 
-static void
-sysfs_stream_info(MFS_descriptor_t * stream)
+static ACE_err_t
+sysfs_dir_delete (MFS_descriptor_t *dir)
 {
-    MFS_stream_print ((MFS_stream_t *)stream);
+    ACE_err_t err = ACE_OK;
+    if (dir && (dir->type == MFS_DIRECTORY))
+    {
+        MFS_directory_t *d = (MFS_directory_t *) dir;
+        if (USO_isempty(&d->descriptors) == FALSE){
+            err = DEF_ERR_IN_USE;
+        }
+    } else {
+        err = DEF_ERR_SYS;
+    }
+    return err;
 }
+
+
+static void
+sysfs_stream_info(MFS_descriptor_t * stream, int number, MFS_info_entry_t *entry)
+{
+    MFS_stream_info ((MFS_stream_t *)stream, number, entry);
+}
+
+static ACE_err_t
+sysfs_stream_delete (MFS_descriptor_t *stream)
+{
+    ACE_err_t err = DEF_ERR_SYS;
+    if (stream && (stream->type == MFS_STREAM))
+    {
+        err = ACE_OK;
+    }
+    return err;
+    
+}
+
 
 static struct MFS_descriptor_op MFS_sysfs_super_desc_op = {
     .open = NULL,
     .close = NULL,
-    .info = sysfs_super_info,
-    .control = NULL
+    .info = NULL,
+    .control = NULL,
+    .delete = NULL
 };
 
 static struct MFS_super_op MFS_sysfs_super_op = {
@@ -44,7 +67,8 @@ static struct MFS_descriptor_op MFS_sysfs_directory_desc_op = {
     .open = NULL,
     .close = NULL,
     .info = sysfs_dir_info,
-    .control = NULL
+    .control = NULL,
+    .delete = sysfs_dir_delete
 };
 
 static struct MFS_directory_op MFS_sysfs_directory_op = {
@@ -57,7 +81,8 @@ static struct MFS_descriptor_op MFS_sysfs_stream_desc_op = {
     .open = NULL,
     .close = NULL,
     .info = sysfs_stream_info,
-    .control = NULL
+    .control = NULL,
+    .delete = sysfs_stream_delete
 };
 
 static struct MFS_stream_op MFS_sysfs_stream_op = {
@@ -93,9 +118,7 @@ MFS_sysfs_init (void)
 
     if ( (dir = MFS_directory_create (sys, "uso")) == NULL) return FALSE;
     if ( (sub = MFS_directory_create (dir, "thread")) == NULL) return FALSE;
-    USO_thread_info_head(sub);
     if ( (sub = MFS_directory_create (dir, "heap")) == NULL) return FALSE;
-    USO_heap_info_head(sub);
 
     if ( (dir = MFS_directory_create (sys, "dev")) == NULL) return FALSE;
     if ( (sub = MFS_directory_create (dir, "serial")) == NULL) return FALSE;

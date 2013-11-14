@@ -29,10 +29,11 @@ MDC_start_boot (void)
     MDC_jump_boot ();
 }
 
-static void
+static ACE_err_t
 start_boot_exec (char *nix)
 {
     MDC_start_boot ();
+    return CLI_ERR_NOT_REACHED;
 }
 
 extern void
@@ -44,21 +45,30 @@ MDC_start_app (void)
     MDC_jump_app ();
 }
 
-static void
+static ACE_err_t
 start_app_exec (char *nix)
 {
     MDC_start_app ();
+    return CLI_ERR_NOT_REACHED;
 }
 
 
-static void
-heap_debug_exec (char *heap)
+static ACE_err_t
+heap_debug_exec (char *arg)
 {
-    MFS_descriptor_t *desc = MFS_open (MFS_resolve(MFS_get_root(), "sys/uso/heap"), heap);
-	if (desc != NULL)
-		USO_debug_heap_list (desc->represent);
-	else
-		ACE_puts ("heap not found.\n");
+    ACE_err_t err = ACE_OK;
+    if (arg != NULL){
+        MFS_descriptor_t *desc = MFS_walk_in (MFS_resolve("/sys/uso/heap"), arg, TRUE);
+        if (desc != NULL) {
+            USO_debug_heap_list (desc->represent);
+        } else {
+            err = CLI_ERR_NOT_FOUND;
+        }
+        MFS_close_desc(desc);
+    } else {
+        err = DEF_ERR_ARG;
+    }
+    return err;
 }
 
 extern void

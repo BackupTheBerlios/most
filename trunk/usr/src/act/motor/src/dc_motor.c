@@ -29,7 +29,7 @@ motor_cleanup (void *arg)
     mot->state = ACT_DC_MOT_DEAD;
 }
 
-static void
+static ACE_err_t
 motor_run (void *arg)
 {
     ACT_dc_motor_t *mot = (ACT_dc_motor_t *) arg;
@@ -99,6 +99,7 @@ motor_run (void *arg)
     motor_cleanup (mot);
     USO_unlock(&mot->lock);
     USO_log_puts (USO_LL_INFO, "Motor is stopped.\n");
+    return ACE_OK;
 }
 
 extern void
@@ -124,11 +125,11 @@ extern void
 ACT_dc_motor_start(ACT_dc_motor_t *mot)
 {
     if (mot->state == ACT_DC_MOT_INIT || mot->state == ACT_DC_MOT_DEAD){
-        mot->thread = USO_thread_new ((void (*)(void *))motor_run,
-                                                 MOTOR_STACK_SIZE,
-                                                 USO_SYSTEM,
-                                                 USO_FIFO,
-                                                 mot->name);
+        mot->thread = USO_thread_new (motor_run,
+                        MOTOR_STACK_SIZE,
+                        USO_SYSTEM,
+                        USO_FIFO,
+                        mot->name);
         if (mot->thread){
             USO_thread_arg_init (mot->thread, mot);
             USO_thread_flags_set (mot->thread, 1 << USO_FLAG_DETACH);

@@ -85,35 +85,55 @@ extern int SEN_line_get_dav(SEN_linedetect_t *line)
 }
 
 static void
-info (MFS_descriptor_t * desc)
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
     SEN_linedetect_t *line = (SEN_linedetect_t *) desc->represent;
-    char *state;
-    switch(line->state){
-        case SEN_LINE_LOST:
-            state = "lost";
+    switch (number){
+        case 0:{
+            char *state;
+            switch(line->state){
+                case SEN_LINE_LOST:
+                    state = "lost";
+                    break;
+                case SEN_LINE_LEFT:
+                    state = "left";
+                    break;
+                case SEN_LINE_RIGHT:
+                    state = "right";
+                    break;
+                case SEN_LINE_FOUND:
+                    state = "found";
+                    break;
+                default:
+                    state = "?";
+                    break;
+            }
+            entry->type = MFS_INFO_STRING;
+            entry->name = "state";
+            entry->value.s = state;
+            break;}
+        case 1:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "diff";
+            entry->value.l = line->diff;
             break;
-        case SEN_LINE_LEFT:
-            state = "left";
-            break;
-        case SEN_LINE_RIGHT:
-            state = "right";
-            break;
-        case SEN_LINE_FOUND:
-            state = "found";
+        case 2:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "av";
+            entry->value.l = line->av;
             break;
         default:
-            state = "?";
+            entry->type = MFS_INFO_NOT_AVAIL;
             break;
     }
-    ACE_printf ("Line state %s diff=%i av=%i\n", state, line->diff, line->av);
 }
 
 static struct MFS_descriptor_op line_descriptor_op = {
     .open = NULL,
     .close = NULL,
     .info = info,
-    .control = NULL
+    .control = NULL,
+    .delete = NULL
 };
 
 extern void

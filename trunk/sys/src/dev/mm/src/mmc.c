@@ -73,45 +73,70 @@
 
 
 static DEV_spi_dev_t *spi;
+static struct DEV_mmc_CID cid;
+static struct DEV_mmc_CSD csd;
 
 static void
-info (MFS_descriptor_t * desc)
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
-    ACE_err_t err;
-    struct DEV_mmc_CID cid;
-    err = DEV_mmc_read_CID (&cid);
-    if (err == ACE_OK)
-    {
-        ACE_printf ("MID=0x%02x   Name=%s   SNr=%lu\n", cid.mid, cid.name, cid.serial_nr);
-    }
-    else
-    {
-        ACE_printf ("Read CID failed, err: %d\n", err);
-    }
-    struct DEV_mmc_CSD csd;
-    err = DEV_mmc_read_CSD (&csd);
-    if (err == ACE_OK)
-    {
-        ACE_printf ("\tRead: block len = %d B, partial = %s\n",
-                    csd.read_block_len, csd.read_block_partial == TRUE ? "true" : "false");
-        ACE_printf ("\tWrite: block len = %d B , partial = %s\n",
-                    csd.write_block_len, csd.write_block_partial == TRUE ? "true" : "false");
-        ACE_printf ("\tNumber of blocks = %d\n", csd.block_nr);
-        ACE_printf ("\tCard capacity = %lu MB\n",
-                    (csd.block_nr * csd.read_block_len) / (((unsigned long)1024) * 1024));
-
-    }
-    else
-    {
-        ACE_printf ("Read CSD failed, err: %d\n", err);
+    switch (number){
+        case 0:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "mid";
+            entry->value.z = cid.mid;
+            break;
+        case 1:
+            entry->type = MFS_INFO_STRING;
+            entry->name = "name";
+            entry->value.s = cid.name;
+            break;
+        case 2:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "serial_nr";
+            entry->value.z = cid.serial_nr;
+            break;
+        case 3:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "R block len";
+            entry->value.l = csd.read_block_len;
+            break;
+        case 4:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "R block part";
+            entry->value.l = csd.read_block_partial;
+            break;
+        case 5:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "W block len";
+            entry->value.l = csd.write_block_len;
+            break;
+        case 6:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "W block part";
+            entry->value.l = csd.write_block_partial;
+            break;
+        case 7:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "Nr. of blocks";
+            entry->value.l = csd.block_nr;
+            break;
+        case 8:
+            entry->type = MFS_INFO_SIZE;
+            entry->name = "Card capacity";
+            entry->value.z = (csd.block_nr * csd.read_block_len) / (((unsigned long)1024) * 1024);
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
     }
 }
 
 static struct MFS_descriptor_op mmc_descriptor_op = {
-	.open = NULL,
+    .open = NULL,
     .close = NULL,
     .info = info,
-    .control = NULL
+    .control = NULL,
+    .delete = NULL
 };
 
 
@@ -127,7 +152,6 @@ static unsigned char
 mmc_get_response (void)
 {
     unsigned char response;
-
     for (int i = 0; i <= MMC_MAX_BYTES_TO_RESPONSE; ++i)
     {
         response = spi_send_byte (MMC_RESPONSE);
@@ -328,14 +352,23 @@ DEV_mmc_init (void)
 
     DEV_spi_release (spi);
 
+    if (err == ACE_OK){
+        err = DEV_mmc_read_CID (&cid);
+    }
+
+    if (err == ACE_OK){
+        err = DEV_mmc_read_CSD (&csd);
+    }
+
     return err;
 }
 
 extern void
 DEV_mmc_install (void)
 {
-    MFS_descriptor_create (MFS_resolve(MFS_get_root(), "sys/dev/mm"), "mmc",
-                     MFS_SYS, &mmc_descriptor_op, NULL);
+    MFS_descriptor_t *dir = MFS_resolve("/sys/dev/mm"); 
+    MFS_descriptor_create (dir, "mmc", MFS_SYS, &mmc_descriptor_op, NULL);
+    MFS_close_desc(dir);
 }
 
 /* The card will respond with a standard response token followed by a data
