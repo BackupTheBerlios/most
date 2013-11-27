@@ -75,7 +75,7 @@ MFS_stream_info (MFS_stream_t * stream, int number, MFS_info_entry_t *entry)
     switch (number){
         case 0:
             entry->type = MFS_INFO_STRING;
-            entry->name = "type";
+            entry->name = "Type";
             if (stream->type == MFS_STREAM_IO) {
                 entry->value.s = "io";
             } else {
@@ -85,18 +85,18 @@ MFS_stream_info (MFS_stream_t * stream, int number, MFS_info_entry_t *entry)
         case 1:
             entry->type = MFS_INFO_SIZE;
             if (stream->type == MFS_STREAM_IO) {
-                entry->name = "tx";
+                entry->name = "Tx";
             } else {
-                entry->name = "size";
+                entry->name = "Size";
             }
             entry->value.z = stream->size_tx;
             break;
         case 2:
             entry->type = MFS_INFO_SIZE;
             if (stream->type == MFS_STREAM_IO) {
-                entry->name = "rx";
+                entry->name = "Rx";
             } else {
-                entry->name = "pos";
+                entry->name = "Pos";
             }
             entry->value.z = stream->pos_rx;
             break;

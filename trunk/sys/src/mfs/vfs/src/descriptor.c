@@ -138,90 +138,9 @@ MFS_info_desc (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
     {
         desc->operations->info (desc, number, entry);
     }
-}
-
-extern void
-MFS_print_info (MFS_descriptor_t * desc)
-{
-    if (desc != NULL)
+    else
     {
-        MFS_info_entry_t entry;
-        ACE_printf("%s {\n", desc->name);
-        for (int i = 0; i < MFS_INFO_MAX_ENTRIES; ++i){
-            MFS_info_desc (desc, i, &entry);
-            if (entry.type != MFS_INFO_NOT_AVAIL){
-                switch (entry.type){
-                    case MFS_INFO_LONG:
-                        ACE_printf("\t%s = %li;\n", entry.name, entry.value.l);
-                        break;
-                    case MFS_INFO_SIZE:
-                        ACE_printf("\t%s = %lu;\n", entry.name, entry.value.z);
-                        break;
-                    case MFS_INFO_PTR:
-                        ACE_printf("\t%s = %p;\n", entry.name, (void*)entry.value.p);
-                        break;
-                    case MFS_INFO_STRING:
-                        ACE_printf("\t%s = %s;\n", entry.name, (char*)entry.value.s);
-                        break;
-                    default:
-                        ACE_printf("\t%s = ?;\n", entry.name);
-                        break;
-                }
-            } else {
-                break;
-            }
-        }
-        ACE_puts("}\n");
-    }
-}
-
-static void
-print_info_name(MFS_descriptor_t * desc)
-{
-    if (desc != NULL)
-    {
-        MFS_info_entry_t entry;
-        for (int i = 0; i < MFS_INFO_MAX_ENTRIES; ++i){
-            MFS_info_desc (desc, i, &entry);
-            if (entry.type != MFS_INFO_NOT_AVAIL){
-                ACE_printf(" \t%s", entry.name);
-            } else {
-                break;
-            }
-        }
-    }
-}
-
-static void
-print_info_value(MFS_descriptor_t * desc)
-{
-    if (desc != NULL)
-    {
-        MFS_info_entry_t entry;
-        for (int i = 0; i < MFS_INFO_MAX_ENTRIES; ++i){
-            MFS_info_desc (desc, i, &entry);
-            if (entry.type != MFS_INFO_NOT_AVAIL){
-                switch (entry.type){
-                    case MFS_INFO_LONG:
-                        ACE_printf(" \t%li", entry.value.l);
-                        break;
-                    case MFS_INFO_SIZE:
-                        ACE_printf(" \t%lu", entry.value.z);
-                        break;
-                    case MFS_INFO_PTR:
-                        ACE_printf(" \t%p", (void*)entry.value.p);
-                        break;
-                    case MFS_INFO_STRING:
-                        ACE_printf(" \t%s", (char*)entry.value.s);
-                        break;
-                    default:
-                        ACE_puts(" \t?");
-                        break;
-                }
-            } else {
-                break;
-            }
-        }
+        entry->type = MFS_INFO_NOT_AVAIL;
     }
 }
 
@@ -233,6 +152,11 @@ MFS_control_desc (MFS_descriptor_t * desc, int number, MFS_ctrl_entry_t *entry)
     if (desc->operations->control != NULL)
     {
         desc->operations->control (desc, number, entry);
+    }
+    else
+    {
+        entry->type = MFS_CTRL_INFO;
+        entry->value.s = "ctrl not avail";
     }
 }
 
@@ -275,46 +199,4 @@ MFS_descriptor_create (MFS_descriptor_t * dir, char *name, enum MFS_desc_type ty
 }
 
 
-extern void
-MFS_descriptor_print (MFS_descriptor_t * desc, ACE_bool_t info, ACE_bool_t head)
-{
-    ACE_SANITY_CHECK(desc);
-    char *type;
-    switch (desc->type)
-    {
-    case MFS_DIRECTORY:
-        type = "dir";
-        break;
-    case MFS_STREAM:
-        type = "stream";
-        break;
-    case MFS_BLOCK:
-        type = "block";
-        break;
-    case MFS_EXEC:
-        type = "exec";
-        break;
-    case MFS_SYS:
-        type = "sys";
-        break;
-    case MFS_USR:
-        type = "usr";
-        break;
-    default:
-        type = "?";
-        break;
-    }
-    if (head){
-        ACE_puts ("type \tname \topen");
-        if (info){
-            print_info_name(desc);
-        }
-        ACE_puts("\n");
-    }
-    ACE_printf ("%s \t%s \t%i", type, desc->name, desc->open_cnt);
-    if (info){
-        print_info_value(desc);
-    }
-    ACE_puts("\n");
-}
 

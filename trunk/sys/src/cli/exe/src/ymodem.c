@@ -14,6 +14,7 @@
 #include <dev/serial.h>
 #include <cli/tty.h>
 #include <cli/exec.h>
+#include <cli/arg.h>
 #include <mfs/stream.h>
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
@@ -27,17 +28,21 @@ write_packet(char *data, int length, MFS_descriptor_t *desc)
     return ACE_fwrite (desc, data, length);
 }
 
-static ACE_err_t
-ymr_exec (char *arg)
+extern ACE_err_t
+CLI_ymodem_r (char *arg)
 {
     ACE_err_t err = ACE_OK;;
-    if (arg == NULL){
+    int argc;
+    char *argv[CLI_MAX_ARG];
+
+    argc = CLI_arg_parse(arg, argv);
+    if (argc < 1){
         return DEF_ERR_ARG;
     }
     
-    MFS_descriptor_t *desc = MFS_open(USO_thread_work_get(USO_current()), arg);
+    MFS_descriptor_t *desc = MFS_open(USO_thread_work_get(USO_current()), argv[0]);
     if (desc == NULL) {
-        return CLI_ERR_NOT_FOUND;
+        return DEF_ERR_NOT_FOUND;
     }
 
     ACE_size_t size = 0;
@@ -61,9 +66,9 @@ ymr_exec (char *arg)
 }
 
 extern void
-NAP_ymodem_install (void)
+CLI_ymodem_install (void)
 {
     MFS_descriptor_t *dir = MFS_resolve("/sys/cli/exe");
-    CLI_exec_init (dir, &ymr, "ym_r", "Ymodem receive", ymr_exec);
+    CLI_exec_init (dir, &ymr, "ym_r", "Ymodem receive", CLI_ymodem_r);
     MFS_close_desc(dir);
 }

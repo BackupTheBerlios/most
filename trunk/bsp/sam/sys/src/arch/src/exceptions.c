@@ -93,10 +93,8 @@ SAM_default_spurious_handler (void)
 
 
 
-static void sys_interrupt (void) ACE_SECTION_ (".unref");
-
 static void
-sys_interrupt (void)
+ACE_SECTION_ (".unref")sys_interrupt (void)
 {
     AT91C_BASE_AIC->AIC_ICCR = (1 << AT91C_ID_SYS);
     if (DEV_at91_PIT_get_status () == 1)

@@ -8,7 +8,7 @@
 #ifndef SCANCODE_H_
 #define SCANCODE_H_
 
-#include <dev/arch/ibmpc/types.h>
+#include <ace/stddef.h>
 
 /**
  * Scancode in einen Keycode uebersetzen

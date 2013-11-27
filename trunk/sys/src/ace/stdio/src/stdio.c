@@ -6,18 +6,17 @@
 #include <ace/string.h>
 #include <ace/stdio.h>
 
-#include <uso/scheduler.h>
 #include <uso/thread.h>
 #include <mfs/stream.h>
+#include <uso/scheduler.h>
 
-/*------------- Implementation ------------------------------------------*/
 
-static USO_buf_pool_t *buf_pool;
+USO_buf_pool_t *ACE_ios_buf_pool;
 
 extern void
 ACE_stdio_init (USO_buf_pool_t *ios_buf_pool)
 {
-    buf_pool = ios_buf_pool;
+    ACE_ios_buf_pool = ios_buf_pool;
 }
 
 
@@ -44,18 +43,44 @@ ACE_fwrite (ACE_FILE * out, char *buf, ACE_size_t len)
 extern int
 ACE_fgetc (ACE_FILE * in)
 {
-    char c;
-    if (ACE_fread (in, &c, sizeof (c)) >= sizeof (c))
+    unsigned char c;
+    if (ACE_fread (in, (char*)&c, sizeof (c)) >= sizeof (c))
     {
-        return (unsigned char)c;
+        return (int)c;
     }
     return ACE_EOF;
 }
 
 extern int
-ACE_fputc (ACE_FILE * out, char c)
+ACE_fputc (ACE_FILE * out, int c)
 {
-    int ret = ACE_fwrite (out, &c, sizeof (c));
+    int ret;
+    unsigned char t;
+    if (c == ACE_EOF) return c;
+    t = (unsigned char)c;
+    ret = ACE_fwrite (out, (char*)&t, sizeof (t));
+    if (ret < 0) return ACE_EOF;
+    return (int)t;
+}
+
+extern char*
+ACE_fgets (ACE_FILE * in, char *string, ACE_size_t len)
+{
+    char *ret = string;
+    if (len == 0 || string == NULL) return NULL;
+    for (int n = 0; n < len - 1; ++n)
+    {
+        char c;
+        if (ACE_fread (in, &c, sizeof (c)) >= sizeof (c))
+        {
+            *string++ = c;
+            if (c == '\0') return ret;
+            if (c == '\n') break;
+        } else {
+            break; /* EOF */
+        }
+    }
+    *string = '\0';
     return ret;
 }
 
@@ -64,22 +89,6 @@ ACE_fputs (ACE_FILE * out, char *string)
 {
     int len = ACE_strlen (string);
     int ret = ACE_fwrite (out, string, len);
-    return (ret < len) ? ACE_EOF : ret;
-}
-
-extern int
-ACE_fprintf (ACE_FILE * out, const char *fmt, ...)
-{
-    int len;
-    int ret;
-    ACE_va_list_t args;
-    char *buf;
-    buf = USO_buf_alloc (buf_pool);
-    ACE_va_start (args, fmt);
-    len = ACE_vsprintf (buf, fmt, args);
-    ACE_va_end (args);
-    ret = ACE_fwrite (out, buf, len);
-    USO_buf_free (buf_pool, buf);
     return (ret < len) ? ACE_EOF : ret;
 }
 
@@ -102,9 +111,15 @@ ACE_getc (void)
 }
 
 extern int
-ACE_putc (char c)
+ACE_putc (int c)
 {
     return ACE_fputc (USO_current ()->out, c);
+}
+
+extern char*
+ACE_gets (char *string, ACE_size_t len)
+{
+    return ACE_fgets (USO_current ()->in, string, len);
 }
 
 extern int
@@ -113,20 +128,3 @@ ACE_puts (char *string)
     return ACE_fputs (USO_current ()->out, string);
 }
 
-extern int
-ACE_printf (const char *fmt, ...)
-{
-    int len;
-    int ret;
-    ACE_va_list_t args;
-    char *buf;
-    buf = USO_buf_alloc (buf_pool);
-    ACE_va_start (args, fmt);
-    len = ACE_vsprintf (buf, fmt, args);
-    ACE_va_end (args);
-    ret = ACE_fwrite (USO_current ()->out, buf, len);
-    USO_buf_free (buf_pool, buf);
-    return (ret < len) ? ACE_EOF : ret;
-}
-
-/*------------------------------------------------------------------------*/

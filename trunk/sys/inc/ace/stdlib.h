@@ -6,8 +6,7 @@
 #ifndef ACE_STDLIB_H
 #define ACE_STDLIB_H
 
-#include "ace/cpu.h"
-#include "ace/stddef.h"
+#include <ace/stddef.h>
 
 #include <uso/heap.h>
 #include <uso/mutex.h>
@@ -43,21 +42,24 @@ extern long ACE_atol (const char *s);
  *  @param c Character representing a hexadecimal digit.
  *  @return Integer value.
  */
-extern int ACE_atox (char c);
+extern int ACE_xtoi (char c);
 
 /** Convert 2 char representing a hexadecimal value to an integer value.
  *  @param s Pointer to string.
  *  @return Integer value.
  */
-extern int ACE_atoxc (char *s);
+extern int ACE_xxtoi (char *s);
+
+extern long ACE_strtol(const char *nptr, char **endptr, int base);
+extern unsigned long ACE_strtoul(const char *ptr, char **endptr, int base);
+
 
 /** Conversion of data from or to network order is the same.*/
 #define ACE_ntohl(n) ACE_htonl(n)
 /** Conversion of data from or to network order is the same.*/
 #define ACE_ntohs(n) ACE_htons(n)
 
-#ifdef ACE_BYTE_ORDER
-#if ACE_BYTE_ORDER == ACE_LITTLE_ENDIAN
+#if defined MOST_ENDIAN_LITTLE
 
 /**
  * If BYTE_ORDER = LITTLE_ENDIAN do a conversion..
@@ -73,7 +75,7 @@ extern ACE_u16_t ACE_htons (ACE_u16_t n);
  */
 extern ACE_u32_t ACE_htonl (ACE_u32_t n);
 
-#elif ACE_BYTE_ORDER == ACE_BIG_ENDIAN
+#elif defined MOST_ENDIAN_BIG
 
 /** If BYTE_ORDER = BIG_ENDIAN no conversion is done. */
 #define ACE_htons(n) (n)
@@ -82,10 +84,7 @@ extern ACE_u32_t ACE_htonl (ACE_u32_t n);
 #define ACE_htonl(n) (n)
 
 #else
-#error "ACE_BYTE_ORDER not valid!"
-#endif
-#else
-#error "ACE_BYTE_ORDER not defined!"
+#error "Byte_order not defined!"
 #endif
 
 /**

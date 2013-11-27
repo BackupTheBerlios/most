@@ -20,7 +20,7 @@ command_info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
     switch (number){
         case 0:
             entry->type = MFS_INFO_STRING;
-            entry->name = "description";
+            entry->name = "Description";
             entry->value.s = command->description;
             break;
         default:

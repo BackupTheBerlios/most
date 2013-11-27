@@ -18,7 +18,8 @@
  * @{
  */
 
-#define USO_STACK USO_HI2LOW
+#define USO_STACK_HI2LOW
+#undef USO_STACK_LOW2HI
 
 typedef volatile unsigned char USO_cpu_status_t;
 typedef unsigned long USO_stack_t;

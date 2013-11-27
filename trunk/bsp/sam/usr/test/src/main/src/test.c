@@ -4,15 +4,11 @@
 #include <dev/cpu.h>
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
-#include <nap/syslog.h>
-#include <nap/ymodem.h>
+#include <cli/exec.h>
 
 #include <arch/digio.h>
 #include <init/net.h>
 #include <init/download.h>
-
-#include <test.h>
-#include <err.h>
 
 #include <tst/ser_test.h>
 #include <tst/thread_test.h>
@@ -22,6 +18,8 @@
 #include <tst/digio_test.h>
 #include <tst/debug_test.h>
 
+#include <test.h>
+#include <err.h>
 #include <flash_test.h>
 #include <lcd_test.h>
 
@@ -39,14 +37,17 @@ SAM_main (void)
 
     MFS_descriptor_t * app = MFS_resolve("/app");
     MFS_descriptor_t *putboot;
-    putboot = MFS_directory_create (app, "putboot");
+    putboot = MFS_directory_create (app, "putboot"); /* is for updating the bootloader */
 
     SAM_download_install (putboot, SAM_BOOT_START, SAM_BOOT_END);
-    NAP_ymodem_install();
+
+    CLI_executes_install();
+    CLI_ymodem_install();
     SAM_net_start(NULL);
 
     MFS_descriptor_t *test;
     test = MFS_directory_create (app, "test");
+    MFS_close_desc(app);
 
     TST_ram_test_install (test);
     TST_ser_test_install (test);
@@ -58,5 +59,4 @@ SAM_main (void)
     TST_digio_test_install (test);
     lcd_test_install (test);
     flash_test_install (test);
-    MFS_close_desc(app);
 }

@@ -19,7 +19,7 @@
 static unsigned long
 get_us (void)
 {
-	return 0;
+    return 0;
 }
 
 /*
@@ -65,7 +65,7 @@ LA2_ticks_debug (void)
 }
 
 extern void
-LA2_ticks_interrupt (void)
+ACE_SECTION_ (".unref") LA2_ticks_interrupt (void)
 {
     ACE_u32_t status = CSP_ST_GET_SR(ST0);
     if ( (status & CHEND0) != CHEND0) return ;

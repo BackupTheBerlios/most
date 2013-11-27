@@ -15,7 +15,6 @@
  * along with MOST.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <ace/cpu.h>
 #include <ace/stddef.h>
 #include <ace/stdio.h>
 #include <ace/string.h>
@@ -30,30 +29,38 @@
 #include <dev/timer.h>
 #include <dev/clock.h>
 #include <dev/cpu.h>
-#include <cli/tty.h>
 #include <mfs/sysfs.h>
 #include <mfs/descriptor.h>
 #include <mfs/stream.h>
 #include <mfs/sysfs.h>
+#include <cli/tty.h>
+#include <cli/switch.h>
+#include <cli/config.h>
 
-#include "arch/cpu.h"
-#include "arch/reset.h"
-#include "arch/pins.h"
-#include "arch/exceptions.h"
-#include "arch/uart.h"
-#include "arch/ticks.h"
-#include "arch/rtc.h"
-#include "arch/digio.h"
-#include "arch/spi.h"
-#include "arch/adc.h"
-#include "arch/pwm.h"
+#include <arch/cpu.h>
+#include <arch/reset.h>
+#include <arch/pins.h>
+#include <arch/exceptions.h>
+#include <arch/uart.h>
+#include <arch/ticks.h>
+#include <arch/rtc.h>
+#include <arch/digio.h>
+#include <arch/spi.h>
+#include <arch/adc.h>
+#include <arch/pwm.h>
 #include <arch/eth.h>
 #include <arch/mmc.h>
-#include "init/main.h"
-#include "init/init.h"
-#include "init/start.h"
-#include "init/config.h"
-#include "init/events.h"
+#include <init/main.h>
+#include <init/init.h>
+#include <init/start.h>
+#include <init/config.h>
+#include <init/events.h>
+
+extern char data_start, data_end, code_end;     /* Defined in *.ld! */
+extern char bss_start, bss_end; /* Defined in *.ld! */
+extern char stack_start;        /* stack_end defined in *.ld!, SAM_TOTAL_STACK_SIZE must match size of stack in *.ld */
+extern char heap_start, heap_end;       /* Defined in *.ld! */
+
 
 #define SAM_LOOPS_PER_MSEC 2000L;
 
@@ -62,33 +69,34 @@
 
 #define GREEN_PULSE (200L)         /* 5 p/s */
 
-extern char data_start, data_end, code_end;     /* Defined in *.ld! */
-extern char bss_start, bss_end; /* Defined in *.ld! */
-extern char stack_start;        /* stack_end defined in *.ld!, SAM_TOTAL_STACK_SIZE must match size of stack in *.ld */
-extern char heap_start, heap_end;       /* Defined in *.ld! */
+/* !!!! you must have more or same amount of ios buffers as CLIs otherwise the system deadlocks !!!!!
+ */
+#define IOS_BUF_COUNT 4
+#define IOS_BUF_SIZE 0x100
+
+static USO_buf_pool_t ios_buf_pool;
+static char ios_bufs[IOS_BUF_COUNT][IOS_BUF_SIZE];
+
+static USO_heap_t heap;
 
 static MFS_descriptor_t *ser0 = NULL;
 static MFS_descriptor_t *ser1 = NULL;
 static MFS_descriptor_t *tty0 = NULL;
 
 static CLI_tty_t tty_0;
+static CLI_tty_t tty_1;
 
-static USO_heap_t heap;
 
 static void
 blink_red (int c)
 {
-    while (1)
-    {
-        DEV_blink_nb (&SAM_red_led, c, RED_PULSE);
-        DEV_cpudelay (DEV_USEC_2_LOOPS(RED_PAUSE));
-    }
+    DEV_blink_nb (&SAM_red_led, c, RED_PULSE);
 }
 
 static void
-blink_green (void)
+blink_green (int c)
 {
-    DEV_blink_nb (&SAM_green_led, 1, GREEN_PULSE);
+    DEV_blink_nb (&SAM_green_led, c, GREEN_PULSE);
 }
 
 static void
@@ -103,8 +111,8 @@ panic_handler (char *msg, char *file, int line)
     DEV_at91_DBGU_print_ascii (file);
     DEV_at91_DBGU_print_ascii ("] !\n");
     for (;;){
-    	blink_red (20);
-        DEV_cpudelay (DEV_USEC_2_LOOPS (5000000L));
+        blink_red (20);
+        DEV_cpudelay (DEV_USEC_2_LOOPS (RED_PAUSE));
     }
 }
 
@@ -114,20 +122,19 @@ abort_handler (char *msg, char *file, int line)
     USO_log_printf (USO_LL_PANIC, "\n ABORT: %s - %s - [%s, %d] !\n",
                  msg, USO_thread_name (), file, line);
     for (;;){
-    	blink_red (10);
-    	USO_sleep (USO_MSEC_2_TICKS (5000));
+        blink_red (10);
+        USO_sleep (USO_MSEC_2_TICKS (RED_PAUSE/1000));
     }
 }
 
-#define IOS_BUF_COUNT 3
-#define IOS_BUF_SIZE 0x100
-static USO_buf_pool_t ios_buf_pool;
-static char ios_bufs[IOS_BUF_COUNT][IOS_BUF_SIZE];
-
 static void
-init (void)
+idle (void)
 {
-    /* System initialization without kernel logging */
+    /* System initialization without kernel logging!
+     * The scheduler is initialized and we are running on the idle
+     * thread so now we are allowed to start threads!
+     * The idle thread is not allowed to block!
+     */
 
     USO_buf_pool_init (&ios_buf_pool, ios_bufs, IOS_BUF_COUNT, IOS_BUF_SIZE);
     ACE_stdio_init (&ios_buf_pool);
@@ -140,8 +147,11 @@ init (void)
     SAM_rtc_init ();
     SAM_ticks_init ();
     SAM_sys_interrupt_init ();
+    SAM_adc_init ();
+    SAM_pwm_init ();
+    SAM_events_init ();
 
-    blink_green ();
+    blink_green (1);
 
     ser0 = MFS_resolve("/sys/dev/serial/ser0");
     if (ser0 == NULL)
@@ -151,10 +161,11 @@ init (void)
 
     /* Initialize kernel logging */
     CLI_tty_init (&tty_0,
-                  ser0, ser0,
+                  ser0,
                   CLI_TTY_INTRANSL_CR_2_NL,
                   CLI_TTY_OUTTRANSL_ADD_CR,
-                  "tty0");
+                  "tty0",
+                  TRUE);
 
     tty0 = MFS_resolve("/sys/cli/tty0");
     if (tty0 == NULL)
@@ -162,49 +173,55 @@ init (void)
         ACE_PANIC ("Open tty0 fail");
     }
 
+    CLI_tty_init (&tty_1,
+                  ser0,
+                  CLI_TTY_INTRANSL_CR_2_NL,
+                  CLI_TTY_OUTTRANSL_ADD_CR,
+                  "tty1",
+                  FALSE);
+
+    CLI_switch_init();
+    CLI_switch_set(0,tty0);
+    CLI_tty_select(tty0);
+
     ser1 = MFS_resolve("/sys/dev/serial/ser1");
     if (ser1 == NULL)
     {
         ACE_PANIC ("Open ser1 fail");
     }
 
+    /* The idle thread is not allowed to block
+     * so it is not allowed to do any printf or log output!!!!
+     */
     USO_log_init (tty0, USO_LL_INFO);
+    blink_green (1);
+
+    /* Interrupts must be enabled before starting the first thread! */
     USO_enable ();
-    blink_green ();
-    USO_log_puts (USO_LL_INFO, "\nInit: Kernel log on ttyS0.\n");
+    blink_green (1);
 
-    /* Kernel logging on */
-
-    unsigned long ticks_count = DEV_get_ticks ();
-    DEV_cpudelay (DEV_USEC_2_LOOPS (100000L));
-    USO_log_printf (USO_LL_INFO, "Loop calib 100ms: %lu.\n", USO_TICKS_2_MSEC(DEV_get_ticks_diff (ticks_count)) );
-
-    SAM_config_init ();
+    CLI_config_init ();
+    SAM_config_install ();
     if (SAM_spi_init () != 0)
     {
-        DEV_digout_set (&SAM_red_led);
-        USO_log_puts (USO_LL_ERROR, "SPI init failed.\n");
+        ACE_PANIC ("Spi init fail");
     }
     else
     {
         if (SAM_mmc_install () == ACE_OK)
         {
-            SAM_config_read ();
+            CLI_config_read ();
+        } else {
+            blink_red(2);
         }
     }
-    SAM_eth_init ();            /* must be called after SAM_config_read() */
-    /* todo emac interrupt init has to be done here otherwise in hangs ??? */
-    SAM_emac_interrupt_init ();
-    SAM_adc_init ();
-    SAM_pwm_init ();
-    SAM_events_init ();
 
     /* ttyS0 is stdio for start thread,
      * all other threads started(derived) from start thread
      * will also use ttyS0 as stdio as long they don't change it.
      */
     SAM_start (tty0);
-    USO_log_puts (USO_LL_INFO, "Idle.\n");
+    /* idle */
 }
 
 extern void
@@ -226,9 +243,6 @@ SAM_init (void)
 
     SAM_pins_init ();
 
-    DEV_at91_RST_configure_mode (AT91C_BASE_RSTC, 0);
-    DEV_at91_RST_set_ext_reset_length (AT91C_BASE_RSTC, 0x8); /* 1s */
-    DEV_at91_RST_set_user_reset_IT_enable (AT91C_BASE_RSTC, 0);
     DEV_at91_RST_set_user_reset_enable (AT91C_BASE_RSTC, 1);
 
     /* Low level debug (polling) initialization */
@@ -240,7 +254,7 @@ SAM_init (void)
     /* Use green, red LED for debugging */
     DEV_loops_per_msec = SAM_LOOPS_PER_MSEC;
     SAM_digio_init ();
-    blink_green ();
+    blink_green (1);
 
     /* Abort handler initialization */
     ACE_stdlib_init (&heap, abort_handler, panic_handler);
@@ -257,8 +271,8 @@ SAM_init (void)
     }
     USO_heap_install (&heap, "heap0");
     SAM_digio_install ();
-    blink_green ();
+    blink_green (1);
 
     /* Go multithreading */
-    USO_transform (init, (USO_stack_t *) &stack_start, SAM_IDLE_STACK_SIZE / sizeof (USO_stack_t));
+    USO_transform (idle, (USO_stack_t *) &stack_start, SAM_IDLE_STACK_SIZE / sizeof (USO_stack_t));
 }

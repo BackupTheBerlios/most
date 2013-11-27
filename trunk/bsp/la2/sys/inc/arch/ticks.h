@@ -36,7 +36,7 @@ extern void LA2_ticks_init (void);
 /**
  *
  */
-extern void LA2_ticks_interrupt (void) ACE_SECTION_ (".unref");
+extern void LA2_ticks_interrupt (void);
 
 /**
  *

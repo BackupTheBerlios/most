@@ -6,12 +6,12 @@
 #include <uso/log.h>
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
-#include <nap/syslog.h>
-#include <nap/ymodem.h>
+#include <cli/exec.h>
 
 #include <arch/digio.h>
 #include <arch/lcd.h>
 #include <init/net.h>
+#include <init/config.h>
 #include <init/download.h>
 
 #include <tst/ram_test.h>
@@ -44,7 +44,9 @@ MDC_main (void)
     MDC_lcd_backlight_on(TRUE);
     DPY_ks0070b_put_string(&lcd, MDC_APPLICATION);
     
-    NAP_ymodem_install();
+    MDC_config_create ();
+    CLI_executes_install();
+    CLI_ymodem_install();
     MDC_net_start(NULL);
 
     MFS_descriptor_t *app = MFS_resolve("/app");
@@ -55,6 +57,7 @@ MDC_main (void)
 
     MFS_descriptor_t *test;
     test = MFS_directory_create (app, "test");
+    MFS_close_desc(app);
 
     TST_ram_test_install (test);
     TST_ser_test_install (test);
@@ -68,6 +71,4 @@ MDC_main (void)
     lcd_bl_test_install (test);
     rand_test_install (test);
     lcd_test_install (test);
-
-    MFS_close_desc(app);
 }

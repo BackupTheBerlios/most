@@ -6,7 +6,7 @@
 #ifndef CLI_TTY_H
 #define CLI_TTY_H
 
-#include <uso/mutex.h>
+#include <uso/semaphore.h>
 #include <ace/stddef.h>
 #include <mfs/vfs.h>
 #include <mfs/stream.h>
@@ -66,15 +66,19 @@ enum CLI_tty_mode
  */
 struct CLI_tty
 {
-    MFS_descriptor_t *in_stream;
-    MFS_descriptor_t *out_stream;
+    MFS_descriptor_t *io_stream;
     enum CLI_tty_mode in_mode;
     enum CLI_tty_mode out_mode;
     enum CLI_tty_in_transl in_transl;
     enum CLI_tty_out_transl out_transl;
     enum CLI_tty_in_transl in_transl_default;
     enum CLI_tty_out_transl out_transl_default;
-    USO_mutex_t lock;
+    USO_semaphore_t r_lock;
+    USO_semaphore_t w_lock;
+    USO_semaphore_t select;
+    ACE_bool_t start;
+    ACE_bool_t log;
+    int t;
 };
 
 /**
@@ -87,23 +91,28 @@ typedef struct CLI_tty CLI_tty_t;
 
 /*-------------- Interface -----------------------------------------------*/
 
+/* this function is called from the tty switch
+ *
+ */
+extern void CLI_tty_select(MFS_descriptor_t *stream);
+
+
 /**
  * Initialize a serial device.
  *
  * @param tty : Pointer to tty
- * @param in_stream :
- * @param out_stream :
+ * @param io_stream :
  * @param tx_mode : newline conversion for transmit.
  * @param rx_mode : newline conversion for receive.
  * @param name : name for tty.
  */
 
 extern void CLI_tty_init (CLI_tty_t * tty,
-                          MFS_descriptor_t *in_stream,
-                          MFS_descriptor_t *out_stream,
+                          MFS_descriptor_t *io_stream,
                           enum CLI_tty_in_transl in_transl,
                           enum CLI_tty_out_transl out_transl,
-                          char *name);
+                          char *name,
+                          ACE_bool_t log);
 
 /*------------------------------------------------------------------------*/
 

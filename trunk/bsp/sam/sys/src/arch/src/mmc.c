@@ -142,13 +142,11 @@ SAM_mmc_install(void)
     if ( (ret = DEV_mmc_spi_init ((DEV_spi_dev_t *) &SAM_mmc)) < ACE_OK)
     {
         DEV_digout_set (&SAM_red_led);
-        USO_log_puts (USO_LL_ERROR, "MMC spi init failed.\n");
         return ret;
     }
-    else if ( (ret = DEV_mmc_init ()) < ACE_OK)
+    if ( (ret = DEV_mmc_init ()) < ACE_OK)
     {
         DEV_digout_set (&SAM_red_led);
-        USO_log_puts (USO_LL_ERROR, "MMC card not found.\n");
         return ret;
     }
     DEV_mmc_install ();

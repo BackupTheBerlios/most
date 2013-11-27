@@ -7,7 +7,7 @@
 
 #include <uso/log.h>
 #include <dev/arch/ibmpc/ports.h>
-#include <dev/arch/ibmpc/types.h>
+#include <ace/stddef.h>
 
 #include <arch/pic.h>
 

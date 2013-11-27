@@ -78,14 +78,14 @@ LA2_uart_init_1 (void)
 }
 
 extern void
-LA2_uart_interrupt_0 (void)
+ACE_SECTION_ (".unref")LA2_uart_interrupt_0 (void)
 {
     CSP_GIC_SET_ICCR(GIC, IBIT_USART0);
     AT91SAM7A2_uart_interrupt (0, &ser0);
 }
 
 extern void
-LA2_uart_interrupt_1 (void)
+ACE_SECTION_ (".unref")LA2_uart_interrupt_1 (void)
 {
     CSP_GIC_SET_ICCR(GIC, IBIT_USART1);
     AT91SAM7A2_uart_interrupt (1, &ser1);

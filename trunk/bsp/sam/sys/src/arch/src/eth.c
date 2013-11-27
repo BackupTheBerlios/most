@@ -16,9 +16,10 @@
 #include <net/netbuf.h>
 #include <net/stats.h>
 
-#include "arch/digio.h"
-#include "arch/eth.h"
-#include "init/config.h"
+#include <arch/exceptions.h>
+#include <arch/digio.h>
+#include <arch/eth.h>
+#include <cli/config.h>
 
 NET_netif_t SAM_lo;
 NET_netif_t SAM_eth0;
@@ -43,7 +44,6 @@ SAM_eth_init (void)
 {
     NET_stats_init ();
     NET_netbuf_init ();
-    NET_eth_init ();
     NET_ip_init ();
     NET_udp_init ();
 
@@ -55,17 +55,19 @@ SAM_eth_init (void)
     NET_loopif_init (&SAM_lo);
 
     NET_netif_init (&SAM_eth0, "net0");
-    SAM_config_ip ();
-    NET_ethif_init (&SAM_eth0, &ethif0, &SAM_config.eth_addr, "eth0");
+    CLI_config_ip ();
+    NET_ethif_init (&SAM_eth0, &ethif0, &CLI_config.eth_addr, "eth0");
+    DEV_at91_emac_init (&ethif0, &mac);
 
     NET_netif_set_default (&SAM_eth0);
-    eth_power_on ();
-    DEV_at91_emac_init (&ethif0, &mac);
 }
 
 extern void
 SAM_eth_start (void)
 {
+    eth_power_on ();
+    SAM_emac_interrupt_init ();
+    NET_eth_init ();
     NET_ethif_start (&ethif0);
 }
 

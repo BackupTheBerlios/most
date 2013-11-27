@@ -26,58 +26,53 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */  
 
-#ifndef _PORTS_H_
-#define _PORTS_H_
+#ifndef IBMPC_PORTS_H_
+#define IBMPC_PORTS_H_
 
-#include <dev/arch/ibmpc/types.h>
+#include <ace/stddef.h>
 
-static inline word inw(word _port)
+static inline ACE_u16_t inw(ACE_u16_t port)
 {
-	word result;
-	__asm__ volatile ("inw %1, %0" : "=a" (result) : "Nd" (_port));
-	return result;
+    ACE_u16_t result;
+    __asm__ volatile ("inw %1, %0" : "=a" (result) : "Nd" (port));
+    return result;
 }
 
-/// in in byte ///
-static inline byte inb(word _port)
+static inline ACE_u8_t inb(ACE_u16_t port)
 {
-	byte result;
-	__asm__ volatile ("inb %1, %0" : "=a" (result) : "Nd" (_port));
-	return result;
+    ACE_u8_t result;
+    __asm__ volatile ("inb %1, %0" : "=a" (result) : "Nd" (port));
+    return result;
 }
 
-/// in in long(32 bit) ///
-static inline dword inl(word _port)
+static inline ACE_u32_t inl(ACE_u16_t port)
 {
-	dword result;
-	__asm__ volatile ("inl %1, %0" : "=a" (result) : "Nd" (_port));
-	return result;
+    ACE_u32_t result;
+    __asm__ volatile ("inl %1, %0" : "=a" (result) : "Nd" (port));
+    return result;
 }
 
 
 
-/// out in dword ///
-static inline void outw(word _port, word _data)
+static inline void outw(ACE_u16_t port, ACE_u16_t data)
 {
-	__asm__ volatile ("outw %0, %1" : : "a" (_data), "Nd" (_port));
+    __asm__ volatile ("outw %0, %1" : : "a" (data), "Nd" (port));
 }
 
-/// out in byte ///
-static inline void outb(word _port, byte _data)
+static inline void outb(ACE_u16_t port, ACE_u8_t data)
 {
-	__asm__ volatile ("outb %0, %1" : : "a" (_data), "Nd" (_port));
+    __asm__ volatile ("outb %0, %1" : : "a" (data), "Nd" (port));
 }
 
-/// out in long(32 bit) ///
-static inline void outl(word _port, dword _data)
+static inline void outl(ACE_u16_t port, ACE_u32_t data)
 {
-	__asm__ volatile ("outl %0, %1" : : "a"(_data), "Nd" (_port));
+    __asm__ volatile ("outl %0, %1" : : "a"(data), "Nd" (port));
 }
 
-/* Ein Byte an einen IO Port senden und f�r langsame Ports kurz verz�gern */
-static inline void outb_wait(word _port, byte _data)
+/* Ein Byte an einen IO Port senden und fuer langsame Ports kurz verzoegern */
+static inline void outb_wait(ACE_u16_t port, ACE_u8_t data)
 {
-	__asm__ volatile ("outb %0, %1\njmp 1f\n1: jmp 1f\n1:" : : "a" (_data), "Nd" (_port));
+    __asm__ volatile ("outb %0, %1\njmp 1f\n1: jmp 1f\n1:" : : "a" (data), "Nd" (port));
 }
 
 #endif

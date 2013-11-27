@@ -1,4 +1,4 @@
-#include <dev/arch/ibmpc/types.h>
+#include <ace/stddef.h>
 #include <ace/string.h>
 #include <arch/mm.h>
 #include <arch/multiboot.h>
@@ -22,7 +22,7 @@ void PC_pmm_init(struct multiboot_info* mb_info)
 {
     struct multiboot_mmap* mmap = mb_info->mbs_mmap_addr;
     struct multiboot_mmap* mmap_end = (void*)
-        ((uintptr_t) mb_info->mbs_mmap_addr + mb_info->mbs_mmap_length);
+        ((ACE_u32_t) mb_info->mbs_mmap_addr + mb_info->mbs_mmap_length);
 
     /* Per Default ist erst einmal alles reserviert */
     memset(bitmap, 0, sizeof(bitmap));
@@ -34,8 +34,8 @@ void PC_pmm_init(struct multiboot_info* mb_info)
     while (mmap < mmap_end) {
         if (mmap->type == 1) {
             /* Der Speicherbereich ist frei, entsprechend markieren */
-            uintptr_t addr = mmap->base;
-            uintptr_t end_addr = addr + mmap->length;
+            ACE_u32_t addr = mmap->base;
+            ACE_u32_t end_addr = addr + mmap->length;
 
             while (addr < end_addr) {
                 PC_pmm_free((void*) addr);
@@ -46,8 +46,8 @@ void PC_pmm_init(struct multiboot_info* mb_info)
     }
 
     /* Den Kernel wieder als belegt kennzeichnen */
-    uintptr_t addr = (uintptr_t) &kernel_start;
-    while (addr < (uintptr_t) &kernel_end) {
+    ACE_u32_t addr = (ACE_u32_t) &kernel_start;
+    while (addr < (ACE_u32_t) &kernel_end) {
         pmm_mark_used((void*) addr);
         addr += 0x1000;
     }
@@ -100,12 +100,12 @@ void* PC_pmm_alloc(void)
 
 static void pmm_mark_used(void* page)
 {
-    uintptr_t index = (uintptr_t) page / 4096;
+    ACE_u32_t index = (ACE_u32_t) page / 4096;
     bitmap[index / 32] &= ~(1 << (index % 32));
 }
 
 void PC_pmm_free(void* page)
 {
-    uintptr_t index = (uintptr_t) page / 4096;
+    ACE_u32_t index = (ACE_u32_t) page / 4096;
     bitmap[index / 32] |= (1 << (index % 32));
 }

@@ -54,39 +54,39 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
         case 0:
             print_ipaddr (buf, netif->ip_addr);
             entry->type = MFS_INFO_STRING;
-            entry->name = "ip addr";
+            entry->name = "Ip_addr";
             entry->value.s = buf;
             break;
         case 1:
             print_ipaddr (buf, netif->netmask);
             entry->type = MFS_INFO_STRING;
-            entry->name = "netmask";
+            entry->name = "Netmask";
             entry->value.s = buf;
             break;
         case 2:
             print_ipaddr (buf, netif->gateway);
             entry->type = MFS_INFO_STRING;
-            entry->name = "gateway";
+            entry->name = "Gateway";
             entry->value.s = buf;
             break;
         case 3:
             entry->type = MFS_INFO_SIZE;
-            entry->name = "tx";
+            entry->name = "Tx";
             entry->value.z = netif->tx;
             break;
         case 4:
             entry->type = MFS_INFO_SIZE;
-            entry->name = "tx_drop";
+            entry->name = "Tx_drop";
             entry->value.z = netif->tx_drop;
             break;
         case 5:
             entry->type = MFS_INFO_SIZE;
-            entry->name = "rx";
+            entry->name = "Rx";
             entry->value.z = netif->rx;
             break;
         case 6:
             entry->type = MFS_INFO_SIZE;
-            entry->name = "rx_drop";
+            entry->name = "Rx_drop";
             entry->value.z = netif->rx_drop;
             break;
         default:

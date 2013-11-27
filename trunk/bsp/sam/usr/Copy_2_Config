@@ -19,5 +19,5 @@ MOST_FILE:=bin
 
 ## [run, debug]
 ## build release version or debug version
-MOST_BUILD:=run
-#MOST_BUILD:=debug
+#MOST_BUILD:=run
+MOST_BUILD:=debug

@@ -1,20 +1,21 @@
-! TCP
-! filesystems (mmc, ram, flash)
+! TCP (http, rlogin)
+! Filesystems (mmc, ram, nor_flash, nand_flash)
 ! CAN, CAN open
 ! USB Device
 
 * put for tftp to upload files
 * send for ymodem
-* synchronization CLI, MFS, NET
+* synchronization CLI, MFS, NET, ...
 * documentation
-* Driver cleanup and improvements, spi, adc, pwm 
+* driver cleanup and improvements, spi, adc, pwm ... 
 * USR -> Grafik GFX library and display improvements
 * cleanup mac drivers
 * i2c(twi) driver
 * porting to other platforms (lpc2294 olimex board, ...)
 * DMA
+* irda
+* try to avoid global data and local static data to be reentrant
 
 ? global interrupt handling in DEV(USO?) (register interrupt handler, wait for interrupt ?)
 ? global exception handling and post mortem dump ? in bsp ?
-? add PC target with process (mmu) support for kernel and a sys interface(uso, vfs) 
-? add PC target with applications and drivers (drivers shall be userspae programms)
+? pc target mmu and syscalls ? 

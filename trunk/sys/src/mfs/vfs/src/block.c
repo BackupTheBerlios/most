@@ -84,7 +84,7 @@ MFS_block_info (MFS_block_t * block, int number, MFS_info_entry_t *entry)
     switch (number){
        case 0:
            entry->type = MFS_INFO_STRING;
-           entry->name = "type";
+           entry->name = "Type";
            if (block->type == MFS_BLOCK_IO){
                entry->value.s = "io";
            } else {
@@ -93,22 +93,22 @@ MFS_block_info (MFS_block_t * block, int number, MFS_info_entry_t *entry)
            break;
        case 1:
            entry->type = MFS_INFO_SIZE;
-           entry->name = "start";
+           entry->name = "Start";
            entry->value.z = block->start;
            break;
        case 2:
            entry->type = MFS_INFO_SIZE;
-           entry->name = "end";
+           entry->name = "End";
            entry->value.z = block->end;
            break;
        case 3:
            entry->type = MFS_INFO_SIZE;
-           entry->name = "size";
+           entry->name = "Size";
            entry->value.z = block->size;
            break;
        case 4:
            entry->type = MFS_INFO_SIZE;
-           entry->name = "total";
+           entry->name = "Total";
            entry->value.z = (block->end - block->start) * block->size;
            break;
        default:

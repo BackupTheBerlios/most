@@ -14,10 +14,11 @@
 #include <net/udp.h>
 #include <net/netbuf.h>
 #include <net/stats.h>
+#include <cli/config.h>
 
-#include "arch/digio.h"
-#include "arch/eth.h"
-#include "init/config.h"
+#include <arch/digio.h>
+#include <arch/interrupts.h>
+#include <arch/eth.h>
 
 #define SMC_IOADDR 0xA00000L
 
@@ -44,7 +45,6 @@ MDC_eth_init (void)
 {
     NET_stats_init ();
     NET_netbuf_init ();
-    NET_eth_init ();
     NET_ip_init ();
     NET_udp_init ();
 
@@ -56,25 +56,20 @@ MDC_eth_init (void)
     NET_loopif_init (&MDC_lo);
 
     NET_netif_init (&MDC_eth0, "eth0");
-    MDC_config_ip ();
-    NET_ethif_init (&MDC_eth0, &ethif0, &MDC_config.eth_addr, "eth0");
+    CLI_config_ip ();  /* configure MDC_eth0 with the values from the config */
+    NET_ethif_init (&MDC_eth0, &ethif0, &CLI_config.eth_addr, "eth0");
+    DEV_smc_init (&ethif0, &smc, SMC_IOADDR);
 
     NET_netif_set_default (&MDC_eth0);
-    eth_reset ();
-    DEV_smc_init (&ethif0, &smc, SMC_IOADDR);
 }
 
 extern void
 MDC_eth_start (void)
 {
+    eth_reset ();
+    NET_eth_init ();
+    MDC_interrupts_set_eth(DEV_smc_interrupt, &smc);
     NET_ethif_start (&ethif0);
 }
 
-extern ACE_INTERRUPT_ void
-MDC_IRQ7_ISR (void) ACE_SECTION_ (".unref");
 
-extern ACE_INTERRUPT_ void
-MDC_IRQ7_ISR (void)
-{
-    DEV_smc_interrupt (&smc);
-}

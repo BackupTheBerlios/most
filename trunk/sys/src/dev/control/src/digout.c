@@ -20,12 +20,12 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
     switch (number){
         case 0:
             entry->type = MFS_INFO_STRING;
-            entry->name = "state";
+            entry->name = "State";
             entry->value.s = out->state == DEV_DIGIO_HIGH ? "1" : "0";
             break;
         case 1:
             entry->type = MFS_INFO_STRING;
-            entry->name = "logic";
+            entry->name = "Logic";
             entry->value.s = out->logig == DEV_DIGIO_POS ? "+" : "-";
             break;
         default:

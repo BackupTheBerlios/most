@@ -6,7 +6,7 @@
 #include <uso/log.h>
 #include <mfs/sysfs.h>
 #include <mfs/directory.h>
-#include <nap/ymodem.h>
+#include <cli/exec.h>
 #include <arch/digio.h>
 #include <init/bsp_commands.h>
 #include <init/download.h>
@@ -23,12 +23,11 @@ MDC_main (void)
         MDC_start_boot ();
     DEV_digout_set (&MDC_red_led);
 
-    NAP_ymodem_install();
+    CLI_ymodem_install();
 
     MFS_descriptor_t *app = MFS_resolve("/app");
     MFS_descriptor_t *putboot;
     putboot = MFS_directory_create (app, "putboot");
     MFS_close_desc(app);
     MDC_download_install (putboot, MDC_BOOT_START, MDC_APPL_END);
-    MFS_close_desc(app);
 }

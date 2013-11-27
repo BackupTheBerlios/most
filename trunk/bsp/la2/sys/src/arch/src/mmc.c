@@ -136,18 +136,16 @@ disc_install(MFS_descriptor_t *dir)
 }
 
 extern ACE_err_t
-LA2_mmc_install(void)
+LA2_mmc_create(void)
 {
     ACE_err_t ret;
     MFS_descriptor_t *dir;
     if ( (ret = DEV_mmc_spi_init ((DEV_spi_dev_t *) &LA2_mmc)) < ACE_OK)
     {
-        USO_log_puts (USO_LL_ERROR, "MMC spi init failed.\n");
         return ret;
     }
-    else if ( (ret = DEV_mmc_init ()) < ACE_OK)
+    if ( (ret = DEV_mmc_init ()) < ACE_OK)
     {
-        USO_log_puts (USO_LL_ERROR, "MMC card not found.\n");
         return ret;
     }
     DEV_mmc_install ();

@@ -1,4 +1,3 @@
-#include <dev/arch/ibmpc/types.h>
 #include <arch/mm.h>
 
 struct vmm_context {
@@ -26,7 +25,7 @@ struct vmm_context* vmm_create_context(void)
     return context;
 }
 
-int vmm_map_page(struct vmm_context* context, uintptr_t virt, uintptr_t phys)
+int vmm_map_page(struct vmm_context* context, ACE_u32_t virt, ACE_u32_t phys)
 {
     ACE_u32_t page_index = virt / 0x1000;
     ACE_u32_t pd_index = page_index / 1024;

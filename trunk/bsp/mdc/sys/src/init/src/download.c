@@ -55,32 +55,32 @@ flash_info (MFS_descriptor_t *desc, int number, MFS_info_entry_t *entry)
             break;
         case 3:
             entry->type = MFS_INFO_PTR;
-            entry->name = "loc";
+            entry->name = "Loc";
             entry->value.p = MDC_FLASH_START;
             break;
         case 4:
             entry->type = MFS_INFO_PTR;
-            entry->name = "start";
+            entry->name = "Start";
             entry->value.p = fl->sector_start;
             break;
         case 5:
             entry->type = MFS_INFO_PTR;
-            entry->name = "end";
+            entry->name = "End";
             entry->value.p = fl->sector_end;
             break;
         case 6:
             entry->type = MFS_INFO_SIZE;
-            entry->name = "max";
+            entry->name = "Max";
             entry->value.z = fl->sector_end - fl->sector_start;
             break;
         case 7:
             entry->type = MFS_INFO_SIZE;
-            entry->name = "block";
+            entry->name = "Block";
             entry->value.z = fl->sector_size;
             break;
         case 8:
             entry->type = MFS_INFO_STRING;
-            entry->name = "state";
+            entry->name = "State";
             entry->value.s = (fl->erased == TRUE) ? "erased" : "written";
             break;
         default:

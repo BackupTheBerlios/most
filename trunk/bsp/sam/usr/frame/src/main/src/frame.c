@@ -3,7 +3,7 @@
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
 #include <mfs/directory.h>
-#include <nap/ymodem.h>
+#include <cli/exec.h>
 
 #include <init/net.h>
 #include <init/download.h>
@@ -21,7 +21,8 @@ SAM_main (void)
     putboot = MFS_directory_create (app, "putboot");
     SAM_download_install (putboot, SAM_BOOT_START, SAM_BOOT_END);
     MFS_close_desc(app);
-    NAP_ymodem_install();
+    CLI_executes_install();
+    CLI_ymodem_install();
     SAM_net_start(NULL);
 
 }

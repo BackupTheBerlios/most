@@ -21,8 +21,9 @@ used rigorous through the project, but it shall be used for changes and extensio
 6.) HEADER FILES
 7.) OBJECT INITIALIZATION
 8.) CODE_FORMATTING
-
-
+9.) VOLATILE and CONST
+10) CASTS
+11) USE THE N FUNCTIONS
 
 
 1.)DESIGN PRINCIPLES
@@ -312,6 +313,69 @@ in trunk/etc/scripts:
 beautify.sh shell script for beautifying *.c and *.h files,
 style.xml shall be imported and used by eclipse!
 
+Syntax highlighting:
+for me its useful (in eclipse) to print global data in red,
+but sadly i can not change the color for local static data.
+
+
+9.) VOLATILE AND CONST
+======================
+
+ A variable should be declared volatile whenever its value could change unexpectedly.
+  In practice, only three types of variables could change:
+
+    Memory-mapped peripheral registers
+    Global variables modified by an interrupt service routine
+    Global variables within a multi-threaded application 
+
+On a problem happen when debug code was running and optimized code breaks
+i get unsure if when an interrupt is doing a USO_signal (&sem),
+if i have to declare the counter variable in the semaphore volatile (and also the variables and pointers in the list)
+so my understanding is that when the intrrupt is using the USO_signal function and not directly changing the semaphore counter
+i do not have to declare the semaphore counter as volatile!!!
+It turned out that the problem was a synchronisation problem(idle thread gets blocked as it did USO_log.
+
+So volatile is necessary when the interrupt is changing a variable directly!
+
+also try to avoid global variables
+
+const
+maybe i take to less care for const.
+
+10) CASTS
+=========
+
+Down casts: die höher wertigen bits werden einfach abgeschnitten.
+
+int -> char:             255 -> -1    (zweier komplement)
+int -> char:             128 -> -128  (zweier komplement)
+int -> unsigned char:    255 -> 255 
+
+Up casts: die Vorzeichenerweiterung ist compilerabhängig!
+
+char to int:              -1 -> -1     (gcc)
+
+
+Für normale Zeichenverarbeitung habe ich den typ char verwendet,
+das ist kein Problem solange eine funktion keine einzelnen zeichen zurückgibt oder als parameter
+bekommt und für diese zeichen den typ int verwendet um auch EOF zu behandeln!
+Also read und write für streams sollten sicher sein, nur für ACE_putc und ACE_getc
+sowie uart interrupts sind gefährdet.
+
+Vielleichts wäre es besser so:
+ACE_err_t getc(char *c);           anstatt: int getc(void);
+ACE_err_t putc(char c);            anstatt: int putc(int c);
+und niemals char und EOF in einem wert zu vereinen?
+
+
+11) USE THE N FUNCTIONS
+=======================
+
+use strncpy instead of strcpy and similar to all other string functions.
+
+but for printf and scanf currently i dont have the n functions :)
+so keep in mind to print short messages to avoid buffer overruns!
 
 END
+ 
  

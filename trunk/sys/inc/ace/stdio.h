@@ -6,12 +6,13 @@
 #ifndef ACE_STDIO_H
 #define ACE_STDIO_H
 
+#include <ace/stdarg.h>
+#include <ace/err.h>
+#include <ace/limits.h>
 #include <uso/list.h>
 #include <uso/buf_pool.h>
 #include <mfs/vfs.h>
 
-#include <ace/stdarg.h>
-#include <ace/err.h>
 
 /** @addtogroup ace
  *
@@ -25,18 +26,27 @@
  * @{
  */
 
-/*---------------- Definitions ------------------------------------------*/
 
 /** End of file. */
-#define ACE_EOF    DEF_ERR_EOF     /* same as default error end of file to avoid conflicts */
+#define ACE_EOF    ACE_INT_MIN    /* the highest negative integer number  */
 
 /** File type. */
 typedef MFS_descriptor_t ACE_FILE;
 
-/*------------------------------------------------------------------------*/
 
-/*---------------- Interface ---------------------------------------------*/
+struct __ACE_arg_scanf__ {
+    void *data;
+    int (*getc)(void*);
+    int (*putc)(void*, int);
+};
 
+int __ACE_vscanf__(struct __ACE_arg_scanf__ *fn, const char *format, ACE_va_list_t  args);
+
+/* todo here a deadlock can occur if threads allocate a buffer and then block
+ * (you maybe have switched the cli) and wait for something which can not happen
+ * because the event to happen is blocked and waiting for free ios_buffers.
+ */
+extern USO_buf_pool_t *ACE_ios_buf_pool;
 /**
  *  The function behaves exactly as printf does, but writing its results to a buffer.
  *  The result is terminated with //0.
@@ -54,12 +64,9 @@ extern int ACE_sprintf (char *buf, const char *fmt, ...);
  */
 extern int ACE_vsprintf (char *buf, const char *fmt, ACE_va_list_t args);
 
+extern int ACE_sscanf(const char *str, const char *format, ...);
 
-
-/**
- * Initalize list and buffers. Must be called befor you can use the stdio functions.
- */
-extern void ACE_stdio_init (USO_buf_pool_t *ios_buf_pool);
+extern int ACE_vsscanf(const char* str, const char* format, ACE_va_list_t args);
 
 /**
  * Read from IO stream.
@@ -96,7 +103,9 @@ extern int ACE_fgetc (ACE_FILE * in);
  * @param out : File descriptor or NULL.
  * @param c : Character.
  */
-extern int ACE_fputc (ACE_FILE * out, char c);
+extern int ACE_fputc (ACE_FILE * out, int c);
+
+extern char *ACE_fgets (ACE_FILE * in, char *string, ACE_size_t len);
 
 /**
  * Put sting to IO stream.
@@ -146,7 +155,9 @@ extern int ACE_getc (void);
  *
  * @param c : Character.
  */
-extern int ACE_putc (char c);
+extern int ACE_putc (int c);
+
+extern char *ACE_gets (char *string, ACE_size_t len);
 
 /**
  * Put string to standard IO.
@@ -155,6 +166,7 @@ extern int ACE_putc (char c);
  */
 extern int ACE_puts (char *string);
 
+
 /**
  * Formated print to standard IO.
  *
@@ -162,7 +174,10 @@ extern int ACE_puts (char *string);
  */
 extern int ACE_printf (const char *fmt, ...);
 
-/*------------------------------------------------------------------------*/
+/**
+ * Initalize list and buffers. Must be called befor you can use the stdio functions.
+ */
+extern void ACE_stdio_init (USO_buf_pool_t *ios_buf_pool);
 
 /** @}
  */

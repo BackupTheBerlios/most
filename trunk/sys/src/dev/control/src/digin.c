@@ -25,27 +25,27 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
     switch (number){
         case 0:
             entry->type = MFS_INFO_STRING;
-            entry->name = "state";
+            entry->name = "State";
             entry->value.s = in->state == DEV_DIGIO_HIGH ? "1" : "0";
             break;
         case 1:
             entry->type = MFS_INFO_STRING;
-            entry->name = "logic";
+            entry->name = "Logic";
             entry->value.s = in->logig == DEV_DIGIO_POS ? "+" : "-";
             break;
         case 2:
             entry->type = MFS_INFO_STRING;
-            entry->name = "edge";
+            entry->name = "Edge";
             entry->value.s = signal;
             break;
         case 3:
             entry->type = MFS_INFO_LONG;
-            entry->name = "deb time";
+            entry->name = "Deb_time";
             entry->value.l = in->debounce_time;
             break;
         case 4:
             entry->type = MFS_INFO_LONG;
-            entry->name = "deb cnt";
+            entry->name = "Deb_cnt";
             entry->value.l = in->debounce_count;
             break;
         default:

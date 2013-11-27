@@ -39,10 +39,10 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
     if (number < DEV_ADC_CHN_MAX) {
         entry->type = MFS_INFO_SIZE;
         if (1 << number & adc->channel_mask){
-            entry->name = "value";
+            entry->name = "Value";
             entry->value.z = DEV_adc_get(adc, number);
         } else {
-            entry->name = "disabled";
+            entry->name = "Disabled";
             entry->value.z = 0;
         }
         

@@ -8,6 +8,7 @@
  */
 
 #include <ace/stddef.h>
+#include <ace/ascii.h>
 #include <ace/stdio.h>
 #include <ace/string.h>
 #include <ace/stdlib.h>
@@ -31,16 +32,16 @@ receive_packet(char *data, int *length)
         return -1;
 
     switch (c) {
-        case ACE_SOH:
+        case ACE_ASCII_SOH:
             packet_size = NAP_YMODEM_PACKET_SIZE;
             break;
-        case ACE_STX:
+        case ACE_ASCII_STX:
             packet_size = NAP_YMODEM_PACKET_1K_SIZE;
             break;
-        case ACE_EOT:
+        case ACE_ASCII_EOT:
             return 0;
-        case ACE_CAN:
-            if ( (c = ACE_getc()) == ACE_CAN) {
+        case ACE_ASCII_CAN:
+            if ( (c = ACE_getc()) == ACE_ASCII_CAN) {
                 *length = -1;
                 return 0;
             }
@@ -87,8 +88,8 @@ filename_packet(char *packet_data, int packet_len, char* name, ACE_size_t *size,
         file = &packet_data[i];
 
         if (files_received >= 1){ /* just support one file */
-            ACE_putc(ACE_CAN);
-            ACE_putc(ACE_CAN);
+            ACE_putc(ACE_ASCII_CAN);
+            ACE_putc(ACE_ASCII_CAN);
             return TRUE;
         }
 
@@ -106,13 +107,13 @@ filename_packet(char *packet_data, int packet_len, char* name, ACE_size_t *size,
         file_size[i++] = '\0';
         *size = ACE_atol(file_size);
 
-        ACE_putc(ACE_ACK);
+        ACE_putc(ACE_ASCII_ACK);
         /* procced with X-Modem filetransfer */
-        ACE_putc(ACE_NAK);
+        ACE_putc(ACE_ASCII_NAK);
         return FALSE;
 
     } else {  /* filename packet is empty; end session */
-        ACE_putc(ACE_ACK);
+        ACE_putc(ACE_ASCII_ACK);
         return TRUE;
     }
 
@@ -140,7 +141,7 @@ NAP_ymodem_receive(char *name, ACE_size_t (*process_packet)(char *data, int leng
     MFS_control_desc (USO_current()->in, CLI_TTY_CTRL_RX_TIMEOUT, &tty_ctrl);
 
     USO_sleep(USO_SEC_2_TICKS(NAP_YMODEM_INITIAL_TIME));
-    ACE_putc(ACE_NAK);
+    ACE_putc(ACE_ASCII_NAK);
 
     for (files_received = 0, session_done = FALSE; session_done == FALSE; ) {
 
@@ -157,12 +158,12 @@ NAP_ymodem_receive(char *name, ACE_size_t (*process_packet)(char *data, int leng
                     errors = 0;
                     switch (packet_length) {
                         case -1:  /* abort */
-                            ACE_putc(ACE_ACK);
+                            ACE_putc(ACE_ASCII_ACK);
                             file_done = TRUE;
                             session_done = TRUE;
                             break;
                         case 0:   /* end of transmission */
-                            ACE_putc(ACE_ACK);
+                            ACE_putc(ACE_ASCII_ACK);
                             file_done = TRUE;
                             ++files_received;
                             break;
@@ -170,7 +171,7 @@ NAP_ymodem_receive(char *name, ACE_size_t (*process_packet)(char *data, int leng
                             /* check sequence number */
                             if ((packet_data[NAP_YMODEM_PACKET_SEQNO_INDEX] & 0xff) !=
                                             (packets_received & 0xff)) {
-                                ACE_putc(ACE_NAK); /* sequence number false */
+                                ACE_putc(ACE_ASCII_NAK); /* sequence number false */
                             } else { /* sequence number ok */
                                 if (packets_received == 0) {
                                     /* filename packet */
@@ -183,8 +184,8 @@ NAP_ymodem_receive(char *name, ACE_size_t (*process_packet)(char *data, int leng
                                     int written_length, packet_data_length;
                                     packet_data_length = packet_length;
                                     if (rx_data_size > file_size){ /** received to much data packets */
-                                        ACE_putc(ACE_CAN);
-                                        ACE_putc(ACE_CAN);
+                                        ACE_putc(ACE_ASCII_CAN);
+                                        ACE_putc(ACE_ASCII_CAN);
                                         file_done = TRUE;
                                         session_done = TRUE;
                                         break;
@@ -196,13 +197,13 @@ NAP_ymodem_receive(char *name, ACE_size_t (*process_packet)(char *data, int leng
                                     }
                                     written_length = process_packet (packet_data + NAP_YMODEM_PACKET_HEADER, packet_data_length, desc);
                                     if (written_length < packet_data_length){ /* process data error */
-                                        ACE_putc(ACE_CAN);
-                                        ACE_putc(ACE_CAN);
+                                        ACE_putc(ACE_ASCII_CAN);
+                                        ACE_putc(ACE_ASCII_CAN);
                                         file_done = TRUE;
                                         session_done = TRUE;
                                         break;
                                     }
-                                    ACE_putc(ACE_ACK); /* data processed */
+                                    ACE_putc(ACE_ASCII_ACK); /* data processed */
                                 }
                                 ++packets_received;
                             } /* sequence number */
@@ -216,13 +217,13 @@ NAP_ymodem_receive(char *name, ACE_size_t (*process_packet)(char *data, int leng
                 default:
                 {
                     if (++errors >= (packets_received == 0 ? NAP_YMODEM_MAX_CRC_TRIES : NAP_YMODEM_MAX_ERRORS)) {
-                        ACE_putc(ACE_CAN);
-                        ACE_putc(ACE_CAN);
+                        ACE_putc(ACE_ASCII_CAN);
+                        ACE_putc(ACE_ASCII_CAN);
                         file_done = TRUE;
                         session_done = TRUE;
                         break;
                     }
-                    ACE_putc(ACE_NAK);
+                    ACE_putc(ACE_ASCII_NAK);
                     break;
                 } /* error case */
             } /* switch packet_receive() code */

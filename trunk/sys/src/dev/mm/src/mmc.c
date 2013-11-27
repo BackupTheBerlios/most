@@ -82,47 +82,47 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
     switch (number){
         case 0:
             entry->type = MFS_INFO_SIZE;
-            entry->name = "mid";
+            entry->name = "Mid";
             entry->value.z = cid.mid;
             break;
         case 1:
             entry->type = MFS_INFO_STRING;
-            entry->name = "name";
+            entry->name = "Name";
             entry->value.s = cid.name;
             break;
         case 2:
             entry->type = MFS_INFO_SIZE;
-            entry->name = "serial_nr";
+            entry->name = "Serial_nr";
             entry->value.z = cid.serial_nr;
             break;
         case 3:
             entry->type = MFS_INFO_LONG;
-            entry->name = "R block len";
+            entry->name = "R_b_len";
             entry->value.l = csd.read_block_len;
             break;
         case 4:
             entry->type = MFS_INFO_LONG;
-            entry->name = "R block part";
+            entry->name = "R_b_part";
             entry->value.l = csd.read_block_partial;
             break;
         case 5:
             entry->type = MFS_INFO_LONG;
-            entry->name = "W block len";
+            entry->name = "W _b_len";
             entry->value.l = csd.write_block_len;
             break;
         case 6:
             entry->type = MFS_INFO_LONG;
-            entry->name = "W block part";
+            entry->name = "W_b_part";
             entry->value.l = csd.write_block_partial;
             break;
         case 7:
             entry->type = MFS_INFO_LONG;
-            entry->name = "Nr. of blocks";
+            entry->name = "Nr_blocks";
             entry->value.l = csd.block_nr;
             break;
         case 8:
             entry->type = MFS_INFO_SIZE;
-            entry->name = "Card capacity";
+            entry->name = "Capacity";
             entry->value.z = (csd.block_nr * csd.read_block_len) / (((unsigned long)1024) * 1024);
             break;
         default:

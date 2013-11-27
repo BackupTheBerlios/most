@@ -40,7 +40,7 @@
 
 
 extern int
-IBMPC_vt100_translate_keycode(ACE_u8_t keycode, char* buffer, ACE_size_t buffer_sz)
+IBMPC_vt100_input(ACE_u8_t keycode, char* buffer, ACE_size_t buffer_sz)
 {
     const char* res = NULL;
 

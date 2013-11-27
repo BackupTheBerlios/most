@@ -8,6 +8,7 @@
 #include <ace/stdio.h>
 #include <uso/thread.h>
 #include <cli/command.h>
+#include <cli/arg.h>
 #include <mfs/descriptor.h>
 #include <mfs/sysfs.h>
 
@@ -15,11 +16,15 @@ extern ACE_err_t
 CLI_cmd_flag (CLI_interpreter_t * cli)
 {
     ACE_err_t err = ACE_OK;
-    if (cli->p.arg[0] != '\0')
+    int argc;
+    char *argv[CLI_MAX_ARG];
+
+    argc = CLI_arg_parse(cli->p.arg, argv);
+    if (argc >= 1)
     {
         int prio = USO_USER;
         int sched = USO_ROUND_ROBIN;
-        switch (cli->p.arg[0])
+        switch (argv[0][0])
         {
         case 'u':
             prio = USO_USER;
@@ -31,9 +36,10 @@ CLI_cmd_flag (CLI_interpreter_t * cli)
             prio = USO_INTERRUPT;
             break;
         default:
+            err = DEF_ERR_ARG;
             break;
         }
-        switch (cli->p.arg[1])
+        switch (argv[0][1])
         {
         case 'f':
             sched = USO_FIFO;
@@ -42,6 +48,7 @@ CLI_cmd_flag (CLI_interpreter_t * cli)
             sched = USO_ROUND_ROBIN;
             break;
         default:
+            err = DEF_ERR_ARG;
             break;
         }
         cli->prio = prio;

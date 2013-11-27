@@ -101,25 +101,6 @@ start_app_exec (char *nix)
     return CLI_ERR_NOT_REACHED;
 }
 
-static CLI_exec_t heap_debug;
-
-static ACE_err_t
-heap_debug_exec (char *arg)
-{
-    ACE_err_t err = ACE_OK;
-    MFS_descriptor_t *desc = MFS_walk_in (MFS_resolve("/sys/uso/heap"), arg, TRUE);
-    if (arg != NULL){
-        if (desc != NULL) {
-            USO_debug_heap_list (desc->represent);
-        } else {
-            err = CLI_ERR_NOT_FOUND;
-        }
-        MFS_close_desc(desc);
-    } else {
-        err = DEF_ERR_ARG;
-    }
-    return err;
-}
 
 static CLI_exec_t ticks_debug;
 
@@ -137,6 +118,5 @@ SAM_bsp_commands_install (MFS_descriptor_t * bsp)
                    exception_stack_check_exec);
     CLI_exec_init (bsp, &start_boot, "start_B", "Start boot", start_boot_exec);
     CLI_exec_init (bsp, &start_app, "start_A", "Start app", start_app_exec);
-    CLI_exec_init (bsp, &heap_debug, "heap_D", "Debug heap list", heap_debug_exec);
     CLI_exec_init (bsp, &ticks_debug, "tick_D", "Debug ticks interrupt", ticks_debug_exec);
 }

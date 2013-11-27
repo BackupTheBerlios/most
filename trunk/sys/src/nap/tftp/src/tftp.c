@@ -2,9 +2,7 @@
 #include <ace/stddef.h>
 #include <ace/stdlib.h>
 #include <ace/string.h>
-#include <uso/scheduler.h>
 #include <net/udp_sock.h>
-#include <cli/exec.h>
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
 #include <mfs/block.h>
@@ -84,6 +82,13 @@ static ACE_bool_t (*callback) (char *data, ACE_size_t length, MFS_descriptor_t *
 
 static NET_udp_socket_t sock;
 
+extern void
+NAP_tftp_init (NET_ip_addr_t * client_address, NET_ip_addr_t * server_address)
+{
+    client_addr = client_address;
+    server_addr = server_address;
+}
+
 extern int
 NAP_tftp_open (void)
 {
@@ -132,7 +137,7 @@ NAP_tftp_get (const char *filename, ACE_bool_t (*f) (char *, ACE_size_t,MFS_desc
     return -1;
 }
 
-void
+extern void
 NAP_tftp_close (void)
 {
     NET_udp_socket_close (&sock);
@@ -313,58 +318,3 @@ check_reply (void)
     NET_netbuf_free (receive_packet);
 }
 
-static CLI_exec_t tftp_get;
-
-static ACE_bool_t
-tftp_write_rx_data (char *data, ACE_size_t len, MFS_descriptor_t *out)
-{
-    ACE_size_t written = ACE_fwrite (out, data, len);
-    if (written != len) return FALSE;
-    return TRUE;
-}
-
-static ACE_err_t
-tftp_get_exec (char *file)
-{
-    ACE_err_t err = ACE_OK;;
-    if (file)
-    {
-        if (NAP_tftp_open () >= 0)
-        {
-            MFS_descriptor_t *out = USO_current()->out;
-            int err = 0;
-            if (out->type == MFS_STREAM) {
-                err = NAP_tftp_get (file, tftp_write_rx_data, out);
-            }
-
-            if (err >= 0)
-            {
-                USO_log_puts (USO_LL_INFO, "Tftp get done\n");
-            }
-            else
-            {
-                USO_log_puts (USO_LL_ERROR, "Tftp get failed\n");
-            }
-            NAP_tftp_close ();
-        }
-        else
-        {
-            USO_log_puts (USO_LL_ERROR, "Tftp open failed\n");
-        }
-    }
-    else
-    {
-        err = DEF_ERR_ARG;
-    }
-    return err;
-}
-
-extern void
-NAP_tftp_install (NET_ip_addr_t * client_address, NET_ip_addr_t * server_address)
-{
-    server_addr = server_address;
-    client_addr = client_address;
-    MFS_descriptor_t *dir = MFS_resolve("/sys/cli/exe");
-    CLI_exec_init (dir, &tftp_get, "tftp_g", "TFTP get", tftp_get_exec);
-    MFS_close_desc(dir);
-}

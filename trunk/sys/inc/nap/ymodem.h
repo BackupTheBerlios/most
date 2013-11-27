@@ -43,6 +43,5 @@
 /* Returns the length of the file received, or 0 on error. */
 extern ACE_size_t NAP_ymodem_receive(char *name, ACE_size_t (*f)(char *data, int length, MFS_descriptor_t *desc), MFS_descriptor_t *desc);
 
-extern void NAP_ymodem_install (void);
 
 #endif /* NAP_YMODEM_H_ */

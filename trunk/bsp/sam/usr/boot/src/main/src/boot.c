@@ -1,7 +1,7 @@
 #include <uso/log.h>
 #include <uso/sleep.h>
 #include <mfs/directory.h>
-#include <nap/ymodem.h>
+#include <cli/exec.h>
 #include <arch/digio.h>
 
 #include <init/bsp_commands.h>
@@ -26,6 +26,6 @@ SAM_main (void)
     boot = MFS_directory_create (app, "boot");
     SAM_download_install (boot, SAM_APPL_START, SAM_APPL_END);
     MFS_close_desc(app);
-    NAP_ymodem_install();
+    CLI_ymodem_install();
     SAM_net_start(NULL);
 }

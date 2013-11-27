@@ -3,7 +3,7 @@
  *
  */
 
-#include "ace/stdio.h"
+#include <ace/stdio.h>
 
 extern int
 ACE_sprintf (char *buf, const char *fmt, ...)

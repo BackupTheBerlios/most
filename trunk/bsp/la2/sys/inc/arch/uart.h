@@ -33,12 +33,12 @@ void LA2_uart_init_1 (void);
 /**
  * Uart 0 interrupt.
  */
-extern void LA2_uart_interrupt_0 (void) ACE_SECTION_ (".unref");
+extern void LA2_uart_interrupt_0 (void);
 
 /**
  * Uart 1 interrupt.
  */
-extern void LA2_uart_interrupt_1 (void) ACE_SECTION_ (".unref");
+extern void LA2_uart_interrupt_1 (void);
 
 
 /** @}

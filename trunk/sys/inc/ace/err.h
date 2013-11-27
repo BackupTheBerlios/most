@@ -37,7 +37,7 @@ typedef int ACE_err_t;
 
 
 /* SYS */
-#define DEF_ERR_NR         (SYS_ERR_NR - 0)    /**< Default error numbers must be the first because of EOF */
+#define DEF_ERR_NR         (SYS_ERR_NR - 0)    /**< Default error numbers must be the first! */
 #define ACE_ERR_NR         (SYS_ERR_NR - 100)  /**< ACE error numbers */
 #define USO_ERR_NR         (SYS_ERR_NR - 200)  /**< USO error numbers */
 #define DEV_ERR_NR         (SYS_ERR_NR - 300)  /**< DEV error numbers */
@@ -63,23 +63,21 @@ typedef int ACE_err_t;
 /* Begin: Error numbers ! ----------------------------- */
 
 /** Default error numbers */
-#define DEF_ERR_OK             (DEF_ERR_NR - 0)   /**< End of File. */
-#define DEF_ERR_EOF            (DEF_ERR_NR - 1)   /**< End of File. */
-#define DEF_ERR_SYS            (DEF_ERR_NR - 2)   /**< System failure. */
-#define DEF_ERR_NULL           (DEF_ERR_NR - 3)   /**< Null pointer. */
-#define DEF_ERR_MEM            (DEF_ERR_NR - 4)   /**< Out of memory. */
-#define DEF_ERR_BUF            (DEF_ERR_NR - 5)   /**< Buffer overflow. */
-#define DEF_ERR_VAL            (DEF_ERR_NR - 6)   /**< Value invalid. */
-#define DEF_ERR_ARG            (DEF_ERR_NR - 7)   /**< Invalid argument. */
-#define DEF_ERR_RANGE          (DEF_ERR_NR - 8)   /**< Out of range. */
-#define DEF_ERR_SIZE           (DEF_ERR_NR - 9)   /**< Invalid size. */
-#define DEF_ERR_TIMEOUT        (DEF_ERR_NR - 10)   /**< Timeout. */
-#define DEF_ERR_BUSY           (DEF_ERR_NR - 11)   /**< Resource is busy. */
-#define DEF_ERR_IN_USE         (DEF_ERR_NR - 12)   /**< Resource is in use. */
-#define DEF_ERR_NOT_FOUND      (DEF_ERR_NR - 13)   /**< Not found. */
-#define DEF_ERR_ROM            (DEF_ERR_NR - 14)    /**< Flash ROM error. */
+#define ACE_OK                 (DEF_ERR_NR - 0)   /**< No error. */
+#define DEF_ERR_SYS            (DEF_ERR_NR - 1)   /**< System failure. */
+#define DEF_ERR_NULL           (DEF_ERR_NR - 2)   /**< Null pointer. */
+#define DEF_ERR_MEM            (DEF_ERR_NR - 3)   /**< Out of memory. */
+#define DEF_ERR_BUF            (DEF_ERR_NR - 4)   /**< Buffer overflow. */
+#define DEF_ERR_VAL            (DEF_ERR_NR - 5)   /**< Value invalid. */
+#define DEF_ERR_ARG            (DEF_ERR_NR - 6)   /**< Invalid argument. */
+#define DEF_ERR_RANGE          (DEF_ERR_NR - 7)   /**< Out of range. */
+#define DEF_ERR_SIZE           (DEF_ERR_NR - 8)   /**< Invalid size. */
+#define DEF_ERR_TIMEOUT        (DEF_ERR_NR - 9)   /**< Timeout. */
+#define DEF_ERR_BUSY           (DEF_ERR_NR - 10)   /**< Resource is busy. */
+#define DEF_ERR_IN_USE         (DEF_ERR_NR - 11)   /**< Resource is in use. */
+#define DEF_ERR_NOT_FOUND      (DEF_ERR_NR - 12)   /**< Not found. */
+#define DEF_ERR_ROM            (DEF_ERR_NR - 13)    /**< Flash ROM error. */
 
-#define ACE_OK                 DEF_ERR_OK    /**< No error, everything OK. */
 
 /** ACE specific error numbers */
 #define ACE_ERR                (ACE_ERR_NR - 1)   /**< Not specified ACE error. */

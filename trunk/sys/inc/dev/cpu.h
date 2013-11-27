@@ -28,7 +28,7 @@ extern unsigned long long DEV_loops_per_msec;
 /**
  * Convert usec to loop circles.
  */
-#define DEV_USEC_2_LOOPS(DEV_usec) ( (DEV_loops_per_msec * (DEV_usec)) / 1000L  )
+#define DEV_USEC_2_LOOPS(DEV_usec) ( ( DEV_loops_per_msec * (DEV_usec)) / 1000L  )
 
 /*-------------- Interface -----------------------------------------------*/
 

@@ -6,58 +6,40 @@
  */
 
 #include <cli/exec.h>
-#include <mfs/sysfs.h>
-#include <nap/bootp.h>
-#include <nap/tftp.h>
+#include <cli/config.h>
 #include <nap/syslog.h>
-#include <init/net.h>
-#include <init/config.h>
 #include <arch/eth.h>
+#include <init/net.h>
 
-static CLI_exec_t bootp;
 
-extern void
-MDC_bootp (void)
-{
-    if (NAP_bootp (&MDC_config.eth_addr) == 0)
-    {
-        NET_netif_set_ipaddr (&MDC_eth0, &NAP_bootp_data.ip_addr);
-        NET_netif_set_gateway (&MDC_eth0, &NAP_bootp_data.gateway);
-        MDC_config.ip_addr = NAP_bootp_data.ip_addr;
-        MDC_config.gateway = NAP_bootp_data.gateway;
-        MDC_config.server = NAP_bootp_data.server;
-    }
-}
-
-static ACE_err_t
-bootp_exec (char *nix)
-{
-    MDC_bootp ();
-    return ACE_OK;
-}
 
 static void
 net_basic_install (void)
 {
-    MFS_descriptor_t *dir = MFS_resolve("/bsp");
-    CLI_exec_init (dir, &bootp, "bootp", "Bootp request", bootp_exec);
-    MFS_close_desc(dir);
-    NAP_tftp_install(&MDC_config.ip_addr, &MDC_config.server);
+    CLI_bootp_install(); /* can be done after CLI_bootp (); */
+    CLI_tftp_install(&CLI_config.ip_addr, &CLI_config.server);
 }
 
 extern void
 MDC_net_start(void (*net_add_install)(void))
 {
-    if (MDC_config.flags & MDC_CONFIG_FLAG_BOOTP){
-        MDC_bootp ();
+    MDC_eth_init ();            /* must be called after ee_config_read() */
+    USO_log_puts (USO_LL_INFO, "Eth start.\n");
+    MDC_eth_start ();
+
+    /* first do bootp to have right configuration */
+    if (CLI_config.flags & CLI_CONFIG_FLAG_BOOTP){
+        CLI_bootp ();
+        CLI_config_ip ();
     }
 
-    if (MDC_config.flags & MDC_CONFIG_FLAG_SYSLOG){
-        NAP_syslog_open (&MDC_config.ip_addr, &MDC_config.server);
+    if (CLI_config.flags & CLI_CONFIG_FLAG_SYSLOG){
+        NAP_syslog_open (&CLI_config.ip_addr, &CLI_config.server);
         NAP_syslog_puts (NAP_SYSLOG_INFO, NAP_SYSLOG_LOCAL0, "Syslog on");
     }
 
     net_basic_install();
     if (net_add_install != NULL) net_add_install();
+
     USO_log_puts (USO_LL_INFO, "Net startup done.\n");
 }

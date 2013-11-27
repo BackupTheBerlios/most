@@ -2,7 +2,6 @@
 #include <uso/log.h>
 
 #include <arch/cpu.h>
-#include <dev/arch/ibmpc/types.h>
 
 #define GDT_FLAG_DATASEG 0x02
 #define GDT_FLAG_CODESEG 0x0a

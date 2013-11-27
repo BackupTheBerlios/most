@@ -41,24 +41,10 @@
 #include <dev/arch/ibmpc/keycode.h>
 
 
-struct modifiers {
-	ACE_bool_t shift;
-	ACE_bool_t control;
-	ACE_bool_t alt;
-	ACE_bool_t altgr;
-};
-
-static struct modifiers modifiers = {
-		.shift = FALSE,
-		.control = FALSE,
-		.alt = FALSE,
-		.altgr = FALSE,
-};
-
-
-extern int IBMPC_translate_keycode(ACE_u8_t keycode, ACE_bool_t down, char *buf, ACE_size_t buf_size)
+extern int IBMPC_translate_keycode(IBMPC_keycode_modifiers_t *modifiers, ACE_u8_t keycode, ACE_bool_t down,
+                                   char *buf, ACE_size_t buf_size)
 {
-    keymap_entry_t* e;
+    keymap_entry_t *e;
     int len = 0;
     int vt100_len;
     char c = 0;
@@ -67,20 +53,20 @@ extern int IBMPC_translate_keycode(ACE_u8_t keycode, ACE_bool_t down, char *buf,
     switch (keycode) {
         case KEYCODE_SHIFT_LEFT:
         case KEYCODE_SHIFT_RIGHT:
-            modifiers.shift = down;
+            modifiers->shift = down;
             return 0;
 
         case KEYCODE_CONTROL_LEFT:
         case KEYCODE_CONTROL_RIGHT:
-            modifiers.control = down;
+            modifiers->control = down;
             return 0;
 
         case KEYCODE_ALT:
-            modifiers.alt = down;
+            modifiers->alt = down;
             return 0;
 
         case KEYCODE_ALTGR:
-            modifiers.altgr = down;
+            modifiers->altgr = down;
             return 0;
     }
 
@@ -90,25 +76,25 @@ extern int IBMPC_translate_keycode(ACE_u8_t keycode, ACE_bool_t down, char *buf,
     }
 
     // Wenn alt gedrueckt wurde, senden wir vorher einfach ein ESC
-    if (modifiers.alt && buf_size > 0) {
+    if (modifiers->alt && buf_size > 0) {
         *buf++ = '\033';
         len++;
         buf_size--;
     }
 
     // Eingabe an vt100-Emulation weiterleiten
-    vt100_len = IBMPC_vt100_translate_keycode(keycode, buf, buf_size);
+    vt100_len = IBMPC_vt100_input(keycode, buf, buf_size);
     if (vt100_len != -1) {
         return len + vt100_len;
     }
 
     // Zeichen auswaehlen
     e = IBMPC_keymap_get(keycode);
-    if (modifiers.shift) {
+    if (modifiers->shift) {
         c = e->shift;
-    } else if (modifiers.altgr) {
+    } else if (modifiers->altgr) {
         c = e->altgr;
-    } else if (modifiers.control) {
+    } else if (modifiers->control) {
         c = e->ctrl;
     } else {
         c = e->normal;
@@ -121,3 +107,11 @@ extern int IBMPC_translate_keycode(ACE_u8_t keycode, ACE_bool_t down, char *buf,
     return len;
 }
 
+extern void
+IBMPC_keycode_init(IBMPC_keycode_modifiers_t *modifiers)
+{
+    modifiers->alt = FALSE;
+    modifiers->altgr = FALSE;
+    modifiers->control = FALSE;
+    modifiers->shift = FALSE;
+}

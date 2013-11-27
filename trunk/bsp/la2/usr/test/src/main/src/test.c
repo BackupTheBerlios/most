@@ -4,7 +4,7 @@
 #include <dev/cpu.h>
 #include <mfs/sysfs.h>
 #include <mfs/directory.h>
-#include <nap/ymodem.h>
+#include <cli/exec.h>
 #include <arch/digio.h>
 #include <init/events.h>
 #include <init/download.h>
@@ -46,7 +46,8 @@ LA2_main (void)
     USO_log_puts (USO_LL_INFO, "App: "LA2_APPLICATION"\n");
     USO_log_printf (USO_LL_INFO, "Sizeof(char, short, int, long) = %d %d %d %d.\n", sizeof (char), sizeof (short), sizeof (int), sizeof (long));
 
-    NAP_ymodem_install();
+    CLI_executes_install();
+    CLI_ymodem_install();
 
     MFS_descriptor_t *app = MFS_resolve("/app");
     MFS_descriptor_t *putboot;
@@ -56,6 +57,10 @@ LA2_main (void)
 
     MFS_descriptor_t *test;
     test = MFS_directory_create (app, "test");
+    LFR_init ();
+    LFR_install(app);
+    MFS_close_desc(app);
+
     TST_ram_test_install (test);
     TST_ser_test_install (test);
     TST_thread_test_install (test);
@@ -65,9 +70,6 @@ LA2_main (void)
     TST_digio_test_init (&LA2_pushbutton ,runninglight);
     TST_digio_test_install (test);
 
-    LFR_init ();
-    LFR_install(app);
-    MFS_close_desc(app);
 
     USO_slot_init (&LA2_event_slots, &test_slot, test_event_ids, TEST_SLOT_SIZE);
 

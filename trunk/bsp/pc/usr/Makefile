@@ -2,9 +2,9 @@ ifneq ($(MOST_BOARD),pc)
 $(warning Wrong board defined!)
 endif
 
-LIB_NAMES_SYS := -l_nap\
-                 -l_cli\
+LIB_NAMES_SYS := -l_cli\
                  -l_mfs\
+                 -l_nap\
                  -l_net\
                  -l_dev\
                  -l_uso\

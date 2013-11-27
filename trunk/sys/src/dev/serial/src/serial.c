@@ -114,7 +114,7 @@ serial_info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
             break;
         case 3:
             entry->type = MFS_INFO_LONG;
-            entry->name = "blocking IO";
+            entry->name = "Blocking";
             entry->value.l = serial->block;
             break;
         default:
@@ -192,7 +192,7 @@ serial_b_read (MFS_stream_t * stream, char *buf, ACE_size_t len)
     ACE_size_t readed;
     USO_lock (&serial->rx_mutex);
     if (serial->rx_timeout_sec > 0){
-    	DEV_timer_start (&serial->rx_timer, USO_SEC_2_TICKS(serial->rx_timeout_sec));
+        DEV_timer_start (&serial->rx_timer, USO_SEC_2_TICKS(serial->rx_timeout_sec));
     }
     while (len && (serial->rx_cancel == FALSE) )
     {
@@ -204,7 +204,7 @@ serial_b_read (MFS_stream_t * stream, char *buf, ACE_size_t len)
         {
             USO_block (&serial->rx_barrier);
             if (serial->rx_cancel == FALSE)
-            	USO_sleep (USO_MSEC_2_TICKS(serial->settings->buffer_fill_time));
+                USO_sleep (USO_MSEC_2_TICKS(serial->settings->buffer_fill_time));
         }
         USO_restore (ps);
     }

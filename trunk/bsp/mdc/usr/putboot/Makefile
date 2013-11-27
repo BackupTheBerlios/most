@@ -9,10 +9,10 @@ LIB_NAMES_USR :=
 ARCH_PATH := ../../sys/src/arch/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)
 INIT_PATH := ../../sys/src/init/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)
 
-OBJ_NAMES_APP := $(ARCH_PATH)/spi.o\
-	             $(ARCH_PATH)/eth.o\
+OBJ_NAMES_APP := $(ARCH_PATH)/interrupts.o\
+	             $(ARCH_PATH)/spi.o\
+	             $(ARCH_PATH)/ee.o\
 	             $(INIT_PATH)/bsp_commands.o\
-	             $(INIT_PATH)/config.o\
 	             $(INIT_PATH)/download.o
 
 ## check max file size : c bytes, k kilobytes, M megabytes

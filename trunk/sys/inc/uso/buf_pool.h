@@ -40,7 +40,7 @@ struct USO_buf_pool
     USO_list_t free_buf;
     USO_semaphore_t sem;
     void *buf;
-    long buf_size;
+    long buf_size;                   /* todo change to ACE_size_t */
     int buf_count;
 };
 

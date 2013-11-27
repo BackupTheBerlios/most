@@ -1,5 +1,4 @@
 #include <dev/arch/ibmpc/ports.h>
-#include <dev/arch/ibmpc/types.h>
 #include <arch/exceptions.h>
 #include <arch/ticks.h>
 #include <arch/kbd.h>

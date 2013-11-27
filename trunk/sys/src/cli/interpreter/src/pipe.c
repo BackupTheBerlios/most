@@ -55,8 +55,8 @@ pipe_info (MFS_descriptor_t *desc, int number, MFS_info_entry_t *entry)
             break;
         case 3:
             entry->type = MFS_INFO_STRING;
-            entry->name = "type";
-            entry->value.s = "pipe io";
+            entry->name = "Type";
+            entry->value.s = "pipe";
             break;
         default:
             entry->type = MFS_INFO_NOT_AVAIL;

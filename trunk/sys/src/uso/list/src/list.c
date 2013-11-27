@@ -3,10 +3,7 @@
  *
  */
 
-#include "uso/list.h"
-// #include "uso/heap.h"
-
-/*------------- Implementation ------------------------------------------*/
+#include <uso/list.h>
 
 extern void
 USO_list_init (USO_list_t * list)
@@ -280,5 +277,3 @@ USO_map (USO_list_t * list, void (*f) (USO_node_t *))
         f (node);
     }
 }
-
-/*------------------------------------------------------------------------*/

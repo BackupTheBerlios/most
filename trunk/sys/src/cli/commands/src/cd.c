@@ -7,6 +7,7 @@
 
 #include <ace/stdio.h>
 #include <cli/command.h>
+#include <cli/arg.h>
 #include <mfs/descriptor.h>
 #include <mfs/sysfs.h>
 
@@ -15,12 +16,22 @@ CLI_cmd_cd (CLI_interpreter_t * cli)
 {
     ACE_err_t err = ACE_OK; 
     MFS_descriptor_t *desc, *curr;
+    int argc;
+    char *argv[CLI_MAX_ARG];
+
+    argc = CLI_arg_parse(cli->p.arg, argv);
     curr = USO_thread_work_get (USO_current());
-    desc = MFS_resolve (cli->p.arg);
-    if (desc != NULL)
-    {
-        USO_thread_work_set (USO_current(), desc);
-        MFS_close_desc(curr);
+    if(argc >= 1) {
+        desc = MFS_resolve (argv[0]);
+        if (desc != NULL)
+        {
+            USO_thread_work_set (USO_current(), desc);
+            MFS_close_desc(curr);
+        }
+        else
+        {
+            err = DEF_ERR_NOT_FOUND;
+        }
     }
     else
     {

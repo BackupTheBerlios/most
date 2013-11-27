@@ -3,10 +3,7 @@
  *
  */
 
-#include "uso/stack.h"
-#include "uso/cpu.h"
-
-#ifdef USO_STACK
+#include <uso/stack.h>
 
 extern void
 USO_stack_init (USO_stack_t stack[], int size)
@@ -23,7 +20,7 @@ USO_stack_check_free (USO_stack_t * end)
     return *end == USO_STACK_INIT_VALUE ? TRUE : FALSE;
 }
 
-#if USO_STACK==USO_HI2LOW
+#if defined USO_STACK_HI2LOW
 
 extern USO_stack_t *
 USO_stack_beginn (USO_stack_t stack[], int size)
@@ -56,7 +53,7 @@ USO_stack_get_free (USO_stack_t * end, int size)
     return free;
 }
 
-#elif USO_STACK==USO_LOW2HI
+#elif defined USO_STACK_LOW2HI
 
 extern USO_stack_t *
 USO_stack_beginn (USO_stack_t stack[], int size)
@@ -89,5 +86,6 @@ USO_stack_get_free (USO_stack_t * end, int size)
     return free;
 }
 
-#endif
+#else
+#error "Kind of stack not defined!"
 #endif

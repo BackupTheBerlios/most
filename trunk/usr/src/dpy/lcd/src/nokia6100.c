@@ -1,4 +1,3 @@
-#include <ace/cpu.h>
 #include <uso/sleep.h>
 #include <dev/spi.h>
 

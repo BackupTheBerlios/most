@@ -3,10 +3,9 @@
  *
  */
 
-#include "ace/stdlib.h"
+#include <ace/stdlib.h>
 
-#ifdef ACE_BYTE_ORDER
-#if ACE_BYTE_ORDER == ACE_LITTLE_ENDIAN
+#if defined MOST_ENDIAN_LITTLE
 
 extern ACE_u16_t
 ACE_htons (ACE_u16_t n)
@@ -14,5 +13,4 @@ ACE_htons (ACE_u16_t n)
     return ((n & 0xff) << 8) | ((n & 0xff00) >> 8);
 }
 
-#endif
 #endif

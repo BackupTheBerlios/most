@@ -48,7 +48,7 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
                         ethif->eth_addr->addr[4],
                         ethif->eth_addr->addr[5]);
             entry->type = MFS_INFO_STRING;
-            entry->name = "addr";
+            entry->name = "Addr";
             entry->value.s = buf;
             break;
         default:

@@ -13,27 +13,57 @@
  */
 
 /** This is the version for MOST.
- *  major.minor.bugfix-(d-counter|t-counter,r)
+ *
+ *  major.minor.bugfix-(d-counter|t-counter|r)
+ *
+ *  for each commit increment a counter or version and make a tag with the version!
+ *
  *  d-counter...marks a developer version: (debugging allowed)
- *  	for each commit the counter must be incremented starting with one,
+ *      for each commit the counter must be incremented starting with one,
  *      best you increment the counter immediate after the commit.
  *  t-counter...marks a testing version: (no debugging)
- *      a testing version is created by branching a developer version replacing d with t
+ *      a testing version is created by replacing d with t and set counter to 1
  *      for each commit the counter must be incremented,
- *      after creating the branch the developer version minor number on the main line must be incremented by 1
- *      and counter on main line reset to 1.
- *      (for compile with debug info, replace t with d)
+ *      this shall be the beginning of the test phase
  *  r...marks a release version: (no debugging)
- *      only testing versions are allowed to became a release version.
- *      only bugfix commits are allowed incrementing the bugfix number.
+ *      this means a freeze and only bugfixes are allowed (we also need the bugfixes on the trunk)
+ *      only testing versions are allowed to become a release version.
  *      each release version must have a CVS label with the version name
- *      for building the release check out the testing version, do not build the release from
+ *      for building the release check out the testing (release) version, do not build the release from
  *      your development directory
+ *      for each bugfix commit increment the bugfix counter
+ *
+ *  d-counter ... after installing the release change back to developer version:
+ *      after creating a release the version minor number must be incremented by 1
+ *      and change r to d-1.
+ *
+ *  r...if you have to make a bugfix on a release which has turned back to development
+ *      you have to branch the release with the latest bugfix
+ *      and increment the bugfix number
+ *      (i will not do that here on berlios)
+ *
+ *
+ *   VERSION V-0-1-0-d-x   pre alpha development
+ *   VERSION V-0-1-0-t-x   pre alpha testing
+ *   VERSION V-0-1-0-r     alpha version
+ *   VERSION V-0-1-x-r     alpha version bugfix
+ *   VERSION V-0-2-0-d-x   pre beta development
+ *   VERSION V-0-2-0-t-x   pre beta testing
+ *   VERSION V-0-2-0-r     beta version
+ *   VERSION V-0-2-x-r     beta version bugfix
+ *   VERSION V-0-3-0-d-x   beta version continued
+               ..........
+ *   VERSION V-1-0-0-r     first release ....
+ *   VERSION V-1-0-x-r     first release bugfix
+ *   VERSION V-1-1-0-d-x   release development
+ *           .................
+ *
+ *
  */
 
 #define ACE_MOST "freoMost"
 
-#define ACE_MOST_VERSION "V-0-1-0-d-8"
+#define ACE_MOST_VERSION "V-0-1-0-d-9"
 
 
 #define ACE_MOST_BUILD   ACE_MOST" "ACE_MOST_VERSION" [ "__DATE__" - "__TIME__" ] "
@@ -41,7 +71,10 @@
 /* CVS Log:
  *
  * $Log: version.h,v $
- * Revision 1.8  2013/11/14 17:46:29  maik42
+ * Revision 1.9  2013/11/27 21:27:41  maik42
+ * V-0-1-0-d-9 see doc/CHANGELOG, bugfixis, up to 4 virtual terminals, vt100 esc subset (very limited)
+ *
+ * Revision 1.8  2013-11-14 17:46:29  maik42
  * V-0-1-0-d-8, see CHANGELOG
  *
  * Revision 1.7  2013-09-07 09:15:13  maik42

@@ -9,7 +9,15 @@
 #define KEYCODE_H_
 
 #include <ace/stddef.h>
-#include <dev/arch/ibmpc/types.h>
+
+struct IBMPC_keycode_modifiers {
+    ACE_bool_t shift;
+    ACE_bool_t control;
+    ACE_bool_t alt;
+    ACE_bool_t altgr;
+};
+
+typedef struct IBMPC_keycode_modifiers IBMPC_keycode_modifiers_t;
 
 /**
  * Es handelt sich dabei aber nur um diese Keycodes, die auf allen Layouts am
@@ -54,7 +62,10 @@
  * @param keycode   Der Keycode
  * @param down      TRUE wenn die Taste gedrueckt wurde, FALSE sonst
  */
-extern int IBMPC_translate_keycode(ACE_u8_t keycode, ACE_bool_t down, char *buf, ACE_size_t buf_size);
+extern int IBMPC_translate_keycode(IBMPC_keycode_modifiers_t *modifiers, ACE_u8_t keycode, ACE_bool_t down,
+                                   char *buf, ACE_size_t buf_size);
+
+extern void IBMPC_keycode_init(IBMPC_keycode_modifiers_t *modifiers);
 
 
 #endif /* KEYCODE_H_ */

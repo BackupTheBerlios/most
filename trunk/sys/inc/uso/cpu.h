@@ -3,8 +3,6 @@
  *
  */
 
-#include <ace/cpu.h>
-
 #ifndef USO_CPU_H
 #define USO_CPU_H
 
@@ -20,25 +18,16 @@
 
 /*------------- Representation ------------------------------------------*/
 
-/** Stack grows from hi addresses to lo addresses */
-#define USO_HI2LOW 21
-
-/** Stack grows from low addresses to hi addresses */
-#define USO_LOW2HI 12
-
-
-#ifdef ACE_CPU
-#if ACE_CPU==ACE_CPU_H8300
-#include <uso/arch/h8300h.h>
-#elif ACE_CPU==ACE_CPU_I386
+#if defined MOST_CPU_I386
 #include <uso/arch/i386.h>
-#elif ACE_CPU==ACE_CPU_ARM
+#elif defined MOST_CPU_ARM
 #include <uso/arch/arm.h>
+#elif defined MOST_CPU_H8300
+#include <uso/arch/h8300h.h>
+#elif defined MOST_CPU_M68K
+#error "CPU not supported!"
 #else
-#error "ACE CPU not supported!"
-#endif
-#else
-#error "ACE CPU not defined!"
+#error "CPU not defined!"
 #endif
 
 /*------------------------------------------------------------------------*/

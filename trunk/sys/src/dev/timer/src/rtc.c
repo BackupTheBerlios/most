@@ -35,7 +35,7 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
             {
                 ACE_time_print (&time, buf);
                 entry->type = MFS_INFO_STRING;
-                entry->name = "time";
+                entry->name = "Time";
                 entry->value.s = buf;
             }
             break;}

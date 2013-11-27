@@ -37,7 +37,6 @@
 #define _KEYMAP_H_
 
 #include <ace/stddef.h>
-#include <dev/arch/ibmpc/types.h>
 
 /**
  * Eintrag in der Keymap

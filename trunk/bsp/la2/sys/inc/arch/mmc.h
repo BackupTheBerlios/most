@@ -8,7 +8,7 @@
 #ifndef LA2_MMC_H_
 #define LA2_MMC_H_
 
-extern ACE_err_t LA2_mmc_install(void);
+extern ACE_err_t LA2_mmc_create(void);
 
 
 #endif /* LA2_MMC_H_ */

@@ -27,7 +27,7 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
     switch (number){
         case 0:
             entry->type = MFS_INFO_STRING;
-            entry->name = "todo";
+            entry->name = "Todo";
             entry->value.s = "todo";
             break;
         default:

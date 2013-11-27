@@ -91,11 +91,6 @@ extern MFS_descriptor_t *MFS_walk_out (MFS_descriptor_t * desc, ACE_bool_t close
 extern void MFS_info_desc (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry);
 
 
-/**
- * @param desc
- */
-extern void MFS_print_info (MFS_descriptor_t * desc);
-
 
 extern void MFS_control_desc (MFS_descriptor_t * desc, int number, MFS_ctrl_entry_t *entry);
 
@@ -130,12 +125,6 @@ extern MFS_descriptor_t * MFS_descriptor_create (
                 enum MFS_desc_type type,
                 struct MFS_descriptor_op *desc_op,
                 MFS_represent_t * represent);
-
-/**
- * Print information about the descriptor.
- * @param desc : Descriptor.
- */
-extern void MFS_descriptor_print (MFS_descriptor_t * desc, ACE_bool_t info, ACE_bool_t head);
 
 
 /** @}

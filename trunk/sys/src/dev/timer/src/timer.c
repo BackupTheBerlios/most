@@ -30,17 +30,17 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
     switch (number){
         case 0:
             entry->type = MFS_INFO_STRING;
-            entry->name = "state";
+            entry->name = "State";
             entry->value.s = timer->state == DEV_TIMER_ON ? "ON" : "OFF";
             break;
         case 1:
             entry->type = MFS_INFO_SIZE;
-            entry->name = "ticks";
+            entry->name = "Ticks";
             entry->value.z = timer->ticks;
             break;
         case 2:
             entry->type = MFS_INFO_STRING;
-            entry->name = "context";
+            entry->name = "Ctx";
             entry->value.s = timer->ctx == DEV_TIMER_INT ? "INT" : "THREAD";
             break;
         default:
@@ -82,7 +82,7 @@ consume (void)
 static ACE_err_t
 timers_run (void *nix)
 {
-    USO_log_puts (USO_LL_INFO, "Timer is running.\n");
+    USO_log_puts (USO_LL_INFO, "Timer running.\n");
     for (;;)
     {
         DEV_timer_t *timer = consume ();

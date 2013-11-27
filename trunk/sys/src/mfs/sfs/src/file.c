@@ -13,6 +13,8 @@
 #include "file.h"
 #include "sfs.h"
 
+#if 0
+
 struct SFS_file
 {
     USO_pipe_t buf;
@@ -45,6 +47,7 @@ file_close (MFS_descriptor_t * desc)
     return ACE_OK;
 }
 
+/*
 static struct MFS_descriptor_op file_desc_op = {
     .open = file_open,
     .close = file_close,
@@ -52,7 +55,7 @@ static struct MFS_descriptor_op file_desc_op = {
     .control = NULL,
     .delete = NULL
 };
-
+*/
 
 static ACE_size_t
 file_read (MFS_stream_t * stream, char *buf, ACE_size_t len)
@@ -87,8 +90,9 @@ static struct MFS_stream_op file_op = {
 
 
 
-
 extern void
 SFS_file_init (void)
 {
 }
+
+#endif

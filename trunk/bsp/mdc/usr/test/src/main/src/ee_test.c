@@ -6,8 +6,7 @@
 #include <ace/stdio.h>
 #include <cli/exec.h>
 
-#include <dev/chips/ee_93C46.h>
-#include <init/config.h>
+#include <arch/ee.h>
 #include <ee_test.h>
 
 static CLI_exec_t eraseEE;

@@ -6,7 +6,9 @@
  */
 
 #include <ace/stdio.h>
+#include <ace/ascii.h>
 #include <cli/exec.h>
+#include <cli/arg.h>
 #include <cli/tty.h>
 #include <uso/scheduler.h>
 #include <uso/log.h>
@@ -38,19 +40,23 @@ CLI_exe_axfr_r (char *arg)
 {
     ACE_err_t err = ACE_OK;
     MFS_ctrl_entry_t tty_ctrl;
+    int argc;
+    char *argv[CLI_MAX_ARG];
+
     tty_ctrl.type = MFS_CTRL_LONG;
-    if (arg != NULL) {
-        switch (arg[0]){
+    argc = CLI_arg_parse(arg, argv);
+    if (argc >= 1){
+        switch (argv[0][0]){
             case 'a':
                 tty_ctrl.value.l = CLI_TTY_INTRANSL_REMOVE_CR;
                 MFS_control_desc (USO_current()->in, CLI_TTY_CTRL_IN_TRANSL, &tty_ctrl);
-                axfr_rx(arg);
+                axfr_rx(argv[0]);
                 MFS_control_desc (USO_current()->in, CLI_TTY_CTRL_DEFAULT_TRANSL, &tty_ctrl);
                 break;
             case 'b':
                 tty_ctrl.value.l = CLI_TTY_MODE_RAW;
                 MFS_control_desc (USO_current()->in, CLI_TTY_CTRL_IN_MODE, &tty_ctrl);
-                axfr_rx(arg);
+                axfr_rx(argv[0]);
                 tty_ctrl.value.l = CLI_TTY_MODE_COOKED;
                 MFS_control_desc (USO_current()->in, CLI_TTY_CTRL_IN_MODE, &tty_ctrl);
                 break;
@@ -87,20 +93,24 @@ CLI_exe_axfr_s (char *arg)
 {
     ACE_err_t err = ACE_OK;
     MFS_ctrl_entry_t tty_ctrl;
+    int argc;
+    char *argv[CLI_MAX_ARG];
+
     tty_ctrl.type = MFS_CTRL_LONG;
-    if (arg != NULL) {
-        switch (arg[0]){
+    argc = CLI_arg_parse(arg, argv);
+    if (argc >= 1){
+        switch (argv[0][0]){
             case 'a':
                 tty_ctrl.value.l = CLI_TTY_OUTTRANSL_ADD_CR;
                 MFS_control_desc (USO_current()->out, CLI_TTY_CTRL_OUT_TRANSL, &tty_ctrl);
-                axfr_tx(arg);
+                axfr_tx(argv[0]);
                 ACE_putc(ACE_CTRL_D);
                 MFS_control_desc (USO_current()->out, CLI_TTY_CTRL_DEFAULT_TRANSL, &tty_ctrl);
                 break;
             case 'b':
                 tty_ctrl.value.l = CLI_TTY_MODE_RAW;
                 MFS_control_desc (USO_current()->out, CLI_TTY_CTRL_OUT_MODE, &tty_ctrl);
-                axfr_tx(arg);
+                axfr_tx(argv[0]);
                 tty_ctrl.value.l = CLI_TTY_MODE_COOKED;
                 MFS_control_desc (USO_current()->out, CLI_TTY_CTRL_OUT_MODE, &tty_ctrl);
                 break;

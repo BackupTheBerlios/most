@@ -4,7 +4,6 @@
  */
 
 #include <ace/stdio.h>
-#include <ace/cpu.h>
 #include <ace/err.h>
 #include <uso/sleep.h>
 #include <mfs/sysfs.h>
@@ -26,17 +25,17 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
     switch (number){
         case 0:
             entry->type = MFS_INFO_LONG;
-            entry->name = "heartbeat Hz";
+            entry->name = "Hz";
             entry->value.l = USO_MSEC_2_TICKS (1000);
             break;
         case 1:
             entry->type = MFS_INFO_SIZE;
-            entry->name = "ticks";
+            entry->name = "Ticks";
             entry->value.z = clock.ticks;
             break;
         case 2:
             entry->type = MFS_INFO_LONG;
-            entry->name = "usec";
+            entry->name = "Usec";
             entry->value.z = DEV_get_usec ();
             break;
         default:

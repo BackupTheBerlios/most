@@ -23,7 +23,8 @@
  * Kind of stack.
  *
  */
-#define USO_STACK USO_HI2LOW
+#define USO_STACK_HI2LOW
+#undef USO_STACK_LOW2HI
 
 /**
  * Type of the CCR(Condition Code Register).

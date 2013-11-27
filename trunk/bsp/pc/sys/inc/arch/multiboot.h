@@ -1,7 +1,7 @@
 #ifndef MULTIBOOT_H
 #define MULTIBOOT_H
 
-#include <dev/arch/ibmpc/types.h>
+#include <ace/stddef.h>
 
 struct multiboot_info {
     ACE_u32_t    mbs_flags;

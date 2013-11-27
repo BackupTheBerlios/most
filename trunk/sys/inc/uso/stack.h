@@ -6,7 +6,7 @@
 #ifndef USO_STACK_H
 #define USO_STACK_H
 
-#include "uso/cpu.h"
+#include <uso/cpu.h>
 
 /** @addtogroup uso
  * @{

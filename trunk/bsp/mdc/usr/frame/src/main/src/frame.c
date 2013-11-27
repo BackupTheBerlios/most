@@ -4,12 +4,12 @@
  */
 
 #include <uso/log.h>
-#include <nap/syslog.h>
-#include <nap/ymodem.h>
+#include <cli/exec.h>
 
+#include <arch/lcd.h>
+#include <init/config.h>
 #include <init/net.h>
 #include <init/download.h>
-#include <arch/lcd.h>
 
 #include <frame.h>
 
@@ -22,12 +22,14 @@ MDC_main (void)
     MDC_lcd_backlight_on(TRUE);
     DPY_ks0070b_put_string(&lcd, MDC_APPLICATION);
 
-    NAP_ymodem_install();
+    MDC_config_create ();
+    CLI_executes_install();
+    CLI_ymodem_install();
     MDC_net_start(NULL);
 
     MFS_descriptor_t *app = MFS_resolve("/app");
-    MFS_descriptor_t *putboot;
+    MFS_descriptor_t *putboot;  /* dir for updating bootloader */
     putboot = MFS_directory_create (app, "putboot");
-    MDC_download_install (putboot, MDC_BOOT_START, MDC_BOOT_END);
     MFS_close_desc(app);
+    MDC_download_install (putboot, MDC_BOOT_START, MDC_BOOT_END);
 }

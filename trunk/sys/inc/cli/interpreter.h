@@ -31,6 +31,7 @@ struct CLI_interpreter
     char line_buffer[CLI_LINE_SIZE];
     int prio;
     int sched;
+    int run_stack_size;
 };
 
 /** CLI_interpreter_t. */
@@ -43,18 +44,8 @@ typedef struct CLI_interpreter CLI_interpreter_t;
  */
 extern void CLI_setup (const char *name);
 
-/**
- *  Initialize command line interpreter.
- *  
- *  @param cli : Pointer to Command line interpreter.
- */
-extern void CLI_interpreter_init (CLI_interpreter_t * cli);
 
-/**
- *  This function is the entry function for the CLI thread.
- *  @param cli : CLI_interpreter_t passed as argument to the entry function.
- */
-extern ACE_err_t CLI_interpreter_run (void *cli);
+extern ACE_err_t CLI_interpreter_start (char *name, MFS_descriptor_t *tty, int stack_size, int run_stack_size);
 
 /** @}
  */

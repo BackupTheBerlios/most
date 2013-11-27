@@ -1,7 +1,6 @@
 #ifndef EXCEPTIONS_H
 #define EXCEPTIONS_H
 
-#include <dev/arch/ibmpc/types.h>
 #include <arch/multiboot.h>
 
 struct cpu_state {

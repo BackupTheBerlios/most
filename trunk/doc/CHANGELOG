@@ -1,4 +1,94 @@
-VERSION = V-0-1-0-d-8 : commit
+VERSION = V-0-1-0-d-9 : commit
+=====================
+
+DATE = 22.11.2013
+AUTOR = maik
+
+STATE = pc - run: MOST_REMOVE_UNUSED == ON is not supported by pc currently!
+                  DEV_cpudelay() does nothing (is Qemu also optimizing code ??? )
+                  the rest seems to work !!!
+
+        la2 - run: the optimized code does not work (errors with flash (efl, pflid))
+                   must compile with no optimization!
+                   MOST_REMOVE_UNUSED == OFF 
+        la2 -debug: boot and test working (write and read config, download(erasing flash and ymodem)) !!!
+                    frame not testet
+
+        mdc - run: all targets compileable, boot and test running (config, download(ymodem)) !!! ,   network not testet
+                   MOST_REMOVE_UNUSED == OFF (ON not testet)
+                   putboot and frame not testet
+
+        sam - run: boot and test running(config, download(ymodem) !!! network not testet
+                   MOST_REMOVE_UNUSED == OFF (ON not testet)
+                   but the board is broken, it is only useable with Jtag, it does not boot automatically :(
+
+
+ADD = use vt100 escape sequences subset
+      tty switch: you can switch between max 4 CLI with F1, F2, F3, F4
+      ACE lib, add scanf functions and strtol functions
+
+
+FIX = Maybe i broke one of my SD cards :( is this possible ? it was an old one.
+      it worked one day and next day it was dead (also on a normal PC)
+      (maybe wrong initialization?  or run code (optimized)
+      which does not work correctly  Urrgs??) 
+      
+      !Oh my God, big bug and how much bugs retain ? !
+      !!!! Idle thread is not allowed to to block so it must not use USO_log_printf
+           and ACE_printf (and similar functions) !!!!
+      ?i think i forgot this and changed synchronization for USO_log and DEV_serial
+      from disabling interrupts to blocking functions (long ago) which also makes sense or
+      maybe initially for USO_log only the non blocking serial io was allowed.
+      As long the output pipe buffer did not get full the problem was not recognized ?
+      !!!! so moved all code with logging to the start thread !!!!
+      
+      MDC:bsp(putboot), the unused network code is removed, i try to do this just with the code structure
+      so that the objects are not used and avoid preprocessor switches (#if something) as i don't like them.
+      The putboot size is reduced about 20 KB
+      
+      ACE_EOF is now biggest negative integer (to avoid conflicts with signed char)
+      removed ace/cpu.h
+      
+      ls uses set_cursor_position instead of tabs !
+      
+      version.h (repository handling definition - will make no branches for testing) haha if i ever get so far
+      
+      dev/arch/ibmpc: cleanup: console is responsible for screen and keyboard
+                      screen code in own file screen.c
+                      vt100 code for screen in own file vt100_output.c
+                      remove keyboard thread (interrupt routine is now a bit longer)
+                      tty has just one io_stream for in- and output
+      dev/arch/ibmpc: console escape sequences (was not processed) and backspace
+      bsp/board/usr: Makefile NAP depends on CLI, changed to CLI depends on NAP!
+      nap: move exec to cli, nap is only for application protocols but not for the execs!
+      bsp: move config and bootp to cli just to have one code source.
+      move descriptor print to cli/list
+      move descriptor print info to cli/info  
+      there is following layer layout:
+
+      ======================
+            APP
+      ----------------------
+            BSP
+      ======================
+            USR
+      ======================
+            CLI
+      ----------------------
+            MFS
+      ----------------------
+            NAP
+      ----------------------
+            NET
+      ----------------------
+            DEV
+      ----------------------
+      ACE ; USO ; SYSFS
+      ======================
+
+
+
+VERSION = V-0-1-0-d-8 : labeled
 =====================
 
 DATE = 14.11.2013
@@ -8,7 +98,8 @@ STATE = all targets and apps are compileable(no fresh checkout)
 
 ADD = descripter control functionality, change descriptor info interface, descriptor_op delete function
 
-FIX = BSP PC: Copy_2_Config template files
+FIX = ace/err.h   sys errors must come first because of EOF!
+      BSP PC: Copy_2_Config template files
       CLI and VFS improvments
       commandline has now a gramma: INSTREAM < COMMAND (ARG) > OUTSTREAM &
       INSTREAM <      :is optional, redirect stdin to INSTREAM

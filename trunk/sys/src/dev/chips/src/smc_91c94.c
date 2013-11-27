@@ -24,7 +24,7 @@
 
 #define SMC_SELECT_BANK(x)  { DEV_out_w( x , smc->io_addr + SMC_BANK_SELECT ); }
 
-#if MOST_CPU == ACE_CPU_H8300
+#if MOST_CPU_H8300
 
 #define ETHIRQ_ON()   H8_BITSET( H8_IER_IRQ7E, H8_IER)
 #define ETHIRQ_OFF()  H8_BITCLEAR( H8_IER_IRQ7E, H8_IER)

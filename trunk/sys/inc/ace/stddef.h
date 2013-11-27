@@ -6,8 +6,6 @@
 #ifndef ACE_STDDEF_H
 #define ACE_STDDEF_H
 
-#include <ace/cpu.h>
-
 /** @addtogroup ace
  *
  * @{
@@ -32,14 +30,14 @@
 #define ACE_ALIGNED_(alignment) __attribute__ ((aligned (alignment)))
 
 /** long call */
-#ifdef ACE_CPU
-#if ACE_CPU == ACE_CPU_ARM
-#define ACE_LONG_CALL_          __attribute__((__long_call__))
-#else
+#if defined MOST_CPU_I386
 #define ACE_LONG_CALL_
-#endif
+#elif defined MOST_CPU_ARM
+#define ACE_LONG_CALL_          __attribute__((__long_call__))
+#elif defined MOST_CPU_H8300
+#define ACE_LONG_CALL_
 #else
-#error "ACE_CPU not defined!"
+#error "CPU not defined!"
 #endif
 
 /** Null pointer. */
@@ -89,69 +87,6 @@ typedef signed long ACE_s32_t;
 typedef unsigned long long ACE_u64_t;
 /** 64 Bit signed. */
 typedef signed long long ACE_s64_t;
-
-
-#define ACE_NUL     ((char)0x00)     /**< null */
-#define ACE_SOH     ((char)0x01)     /**< start of heading */
-#define ACE_STX     ((char)0x02)     /**< start of text */
-#define ACE_ETX     ((char)0x03)     /**< end of text */
-#define ACE_EOT     ((char)0x04)     /**< end of transmission */
-#define ACE_ENQ     ((char)0x05)     /**< enquiry */
-#define ACE_ACK     ((char)0x06)     /**< acknowledge */
-#define ACE_BELL    ((char)0x07)     /**< bell */
-#define ACE_BS      ((char)0x08)     /**< backspace */
-#define ACE_TAB     ((char)0x09)     /**< horizontal tab */
-#define ACE_LF      ((char)0x0A)     /**< line feed, NL new line */
-#define ACE_VT      ((char)0x0B)     /**< vertical tab */
-#define ACE_FF      ((char)0x0C)     /**< form feed, NP new page */
-#define ACE_CR      ((char)0x0D)     /**< carriage return */
-#define ACE_SO      ((char)0x0E)     /**< shift out */
-#define ACE_SI      ((char)0x0F)     /**< shift in */
-#define ACE_DLE     ((char)0x10)     /**< data link escape */
-#define ACE_DC1     ((char)0x11)     /**< device control 1, XON Ausgabe fortsetzen */
-#define ACE_DC2     ((char)0x12)     /**< device control 2, Reset */
-#define ACE_DC3     ((char)0x13)     /**< device control 3, XOFF Ausgabe anhalten */
-#define ACE_DC4     ((char)0x14)     /**< device control 4 */
-#define ACE_NAK     ((char)0x15)     /**< negative acknowledge */
-#define ACE_SYN     ((char)0x16)     /**< synchronous idle */
-#define ACE_ETB     ((char)0x17)     /**< end of trans. block */
-#define ACE_CAN     ((char)0x18)     /**< cancel */
-#define ACE_EM      ((char)0x19)     /**< end of medium */
-#define ACE_SUB     ((char)0x1A)     /**< substitute */
-#define ACE_ESC     ((char)0x1B)     /**< escape */
-#define ACE_FS      ((char)0x1C)     /**< file separator */
-#define ACE_GS      ((char)0x1D)     /**< group separator */
-#define ACE_RS      ((char)0x1E)     /**< record separator */
-#define ACE_US      ((char)0x1F)     /**< unit separator */
-#define ACE_Space   ((char)0x20)     /**< space */
-#define ACE_DEL     ((char)0x7F)     /**< delete */
-
-#define ACE_CTRL_A     ACE_SOH       /**< 0x01 */
-#define ACE_CTRL_B     ACE_STX       /**< 0x02 */
-#define ACE_CTRL_C     ACE_ETX       /**< 0x03 */
-#define ACE_CTRL_D     ACE_EOT       /**< 0x04 */
-#define ACE_CTRL_E     ACE_ENQ       /**< 0x05 */
-#define ACE_CTRL_F     ACE_ACK       /**< 0x06 */
-#define ACE_CTRL_G     ACE_BELL      /**< 0x07 */
-#define ACE_CTRL_H     ACE_BS        /**< 0x08 */
-#define ACE_CTRL_I     ACE_TAB       /**< 0x09 */
-#define ACE_CTRL_J     ACE_LF        /**< 0x0A */
-#define ACE_CTRL_K     ACE_VT        /**< 0x0B */
-#define ACE_CTRL_L     ACE_FF        /**< 0x0C */
-#define ACE_CTRL_M     ACE_CR        /**< 0x0D */
-#define ACE_CTRL_N     ACE_SO        /**< 0x0E */
-#define ACE_CTRL_O     ACE_SI        /**< 0x0F */
-#define ACE_CTRL_P     ACE_DLE       /**< 0x10 */
-#define ACE_CTRL_Q     ACE_DC1       /**< 0x11 */
-#define ACE_CTRL_R     ACE_DC2       /**< 0x12 */
-#define ACE_CTRL_S     ACE_DC3       /**< 0x13 */
-#define ACE_CTRL_T     ACE_DC4       /**< 0x14 */
-#define ACE_CTRL_U     ACE_NAK       /**< 0x15 */
-#define ACE_CTRL_V     ACE_SYN       /**< 0x16 */
-#define ACE_CTRL_W     ACE_ETB       /**< 0x17 */
-#define ACE_CTRL_X     ACE_CAN       /**< 0x18 */
-#define ACE_CTRL_Y     ACE_EM        /**< 0x19 */
-#define ACE_CTRL_Z     ACE_SUB       /**< 0x1A */
 
 
 /** @}

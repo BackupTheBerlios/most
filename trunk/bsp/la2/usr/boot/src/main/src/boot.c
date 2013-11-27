@@ -4,7 +4,7 @@
 #include <dev/cpu.h>
 #include <mfs/sysfs.h>
 #include <mfs/directory.h>
-#include <nap/ymodem.h>
+#include <cli/exec.h>
 #include <arch/digio.h>
 #include <init/events.h>
 #include <init/download.h>
@@ -36,7 +36,7 @@ LA2_main (void)
     }
     DEV_digout_set (&LA2_red_led);
 
-    NAP_ymodem_install();
+    CLI_ymodem_install();
 
     MFS_descriptor_t *app = MFS_resolve("/app");
     MFS_descriptor_t *boot;
@@ -76,5 +76,6 @@ LA2_main (void)
         if (free == FALSE)
             USO_buf_free (&LA2_event_pool, e);
     }
+
 
 }

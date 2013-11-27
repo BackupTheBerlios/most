@@ -33,7 +33,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <ace/stdio.h>
+#include <uso/log.h>
 #include <dev/arch/ibmpc/scancode.h>
 
 
@@ -121,7 +121,8 @@ ACE_u8_t IBMPC_translate_scancode(int set, ACE_u16_t scancode)
     }
 
     if (keycode == 0) {
-        ACE_printf("kbc: Unbekannter Scancode: 0x%x (%d)\n", scancode, set);
+        /* we are running on interrupt , so do not do printf, anyway for debug */
+        USO_log_printf(USO_LL_ERROR, "kbc: Unbekannter Scancode: 0x%x (%d)\n", scancode, set);
     }
 
     return keycode;

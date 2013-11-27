@@ -65,8 +65,8 @@ MOST_BUILD_DEBUG_FLAGS:= -O0 -g
 ## ==========================================
 
 ## select your bsp/<board>/usr/<app>
-MOST_APP:=boot
+#MOST_APP:=boot
 #MOST_APP:=frame
-#MOST_APP:=test
+MOST_APP:=test
 
 -include $(MOST_ROOT)/bsp/$(MOST_BOARD)/usr/$(MOST_APP)/Config

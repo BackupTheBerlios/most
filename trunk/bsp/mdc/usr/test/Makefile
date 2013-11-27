@@ -12,7 +12,9 @@ LIB_NAMES_USR := -l_tst\
 ARCH_PATH := ../../sys/src/arch/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)
 INIT_PATH := ../../sys/src/init/$(MOST_BUILD)/o/$(MOST_TARGET_TYPE)
 
-OBJ_NAMES_APP := $(ARCH_PATH)/spi.o\
+OBJ_NAMES_APP := $(ARCH_PATH)/interrupts.o\
+	             $(ARCH_PATH)/spi.o\
+	             $(ARCH_PATH)/ee.o\
 	             $(ARCH_PATH)/lcd.o\
 	             $(ARCH_PATH)/eth.o\
 	             $(ARCH_PATH)/rand.o\

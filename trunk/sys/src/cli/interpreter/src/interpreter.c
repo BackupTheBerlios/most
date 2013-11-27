@@ -15,14 +15,12 @@
 #include <mfs/sysfs.h>
 #include <cli/err.h>
 #include <cli/interpreter.h>
+#include <cli/read_line.h>
 #include <cli/parser.h>
 #include <cli/command.h>
 #include <cli/exec.h>
 #include <cli/pipe.h>
 #include <cli/debug.h>
-
-#define CLI_RX_POLLING_TIME USO_MSEC_2_TICKS(250)
-#define CLI_RUN_STACK_SIZE    (0x400/sizeof(USO_stack_t))
 
 static const char *hostname;
 
@@ -31,75 +29,29 @@ CLI_setup (const char *name)
 {
     hostname = name;
     CLI_commands_install ();
-    CLI_executes_install ();
+    CLI_executes_init ();
 }
 
-extern void
-CLI_interpreter_init (CLI_interpreter_t * cli)
+static void
+interpreter_init (CLI_interpreter_t * cli, int run_stack_size)
 {
     cli->in_desc = NULL;
     cli->out_desc = NULL;
     cli->prio = USO_USER;
     cli->sched = USO_ROUND_ROBIN;
+    cli->run_stack_size = run_stack_size;
 }
 
 static void
 promt (CLI_interpreter_t * cli)
 {
-    ACE_printf ("%s:%s# ", hostname, USO_thread_work_get(USO_current())->name);
+    ACE_printf ("%s_%s:%s# ", USO_current()->desc->name, hostname, USO_thread_work_get(USO_current())->name);
 }
 
 
 
 static ACE_err_t
-read_line (CLI_interpreter_t * cli, char *buf)
-{
-    ACE_err_t ret;
-    ret = CLI_ERR_LINESIZE;
-    int i;
-    for (i = 0; i < sizeof (cli->line_buffer) - 1; ++i)
-    {
-        int c = ACE_getc ();
-        if (c == ACE_EOF)
-        {
-            USO_sleep (CLI_RX_POLLING_TIME);
-        }
-        else
-        {
-            if (c == '\n')
-            {
-                ret = ACE_OK;
-                break;
-            }
-            else if (c == '\b')
-            {
-                if (i > 0)
-                {
-                    ACE_putc ((unsigned char)c);
-                    ACE_putc ((unsigned char)' ');
-                    ACE_putc ((unsigned char)c);
-                    --i;
-                }
-            }
-            else if (ACE_isprint(c))
-            {
-                *buf++ = c;
-                ACE_putc ((unsigned char)c);
-            }
-            else
-            {
-                ret = CLI_ERR_LINEINVAL;
-                break;
-            }
-        }
-    }
-    *buf = '\0';
-    return ret;
-}
-
-
-extern ACE_err_t
-CLI_interpreter_run (void *arg)
+interpreter_run (void *arg)
 {
     ACE_err_t err;
     CLI_interpreter_t *cli = (CLI_interpreter_t *) arg;
@@ -107,18 +59,20 @@ CLI_interpreter_run (void *arg)
     USO_thread_t *t;
     
     USO_thread_work_set (USO_current(), MFS_get_root());
-    USO_log_puts (USO_LL_INFO, "Cli is running.\n");
+    USO_log_printf (USO_LL_INFO, "%s running.\n", USO_current()->desc->name);
+
+    ACE_putc ('\n');
 
     for (;;)
     {
         t = NULL;
         promt (cli);
 
-        if ( (err = read_line(cli, cli->line_buffer)) != ACE_OK){
-            ACE_printf("\n CLI: read line err: %i\n", err);
-            continue;
-        } else {
+        if ( CLI_read_line(cli->line_buffer, sizeof(cli->line_buffer)) != NULL){
             ACE_putc ('\n');
+        } else {
+            ACE_puts("\nCLI: read line err\n");
+            continue;
         }
 
         DEBUGF (CLI_INT_DEBUG, ("Cli: cmd line = %s.\n", cli->line_buffer));
@@ -179,7 +133,7 @@ CLI_interpreter_run (void *arg)
                 }
                 else
                 {
-                    t = USO_thread_new ((ACE_err_t (*)(void *))exec->f, CLI_RUN_STACK_SIZE, cli->prio, cli->sched, desc->name);
+                    t = USO_thread_new ((ACE_err_t (*)(void *))exec->f, cli->run_stack_size, cli->prio, cli->sched, desc->name);
                     if (t != NULL)
                     {
                         if (cli->out_desc != NULL){
@@ -224,4 +178,42 @@ CLI_interpreter_run (void *arg)
 
     }
     return DEF_ERR_SYS;
+}
+
+static CLI_interpreter_t *
+interpreter_new(int run_stack_size)
+{
+    CLI_interpreter_t *cli = ACE_malloc(sizeof(CLI_interpreter_t));
+    if (cli != NULL){
+        interpreter_init (cli, run_stack_size);
+    }
+    return cli;
+}
+
+extern ACE_err_t
+CLI_interpreter_start (char *name, MFS_descriptor_t *tty, int stack_size, int run_stack_size)
+{
+    ACE_err_t err = ACE_OK;
+    CLI_interpreter_t *cli = interpreter_new(run_stack_size);
+    if (cli != NULL){
+        USO_thread_t *thread = USO_thread_new (interpreter_run,
+                        stack_size,
+                        USO_USER,
+                        USO_ROUND_ROBIN,
+                        name);
+        if (thread){
+            USO_thread_arg_init (thread, cli);
+            if (tty != NULL){
+                USO_thread_in_init (thread, tty);
+                USO_thread_out_init (thread, tty);
+            }
+            USO_start (thread);
+        } else {
+            ACE_free(cli);
+            err = DEF_ERR_MEM;
+        }
+    } else {
+        err = DEF_ERR_MEM;
+    }
+    return err;
 }

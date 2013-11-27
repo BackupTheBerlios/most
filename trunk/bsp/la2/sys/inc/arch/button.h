@@ -10,5 +10,7 @@
 
 extern void LA2_button_start(void);
 
+extern void LA2_button_interrupt(void);
+
 
 #endif /* BUTTON_H_ */
