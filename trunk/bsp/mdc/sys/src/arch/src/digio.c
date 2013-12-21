@@ -16,10 +16,10 @@ DEV_digout_t MDC_green_led;
 DEV_digout_t MDC_lcd_backlight;
 
 DEV_digin_t MDC_button;
-DEV_digin_t MDC_jumper_1;
-DEV_digin_t MDC_jumper_2;
-DEV_digin_t MDC_jumper_3;
-DEV_digin_t MDC_jumper_4;
+DEV_digin_t MDC_yellow;
+DEV_digin_t MDC_blue;
+DEV_digin_t MDC_green;
+DEV_digin_t MDC_red;
 DEV_digin_t MDC_random_signal;
 DEV_digin_t MDC_switch;
 
@@ -144,10 +144,10 @@ MDC_digio_init (void)
 
     DEV_diginputs_init (&MDC_control_in);
     DEV_digin_init (&MDC_control_in, &MDC_button, DEV_DIGIO_NEG, sample_button, 0);
-    DEV_digin_init (&MDC_control_in, &MDC_jumper_1, DEV_DIGIO_NEG, sample_jumper_1, 0);
-    DEV_digin_init (&MDC_control_in, &MDC_jumper_2, DEV_DIGIO_NEG, sample_jumper_2, 0);
-    DEV_digin_init (&MDC_control_in, &MDC_jumper_3, DEV_DIGIO_NEG, sample_jumper_3, 0);
-    DEV_digin_init (&MDC_control_in, &MDC_jumper_4, DEV_DIGIO_NEG, sample_jumper_4, 0);
+    DEV_digin_init (&MDC_control_in, &MDC_yellow, DEV_DIGIO_NEG, sample_jumper_1, 2);
+    DEV_digin_init (&MDC_control_in, &MDC_blue, DEV_DIGIO_NEG, sample_jumper_2, 2);
+    DEV_digin_init (&MDC_control_in, &MDC_green, DEV_DIGIO_NEG, sample_jumper_3, 2);
+    DEV_digin_init (&MDC_control_in, &MDC_red, DEV_DIGIO_NEG, sample_jumper_4, 2);
     DEV_digin_init (&MDC_control_in, &MDC_random_signal, DEV_DIGIO_POS, sample_random_signal, 0);
     DEV_digin_init (&MDC_control_in, &MDC_switch, DEV_DIGIO_NEG, sample_switch, 0);
 }
@@ -162,10 +162,10 @@ MDC_digio_install (void)
     DEV_digout_install (&MDC_lcd_backlight, "lcd_bl");
 
     DEV_digin_install (&MDC_button, "button");
-    DEV_digin_install (&MDC_jumper_1, "jump1");
-    DEV_digin_install (&MDC_jumper_2, "jump2");
-    DEV_digin_install (&MDC_jumper_3, "jump3");
-    DEV_digin_install (&MDC_jumper_4, "jump4");
+    DEV_digin_install (&MDC_yellow, "yellow");
+    DEV_digin_install (&MDC_blue, "blue");
+    DEV_digin_install (&MDC_green, "green");
+    DEV_digin_install (&MDC_red, "red");
     DEV_digin_install (&MDC_random_signal, "rand");
     DEV_digin_install (&MDC_switch, "switch");
 }

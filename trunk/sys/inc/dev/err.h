@@ -20,6 +20,9 @@
  */
 
 #define DEV_ERR                     (DEV_ERR_NR - 1)    /**< Not specified DEV error. */
+#define DEV_ERR_ADDR                (DEV_ERR_NR - 16)   /**< invalid address */
+#define DEV_ERR_LEN                 (DEV_ERR_NR - 16)   /**< invalid length */
+#define DEV_ERR_TIMEOUT             (DEV_ERR_NR - 16)   /**< timeout */
 #define DEV_ERR_MMC_BLOCK_SET       (DEV_ERR_NR - 10)   /**< MMC */
 #define DEV_ERR_MMC_RESPONSE        (DEV_ERR_NR - 11)   /**< MMC response error*/
 #define DEV_ERR_MMC_DATA_TOKEN      (DEV_ERR_NR - 12)   /**< MMC data token not received */

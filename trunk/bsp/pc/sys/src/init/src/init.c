@@ -92,7 +92,7 @@ panic_handler (char *msg, char *file, int line)
 }
 
 static void
-idle (void)
+idle_run (void)
 {
     /* System initialization without kernel logging!
      * The scheduler is initialized and we are running on the idle
@@ -228,6 +228,6 @@ void PC_init(struct multiboot_info *mb_info)
     PC_dbg_puts("transform\n");
 
     /* Go multithreading */
-    USO_transform (idle, &init_stack_start, PC_IDLE_STACK_SIZE);
+    USO_transform (idle_run, &init_stack_start, PC_IDLE_STACK_SIZE);
 
 }

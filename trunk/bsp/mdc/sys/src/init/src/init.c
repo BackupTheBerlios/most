@@ -32,6 +32,7 @@
 #include <arch/ee.h>
 #include <init/init.h>
 #include <init/start.h>
+#include <init/events.h>
 
 extern char data_start, data_end, code_end;     /* Defined in *.ld! */
 extern char bss_start, bss_end; /* Defined in *.ld! */
@@ -107,7 +108,7 @@ abort_handler (char *msg, char *file, int line)
 }
 
 static void
-idle (void)
+idle_run (void)
 {
     /* System initialization without kernel logging!
      * The scheduler is initialized and we are running on the idle
@@ -124,6 +125,7 @@ idle (void)
     MDC_sci_init_1 ();
     MDC_ticks_init ();
     MDC_interrupts_init();
+    MDC_events_init ();
 
     blink_green (1);
 
@@ -226,5 +228,5 @@ MDC_init (void)
     blink_green (1);
 
     /* Go multithreading */
-    USO_transform (idle, (USO_stack_t *) & stack_start, IDLE_STACK_SIZE / sizeof (USO_stack_t));
+    USO_transform (idle_run, (USO_stack_t *) & stack_start, IDLE_STACK_SIZE / sizeof (USO_stack_t));
 }

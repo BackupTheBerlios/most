@@ -61,17 +61,27 @@
  *
  */
 
-#define ACE_MOST "freoMost"
+#define ACE_MOST "freoMOST"
 
-#define ACE_MOST_VERSION "V-0-1-0-d-9"
+#define ACE_MOST_VERSION "V-0-1-0-d-10"
 
+#if defined MOST_BUILD_DEBUG
+#define ACE_MOST_BUILD    "debug"
+#elif defined MOST_BUILD_RUN
+#define ACE_MOST_BUILD    "run"
+#else
+#error "BUILD not defined!"
+#endif
 
-#define ACE_MOST_BUILD   ACE_MOST" "ACE_MOST_VERSION" [ "__DATE__" - "__TIME__" ] "
+#define ACE_MOST_VERSION_STRING   ACE_MOST" "ACE_MOST_VERSION" [ "__DATE__" - "__TIME__" ] build: "ACE_MOST_BUILD
 
 /* CVS Log:
  *
  * $Log: version.h,v $
- * Revision 1.9  2013/11/27 21:27:41  maik42
+ * Revision 1.10  2013/12/21 11:10:39  maik42
+ * V-0-1-0-d-10 see CHANGELOG, just sync development
+ *
+ * Revision 1.9  2013-11-27 21:27:41  maik42
  * V-0-1-0-d-9 see doc/CHANGELOG, bugfixis, up to 4 virtual terminals, vt100 esc subset (very limited)
  *
  * Revision 1.8  2013-11-14 17:46:29  maik42

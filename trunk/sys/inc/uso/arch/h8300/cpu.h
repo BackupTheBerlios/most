@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef USO_H8300H_H
-#define USO_H8300H_H
+#ifndef USO_CPU_H8300_H
+#define USO_CPU_H8300_H
 
 #include <ace/stddef.h>
 
@@ -38,6 +38,7 @@ struct USO_cpu
     USO_cpu_register_t pc;
     USO_cpu_status_t ps;
 };
+
 
 /** @}
  */

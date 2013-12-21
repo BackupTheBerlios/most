@@ -6,23 +6,23 @@
 #include <ace/string.h>
 #include <ace/stddef.h>
 #include <uso/semaphore.h>
+#include <uso/io_ports.h>
 #include <uso/thread.h>
 #include <uso/log.h>
 #include <uso/sleep.h>
 #include <uso/heap.h>
 #include <dev/cpu.h>
-#include <dev/arch/h83003/ports.h>
 #include <dev/arch/h83003/bitops.h>
 #include <dev/arch/h83003/H83003_REG.h>
 #include <dev/arch/h83003/H83003.h>
 
-#include "dev/chips/smc_91c94.h"
-#include "dev/chips/smc_91c94_def.h"
-#include "dev/debug.h"
-#include "net/netif.h"
-#include "net/ethif.h"
+#include <dev/chips/smc_91c94.h>
+#include <dev/chips/smc_91c94_def.h>
+#include <dev/debug.h>
+#include <net/netif.h>
+#include <net/ethif.h>
 
-#define SMC_SELECT_BANK(x)  { DEV_out_w( x , smc->io_addr + SMC_BANK_SELECT ); }
+#define SMC_SELECT_BANK(x)  { USO_out_w(smc->io_addr + SMC_BANK_SELECT, x); }
 
 #if MOST_CPU_H8300
 
@@ -47,9 +47,9 @@ smc_enable_int (unsigned char x, DEV_smc91c94_t * smc)
     unsigned char mask;
     ETHIRQ_OFF ();
     SMC_SELECT_BANK (2);
-    mask = DEV_IN_B (smc->io_addr + SMC_MSK);
+    mask = USO_in_b (smc->io_addr + SMC_MSK);
     mask |= x;
-    DEV_OUT_B (mask, smc->io_addr + SMC_MSK);
+    USO_out_b (smc->io_addr + SMC_MSK, mask);
     ETHIRQ_ON ();
 }
 
@@ -62,9 +62,9 @@ smc_disable_int (unsigned char x, DEV_smc91c94_t * smc)
     unsigned char mask;
     ETHIRQ_OFF ();
     SMC_SELECT_BANK (2);
-    mask = DEV_IN_B (smc->io_addr + SMC_MSK);
+    mask = USO_in_b (smc->io_addr + SMC_MSK);
     mask &= ~x;
-    DEV_OUT_B (mask, smc->io_addr + SMC_MSK);
+    USO_out_b (smc->io_addr + SMC_MSK, mask);
     ETHIRQ_ON ();
 }
 
@@ -72,7 +72,7 @@ static void
 smc_soft_reset (DEV_smc91c94_t * smc)
 {
     SMC_SELECT_BANK (0);
-    DEV_out_w (SMC_RCR_SOFT_RST, smc->io_addr + SMC_RCR);
+    USO_out_w (smc->io_addr + SMC_RCR, SMC_RCR_SOFT_RST);
     DEV_cpudelay (DEV_USEC_2_LOOPS (100));
 }
 
@@ -84,7 +84,7 @@ smc_check_ios (DEV_smc91c94_t * smc)
 {
     unsigned char smc_io;
     SMC_SELECT_BANK (3);
-    smc_io = (DEV_in_w (smc->io_addr + SMC_MGMT) & 0x0700) >> 8;
+    smc_io = (USO_in_w (smc->io_addr + SMC_MGMT) & 0x0700) >> 8;
     DEBUGF (DEV_SMC_DEBUG, ("Smc: io %02x.\n", smc_io));
 }
 
@@ -98,7 +98,7 @@ smc_set_mac_addr (DEV_smc91c94_t * smc)
     SMC_SELECT_BANK (1);
     for (i = 0; i < NET_ETH_ADDR_SIZE; ++i)
     {
-        DEV_OUT_B (smc->mac_addr[i], smc->io_addr + SMC_IAR0 + i);
+        USO_out_b (smc->io_addr + SMC_IAR0 + i, smc->mac_addr[i]);
     }
 }
 
@@ -117,26 +117,26 @@ smc_start (DEV_smc91c94_t * smc)
      * values 
      */
     SMC_SELECT_BANK (0);
-    DEV_out_w (SMC_RCR_CLEAR, smc->io_addr + SMC_RCR);
-    DEV_out_w (SMC_TCR_CLEAR, smc->io_addr + SMC_TCR);
+    USO_out_w (smc->io_addr + SMC_RCR, SMC_RCR_CLEAR);
+    USO_out_w (smc->io_addr + SMC_TCR, SMC_TCR_CLEAR);
 
     /*
      * set the control register to automatically release successfully
      * transmitted packets, to make the best use out of our limited memory 
      */
     SMC_SELECT_BANK (1);
-    DEV_out_w (SMC_CTR_NORMAL, smc->io_addr + SMC_CTR);
+    USO_out_w (smc->io_addr + SMC_CTR, SMC_CTR_NORMAL);
 
     /*
      * select 10BaseT port !!! 
      */
-    DEV_out_w ((DEV_in_w (smc->io_addr + SMC_CR)) & ~SMC_CR_AUI_SELECT, smc->io_addr + SMC_CR);
+    USO_out_w (smc->io_addr + SMC_CR, (USO_in_w (smc->io_addr + SMC_CR)) & ~SMC_CR_AUI_SELECT);
 
     /*
      * Reset the MMU 
      */
     SMC_SELECT_BANK (2);
-    DEV_out_w (SMC_MMUCR_RESET, smc->io_addr + SMC_MMUCR);
+    USO_out_w (smc->io_addr + SMC_MMUCR, SMC_MMUCR_RESET);
 
     /*
      * Note: It doesn't seem that waiting for the MMU busy is needed here,
@@ -144,20 +144,20 @@ smc_start (DEV_smc91c94_t * smc)
      * issuing another MMU command right after this 
      */
 
-    DEV_OUT_B (0, smc->io_addr + SMC_MSK);
+    USO_out_b (smc->io_addr + SMC_MSK, 0);
 
     SMC_SELECT_BANK (0);
     /*
      * see the header file for options in TCR/RCR NORMAL 
      */
-    DEV_out_w (SMC_TCR_NORMAL, smc->io_addr + SMC_TCR);
-    DEV_out_w (SMC_RCR_NORMAL, smc->io_addr + SMC_RCR);
+    USO_out_w (smc->io_addr + SMC_TCR, SMC_TCR_NORMAL);
+    USO_out_w (smc->io_addr + SMC_RCR, SMC_RCR_NORMAL);
 
     /*
      * now, enable interrupts 
      */
     SMC_SELECT_BANK (2);
-    DEV_OUT_B (SMC_INT_MASK, smc->io_addr + SMC_MSK);
+    USO_out_b (smc->io_addr + SMC_MSK, SMC_INT_MASK);
 
     ETHIRQ_QUIT ();
     ETHIRQ_ON ();
@@ -211,27 +211,27 @@ smc_tx_error (DEV_smc91c94_t * smc)
 
     // assume bank 2
 
-    saved_packet = DEV_IN_B (smc->io_addr + SMC_PNR);
-    packet_no = DEV_in_w (smc->io_addr + SMC_FIFO);
+    saved_packet = USO_in_b (smc->io_addr + SMC_PNR);
+    packet_no = USO_in_w (smc->io_addr + SMC_FIFO);
     packet_no &= 0x7F;
 
     // select this as the packet to read from
-    DEV_OUT_B (packet_no, smc->io_addr + SMC_PNR);
+    USO_out_b (smc->io_addr + SMC_PNR, packet_no);
 
     // read the first word from this packet
-    DEV_out_w (SMC_PTR_AUTOINCR | SMC_PTR_READ, smc->io_addr + SMC_PTR);
+    USO_out_w (smc->io_addr + SMC_PTR, SMC_PTR_AUTOINCR | SMC_PTR_READ);
 
-    tx_status = DEV_in_w (smc->io_addr + SMC_DATA1);
+    tx_status = USO_in_w (smc->io_addr + SMC_DATA1);
 
     // re-enable transmit
     SMC_SELECT_BANK (0);
-    DEV_out_w (DEV_in_w (smc->io_addr + SMC_TCR) | SMC_TCR_TX_ENA, smc->io_addr + SMC_TCR);
+    USO_out_w (smc->io_addr + SMC_TCR, USO_in_w (smc->io_addr + SMC_TCR) | SMC_TCR_TX_ENA);
 
     // kill the packet
     SMC_SELECT_BANK (2);
-    DEV_out_w (SMC_MMUCR_FREEPKT, smc->io_addr + SMC_MMUCR);
+    USO_out_w (smc->io_addr + SMC_MMUCR, SMC_MMUCR_FREEPKT);
 
-    DEV_OUT_B (saved_packet, smc->io_addr + SMC_PNR);
+    USO_out_b (smc->io_addr + SMC_PNR, saved_packet);
     return;
 }
 
@@ -268,11 +268,11 @@ eph_int (DEV_smc91c94_t * smc)
      * Ack eph int 
      */
     SMC_SELECT_BANK (1);
-    DEV_out_w (SMC_CTR_CLEAR, smc->io_addr + SMC_CTR);
-    DEV_out_w (SMC_CTR_NORMAL, smc->io_addr + SMC_CTR);
+    USO_out_w (smc->io_addr + SMC_CTR, SMC_CTR_CLEAR);
+    USO_out_w (smc->io_addr + SMC_CTR, SMC_CTR_NORMAL);
 
     SMC_SELECT_BANK (0);
-    tmp = DEV_in_w (smc->io_addr + SMC_EPHSR);
+    tmp = USO_in_w (smc->io_addr + SMC_EPHSR);
 
     if ((tmp & SMC_EPHSR_LINK_OK) == 0)
     {
@@ -287,16 +287,16 @@ eph_int (DEV_smc91c94_t * smc)
     }
 
     // do MAC statistic
-    tmp = DEV_in_w (smc->io_addr + SMC_ECR);
+    tmp = USO_in_w (smc->io_addr + SMC_ECR);
     smc->tx_exc_def += (tmp & 0xf000) >> 12;
     smc->tx_def += (tmp & 0x0f00) >> 8;
     smc->tx_mcc += (tmp & 0x00f0) >> 4;
     smc->tx_scc += tmp & 0x000f;
 
-    tmp = DEV_in_w (smc->io_addr + SMC_TCR);
+    tmp = USO_in_w (smc->io_addr + SMC_TCR);
     if ((tmp & SMC_TCR_TX_ENA) == 0)
     {
-        DEV_out_w (SMC_TCR_NORMAL, smc->io_addr + SMC_TCR);
+        USO_out_w (smc->io_addr + SMC_TCR, SMC_TCR_NORMAL);
     }
 }
 
@@ -309,10 +309,10 @@ DEV_smc_interrupt (DEV_smc91c94_t * smc)
 
     ETHIRQ_QUIT ();
 
-    saved_bank_select = DEV_in_w (smc->io_addr + SMC_BANK_SELECT);
+    saved_bank_select = USO_in_w (smc->io_addr + SMC_BANK_SELECT);
     SMC_SELECT_BANK (2);
-    saved_pointer = DEV_in_w (smc->io_addr + SMC_PTR);
-    status = DEV_IN_B (smc->io_addr + SMC_IST);
+    saved_pointer = USO_in_w (smc->io_addr + SMC_PTR);
+    status = USO_in_b (smc->io_addr + SMC_IST);
 
     if (status & SMC_IM_RCV_INT)
     {
@@ -322,7 +322,7 @@ DEV_smc_interrupt (DEV_smc91c94_t * smc)
     else if (status & SMC_IAM_TX_INT)
     {
         smc_disable_int (SMC_IAM_TX_INT, smc);
-        DEV_OUT_B (SMC_IAM_TX_INT, smc->io_addr + SMC_ACK);
+        USO_out_b (smc->io_addr + SMC_ACK, SMC_IAM_TX_INT);
         transmit_int (smc);
     }
     else if (status & SMC_IM_EPH_INT)
@@ -331,18 +331,18 @@ DEV_smc_interrupt (DEV_smc91c94_t * smc)
     }
     else if (status & SMC_IAM_RX_OVRN_INT)
     {
-        DEV_OUT_B (SMC_IAM_RX_OVRN_INT, smc->io_addr + SMC_ACK);
+        USO_out_b (smc->io_addr + SMC_ACK, SMC_IAM_RX_OVRN_INT);
         rx_overrun_int (smc);
     }
     else if (status & SMC_IAM_ERCV_INT)
     {
-        DEV_OUT_B (SMC_IAM_ERCV_INT, smc->io_addr + SMC_ACK);
+        USO_out_b (smc->io_addr + SMC_ACK, SMC_IAM_ERCV_INT);
         early_rx_int (smc);
     }
     else if (status & SMC_IAM_TX_EMPTY_INT)
     {
         smc_disable_int (SMC_IAM_TX_EMPTY_INT, smc);
-        DEV_OUT_B (SMC_IAM_TX_EMPTY_INT, smc->io_addr + SMC_ACK);
+        USO_out_b (smc->io_addr + SMC_ACK, SMC_IAM_TX_EMPTY_INT);
         tx_empty_int (smc);
     }
     else if (status & SMC_IM_ALLOC_INT)
@@ -351,8 +351,8 @@ DEV_smc_interrupt (DEV_smc91c94_t * smc)
         alloc_int (smc);
     }
 
-    DEV_out_w (saved_pointer, smc->io_addr + SMC_PTR);
-    DEV_out_w (saved_bank_select, smc->io_addr + SMC_BANK_SELECT);
+    USO_out_w (smc->io_addr + SMC_PTR, saved_pointer);
+    USO_out_w (smc->io_addr + SMC_BANK_SELECT, saved_bank_select);
 }
 
 
@@ -384,7 +384,7 @@ smc_rx_read_data (DEV_smc91c94_t * smc)
      */
     SMC_SELECT_BANK (2);
 
-    if ((pnr = DEV_in_w (smc->io_addr + SMC_FIFO)) & SMC_FIFO_REMPTY)
+    if ((pnr = USO_in_w (smc->io_addr + SMC_FIFO)) & SMC_FIFO_REMPTY)
     {
         /*
          * we got called , but nothing was on the FIFO 
@@ -399,13 +399,13 @@ smc_rx_read_data (DEV_smc91c94_t * smc)
     /*
      * start reading from the start of the packet 
      */
-    DEV_out_w (SMC_PTR_READ | SMC_PTR_RCV | SMC_PTR_AUTOINCR, smc->io_addr + SMC_PTR);
+    USO_out_w (smc->io_addr + SMC_PTR, SMC_PTR_READ | SMC_PTR_RCV | SMC_PTR_AUTOINCR);
 
     /*
      * First two words are status and packet_length 
      */
-    pnr = DEV_in_w (smc->io_addr + SMC_DATA1);
-    plen = (DEV_in_w (smc->io_addr + SMC_DATA1) & 0x07ff) - 6;
+    pnr = USO_in_w (smc->io_addr + SMC_DATA1);
+    plen = (USO_in_w (smc->io_addr + SMC_DATA1) & 0x07ff) - 6;
 
     if (plen > 10)
     {                           // size of eth header
@@ -421,11 +421,11 @@ smc_rx_read_data (DEV_smc91c94_t * smc)
             if ((packet = NET_netbuf_alloc_ram (plen)) != NULL)
             {
                 data = (unsigned char *)NET_netbuf_index (packet);
-                DEV_in_nw (smc->io_addr + SMC_DATA1, (unsigned long)data, ((plen + 1) >> 1));
+                USO_in_w_stream (smc->io_addr + SMC_DATA1, (unsigned long)data, ((plen + 1) >> 1));
                 if (plen & 1)
                 {
                     data += plen & ~1;
-                    *(data++) = DEV_IN_B (smc->io_addr + SMC_DATA1);
+                    *(data++) = USO_in_b (smc->io_addr + SMC_DATA1);
                 }
             }
             else
@@ -443,7 +443,7 @@ smc_rx_read_data (DEV_smc91c94_t * smc)
     /*
      * error or good, tell the card to get rid of this packet 
      */
-    DEV_out_w (SMC_MMUCR_RELEASE, smc->io_addr + SMC_MMUCR);
+    USO_out_w (smc->io_addr + SMC_MMUCR, SMC_MMUCR_RELEASE);
     ++smc->rx_packets;
     return packet;
 }
@@ -492,7 +492,7 @@ smc_tx_alloc_mem (NET_netbuf_t * packet, DEV_smc91c94_t * smc)
      * now, try to allocate the memory 
      */
     SMC_SELECT_BANK (2);
-    DEV_out_w (SMC_MMUCR_ALLOC | numPages, smc->io_addr + SMC_MMUCR);
+    USO_out_w (smc->io_addr + SMC_MMUCR, SMC_MMUCR_ALLOC | numPages);
 
     ETHIRQ_ON ();
     return (TRUE);
@@ -524,7 +524,7 @@ smc_tx_write_data (DEV_smc91c94_t * smc, NET_netbuf_t * packet, ACE_bool_t wirq)
     /*
      * If I get here, I _know_ there is a packet slot waiting for me 
      */
-    packet_no = DEV_IN_B (smc->io_addr + SMC_ARR);
+    packet_no = USO_in_b (smc->io_addr + SMC_ARR);
 
     if (packet_no & 0x80)
     {
@@ -539,12 +539,12 @@ smc_tx_write_data (DEV_smc91c94_t * smc, NET_netbuf_t * packet, ACE_bool_t wirq)
     /*
      * we have a packet address, so tell the card to use it 
      */
-    DEV_OUT_B (packet_no, smc->io_addr + SMC_PNR);
+    USO_out_b (smc->io_addr + SMC_PNR, packet_no);
 
     /*
      * point to the beginning of the packet 
      */
-    DEV_out_w (SMC_PTR_AUTOINCR, smc->io_addr + SMC_PTR);
+    USO_out_w (smc->io_addr + SMC_PTR, SMC_PTR_AUTOINCR);
 
     // memcpy(packet->ep_hdr.e_src, etpaddr, sizeof(etpaddr));
 
@@ -552,11 +552,11 @@ smc_tx_write_data (DEV_smc91c94_t * smc, NET_netbuf_t * packet, ACE_bool_t wirq)
      * send the packet length ( +6 for status, length and ctl BYTE ) and
      * the status word ( set to zeros ) 
      */
-    DEV_out_w (0, smc->io_addr + SMC_DATA1);
+    USO_out_w (smc->io_addr + SMC_DATA1, 0);
     /*
      * send the packet length ( +6 for status words, length, and ctl 
      */
-    DEV_out_w (p_len + 6, smc->io_addr + SMC_DATA1);
+    USO_out_w (smc->io_addr + SMC_DATA1, p_len + 6);
 
     /*
      * send the actual data . I _think_ it's faster to send the longs
@@ -567,7 +567,7 @@ smc_tx_write_data (DEV_smc91c94_t * smc, NET_netbuf_t * packet, ACE_bool_t wirq)
      */
     for (; packet != NULL; packet = NET_netbuf_next (packet))
     {
-        DEV_out_nw (smc->io_addr + SMC_DATA1,
+        USO_out_w_stream (smc->io_addr + SMC_DATA1,
                     (unsigned long)NET_netbuf_index (packet), NET_netbuf_len (packet) >> 1);
 
         /*
@@ -584,10 +584,9 @@ smc_tx_write_data (DEV_smc91c94_t * smc, NET_netbuf_t * packet, ACE_bool_t wirq)
         }
         else
         {
-            DEV_OUT_B (*
-                       ((unsigned char *)NET_netbuf_index (packet) + NET_netbuf_len (packet) - 1),
-                       smc->io_addr + SMC_DATA1);
-            DEV_OUT_B (0x00, smc->io_addr + SMC_DATA1);
+            USO_out_b (smc->io_addr + SMC_DATA1,
+                       *((unsigned char *)NET_netbuf_index (packet) + NET_netbuf_len (packet) - 1));
+            USO_out_b (smc->io_addr + SMC_DATA1, 0x00);
         }
     }
 
@@ -606,7 +605,7 @@ smc_tx_write_data (DEV_smc91c94_t * smc, NET_netbuf_t * packet, ACE_bool_t wirq)
     /*
      * and let the chipset deal with it 
      */
-    DEV_out_w (SMC_MMUCR_ENQUEUE, smc->io_addr + SMC_MMUCR);
+    USO_out_w (smc->io_addr + SMC_MMUCR, SMC_MMUCR_ENQUEUE);
 
     return (TRUE);
 }
@@ -621,7 +620,7 @@ smc_transmit_packet (DEV_smc91c94_t * smc, NET_netbuf_t * packet)
         SMC_SELECT_BANK (2);
         for (;;)
         {
-            status = DEV_IN_B (smc->io_addr + SMC_IST);
+            status = USO_in_b (smc->io_addr + SMC_IST);
             if (status & SMC_IM_ALLOC_INT)
                 break;
         }

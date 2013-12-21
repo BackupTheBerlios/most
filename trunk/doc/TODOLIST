@@ -1,21 +1,42 @@
-! TCP (http, rlogin)
-! Filesystems (mmc, ram, nor_flash, nand_flash)
++ Alpha Version:
++ ==============
++ TCP (http, rlogin)
++ Filesystems (mmc)
+
+! Main Parts:
+! ===========
+! Documentation
+! Filesystems (ram, nand_flash)
 ! CAN, CAN open
 ! USB Device
 
-* put for tftp to upload files
-* send for ymodem
-* synchronization CLI, MFS, NET, ...
-* documentation
-* driver cleanup and improvements, spi, adc, pwm ... 
-* USR -> Grafik GFX library and display improvements
-* cleanup mac drivers
-* i2c(twi) driver
-* porting to other platforms (lpc2294 olimex board, ...)
+* Additional Parts:
+* =================
+* Put for tftp to upload files
+* Send for ymodem
+* I2C(twi) driver
+* Irda
 * DMA
-* irda
-* try to avoid global data and local static data to be reentrant
+* Porting to other platforms (lpc2294 olimex board, ...)
+* Support for sensors and actuators
+* USR -> Grafik GFX library and display improvements
 
-? global interrupt handling in DEV(USO?) (register interrupt handler, wait for interrupt ?)
-? global exception handling and post mortem dump ? in bsp ?
-? pc target mmu and syscalls ? 
+? Design Parts:
+? =============
+? Global interrupt handling in DEV(USO?) (register interrupt handler, wait for interrupt ?)
+? Global exception handling and post mortem dump ? in bsp ?
+? PC target mmu and syscalls ?
+? (get rid of ios_bufs (do it like scanf for printf) ? -> no )
+
+# Bugfix, Completition:
+# =====================
+# la2/emac support
+# dev/chip, make one flash code for nor flash with cfi in dev/mm (also download)
+# complete io_ports
+# make smc eth mac independend from h8300 (interrupt interface)
+# tty improve handling (never eat char) reset CTRL-R (xon/ xoff ? serial)
+# synchronization CLI, MFS, NET, ...
+# try to avoid global data and local static data to be reentrant
+# cleanup mac drivers
+# driver cleanup and improvements, spi, adc, pwm ... 
+ 

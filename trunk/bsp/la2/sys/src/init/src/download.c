@@ -7,6 +7,7 @@
 #include <ace/stdio.h>
 #include <ace/stddef.h>
 #include <uso/cpu.h>
+#include <uso/scheduler.h>
 #include <nap/bootp.h>
 #include <nap/tftp.h>
 #include <cli/exec.h>
@@ -109,7 +110,7 @@ flash_read (MFS_stream_t *stream, char *buf, ACE_size_t len)
     ACE_size_t read;
     if (fl->erased == TRUE) {
         stream->size_tx = 0;
-        return 0; /* todo EOF ? */
+        return 0;
     }
     /* if flash is written but size == 0(this is after a reboot, read the first 2 sectors */
     if (stream->size_tx == 0){
@@ -127,7 +128,7 @@ flash_read (MFS_stream_t *stream, char *buf, ACE_size_t len)
 static ACE_size_t
 flash_write (MFS_stream_t *stream, const char *buf, ACE_size_t len)
 {
-    enum FLASH_26LV800BTC_err_code error;
+    ACE_err_t err;
     ACE_size_t l;
     unsigned char *p;
     flash_t *fl = (flash_t *) ((MFS_descriptor_t *)stream)->represent;
@@ -141,7 +142,7 @@ flash_write (MFS_stream_t *stream, const char *buf, ACE_size_t len)
     p =	(fl->sector_start + stream->pos_rx);
 
     if ( p >= fl->sector_end) {
-        return ACE_EOF;
+        return 0;
     }
 
     if ( (p + len) > fl->sector_end) {
@@ -150,10 +151,11 @@ flash_write (MFS_stream_t *stream, const char *buf, ACE_size_t len)
         l = len;
     }
 
-    error = FLASH_26LV800BTC_programm_is ((unsigned short *)p, buf, l);
-    if (error)
+    err = FLASH_26LV800BTC_programm_is ((unsigned short *)p, buf, l);
+    if (err < ACE_OK)
     {
-        return 0; /* todo return error value */
+        USO_current()->error = err;
+        return 0;
     }
     stream->pos_rx += l;
     stream->size_tx += l;
@@ -190,29 +192,27 @@ flash_init (flash_t *fl, unsigned char *start, unsigned char *end)
 static ACE_err_t
 erase_flash_exec (char *nix)
 {
+    ACE_err_t err = DEV_ERR;
     int i = flash.sector_index; 
-    for (unsigned char *addr = flash.sector_start; (addr < flash.sector_end) && (sector_size[i] > 0); addr += (sector_size[i] * 1024), ++i)
+    for (unsigned char *addr = flash.sector_start;
+         (addr < flash.sector_end) && (sector_size[i] > 0);
+         addr += (sector_size[i] * 1024), ++i)
     {
-        enum FLASH_26LV800BTC_err_code error;
-        error = FLASH_26LV800BTC_sector_erase_is ((unsigned short *)addr);
-        ACE_printf ("Erase flash sector %p error %d\n", addr, error);
-        if (error)
-        {
-            return DEF_ERR_ROM;
-        }
+        err = FLASH_26LV800BTC_sector_erase_is ((unsigned short *)addr);
+        ACE_printf ("Erase flash sector %p error %d\n", addr, err);
     }
     flash.erased = TRUE;
-    return ACE_OK;
+    return err;
 }
 
 static ACE_err_t
 print_flash_id_exec (char *nix)
 {
     unsigned short mf, device;
-    enum FLASH_26LV800BTC_err_code error;
-    error = FLASH_26LV800BTC_get_id_is (&mf, &device);
-    ACE_printf ("Flash err = %d, mf id = %X, device id = %X\n", error, mf, device);
-    return ACE_OK;
+    ACE_err_t err;
+    err = FLASH_26LV800BTC_get_id_is (&mf, &device);
+    ACE_printf ("Flash err = %d, mf id = %X, device id = %X\n", err, mf, device);
+    return err;
 }
 
 extern void

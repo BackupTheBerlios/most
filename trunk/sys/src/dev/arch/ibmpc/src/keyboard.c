@@ -35,7 +35,7 @@
 
 #include <ace/stddef.h>
 #include <ace/stdlib.h>
-#include <dev/arch/ibmpc/ports.h>
+#include <uso/io_ports.h>
 #include <dev/arch/ibmpc/keyboard.h>
 #include <dev/arch/ibmpc/scancode.h>
 
@@ -45,8 +45,8 @@
  */
 static void send_kbd_command(ACE_u8_t command)
 {
-    while ((inb(0x64) & 0x6) != 0x4) USO_yield();
-    outb(0x60, command);
+    while ((USO_in_b(0x64) & 0x6) != 0x4) USO_yield();
+
 }
 
 
@@ -56,7 +56,7 @@ static void send_kbd_command(ACE_u8_t command)
 void IBMPC_keyboard_irq_handler(IBMPC_keyboard_t *kbd) {
     ACE_bool_t break_code = FALSE;
     ACE_u8_t keycode = 0;
-    ACE_u8_t scancode = inb(0x60);
+    ACE_u8_t scancode = USO_in_b(0x60);
 
     // Abbrechen wenn die Initialisierung noch nicht abgeschlossen wurde
     if (kbd->init_done == FALSE) {
@@ -115,17 +115,17 @@ IBMPC_keyboard_open (IBMPC_keyboard_t *kbd)
 {
     // So, mal hoeren was uns die Tastatur noch so alles zu erzaehlen hat von
     // eventuell gedrueckten Tasten waerend dem Booten.
-    while ((inb(0x64) & 0x1)) {
-        inb(0x60);
+    while ((USO_in_b(0x64) & 0x1)) {
+        USO_in_b(0x60);
     }
 
     // Leds alle ausloeschen
     send_kbd_command(0xED);
-    outb(0x60, 0);
+    USO_out_b(0x60, 0);
 
     // Schnellste Wiederholrate
     send_kbd_command(0xF3);
-    outb(0x60, 0);
+    USO_out_b(0x60, 0);
 
     // Tastatur aktivieren
     send_kbd_command(0xF4);

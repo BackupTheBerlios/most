@@ -19,11 +19,11 @@
 /*------------- Representation ------------------------------------------*/
 
 #if defined MOST_CPU_I386
-#include <uso/arch/i386.h>
+#include <uso/arch/i386/cpu.h>
 #elif defined MOST_CPU_ARM
-#include <uso/arch/arm.h>
+#include <uso/arch/arm/cpu.h>
 #elif defined MOST_CPU_H8300
-#include <uso/arch/h8300h.h>
+#include <uso/arch/h8300/cpu.h>
 #elif defined MOST_CPU_M68K
 #error "CPU not supported!"
 #else

@@ -1,4 +1,4 @@
-#include <dev/arch/ibmpc/ports.h>
+#include <uso/io_ports.h>
 #include <arch/exceptions.h>
 #include <arch/ticks.h>
 #include <arch/kbd.h>
@@ -46,10 +46,10 @@ struct cpu_state* PC_handle_vector(struct cpu_state* cpu)
 
         if (cpu->vector >= 0x28) {
             // EOI an Slave-PIC
-            outb(0xa0, 0x20);
+            USO_out_b(0xa0, 0x20);
         }
         // EOI an Master-PIC
-        outb(0x20, 0x20);
+        USO_out_b(0x20, 0x20);
     } else if (cpu->vector == 0x30) {
         new_cpu = syscall(cpu);
     } else {

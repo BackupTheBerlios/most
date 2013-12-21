@@ -14,10 +14,10 @@
  */
 
 
-#define MMC_WP   	PIO0
-#define MMC_CP   	PIO1
-#define STAT_LED   	PIO2
-#define RUN_LED   	STAT_LED
+#define MMC_WP      PIO0
+#define MMC_CP      PIO1
+#define STAT_LED    PIO2
+#define RUN_LED     STAT_LED
 #define LAN_RESET   PIO3
 #define RED_LED     PIO4
 #define GREEN_LED   PIO5
@@ -51,6 +51,10 @@
 #define LED_BAR1_DATA     DIO_3
 #define LED_BAR2_CLK      DIO_4
 #define LED_BAR2_DATA     DIO_5
+#define INPUT_1           DIO_12
+#define INPUT_2           DIO_13
+#define OUTPUT_1          DIO_14
+#define OUTPUT_2          DIO_15
 
 /**
  *

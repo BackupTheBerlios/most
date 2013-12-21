@@ -22,6 +22,7 @@ OBJ_NAMES := $(ARCH_PATH)/reset.o\
 	         $(ARCH_PATH)/ticks.o\
 	         $(INIT_PATH)/init.o\
 	         $(INIT_PATH)/start.o\
+	         $(INIT_PATH)/events.o\
 	         $(MAIN_PATH)/*.o
 
 OBJ_NAMES += $(OBJ_NAMES_APP)

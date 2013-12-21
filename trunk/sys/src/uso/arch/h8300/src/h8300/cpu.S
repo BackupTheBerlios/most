@@ -69,5 +69,5 @@ _USO_context_switch:       /* er0 &old_thread->cpu er1 &new_thread->cpu */
    mov.l    @(4,er1),er3
    mov.l    @er1,er2
    rts                     /* run on the new thread */
-    
+
    .END

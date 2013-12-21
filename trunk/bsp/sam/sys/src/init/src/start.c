@@ -86,7 +86,7 @@ start_run (void *nix)
 {
     /* Kernel logging on */
     ACE_puts(ACE_ESC_CLEAR_SCREEN);
-    USO_log_puts (USO_LL_INFO, SAM_BOARD" : "ACE_MOST_BUILD"\n");
+    USO_log_puts (USO_LL_INFO, SAM_BOARD" : "ACE_MOST_VERSION_STRING"\n");
     USO_log_puts (USO_LL_INFO, "Start: Kernel log on ttyS0.\n");
 
     unsigned long ticks_count = DEV_get_ticks ();

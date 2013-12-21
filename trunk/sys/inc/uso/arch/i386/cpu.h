@@ -3,10 +3,8 @@
  *
  */
 
-#ifndef USO_I386_H
-#define USO_I386_H
-
-#include <ace/stddef.h>
+#ifndef USO_CPU_I386_H
+#define USO_CPU_I386_H
 
 /** @addtogroup uso
  * @{
@@ -18,6 +16,7 @@
  * @{
  */
 
+#include <ace/stddef.h>
 
 /**
  * Kind of stack.
@@ -72,6 +71,7 @@ struct USO_cpu
     USO_cpu_register_t pc; /** Programm counter (eip) */
     USO_cpu_status_t ps; /** Contition code register (eflags)*/
 };
+
 
 /** @}
  */

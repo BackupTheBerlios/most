@@ -128,7 +128,7 @@ abort_handler (char *msg, char *file, int line)
 }
 
 static void
-idle (void)
+idle_run (void)
 {
     /* System initialization without kernel logging!
      * The scheduler is initialized and we are running on the idle
@@ -274,5 +274,5 @@ SAM_init (void)
     blink_green (1);
 
     /* Go multithreading */
-    USO_transform (idle, (USO_stack_t *) &stack_start, SAM_IDLE_STACK_SIZE / sizeof (USO_stack_t));
+    USO_transform (idle_run, (USO_stack_t *) &stack_start, SAM_IDLE_STACK_SIZE / sizeof (USO_stack_t));
 }

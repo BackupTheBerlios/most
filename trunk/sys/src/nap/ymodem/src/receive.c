@@ -196,7 +196,7 @@ NAP_ymodem_receive(char *name, ACE_size_t (*process_packet)(char *data, int leng
                                         rx_data_size = file_size;
                                     }
                                     written_length = process_packet (packet_data + NAP_YMODEM_PACKET_HEADER, packet_data_length, desc);
-                                    if (written_length < packet_data_length){ /* process data error */
+                                    if (written_length != packet_data_length){ /* process data error */
                                         ACE_putc(ACE_ASCII_CAN);
                                         ACE_putc(ACE_ASCII_CAN);
                                         file_done = TRUE;

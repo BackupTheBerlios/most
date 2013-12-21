@@ -4,8 +4,8 @@
  */
 
 
-#ifndef USO_ARM_H
-#define USO_ARM_H
+#ifndef USO_CPU_ARM_H
+#define USO_CPU_ARM_H
 
 #include <ace/stddef.h>
 

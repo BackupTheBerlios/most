@@ -34,11 +34,33 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
     }
 }
 
+static void
+control (MFS_descriptor_t * desc, int number, MFS_ctrl_entry_t *entry)
+{
+    DEV_digout_t *out = (DEV_digout_t *) desc->represent;
+    switch (number){
+        case 0:
+            if (entry->type == MFS_CTRL_INFO){
+                ACE_sprintf(entry->value.s, "1   set\n"
+                                            "2   clear\n");
+            }
+            break;
+        case 1:
+            DEV_digout_set(out);
+            break;
+        case 2:
+            DEV_digout_clear(out);
+            break;
+        default:
+            break;
+    }
+}
+
 static struct MFS_descriptor_op digout_descriptor_op = {
     .open = NULL,
     .close = NULL,
     .info = info,
-    .control = NULL,
+    .control = control,
     .delete = NULL
 };
 

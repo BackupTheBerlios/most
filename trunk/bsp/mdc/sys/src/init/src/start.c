@@ -24,6 +24,7 @@
 #include <arch/digio.h>
 #include <arch/ticks.h>
 #include <init/start.h>
+#include <init/events.h>
 #include <init/main.h>
 #include <init/bsp_commands.h>
 
@@ -46,6 +47,7 @@ run_led_run (void *nix)
     {
         MDC_watchdog_trigger ();
         DEV_digout_toggle (&MDC_run_led);
+        MDC_events_create ();
         USO_sleep (USO_MSEC_2_TICKS (100));
     }
     return DEF_ERR_SYS;
@@ -56,7 +58,7 @@ start_run (void *nix)
 {
     /* Kernel logging on */
     ACE_puts(ACE_ESC_CLEAR_SCREEN);
-    USO_log_puts (USO_LL_INFO, MDC_BOARD" : "ACE_MOST_BUILD"\n");
+    USO_log_puts (USO_LL_INFO, MDC_BOARD" : "ACE_MOST_VERSION_STRING"\n");
     USO_log_puts (USO_LL_INFO, "Start: Kernel log on tty0.\n");
 
     unsigned long loop_count = DEV_get_ticks ();

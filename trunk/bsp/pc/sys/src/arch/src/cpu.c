@@ -1,4 +1,4 @@
-#include <dev/arch/ibmpc/ports.h>
+#include <uso/io_ports.h>
 #include <uso/log.h>
 
 #include <arch/cpu.h>

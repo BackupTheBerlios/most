@@ -3,9 +3,8 @@
  *
  */
 
-#include "ace/ctype.h"
+#include <ace/ctype.h>
 
-char _ACE_ctmp;
 
 const unsigned char _ACE_ctype[] = {
     _ACE_C, _ACE_C, _ACE_C, _ACE_C, _ACE_C, _ACE_C, _ACE_C, _ACE_C,     /* 0-7 
@@ -60,3 +59,16 @@ const unsigned char _ACE_ctype[] = {
     _ACE_L, _ACE_L, _ACE_L, _ACE_L, _ACE_L, _ACE_L, _ACE_L, _ACE_P, _ACE_L,
     _ACE_L, _ACE_L, _ACE_L, _ACE_L, _ACE_L, _ACE_L, _ACE_L
 };                              /* 240-255 */
+
+
+extern char
+ACE_tolower(char c)
+{
+     return ACE_isupper(c) ? c - ('A'-'a') : c;
+}
+
+extern char
+ACE_toupper(char c)
+{
+    return ACE_islower(c) ? c - ('a'-'A') : c;
+}

@@ -61,7 +61,7 @@ start_run (void *nix)
     /* Kernel logging on */
     USO_sleep (USO_MSEC_2_TICKS (3000)); /* to see lowlevel print */
     ACE_puts(ACE_ESC_CLEAR_SCREEN);
-    USO_log_puts (USO_LL_INFO, PC_BOARD" : "ACE_MOST_BUILD"\n");
+    USO_log_puts (USO_LL_INFO, PC_BOARD" : "ACE_MOST_VERSION_STRING"\n");
     USO_log_puts (USO_LL_INFO, "Start: Kernel log on tty0.\n");
 
     unsigned long ticks_start = DEV_get_ticks ();

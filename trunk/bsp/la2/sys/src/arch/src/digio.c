@@ -21,6 +21,8 @@ DEV_digout_t LA2_led_bar1_clk;
 DEV_digout_t LA2_led_bar1_data;
 DEV_digout_t LA2_led_bar2_clk;
 DEV_digout_t LA2_led_bar2_data;
+DEV_digout_t LA2_output_1;
+DEV_digout_t LA2_output_2;
 
 
 static void
@@ -168,6 +170,32 @@ clear_led_bar2_data (void)
     UPIO->CODR   = LED_BAR2_DATA;
 }
 
+static void
+set_output_1 (void)
+{
+    UPIO->SODR   = OUTPUT_1;
+}
+
+static void
+clear_output_1 (void)
+{
+    UPIO->CODR   = OUTPUT_1;
+}
+
+static void
+set_output_2 (void)
+{
+    UPIO->SODR   = OUTPUT_2;
+}
+
+static void
+clear_output_2 (void)
+{
+    UPIO->CODR   = OUTPUT_2;
+}
+
+
+
 
 DEV_digin_t LA2_card_write;
 DEV_digin_t LA2_card_insert;
@@ -175,6 +203,9 @@ DEV_digin_t LA2_switch;
 DEV_digin_t LA2_pushbutton;
 DEV_digin_t LA2_line_1;
 DEV_digin_t LA2_line_2;
+DEV_digin_t LA2_input_1;
+DEV_digin_t LA2_input_2;
+
 
 static unsigned long
 sample_card_write (void)
@@ -212,7 +243,23 @@ sample_line_2 (void)
     return CSP_PIOGetStatus(UPIO) & LINE_2;
 }
 
+static unsigned long
+sample_input_1 (void)
+{
+    return CSP_PIOGetStatus(UPIO) & INPUT_1;
+}
+
+static unsigned long
+sample_input_2 (void)
+{
+    return CSP_PIOGetStatus(UPIO) & INPUT_2;
+}
+
+
+
 DEV_diginputs_t LA2_control_in;
+
+
 
 extern void
 LA2_digio_init (void)
@@ -229,6 +276,8 @@ LA2_digio_init (void)
     DEV_digout_init (&LA2_led_bar1_data, DEV_DIGIO_LOW, DEV_DIGIO_POS, set_led_bar1_data, clear_led_bar1_data);
     DEV_digout_init (&LA2_led_bar2_clk, DEV_DIGIO_LOW, DEV_DIGIO_POS, set_led_bar2_clk, clear_led_bar2_clk);
     DEV_digout_init (&LA2_led_bar2_data, DEV_DIGIO_LOW, DEV_DIGIO_POS, set_led_bar2_data, clear_led_bar2_data);
+    DEV_digout_init (&LA2_output_1, DEV_DIGIO_LOW, DEV_DIGIO_POS, set_output_1, clear_output_1);
+    DEV_digout_init (&LA2_output_2, DEV_DIGIO_LOW, DEV_DIGIO_POS, set_output_2, clear_output_2);
 
     DEV_diginputs_init (&LA2_control_in);
     DEV_digin_init (&LA2_control_in, &LA2_card_write, DEV_DIGIO_POS, sample_card_write, 0);
@@ -237,6 +286,8 @@ LA2_digio_init (void)
     DEV_digin_init (&LA2_control_in, &LA2_pushbutton, DEV_DIGIO_NEG, sample_pushbutton, 3);
     DEV_digin_init (&LA2_control_in, &LA2_line_1, DEV_DIGIO_NEG, sample_line_1, 0);
     DEV_digin_init (&LA2_control_in, &LA2_line_2, DEV_DIGIO_NEG, sample_line_2, 0);
+    DEV_digin_init (&LA2_control_in, &LA2_input_1, DEV_DIGIO_NEG, sample_input_1, 2);
+    DEV_digin_init (&LA2_control_in, &LA2_input_2, DEV_DIGIO_NEG, sample_input_2, 2);
 }
 
 extern void
@@ -250,6 +301,8 @@ LA2_digio_install (void)
     DEV_digout_install (&LA2_m1_b, "m1_b");
     DEV_digout_install (&LA2_m2_a, "m2_a");
     DEV_digout_install (&LA2_m2_b, "m2_b");
+    DEV_digout_install (&LA2_output_1, "out_1");
+    DEV_digout_install (&LA2_output_2, "out_2");
 
     DEV_digin_install (&LA2_card_write, "card_w");
     DEV_digin_install (&LA2_card_insert, "card_in");
@@ -257,4 +310,6 @@ LA2_digio_install (void)
     DEV_digin_install (&LA2_pushbutton, "pushbut");
     DEV_digin_install (&LA2_line_1, "line_1");
     DEV_digin_install (&LA2_line_2, "line_2");
+    DEV_digin_install (&LA2_input_1, "in_1");
+    DEV_digin_install (&LA2_input_2, "in_2");
 }

@@ -30,7 +30,6 @@
 #define _ACE_SP	0x80            /* hard space (0x20) */
 
 extern const unsigned char _ACE_ctype[];
-extern char _ACE_ctmp;
 
 /** Isalpha(c) or isdigit(c).
  */
@@ -79,11 +78,11 @@ extern char _ACE_ctmp;
 
 /** Convert c to lower case letter.
  */
-#define ACE_tolower(c) (_ACE_ctmp=(c), ACE_isupper(_ACE_ctmp) ? _ACE_ctmp - ('A'-'a') : _ACE_ctmp)
+extern char ACE_tolower(char c);
 
 /** Convert c to upper case letter.
  */
-#define ACE_toupper(c) (_ACE_ctmp=(c), ACE_islower(_ACE_ctmp) ? _ACE_ctmp - ('a'-'A') : _ACE_ctmp)
+extern char ACE_toupper(char c);
 
 /*------------------------------------------------------------------------*/
 

@@ -12,14 +12,14 @@ extern ACE_size_t
 MFS_read (MFS_stream_t * stream, char *buf, ACE_size_t len)
 {
     ACE_SANITY_CHECK(stream);
-    return (stream->operations->read != NULL) ? stream->operations->read (stream, buf, len) : ACE_EOF;
+    return (stream->operations->read != NULL) ? stream->operations->read (stream, buf, len) : 0;
 }
 
 extern ACE_size_t
 MFS_write (MFS_stream_t * stream, char *buf, ACE_size_t len)
 {
     ACE_SANITY_CHECK(stream);
-    return (stream->operations->write != NULL) ? stream->operations->write (stream, buf, len) : ACE_EOF;
+    return (stream->operations->write != NULL) ? stream->operations->write (stream, buf, len) : 0;
 }
 
 extern int

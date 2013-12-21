@@ -95,7 +95,7 @@ pipe_read (MFS_stream_t *stream, char *buf, ACE_size_t len)
     ACE_size_t readed;
     USO_lock (&pipe->r_lock);
     USO_lock (&pipe->sync);
-    if (pipe->state != CLI_PIPE_OPEN && pipe->pipe->state == USO_PIPE_EMPTY) return ACE_EOF;
+    if (pipe->state != CLI_PIPE_OPEN && pipe->pipe->state == USO_PIPE_EMPTY) return 0;
     while (len)
     {
         while (pipe->pipe->state == USO_PIPE_EMPTY && pipe->state == CLI_PIPE_OPEN){
@@ -123,7 +123,7 @@ pipe_write (MFS_stream_t * stream, const char *buf, ACE_size_t len)
     ACE_size_t written;
     USO_lock (&pipe->w_lock);
     USO_lock (&pipe->sync);
-    if (pipe->state != CLI_PIPE_OPEN) return ACE_EOF;
+    if (pipe->state != CLI_PIPE_OPEN) return 0;
     while (len)
     {
         while (pipe->pipe->state == USO_PIPE_FULL && pipe->state == CLI_PIPE_OPEN){
@@ -134,7 +134,7 @@ pipe_write (MFS_stream_t * stream, const char *buf, ACE_size_t len)
         buf += written;
         USO_go_all(&pipe->cond_empty);
         if (pipe->state != CLI_PIPE_OPEN)
-        	break;
+            break;
     }
     written = ret - len;
     stream->size_tx += written;

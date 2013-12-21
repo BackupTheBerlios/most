@@ -57,6 +57,15 @@ extern DEV_digout_t LA2_led_bar2_clk;
 /** LED Bar 2 Data. */
 extern DEV_digout_t LA2_led_bar2_data;
 
+/** Output 1. */
+extern DEV_digout_t LA2_output_1;
+
+/** Output 2. */
+extern DEV_digout_t LA2_output_2;
+
+
+
+
 /** SD card write protect. */
 extern DEV_digin_t LA2_card_write;
 
@@ -75,9 +84,18 @@ extern DEV_digin_t LA2_line_1;
 /** Line Sensor 2 Digital. */
 extern DEV_digin_t LA2_line_2;
 
+/** Input 1. */
+extern DEV_digin_t LA2_input_1;
+
+/** Input 2. */
+extern DEV_digin_t LA2_input_2;
+
+
+
 
 /** Control panel inputs. */
 extern DEV_diginputs_t LA2_control_in;
+
 
 
 /**

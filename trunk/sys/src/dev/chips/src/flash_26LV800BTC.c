@@ -18,9 +18,8 @@
 #include <ace/string.h>
 #include <ace/stdlib.h>
 #include <uso/cpu.h>
+#include <uso/debug.h>
 #include <dev/chips/flash_26LV800BTC.h>
-
-
 
 
 #define BASE_ADDR    ((volatile unsigned short*)(0x40000000))
@@ -72,22 +71,32 @@ FLASH_26LV800BTC_segment_size (void)
     return SECTOR_SIZE;
 }
 
-ACE_SECTION_ (".ramcode")
-ACE_INLINE_ static unsigned short
+
+static unsigned short
+read (volatile unsigned short *addr)
+ACE_SECTION_(".ramcode");
+
+ACE_INLINE_  static unsigned short
 read (volatile unsigned short *addr)
 {
     return *addr;
 }
 
-ACE_SECTION_ (".ramcode")
+static void
+write (volatile unsigned short *addr, unsigned short data)
+ACE_SECTION_(".ramcode");
+
 ACE_INLINE_ static void
 write (volatile unsigned short *addr, unsigned short data)
 {
     *addr = data;
 }
 
-ACE_SECTION_ (".ramcode")
-ACE_INLINE_ static void
+static void
+write_command (volatile unsigned short *addr, unsigned short cmd)
+ACE_SECTION_(".ramcode");
+
+ACE_INLINE_  static void
 write_command (volatile unsigned short *addr, unsigned short cmd)
 {
     write (BASE_ADDR + H555, CMD_AAH);
@@ -95,13 +104,20 @@ write_command (volatile unsigned short *addr, unsigned short cmd)
     write (addr, cmd);
 }
 
-ACE_SECTION_ (".ramcode")
+static void
+reset (void)
+ACE_SECTION_(".ramcode");
+
 ACE_INLINE_ static void
 reset (void)
 {
     write (BASE_ADDR + HXXX, CMD_RESET);
 }
-ACE_SECTION_ (".ramcode")
+
+static unsigned short
+silicon_id (int adi)
+ACE_SECTION_(".ramcode");
+
 ACE_INLINE_ static unsigned short
 silicon_id (int adi)
 {
@@ -109,14 +125,23 @@ silicon_id (int adi)
     return read (BASE_ADDR + adi);
 }
 
-ACE_SECTION_ (".ramcode")
+#if 0
+static void
+chip_erase (void)
+ACE_SECTION_(".ramcode");
+
 ACE_INLINE_ static void
 chip_erase (void)
 {
     write_command (BASE_ADDR + H555, CMD_ERASE);
     write_command (BASE_ADDR + H555, CMD_CHIP);
 }
-ACE_SECTION_ (".ramcode")
+#endif
+
+static void
+sector_erase (volatile unsigned short *sector_addr)
+ACE_SECTION_(".ramcode");
+
 ACE_INLINE_ static void
 sector_erase (volatile unsigned short *sector_addr)
 {
@@ -124,7 +149,10 @@ sector_erase (volatile unsigned short *sector_addr)
     write_command (sector_addr, CMD_SECTOR);
 }
 
-ACE_SECTION_ (".ramcode")
+static void
+program (volatile unsigned short *addr, unsigned short data)
+ACE_SECTION_(".ramcode");
+
 ACE_INLINE_ static void
 program (volatile unsigned short *addr, unsigned short data)
 {
@@ -132,12 +160,15 @@ program (volatile unsigned short *addr, unsigned short data)
     write (addr, data);
 }
 
-ACE_SECTION_ (".ramcode")
-static enum FLASH_26LV800BTC_err_code
+static ACE_err_t
+poll (volatile unsigned short *addr, unsigned short data)
+ACE_SECTION_(".ramcode");
+
+static ACE_err_t
 poll (volatile unsigned short *addr, unsigned short data)
 {
     unsigned short tmp;
-    enum FLASH_26LV800BTC_err_code err = FLASH_26LV800BTC_ok;
+    ACE_err_t err = ACE_OK;
 
     for (;;)
     {
@@ -149,7 +180,7 @@ poll (volatile unsigned short *addr, unsigned short data)
         if (tmp & Q5)
         {
             reset ();
-            err = FLASH_26LV800BTC_timeout;
+            err = DEV_ERR_TIMEOUT;
             break;
         }
         WATCHDOG ();
@@ -157,42 +188,48 @@ poll (volatile unsigned short *addr, unsigned short data)
     return err;
 }
 
-ACE_SECTION_ (".ramcode")
-static enum FLASH_26LV800BTC_err_code
-ACE_LONG_CALL_ sector_erase_ns (volatile unsigned short *sector_addr)
+/* this function must be extern to be in the ramcode section (run build)! */
+extern ACE_err_t
+ACE_LONG_CALL_ FLASH_26LV800BTC_sector_erase_ns (volatile unsigned short *sector_addr)
+ACE_SECTION_(".ramcode");
+
+extern ACE_err_t
+ACE_LONG_CALL_ FLASH_26LV800BTC_sector_erase_ns (volatile unsigned short *sector_addr)
 {
-    enum FLASH_26LV800BTC_err_code err;
+    ACE_err_t err = DEV_ERR_ADDR;
     if (((unsigned long)sector_addr)%2)
     {
-        return FLASH_26LV800BTC_addr;
+        return err;
     }
     if (sector_addr < (BASE_ADDR))
     {
-        return FLASH_26LV800BTC_addr;
+        return err;
     }
     if (sector_addr >= (BASE_ADDR + FLASH_SIZE/2))
     {
-        return FLASH_26LV800BTC_addr;
+        return DEV_ERR_LEN;
     }
     sector_erase (sector_addr);
     err = poll (sector_addr, 0xFFFF);
     return err;
 }
 
-extern enum FLASH_26LV800BTC_err_code
+extern ACE_err_t
 FLASH_26LV800BTC_sector_erase_is (volatile unsigned short *sector_addr)
 {
-    enum FLASH_26LV800BTC_err_code err;
+    ACE_err_t err;
     USO_cpu_status_t ps;
     ps = USO_disable ();
-    err = sector_erase_ns (sector_addr);
+    err = FLASH_26LV800BTC_sector_erase_ns (sector_addr);
     USO_restore (ps);
     return err;
 }
 
-
-ACE_SECTION_ (".ramcode")
 static void *
+FLASH_26LV800BTC_memcpy (void *s, const void *ct, ACE_size_t n)
+ACE_SECTION_(".ramcode");
+
+ACE_INLINE_ static void *
 FLASH_26LV800BTC_memcpy (void *s, const void *ct, ACE_size_t n)
 {
     char *p1 = (char *)s, *p2 = (char *)ct;
@@ -202,26 +239,30 @@ FLASH_26LV800BTC_memcpy (void *s, const void *ct, ACE_size_t n)
     return s;
 }
 
-ACE_SECTION_ (".ramcode")
-static enum FLASH_26LV800BTC_err_code
-ACE_LONG_CALL_ programm_ns (volatile unsigned short *addr, const char *data, ACE_size_t len)
+/* this function must be extern to be in the ramcode section (run build)! */
+extern ACE_err_t
+ACE_LONG_CALL_ FLASH_26LV800BTC_programm_ns (volatile unsigned short *addr, const char *data, ACE_size_t len)
+ACE_SECTION_(".ramcode");
+
+extern ACE_err_t
+ACE_LONG_CALL_ FLASH_26LV800BTC_programm_ns (volatile unsigned short *addr, const char *data, ACE_size_t len)
 {
-    enum FLASH_26LV800BTC_err_code err = FLASH_26LV800BTC_ok;
+    ACE_err_t err = DEV_ERR_ADDR;
     if (((unsigned long)addr)%2)
     {
-        return FLASH_26LV800BTC_addr;
+        return err;
     }
     if (len%2)
     {
-        return FLASH_26LV800BTC_len;
+        return err;
     }
     if (addr < (BASE_ADDR))
     {
-        return FLASH_26LV800BTC_addr;
+        return err;
     }
     if ((addr + len) >= (BASE_ADDR + FLASH_SIZE/2))
     {
-        return FLASH_26LV800BTC_addr;
+        return DEV_ERR_LEN;
     }
     for (; len >= 2; ++addr)
     {
@@ -233,42 +274,45 @@ ACE_LONG_CALL_ programm_ns (volatile unsigned short *addr, const char *data, ACE
         data += sizeof(s);
         program (addr, s);
         err = poll (addr, s);
-        if (err != FLASH_26LV800BTC_ok)
+        if (err != ACE_OK)
             break;
     }
     return err;
 }
 
-extern enum FLASH_26LV800BTC_err_code
+extern ACE_err_t
 FLASH_26LV800BTC_programm_is (volatile unsigned short *addr, const char *data, ACE_size_t len)
 {
-    enum FLASH_26LV800BTC_err_code err;
+    ACE_err_t err;
     USO_cpu_status_t ps;
     ps = USO_disable ();
-    err = programm_ns (addr, data, len);
+    err = FLASH_26LV800BTC_programm_ns (addr, data, len);
     USO_restore (ps);
     return err;
 }
 
+/* this function must be extern to be in the ramcode section (run build)! */
+extern ACE_err_t
+ACE_LONG_CALL_ FLASH_26LV800BTC_get_id_ns (volatile unsigned short *mf, volatile unsigned short *device)
+ACE_SECTION_(".ramcode");
 
-ACE_SECTION_ (".ramcode")
-static enum FLASH_26LV800BTC_err_code
-ACE_LONG_CALL_ get_id_ns (unsigned short *mf, unsigned short *device)
+extern ACE_err_t
+ACE_LONG_CALL_ FLASH_26LV800BTC_get_id_ns (volatile unsigned short *mf, volatile unsigned short *device)
 {
-    enum FLASH_26LV800BTC_err_code err = FLASH_26LV800BTC_ok;
+    ACE_err_t err = ACE_OK;
     *mf = silicon_id (ADI_MANUFACTURE);
     *device = silicon_id (ADI_DEVICE);
     reset ();
     return err;
 }
 
-extern enum FLASH_26LV800BTC_err_code
-FLASH_26LV800BTC_get_id_is (unsigned short *mf, unsigned short *device)
+extern ACE_err_t
+FLASH_26LV800BTC_get_id_is (volatile unsigned short *mf, volatile unsigned short *device)
 {
-    enum FLASH_26LV800BTC_err_code err;
+    ACE_err_t err;
     USO_cpu_status_t ps;
     ps = USO_disable ();
-    err = get_id_ns(mf, device);
+    err = FLASH_26LV800BTC_get_id_ns(mf, device);
     USO_restore (ps);
     return err;
 }

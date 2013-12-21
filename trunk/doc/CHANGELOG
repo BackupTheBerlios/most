@@ -1,7 +1,29 @@
-VERSION = V-0-1-0-d-9 : commit
+VERSION = V-0-1-0-d-10 : develop
 =====================
 
-DATE = 22.11.2013
+DATE = 27.11.2013
+AUTOR = maik
+
+STATE =
+
+ADD = MOST_BUILD := debug|run (just show build variant in version string)
+
+FIX = la2-run: fixed flash_26LV800BTC,
+               (the behavior for __attribute__ (section) seems to be different for
+                debug code or run code, for optimized code the function for .ramcode section must be
+                extern, subfunctions can be static, else the the .ramcode section is empty !)
+                for pflid added missing volatile
+      mfs: stream -> read, write return 0 instead of EOF (for all implemented streams)
+                     if an error occurs the USO_current()->error must be used as we can not return an error
+      uso/arch/cpu: io_ports implementation (not completed) the different io_ports from dev were removed.
+      
+
+
+
+VERSION = V-0-1-0-d-9 : taged
+=====================
+
+DATE = 27.11.2013
 AUTOR = maik
 
 STATE = pc - run: MOST_REMOVE_UNUSED == ON is not supported by pc currently!

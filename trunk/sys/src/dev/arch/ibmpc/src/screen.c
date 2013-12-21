@@ -6,8 +6,8 @@
  */
 
 #include <ace/string.h>
+#include <uso/io_ports.h>
 #include <dev/arch/ibmpc/screen.h>
-#include <dev/arch/ibmpc/ports.h>
 #include <dev/err.h>
 
 /*
@@ -48,10 +48,10 @@ screen_set_hw_cursor(IBMPC_screen_t *screen)
 {
     //Hardware Cursor verschieben
     ACE_u16_t hw_cursor_pos = screen->cursor_x + screen->cursor_y * SCREEN_WIDTH;
-    outb(0x3D4, 15);
-    outb(0x3D5, hw_cursor_pos);
-    outb(0x3D4, 14);
-    outb(0x3D5, hw_cursor_pos >> 8);
+    USO_out_b(0x3D4, 15);
+    USO_out_b(0x3D5, hw_cursor_pos);
+    USO_out_b(0x3D4, 14);
+    USO_out_b(0x3D5, hw_cursor_pos >> 8);
 }
 
 extern void

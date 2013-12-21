@@ -54,13 +54,13 @@ ACE_fgetc (ACE_FILE * in)
 extern int
 ACE_fputc (ACE_FILE * out, int c)
 {
-    int ret;
     unsigned char t;
     if (c == ACE_EOF) return c;
     t = (unsigned char)c;
-    ret = ACE_fwrite (out, (char*)&t, sizeof (t));
-    if (ret < 0) return ACE_EOF;
-    return (int)t;
+    if (ACE_fwrite (out, (char*)&t, sizeof (t)) >= sizeof (t)){
+        return (int)t;
+    }
+    return ACE_EOF;
 }
 
 extern char*

@@ -7,10 +7,10 @@
 #include <ace/stdio.h>
 #include <ace/assert.h>
 #include <uso/scheduler.h>
+#include <uso/io_ports.h>
 #include <dev/digin.h>
 #include <dev/timer.h>
 #include <dev/clock.h>
-#include <dev/arch/ibmpc/ports.h>
 
 #include <init/init.h>
 #include <arch/ticks.h>
@@ -27,9 +27,9 @@ get_us (void)
 static void pit_init(int freq)
 {
    int counter = 1193182 / freq;
-   outb(0x43, 0x34);
-   outb(0x40,counter & 0xFF);
-   outb(0x40,counter >> 8);
+   USO_out_b(0x43, 0x34);
+   USO_out_b(0x40,counter & 0xFF);
+   USO_out_b(0x40,counter >> 8);
 }
 extern void
 PC_ticks_init (void)

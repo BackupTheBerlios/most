@@ -95,7 +95,7 @@ flash_write (MFS_stream_t * stream, const char *buf, ACE_size_t len)
     p = (fl->sector_start + stream->pos_rx);
 
     if ( p >= fl->sector_end) {
-        return ACE_EOF;
+        return 0;
     }
 
     if ( (p + len) > fl->sector_end) {
@@ -107,7 +107,7 @@ flash_write (MFS_stream_t * stream, const char *buf, ACE_size_t len)
     error = DEV_at91_FLASHD_write ((unsigned int)p, (unsigned char *)buf, (unsigned int)l);
     if (error)
     {
-        return 0; /* todo return error value */
+        return 0;
     }
 
     stream->pos_rx += l;

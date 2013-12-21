@@ -40,7 +40,7 @@ idle (void)
 }
 
 extern void
-USO_transform (void (*init) (void), USO_stack_t * stack, int stack_size)
+USO_transform (void (*run) (void), USO_stack_t * stack, int stack_size)
 {
     USO_list_init (&interrupt_threads);
     USO_list_init (&system_threads);
@@ -51,7 +51,7 @@ USO_transform (void (*init) (void), USO_stack_t * stack, int stack_size)
     USO_thread_work_set (&idle_thread, NULL);
     current_thread = &idle_thread;
     old_thread = &idle_thread;
-    init ();
+    run ();
     idle ();
 }
 
