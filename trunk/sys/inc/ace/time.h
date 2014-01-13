@@ -61,6 +61,7 @@ extern ACE_err_t ACE_time_to_param (ACE_time_t * time);
  * Print time.
  *
  * @param time : pointer to time type.
+ * @param buf : output buffer.
  *
  * @return error.
  */

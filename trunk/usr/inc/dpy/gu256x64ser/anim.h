@@ -24,27 +24,27 @@
  */
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_Initialize (void);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_Standard (const char *text);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_Travel (const char *text);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_Strobe (const char *text);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_Snow (const char *text);
 

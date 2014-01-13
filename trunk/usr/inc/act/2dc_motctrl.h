@@ -41,13 +41,13 @@ extern void
 ACT_2dc_mc_stop(ACT_2dc_motctrl_t *ctr);
 
 extern void
-ACT_2dc_mc_go(ACT_2dc_motctrl_t *ctrl, int speed);
-
-extern void
-ACT_2dc_mc_turn(ACT_2dc_motctrl_t *ctrl, int speed, int turn);
+ACT_2dc_mc_go(ACT_2dc_motctrl_t *ctrl, int speed, int turn);
 
 extern void
 ACT_2dc_mc_init (ACT_2dc_motctrl_t *ctrl, struct ACT_2dc_motctrl_io *io, int max, int dt, int du);
+
+extern void
+ACT_2dc_mc_install (ACT_2dc_motctrl_t *mc, MFS_descriptor_t * dir, char *name);
 
 
 #endif /* MOTCTRL_H_ */

@@ -60,7 +60,7 @@ extern char stack_start;        /* stack_end defined in *.ld!, SAM_TOTAL_STACK_S
 extern char heap_start, heap_end;       /* Defined in *.ld! */
 
 
-#define LA2_LOOPS_PER_MSEC 420L;
+#define LA2_LOOPS_PER_MSEC 300L;
 #define RED_PAUSE (1000000L)       /* 1sec */
 #define RED_PULSE (200L)          /* 5 p/s */
 #define GREEN_PULSE (200L)         /* 5 p/s */

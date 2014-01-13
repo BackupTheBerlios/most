@@ -63,7 +63,7 @@
 
 #define ACE_MOST "freoMOST"
 
-#define ACE_MOST_VERSION "V-0-1-0-d-10"
+#define ACE_MOST_VERSION "V-0-1-0-d-11"
 
 #if defined MOST_BUILD_DEBUG
 #define ACE_MOST_BUILD    "debug"
@@ -78,7 +78,10 @@
 /* CVS Log:
  *
  * $Log: version.h,v $
- * Revision 1.10  2013/12/21 11:10:39  maik42
+ * Revision 1.11  2014/01/13 10:39:34  maik42
+ * Version V-0-1-0-d-11  see CHANGELOG, fexible OCD configuration, add lalinea, ...
+ *
+ * Revision 1.10  2013-12-21 11:10:39  maik42
  * V-0-1-0-d-10 see CHANGELOG, just sync development
  *
  * Revision 1.9  2013-11-27 21:27:41  maik42

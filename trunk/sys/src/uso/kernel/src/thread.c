@@ -23,8 +23,6 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
 {
     USO_thread_t *thread = (USO_thread_t *) desc->represent;
 
-    
-    
     char *priority, *scheduling, *state, *error;
     error = "error";
 
@@ -169,13 +167,21 @@ info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
     }
 }
 
+static ACE_err_t delete (MFS_descriptor_t *desc)
+{
+    USO_thread_t *thread = (USO_thread_t *) desc->represent;
+    if (thread->state == USO_INIT || thread->state == USO_DEAD){
+        return ACE_OK;
+    }
+    return DEF_ERR_IN_USE;
+}
 
 static struct MFS_descriptor_op thread_descriptor_op = {
                 .open = NULL,
                 .close = NULL,
                 .info = info,
                 .control = NULL,
-                .delete = NULL
+                .delete = delete
 };
 
 static void

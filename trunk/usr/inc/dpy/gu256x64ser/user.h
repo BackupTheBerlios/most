@@ -24,38 +24,38 @@
  */
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_UserSetUpModeStart (void);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_UserSetUpModeEnd (void);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_MemorySwSetting (unsigned char memorySw, unsigned char data);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_MemorySwDataSend (unsigned char data);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_FROMImageDefinition (unsigned long address,
                                                  unsigned long length, unsigned char *data);
 
-/** 
- * .
+/**
+ * 
  */
 extern void DPY_gu256x64ser_SaveDownloadedChar (unsigned char fontType);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_FROMMacroDefinition (unsigned char registration,
                                                  unsigned short length,
@@ -63,12 +63,12 @@ extern void DPY_gu256x64ser_FROMMacroDefinition (unsigned char registration,
                                                  unsigned char idleTime, unsigned char *data);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_DownloadCharTransfer (unsigned char fontType);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_DisplayStatusSendData (unsigned char status,
                                                    unsigned char address, unsigned char length);

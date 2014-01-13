@@ -79,17 +79,16 @@ static void
 tty_control (MFS_descriptor_t * desc, int number, MFS_ctrl_entry_t *entry)
 {
     CLI_tty_t *tty = (CLI_tty_t *) desc->represent;
+    if (entry->type == MFS_CTRL_HELP){
+        ACE_sprintf(entry->value.s, "\t 0 l in_mode\n"
+                                    "\t 1 l out_mode\n"
+                                    "\t 2 l in_transl\n"
+                                    "\t 3 l out_transl\n"
+                                    "\t 4   def_transl\n"
+                                    "\t 5 l rx_timeout\n");
+        return;
+    }
     switch (number){
-        case 0:
-            if (entry->type == MFS_CTRL_INFO){
-                ACE_sprintf(entry->value.s, "1 l in_mode\n"
-                                            "2 l out_mode\n"
-                                            "3 l in_transl\n"
-                                            "4 l out_transl\n"
-                                            "5   def_transl\n"
-                                            "6 l rx_timeout");
-            }
-            break;
         case CLI_TTY_CTRL_IN_MODE:
             if (entry->type == MFS_CTRL_LONG){
                 tty->in_mode = entry->value.l;

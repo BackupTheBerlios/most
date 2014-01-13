@@ -38,17 +38,16 @@ static void
 control (MFS_descriptor_t * desc, int number, MFS_ctrl_entry_t *entry)
 {
     DEV_digout_t *out = (DEV_digout_t *) desc->represent;
+    if (entry->type == MFS_CTRL_HELP){
+        ACE_sprintf(entry->value.s, "\t 0   set\n"
+                                    "\t 1   clear\n");
+        return;
+    }
     switch (number){
         case 0:
-            if (entry->type == MFS_CTRL_INFO){
-                ACE_sprintf(entry->value.s, "1   set\n"
-                                            "2   clear\n");
-            }
-            break;
-        case 1:
             DEV_digout_set(out);
             break;
-        case 2:
+        case 1:
             DEV_digout_clear(out);
             break;
         default:

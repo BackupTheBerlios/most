@@ -25,6 +25,9 @@
  * @{
  */
 
+/**
+ * 
+ */
 enum CLI_pipe_state
 {
     CLI_PIPE_INIT,      /**< pipe is initialized. */

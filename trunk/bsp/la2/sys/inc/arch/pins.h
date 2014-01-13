@@ -13,20 +13,24 @@
  * @{
  */
 
+#include <dev/arch/at91sam7a2/csp.h>
 
-#define MMC_WP      PIO0
-#define MMC_CP      PIO1
-#define STAT_LED    PIO2
+#define MMC_WP         PIO0
+#define MMC_CP         PIO1
+#define STAT_LED       PIO2
+#define LAN_RESET      PIO3
+#define RED_LED        PIO4
+#define GREEN_LED      PIO5
+#define SWITCH         PIO6
+#define PUSHBUTTON     PIO7
+#define M1_A           PIO8
+#define M1_B           PIO9
+#define M2_A           PIO10
+#define M2_B           PIO11
+#define PIO_RESERVE_1  PIO12
+#define PIO_RESERVE_2  PIO13
+
 #define RUN_LED     STAT_LED
-#define LAN_RESET   PIO3
-#define RED_LED     PIO4
-#define GREEN_LED   PIO5
-#define SWITCH      PIO6
-#define PUSHBUTTON  PIO7
-#define M1_A        PIO8
-#define M1_B        PIO9
-#define M2_A        PIO10
-#define M2_B        PIO11
 
 #define DIO_0       PIO14
 #define DIO_1       PIO15
@@ -51,6 +55,12 @@
 #define LED_BAR1_DATA     DIO_3
 #define LED_BAR2_CLK      DIO_4
 #define LED_BAR2_DATA     DIO_5
+#define ULTRA_SONIC       DIO_6
+#define DIO_RESERVE_1     DIO_7
+#define SIDE_LINE_1       DIO_8
+#define SIDE_LINE_2       DIO_9
+#define DIO_RESERVE_2     DIO_10
+#define DIO_RESERVE_3     DIO_11
 #define INPUT_1           DIO_12
 #define INPUT_2           DIO_13
 #define OUTPUT_1          DIO_14
@@ -60,6 +70,13 @@
  *
  */
 extern void LA2_pins_init (void);
+
+extern void
+LA2_pins_cfg_out(ACE_u32_t pin, int state);
+
+extern void
+LA2_pins_cfg_in(ACE_u32_t pin);
+
 
 /** @}
  */

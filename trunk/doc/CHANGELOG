@@ -1,4 +1,30 @@
-VERSION = V-0-1-0-d-10 : develop
+VERSION = V-0-1-0-d-11 : commit
+=====================
+
+DATE = 13.01.2014
+AUTOR = maik
+
+STATE = la2-run: lalinea compileable and running
+        all other targets are not checked
+
+ADD = OpenOCD :more flexible configuration and also tried with OpenOCD 0.7.0
+      usr/act: rc_servo  (rc servo motor)
+      usr/sen: encoder  (the encoder is made with the groove ir-reflective sensors)
+      usr/sen: usonic_ranger (groove ultra sonic ranger)
+      bsp/la2/usr/lalinea (a line follower robot application)
+      new simple template for homepage and api(GPL license, the old had a creative commons license)
+      put homepage to cvs tree and add projects side for planned freoMOST projects(like lalinea)
+      put build_cross.sh script and cross dir to cvs tree 
+
+FIX = the descriptor operator for threads must implement delete function to be able to delete
+      dead threads.
+      !for CLI switch the active CLI thread can not switch to a other CLI if it blocks( as
+      it can not read data (function keys) from input-> this is not a nice behavior but currently i dont
+      change it!
+
+
+
+VERSION = V-0-1-0-d-10 : committed (just development)
 =====================
 
 DATE = 27.11.2013
@@ -20,7 +46,7 @@ FIX = la2-run: fixed flash_26LV800BTC,
 
 
 
-VERSION = V-0-1-0-d-9 : taged
+VERSION = V-0-1-0-d-9 : tagged
 =====================
 
 DATE = 27.11.2013

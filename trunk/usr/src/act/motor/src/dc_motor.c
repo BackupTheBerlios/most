@@ -96,7 +96,6 @@ motor_run (void *arg)
         USO_sleep (USO_MSEC_2_TICKS (mot->dt));
         USO_lock(&mot->lock);
     }
-    motor_cleanup (mot);
     USO_unlock(&mot->lock);
     USO_log_puts (USO_LL_INFO, "Motor is stopped.\n");
     return ACE_OK;
@@ -105,31 +104,32 @@ motor_run (void *arg)
 extern void
 ACT_dc_motor_init (ACT_dc_motor_t *mot, DEV_pwm_t *U_out,
                 DEV_digout_t *dir_a, DEV_digout_t *dir_b,
-                int U_max, int dt, int du,
-                char *name)
+                int U_max, int dt, int du)
 {
     mot->U_out = U_out;
     mot->dir_a = dir_a;
     mot->dir_b = dir_b;
     mot->U_max = U_max;
+    mot->U_soll = 0;
+    mot->U_ist = 0;
     mot->dt = dt;
     mot->du = du;
     mot->thread = NULL;
     USO_mutex_init(&mot->lock);
     USO_barrier_init(&mot->U_soll_changed);
     mot->state = ACT_DC_MOT_INIT;
-    mot->name = name;
+    mot->desc = NULL;
 }
 
 extern void
-ACT_dc_motor_start(ACT_dc_motor_t *mot)
+ACT_dc_motor_start(ACT_dc_motor_t *mot, char *name)
 {
     if (mot->state == ACT_DC_MOT_INIT || mot->state == ACT_DC_MOT_DEAD){
         mot->thread = USO_thread_new (motor_run,
                         MOTOR_STACK_SIZE,
                         USO_SYSTEM,
                         USO_FIFO,
-                        mot->name);
+                        name);
         if (mot->thread){
             USO_thread_arg_init (mot->thread, mot);
             USO_thread_flags_set (mot->thread, 1 << USO_FLAG_DETACH);
@@ -184,4 +184,91 @@ ACT_dc_motor_go(ACT_dc_motor_t *mot, int U_soll)
         USO_go_all(&mot->U_soll_changed);
     }
 }
+
+static void
+info (MFS_descriptor_t * desc, int number, MFS_info_entry_t *entry)
+{
+    ACT_dc_motor_t *mot = (ACT_dc_motor_t *) desc->represent;
+    switch (number){
+        case 0:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "U max";
+            entry->value.l = mot->U_max;
+            break;
+        case 1:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "U ist";
+            entry->value.l = mot->U_ist;
+            break;
+        case 2:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "U soll";
+            entry->value.l = mot->U_soll;
+            break;
+        case 3:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "dt";
+            entry->value.l = mot->dt;
+            break;
+        case 4:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "du";
+            entry->value.l = mot->du;
+            break;
+        case 5:
+            entry->type = MFS_INFO_LONG;
+            entry->name = "State";
+            entry->value.l = mot->state;
+            break;
+        default:
+            entry->type = MFS_INFO_NOT_AVAIL;
+            break;
+    }
+}
+
+static void
+control (MFS_descriptor_t * desc, int number, MFS_ctrl_entry_t *entry)
+{
+    ACT_dc_motor_t *mot = (ACT_dc_motor_t *) desc->represent;
+    if (entry->type == MFS_CTRL_HELP){
+        ACE_sprintf(entry->value.s, "\t 0   start\n"
+                                    "\t 1   stop\n"
+                                    "\t 2   break\n"
+                                    "\t 3 l go\n");
+        return;
+    }
+    switch (number){
+        case 0:
+            ACT_dc_motor_start(mot, desc->name);
+            break;
+        case 1:
+            ACT_dc_motor_stop(mot);
+            break;
+        case 2:
+            ACT_dc_motor_break(mot);
+            break;
+        case 3:
+            if (entry->type == MFS_CTRL_LONG){
+                ACT_dc_motor_go(mot, entry->value.l);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+static struct MFS_descriptor_op descriptor_op = {
+    .open = NULL,
+    .close = NULL,
+    .info = info,
+    .control = control,
+    .delete = NULL
+};
+
+extern void
+ACT_dc_motor_install (ACT_dc_motor_t *mot, MFS_descriptor_t * dir, char *name)
+{
+    mot->desc = MFS_descriptor_create (dir, name, MFS_USR, &descriptor_op, (MFS_represent_t *) mot);
+}
+
 

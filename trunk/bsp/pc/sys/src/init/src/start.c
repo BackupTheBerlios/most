@@ -65,8 +65,8 @@ start_run (void *nix)
     USO_log_puts (USO_LL_INFO, "Start: Kernel log on tty0.\n");
 
     unsigned long ticks_start = DEV_get_ticks ();
-    DEV_cpudelay (DEV_USEC_2_LOOPS(100000L)); /* todo DEV_cpudelay does not work ??? Qemu??? */
-    USO_log_printf (USO_LL_INFO, "Loop calib 100ms: %lu.\n",
+    DEV_cpudelay (DEV_USEC_2_LOOPS(10000L)); /* todo DEV_cpudelay does not work ??? Qemu??? */
+    USO_log_printf (USO_LL_INFO, "Loop calib 10ms: %lu.\n",
                     USO_TICKS_2_MSEC(DEV_get_ticks_diff (ticks_start)));
 
     USO_log_puts (USO_LL_INFO, "Timer start.\n");

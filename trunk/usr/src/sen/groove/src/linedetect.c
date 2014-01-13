@@ -3,6 +3,9 @@
  *
  *  Created on: 04.08.2013
  *      Author: maik
+ * 
+ * This line detection needs 2 groove line finder sensor.
+ * Also for the analog mode the analog signal is wired to the NC pin of the connector.
  */
 
 #include <ace/stdio.h>
@@ -28,7 +31,6 @@ extern void SEN_line_init(SEN_linedetect_t *line,
     line->av = 0;
     line->lastdiff = 0;
     line->lastav = 0;
-    line->desc = 0;
 }
 
 static void
@@ -139,6 +141,6 @@ static struct MFS_descriptor_op line_descriptor_op = {
 extern void
 SEN_line_install (SEN_linedetect_t *line, MFS_descriptor_t * dir, char *name)
 {
-    line->desc = MFS_descriptor_create (dir, name, MFS_SYS, &line_descriptor_op, (MFS_represent_t *) line);
+    MFS_descriptor_create (dir, name, MFS_USR, &line_descriptor_op, (MFS_represent_t *) line);
 }
 

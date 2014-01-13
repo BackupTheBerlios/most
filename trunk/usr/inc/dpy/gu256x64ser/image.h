@@ -24,13 +24,13 @@
  */
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_RAMImageDefinition (unsigned long address,
                                                 unsigned long length, unsigned char *data);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_DownloadImageDisplay (unsigned char displayMemory,
                                                   unsigned long imageAddress,
@@ -38,7 +38,7 @@ extern void DPY_gu256x64ser_DownloadImageDisplay (unsigned char displayMemory,
                                                   unsigned short x, unsigned short y);
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_RealTimeImageDisplay (unsigned short x,
                                                   unsigned short y, unsigned char *data);

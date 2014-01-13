@@ -11,7 +11,6 @@
 
 #include <test.h>
 #include <err.h>
-#include <lfr.h>
 
 #include <tst/ser_test.h>
 #include <tst/thread_test.h>
@@ -57,8 +56,6 @@ LA2_main (void)
 
     MFS_descriptor_t *test;
     test = MFS_directory_create (app, "test");
-    LFR_init ();
-    LFR_install(app);
     MFS_close_desc(app);
 
     TST_ram_test_install (test);

@@ -50,5 +50,16 @@ MOST_TARGET_TYPE:=$(MOST_TARGET)-$(MOST_CPU_TYPE)
 ## =========================
 
 ## configure the path to your Cross Toolchain
-MOST_CROSS:=/home/maik/work/cross/bin/$(MOST_HOST)/$(MOST_TARGET)/$(MOST_GCC)$(MOST_GCC_PATCH)
+MOST_CROSS:=$(MOST_ROOT)/cross/bin/$(MOST_HOST)/$(MOST_TARGET)/$(MOST_GCC)$(MOST_GCC_PATCH)
+
+## OCD Configuration
+## =================
+
+MOST_OCD_CFG_DIR := $(MOST_ROOT)/etc/ocd
+#MOST_OCD_CFG_DIR := /usr/share/openocd/scripts
+#MOST_OCD_CFG_DIR := /usr/local/share/openocd/scripts
+
+MOST_OCD_BIN_PREFIX :=
+#MOST_OCD_BIN_PREFIX :=/usr/bin/
+#MOST_OCD_BIN_PREFIX :=/usr/local/bin/
 

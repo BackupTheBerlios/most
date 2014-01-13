@@ -20,10 +20,14 @@
  */
 
 /**
- * Global variable defining loop circles needed for one msec.
+ * Global variable defining loop circles needed for one millisec.
  * The correct value for this determined in the BSP.
+ * This must not be long long because than calculation takes too long,
+ * for example la2: with long long the lowest cpudelay would be 100 usec, and
+ * with long the lowest cpudelay would be 20 usec!
+ * 
  */
-extern unsigned long long DEV_loops_per_msec;
+extern unsigned long DEV_loops_per_msec;
 
 /**
  * Convert usec to loop circles.

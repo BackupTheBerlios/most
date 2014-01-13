@@ -42,7 +42,6 @@ struct SEN_linedetect{
     int lastav;
     int threshold;
     int max;
-    MFS_descriptor_t *desc;
 };
 
 typedef struct SEN_linedetect SEN_linedetect_t;

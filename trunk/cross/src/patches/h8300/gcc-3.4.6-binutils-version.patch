@@ -1,0 +1,21 @@
+diff -Naur gcc-3.4.6.orig/gcc/configure gcc-3.4.6/gcc/configure
+--- gcc-3.4.6.orig/gcc/configure	2010-12-26 14:59:18.082537706 +0100
++++ gcc-3.4.6/gcc/configure	2010-12-26 15:02:16.122617600 +0100
+@@ -9971,7 +9971,7 @@
+          $gcc_cv_as_gas_srcdir/configure \
+          $gcc_cv_as_gas_srcdir/configure.in \
+          $gcc_cv_as_gas_srcdir/Makefile.in ; do
+-  gcc_cv_gas_version=`grep '^VERSION=[0-9]*\.[0-9]*' $f`
++  gcc_cv_gas_version=`grep '^ *VERSION=[0-9]*\.[0-9]*' $f | sed 's/^ //'`
+   if test x$gcc_cv_gas_version != x; then
+     break
+   fi
+@@ -10100,7 +10100,7 @@
+ 	fi
+ 	for f in $gcc_cv_ld_bfd_srcdir/configure $gcc_cv_ld_gld_srcdir/configure $gcc_cv_ld_gld_srcdir/configure.in $gcc_cv_ld_gld_srcdir/Makefile.in
+ 	do
+-		gcc_cv_gld_version=`grep '^VERSION=[0-9]*\.[0-9]*' $f`
++		gcc_cv_gld_version=`grep '^ *VERSION=[0-9]*\.[0-9]*' $f | sed 's/^ //'`
+ 		if test x$gcc_cv_gld_version != x; then
+ 			break
+ 		fi

@@ -105,6 +105,13 @@ extern void CLI_config_set_filename (char *name);
  */
 extern void CLI_config_install (ACE_err_t (*read)(void), ACE_err_t (*write)(void), ACE_err_t (*ip)(void));
 
+/** @}
+ */
+
+/** @}
+ */
+
+
 
 #endif /* CONFIG_H_ */
 

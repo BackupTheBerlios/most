@@ -130,12 +130,11 @@ static void
 serial_control (MFS_descriptor_t *desc, int number, MFS_ctrl_entry_t *entry)
 {
     DEV_serial_t *serial = (DEV_serial_t *) desc->represent;
+    if (entry->type == MFS_CTRL_HELP){
+        ACE_sprintf(entry->value.s, "\t 0 l rx_timeout\n");
+        return;
+    }
     switch (number){
-        case 0:
-            if (entry->type == MFS_CTRL_INFO){
-                ACE_sprintf(entry->value.s, "1 l rx_timeout\n");
-            }
-            break;
         case DEV_SER_CTRL_RX_TIMEOUT:
             if (entry->type == MFS_CTRL_LONG){
                 serial->rx_timeout_sec = entry->value.l;

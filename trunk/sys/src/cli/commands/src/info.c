@@ -6,11 +6,41 @@
  */
 
 #include <ace/stdio.h>
+#include <ace/stdlib.h>
 #include <cli/command.h>
 #include <cli/arg.h>
 #include <mfs/descriptor.h>
 #include <mfs/directory.h>
 #include <mfs/sysfs.h>
+
+static void
+print_info_value (MFS_descriptor_t * desc, int i)
+{
+    if (desc != NULL)
+    {
+        MFS_info_entry_t entry;
+        MFS_info_desc (desc, i, &entry);
+        if (entry.type != MFS_INFO_NOT_AVAIL){
+            switch (entry.type){
+                case MFS_INFO_LONG:
+                    ACE_printf("%li", entry.value.l);
+                    break;
+                case MFS_INFO_SIZE:
+                    ACE_printf("%lu", entry.value.z);
+                    break;
+                case MFS_INFO_PTR:
+                    ACE_printf("%p", entry.value.p);
+                    break;
+                case MFS_INFO_STRING:
+                    ACE_printf("%s", entry.value.s);
+                    break;
+                default:
+                    ACE_putc('?');
+                    break;
+            }
+        }
+    }
+}
 
 static void
 print_info (MFS_descriptor_t * desc)
@@ -24,19 +54,19 @@ print_info (MFS_descriptor_t * desc)
             if (entry.type != MFS_INFO_NOT_AVAIL){
                 switch (entry.type){
                     case MFS_INFO_LONG:
-                        ACE_printf("\t%s = %li;\n", entry.name, entry.value.l);
+                        ACE_printf("\t %i %s = %li;\n", i, entry.name, entry.value.l);
                         break;
                     case MFS_INFO_SIZE:
-                        ACE_printf("\t%s = %lu;\n", entry.name, entry.value.z);
+                        ACE_printf("\t %i %s = %lu;\n", i, entry.name, entry.value.z);
                         break;
                     case MFS_INFO_PTR:
-                        ACE_printf("\t%s = %p;\n", entry.name, (void*)entry.value.p);
+                        ACE_printf("\t %i %s = %p;\n", i, entry.name, entry.value.p);
                         break;
                     case MFS_INFO_STRING:
-                        ACE_printf("\t%s = %s;\n", entry.name, (char*)entry.value.s);
+                        ACE_printf("\t %i %s = %s;\n", i, entry.name, entry.value.s);
                         break;
                     default:
-                        ACE_printf("\t%s = ?;\n", entry.name);
+                        ACE_printf("\t %i %s = ?;\n", i, entry.name);
                         break;
                 }
             } else {
@@ -58,22 +88,14 @@ CLI_cmd_info (CLI_interpreter_t * cli)
     char *argv[CLI_MAX_ARG];
 
     argc = CLI_arg_parse(cli->p.arg, argv);
+    desc = USO_thread_work_get(USO_current());
     if (argc >= 1)
     {
-        desc = MFS_resolve (argv[0]);
-        if (desc != NULL)
-        {
-            print_info (desc);
-            MFS_close_desc (desc);
-        }
-        else
-        {
-            err = DEF_ERR_NOT_FOUND;
-        }
+        print_info_value(desc, ACE_atoi(argv[0]));
     }
     else
     {
-        print_info (USO_thread_work_get(USO_current()));
+        print_info (desc);
     }
     return err;
 }

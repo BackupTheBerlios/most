@@ -1,8 +1,6 @@
-#include <dev/arch/at91sam7a2/csp.h>
-
 #include <arch/pins.h>
 
-void
+extern void
 LA2_pins_init (void)
 {
 
@@ -18,4 +16,21 @@ LA2_pins_init (void)
     /* Set high - (negative logic outputs to be off) */
     UPIO->SODR   = STAT_LED | RED_LED | GREEN_LED;
 
+}
+
+extern void
+LA2_pins_cfg_out(ACE_u32_t pin, int state)
+{
+    UPIO->OER = pin;
+    if (state){
+        UPIO->SODR = pin;
+    } else {
+        UPIO->CODR = pin;
+    }
+}
+
+extern void
+LA2_pins_cfg_in(ACE_u32_t pin)
+{
+    UPIO->ODR = pin;
 }

@@ -8,3 +8,4 @@ TEST := test
 FIND := find
 LS := ls -la
 TOUCH := touch
+OPENOCD := openocd

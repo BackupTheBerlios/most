@@ -26,7 +26,7 @@
  */
 
 /**
- * .
+ * 
  */
 extern void DPY_gu256x64ser_MemoryRewriteMode (void);
 

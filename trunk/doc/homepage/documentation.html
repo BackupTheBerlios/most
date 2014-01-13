@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+<meta name="robots" content="INDEX,NOFOLLOW">
+<meta name="description"
+content="free and open operating system designed for microcontrollers" >
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<title>freoMOST</title>
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+
+<body>
+
+<div id="header">
+ <table>
+ <tr>
+ <td> <img src="images/maik_sl.png" alt=""> </td>
+ <td>free & open<br> Microcontroller<br> Operating System Tool</td>
+ <td> <h1> <font color="orange">f r e o</font> <font color="grey"> M O S T</font>  </h1> </td>
+ <td> <img src="images/documentation.png" alt=""> </td>
+ </tr>
+ </table>
+
+ <div id="menu">
+  <ul id="nav">
+  <li><a href="index.html"  >Home</a></li>
+  <li><a href="download.html"  >Download</a></li>
+  <li><a href="documentation.html"  >Documentation</a></li>
+  <li><a href="projects.html"  >Projects</a></li>
+  <li><a href="imprint.html"  >Imprint</a></li>
+  </ul>
+ </div>
+</div>
+
+
+<div id="content">
+
+<div id="right">
+
+<h2>Documentation</h2>
+
+<p>
+This documentation is not complete and up to date but it can help to understand the concept.
+If you want to work with most you should read the source code.
+The MOST API is generated from the header files and shall describe the interface,
+but it is not well tended. In the past no work was made here.
+</p>
+
+
+<ul>
+<li><a href="#hw"> Supported hardware </a></li>
+<li><a href="#roadmap"> Roadmap to MOST file system layout (PC) </a></li>
+<li><a href="#build"> Basic build information </a></li>
+<li><a href="#eclipse"> Basic Eclipse setup </a></li>
+<li><a href="#ocd"> Basic OpenOCD howto </a></li>
+<li><a href="#rs232"> Useage of RS232 terminal for interaction and logging </a></li>
+<li><a href="#prog"> Where to start programing</a></li>
+<li><a href="#devel"> How to become a MOST developer </a></li>
+</ul>
+
+<h3> <a name=hw> Supported hardware </a> </h3>
+
+<p>
+<b>Microcontroller:</b>
+<ul>
+<li><b>ARM7</b>
+<ul> <li>AT91SAM7X256</li> </ul>
+<ul> <li>AT91SAM7A2</li> </ul>
+</li>
+<li><b>H8</b>
+<ul> <li>H8/3003</li> </ul>
+</li>
+<li><b>I386</b>
+<ul> <li>Qemu</li> </ul>
+</li>
+</ul>
+<b>Boards:</b>
+<ul>
+<li><b>Olimex</b>
+<ul> <li>SAM7-EX256</li> </ul>
+<ul> <li>SAM7-LA2</li> </ul>
+</li>
+<li><b>IBM compat PC</b>
+<ul> <li>Qemu</li> </ul>
+</li>
+<li><b>Other</b>
+<ul> <li>MDC</li> </ul>
+</li>
+</ul>
+</p>
+
+
+
+
+<h3> <a name=roadmap> Roadmap to the MOST filesystem layout </a> </h3>
+<p>
+First the names "board", "app" or "application" are used in this docu for your selected board and application,
+so you have to use the board and application name instead.
+</p>
+<ul>
+<li>trunk/bsp/ ....... Board Support Packages</li>
+<li>trunk/sys/ ....... System Libraries</li>
+<li>trunk/usr/ ....... User Libraries</li>
+<li>trunk/etc/ ....... Configfiles, basic Makefiles and Sripts</li>
+<li>trunk/doc/ ....... Documentation</li>
+</ul>
+<ul>
+<li>trunk/sys/./ace ....... C Library</li>
+<li>trunk/sys/./uso ....... Scheduler, Threads, IPC, Memory Managment</li>
+<li>trunk/sys/./dev ....... RS232, Timer, Digital IO, SPI, PWM, ADC, ...</li>
+<li>trunk/sys/./net ....... Ethernet, IP, UDP, (TCP not done)</li>
+<li>trunk/sys/./nap ....... Bootp, Tftp, Syslog, Y-modem</li>
+<li>trunk/sys/./mfs ....... Mini File System</li>
+<li>trunk/sys/./cli ....... Command Line Interpreter</li>
+</ul>
+<ul>
+<li>trunk/bsp/mdc ....... MOST Development Computer, outdated</li>
+<li>trunk/bsp/sam ....... Olimex SAM7-EX256 board, current development</li>
+<li>trunk/bsp/la2 ....... Olimex SAM7-LA2 board, current development</li>
+<li>trunk/bsp/pc  ....... PC Qemu, trail version</li>
+</ul>
+<ul>
+<li>trunk/bsp/"app"/sys ............ Board support package architecture  and initialization </li>
+<li>trunk/bsp/"app"/usr/putboot .. . Restore the Bootloader for targets without Jtag or HW-Bootloaders </li>
+<li>trunk/bsp/"app"/usr/boot ....... Bootloader</li>
+<li>trunk/bsp/"app"/usr/frame ...... Application Framework</li>
+<li>trunk/bsp/"app"/usr/test ....... Test Application</li>
+<li>trunk/bsp/"app"/usr/kernel ..... Trail kernel for PC-Qemu</li>
+</ul>
+<ul>
+<li>trunk/usr/./tst ....... For testing</li>
+<li>trunk/usr/./dpy ....... Displays</li>
+<li>trunk/usr/./sen ....... Sensors</li>
+<li>trunk/usr/./act ....... Actuators</li>
+</ul>
+
+
+
+
+
+<h3> <a name=build> Basic build information </a> </h3>
+<p>
+As host system currently linux is used.
+If you want to use windows you may use cygwin or minGW or yargato, but you need GNU make
+and some other unix utils.
+For me there is no reason to use windows, so you have to try if it works or not. 
+</p>
+<p>
+The environment variable <b>MOST_ROOT</b> must be set to /path/to/trunk.<br>
+You can do this by typing <font color="orange">source ROOT</font> at the trunk folder in your shell.  
+</p>
+<p>
+Create config files using the template config (Copy_2_Config) files and change it to your needs: <br>
+trunk/etc/<b>Config</b> configure your host system and select your board<br>
+trunk/bsp/"board"/<b>Config</b> configure your target system and select your application,<br>
+trunk/bsp/"board"/usr/"app"/<b>Config</b> (trunk/bsp/"board"/usr/Copy_2_Config), select debug or run build.
+</p>
+<p>
+For howto build an <b>ARM cross-toolchain</b> search on Herman Uwe`s page for "ARM cross-toolchain".  
+</p>
+<p>
+For building type <font color="orange">make all</font> at the trunk folder in your shell.<br>
+Use <font color="orange">make clean</font> to delete all builded object and dependencies files.<br>
+Use <font color="orange">make mrproper</font> to delete all builded files (distclean).<br>
+The libraries are placed in the sys/lib and usr/lib folder, the binaries are placed in 
+<b>bsp/"board"/usr/"app"/(debug | run)</b>.<br>
+<br>
+<b>bsp/"board"/usr/"app" targets:</b><br>
+<font color="orange">make app</font> build application (do not build libraries, do not replace app with the application name)<br>
+<font color="orange">make info</font> print binary information <br>
+<font color="orange">make clean</font> clean bsp <br>
+<font color="orange">make ocd-program</font> write binary to target <br>
+<font color="orange">make ocd-reset</font> reset target <br>
+<font color="orange">make ocd-debug</font> run ocd server which is used by gdb <br>
+Also you may use make targets in subdirectories of the trunk folder for just building a library or asmfiles
+ or objectfiles depending on which subdirectory you are.<br>
+Use <font color="orange">make help</font> to get information wich targets are possible.<br>
+For running the pc kernel in qemu type in the "bsp/pc/usr/kernel/debug"
+folder: <font color="orange">qemu -kernel kernel.elf</font> . 
+</p>
+<p>
+For building the MOST API with doxygen from the source tree,
+type in your shell <font color="orange">make doc</font> at the path trunk .<br>
+Then browse trunk/doc/api/html/index.html.<br> 
+</p>
+
+
+
+<h3> <a name=eclipse> Basic Eclipse setup </a> </h3>
+
+<p>
+<b>Install CDT:</b><br>
+<ul>
+<li>
+Debian: Install eclipse and cdt just with the installer.
+Other: 
+Menu - Help - Install new software<br>
+Select and install CDT <br>
+</li>
+</ul>
+
+<b>Setup CVS repository and checkout:</b><br>
+<ul>
+<li>For repository information see the DOWNLOAD section.
+</li>
+<li>
+CVS_Repositories: - HEAD - trunk - <br>
+Check Out As: New Project Wizard - HEAD - C Project:<br> 
+Project name: trunk, Project type: Makefile Project - Empty Project, Toolchain: other
+</li>
+</ul>
+
+<b>Setup build environment:</b><br>
+<ul>
+<li>
+MENU - Window - Preferences - C/C++ Environment<br>
+add: MOST_ROOT=/path/to/trunk
+</li>
+<li>
+MENU - Window - Preferences - Team - Ignored Recources<br>
+add: run, debug, Config, html, latex, TAGS, tags
+</li>
+<li>
+Right click on the cross folder.<br>
+Go to Properties.<br>
+Go to C/C++ Build.<br>
+Check "Exclude resource from build".<br>
+Click in OK button.<br>
+</li>
+<li>
+Setup the config files as descriped in "Basic build information".
+</li>
+<li>
+Import and use etc/style.xml.
+</li>
+</ul>
+
+<b>Create make targets and build most</b><br>
+<ul>
+<li>
+Create make target: select same as target name, unselect: use builder settings, build command: make, unselect: run all project builders<br> 
+trunk/Makefile - Make Targets - Create: all, clean, mrproper, doc<br>
+trunk/bsp/board/usr/app/Makefile - Make Targets - Create: app, info, clean, ocd-program, ocd-reset<br>
+create sub make targets on your needs(use the make help target to see which targests are possible).
+</li>
+<li>
+MOST has its own buildsystem and you can choose the editor you like, but for this it
+is maybe not so well fittet for eclipse but for me it works fine.
+So add the MOST include directories to eclipse (c/c++ -> Path and symbols) and turn
+of (C/C++ -> Code Analysis -> Symbol is not resolved , this is because the MOST_CPU_.. is defined in the Makefile and given to gcc.)<br>	
+Also i like syntax highlighting for global variables in red :)
+</li>
+<li>
+Build trunk-all
+</li>
+</ul>
+</p>
+
+
+
+<h3> <a name=ocd> Basic OpenOCD Howto </a> </h3>
+<p> 
+In Debian just install oppenocd with the installer.<br>
+You need <b>OpenOCD 0.5.0</b> (or maybe higher) and the <b>FTDI library</b>
+if using the Olimex ARM-USB-OCD.
+</p>
+<p>
+Currently the Olimex jtag keys <b>ARM-JTAG(parport: wiggler)</b> and <b>ARM-USB-OCD(usb: ftdi)</b>
+ are supported in MOST as MOST does not use the configuration files coming with openocd in "usr/share",
+but has its own. Also you should be able to use each interface supported by openocd.
+ARM-USB-OCD is faster than ARM-JTAG and also provides a RS232 port which is very handy
+ on modern computers which often do not have one.
+Do not use the powersupply from the ARM-USB-OCD(it has to less power and the voltage maybe will break).<br>
+The <b>configuration files</b> for open OCD are placed in <i>trunk/etc/ocd/</i>, <i>trunk/bsp/"board"/openocd.cfg</i> and
+<i>trunk/bsp/"board"/usr/"app"/ocd/</i>.
+See OpenOCD docu for configuring OpenOCD.
+</p>
+<p> 
+Build the <b>target binaries</b> with no optimization(-O0) and debbuging (-g) enabled.
+To <b>start the OCD deamon for debugging </b> type in you shell at the path <i>trunk/bsp/"board"/usr/"app"</i> <b>make ocd-debug</b>.
+For downloading the binary use <b>make ocd-program</b>,
+for reseting the board use <b>make ocd-reset</b>.
+If the program runs out of flash, the AT91SAM7X256 supports two <b>HW breakpoints</b>.
+If you want to use more breakpoints you have the code for debugging be placed in a RAMCODE section.
+</p>
+<p>
+Using <b>Emacs</b> for debugging: <br>
+Create a link <i>/home/username/bin/arm-elf-gdb -&gt /path/to/your/toolchain/arm-elf-gdb</i>, 
+or add your crosstoolchain/bin directory to your PATH variable.
+Go to the application directory <i>trunk/bsp/"board"/usr/"app"</i>.
+The "<b>.gdbinit</b>" file placed in this directory will be used by Emacs->GDB, copy it to the debug directory
+and go to the debug directory.
+You should find the builded binaries in this directory.
+The *.elf files contain the debug information.
+Start the emacs in this directory.
+In emacs,  use <b>start gdb</b> with "M-X gdb" ("ALT-X gdb").
+Replace "gdb" with "arm-elf-gdb" and "application.code" with "application.elf".
+The progamm shall break at the "SAM_init" function.
+If the program is running and you want <b>restart debugging</b> from beginning stop the program.
+Then type in the gdb window "(gdb) <b>monitor reset init</b>".
+Set a breakpoint "(gdb) <b>break SAM_init</b>" and then do "(gdb) <b>continue</b>".
+</p>
+<p>
+Using <b>Eclipse</b> for debugging: <br>
+</p>
+<p>
+Use <b>make ocd-debug</b> as external tool: <br>
+External Tools Configuration:<br>
+Main:<br>
+Location          :/usr/bin/make<br>
+Working directory :${workspace_loc:/trunk/bsp/"board"/usr/"app"}<br>
+Arguments         :ocd-debug
+Environment:<br>
+Variable          :MOST_ROOT<br>
+Value             :${workspace_loc}/trunk<br>
+Append environment to native env :on<br>
+Common:<br>
+Local file :on<br>
+Allocate console : on<br> 
+</p>
+<p>
+Create a new <b>Debug configuration</b>:<br>
+Debug Configuration->C/C++ Remote Aplication:<br>
+<i>Main</i>:<br>
+C/C++ Application : your elf file in the debug ordner of your board/application.<br>
+Project           : trunk<br>
+Disable Auto build: on<br>
+<i>Debugger Main:</i>:<br>
+Stop on startup   : SAM_init (for SAM board)<br>
+GDB debuger       : the debuger from your cross toolchain<br>
+<i>Debugger Connection:</i>:<br>
+TCP, localhost 3333<br>
+<i>Common:</i>:<br>
+Allocat console      : on<br>
+Launch in background : on<br>
+</p>
+<p>
+In "trunk/bsp/board/usr/app/" create the make targets <b>make ocd-program</b> and <b>make ocd-reset</b>.
+</p>
+
+
+<h3> <a name=rs232> Useage of RS232 terminal for interaction and logging </a> </h3>
+
+<p>
+Set the RS232 jumpers on the Olimex SAM7_EX256 board to RXD0/TXD0.
+Connect a Serial port terminal (minicom, picocom, Putty) with the parameters
+"baud=9600, parity=n, databits=8, stopbits=1, flow control=none" to the RS232 SER0 port.
+A very limited subset of vt100 emulation is used. So pure dump terminals will not work, i use minicom.
+Also for a serial download the y-modem protocoll is used. 
+In <i>trunk/bsp/"board"/sys/src/init/src/init.c</i> you can configure
+the tty for the LF translation for input and output.
+Incoming CR are translated in LF and outgoing LF are translated in CR LF by default.
+In the terminal press enter and you will receive a prompt "FKey_hostname:current_folder#_".
+</p>
+<p>
+On the commandline you have to set the arguments in braces like "cd(path/to/directory)".<br>
+The braces are needed because the args string is passed as one string to the command.<br>
+<b>(Rudimental Command Line Interpreter) Commands</b><br>
+Use "ls(c)" to list all commands and "ls(e)" to list additional executables.
+Down there is a list of the commands but this is not accurate.
+<ul>
+<li>
+<b>ls</b><br>
+(list current descriptor content)<br>
+i  (list current descriptor with info)<br>
+t  (list threads)<br>
+m  (list memmory (heap))<br>
+c  (list all commands<br>
+e  (list all executeables<br>
+a  (list all timer<br>
+</li>
+<li>
+<b>cd</b><br>
+cd(path/to/descriptor)<br>
+</li>
+<li>
+<b>new</b><br>
+create new directory, file, pipe<br>
+</li>
+<li>
+<b>ren</b><br>
+rename descriptor<br>
+</li>
+<li>
+<b>del</b><br>
+delete descriptor<br>
+</li>
+<li>
+<b>open</b><br>
+(go to directory) use cd instead<br>
+</li>
+<li>
+<b>close</b><br>
+close<br>
+(go to the upper directory) use cd instead<br>
+</li>
+<li>
+<b>info</b><br>
+print info of descriptor <br>
+</li>
+<li>
+<b>ctrl</b><br>
+set parameters of descriptor<br>
+</li>
+<li>
+<b>klog</b><br>
+s (show log level)<br>
++ (increment log level)<br>
+- (decrement log level)<br>
+</li>
+<li>
+<b>start</b><br>
+start thread<br>
+</li>
+<li>
+<b>stop</b><br>
+stop thread<br>
+</li>
+<li>
+<b>flag</b><br>
+set command line interpreter flag: prioryty, scheduling (for commands started in background)<br>
+</li>
+</ul>
+</p>
+<p>
+For interacting with your board you can register C functions as executeables.
+The difference between commands and executeables is that commands have access to the commandline interpreter but can not be started in a own thread,
+Both are just c-functions and not loaded to ram or something like that and the purpose ist just to have a functionality for interaction.
+</p>  
+<p>
+Redirecting stdin and stdout:<br>
+instream &lt commandname(arg ...) &gt outstream<br
+</p>
+<p>
+Starting execs in background:<br>
+execname (arg ...) &<br
+</p>
+<p>
+<b>Executeables for download:</b><br>
+"flash" stream to a flash section int the app/boot or app/putboot dir.<br>
+use ls(i) to print flash info,<br>
+on some targets use efl to erase the flash befor downloading to it<br>
+<br>
+# ym_r(flash)<br>
+and then start y-modem in minicom (10 sec)<br>
+<br>
+# tftp_g(filename) &gt flash<br>
+tftpd must be installed on your PC<br>
+<br>
+use /bsp/start_A for starting the application<br>
+use /bsp/start_B for starting the bootloader<br>
+</p>
+
+<h3> <a name=prog> Where to start programing </a> </h3>
+<p>
+This is for the SAM board, other boards may be simillar.
+</p>
+<p>
+/trunk/bsp/board/sys ....  system part of the board support package<br>
+/trunk/bsp/board/usr ....  here the applications are placed and binaries are builded<br>
+</p>
+<p>
+/trunk/bsp/board/usr/boot/.......bootloader Application<br>
+boot.c ... SAM_main() function.
+</p>
+<p>
+/trunk/bsp/board/usr/frame/......Application frame:<br>
+use this as template for a new application.<br>
+frame.c ... SAM_main() function.
+</p>
+<p>
+/trunk/bsp/board/sys/arch/.......here is all the<br>
+hardware related stuff for the board.<br>
+The vector table (vectors.S) (calling the reset handler for a reset exception) or the
+reset handler(reset.S) are the starting points.<br>
+The reset handler initalizes the cpu and a stack and<br>
+calls the SAM_init().
+</p>
+/trunk/bsp/board/sys/init/.......<br>
+init.c  SAM_init() Initialize the system an call SAM_start().<br>
+start.c  SAM_start() Startup services and call SAM_main().
+(this is done in a own startup thread).
+</p>
+
+
+<h3><a name=devel>How to become a MOST developer</a></h3>
+<p>
+If you find MOST useful and want help to improve it, write an email to Michael Feiner(see Imprint).
+</p>
+
+</div>
+
+
+	
+<div id="left">
+	<div class="box">
+	<h3>External</h3>
+	<p>
+	<ul>
+	<li> MOASTAPI can be generated from source, it is in development and not accurate.</a></li>
+	</ul>
+	</p>
+	</div>
+	
+</div>
+
+</div>
+
+</body>
+
+</html>

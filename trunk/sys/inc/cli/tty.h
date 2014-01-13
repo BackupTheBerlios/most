@@ -23,14 +23,17 @@
 
 /*------------- Representation ------------------------------------------*/
 
+/**
+ * 
+ */
 enum CLI_tty_control_key
 {
-    CLI_TTY_CTRL_IN_MODE = 1,        /**< Set tty receive mode. */
+    CLI_TTY_CTRL_IN_MODE,            /**< Set tty receive mode. */
     CLI_TTY_CTRL_OUT_MODE,           /**< Set tty transmit mode. */
     CLI_TTY_CTRL_IN_TRANSL,          /**< Set tty receive translation. */
     CLI_TTY_CTRL_OUT_TRANSL,         /**< Set tty transmit translation. */
     CLI_TTY_CTRL_DEFAULT_TRANSL,     /**< Set tty translation to default. */
-    CLI_TTY_CTRL_RX_TIMEOUT          /**< Set serial receive timeout in sec. */
+    CLI_TTY_CTRL_RX_TIMEOUT,         /**< Set serial receive timeout in sec. */
 };
 
 enum CLI_tty_in_transl
@@ -102,9 +105,10 @@ extern void CLI_tty_select(MFS_descriptor_t *stream);
  *
  * @param tty : Pointer to tty
  * @param io_stream :
- * @param tx_mode : newline conversion for transmit.
- * @param rx_mode : newline conversion for receive.
+ * @param in_transl : newline conversion for transmit.
+ * @param out_transl : newline conversion for receive.
  * @param name : name for tty.
+ * @param log : a log tty will also output even if you switch to a other tty.
  */
 
 extern void CLI_tty_init (CLI_tty_t * tty,

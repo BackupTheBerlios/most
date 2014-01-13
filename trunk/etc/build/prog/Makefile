@@ -6,7 +6,7 @@ export LIB_PATH_OPT LIB_NAMES LDFLAGS_OPT
 
 export PROG_NAME OBJ_NAMES MAX_BIN_SIZE STRIP_FLAGS STRIP_SECTIONS CODE_SECTIONS DATA_SECTIONS
 
-OPEN_OCD := openocd -s $(MOST_ROOT)/etc/ocd/ -f $(MOST_ROOT)/bsp/$(MOST_BOARD)/openocd.cfg
+OPEN_OCD := $(MOST_OCD_BIN_PREFIX)$(OPENOCD) -s $(MOST_OCD_CFG_DIR) -f $(MOST_OCD_CFG_DIR)/interface/$(MOST_OCD_INTERFACE).cfg -f $(MOST_ROOT)/bsp/$(MOST_BOARD)/openocd.cfg
 
 .PHONY : default help prog bin srec hex app info obj clean mrproper ocd-debug ocd-reset ocd-program
 

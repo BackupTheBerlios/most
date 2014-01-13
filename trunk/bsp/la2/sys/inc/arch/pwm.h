@@ -33,9 +33,15 @@
 #define PWM_PERIOD_MOTOR       100
 #define PWM_DUTY_MOTOR         0 /* initial duty cycle, motor is not running */
 
-#define PWM_PRESCALAR_CH2      10
-#define PWM_PERIOD_CH2         10
-#define PWM_DUTY_CH2           5
+/* periode = 20ms, f = 50 HZ, core_clk = 30 MHZ, period = 1000 => 20 ms
+ * cnt_clk = f * period = 50 kHz
+ * cnt_clk = core_clk / (2 ^ prescalar)
+ * 59 kHz = 30 MHZ / 2 ^ 9
+ * f = cnt_clk / period = 59 HZ
+ */
+#define PWM_PRESCALAR_SERVO    9
+#define PWM_PERIOD_SERVO       500
+#define PWM_DUTY_SERVO         0
 
 /**
  *
@@ -50,7 +56,7 @@ extern DEV_pwm_t LA2_motor2;
 /**
  *
  */
-extern DEV_pwm_t LA2_ch2;
+extern DEV_pwm_t LA2_servo;
 
 /**
  *

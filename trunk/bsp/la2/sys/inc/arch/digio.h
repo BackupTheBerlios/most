@@ -57,6 +57,9 @@ extern DEV_digout_t LA2_led_bar2_clk;
 /** LED Bar 2 Data. */
 extern DEV_digout_t LA2_led_bar2_data;
 
+/** Ultra sonic pulse. */
+extern DEV_digout_t LA2_ultra_sonic;
+
 /** Output 1. */
 extern DEV_digout_t LA2_output_1;
 
@@ -83,6 +86,12 @@ extern DEV_digin_t LA2_line_1;
 
 /** Line Sensor 2 Digital. */
 extern DEV_digin_t LA2_line_2;
+
+/** Side line Sensor 1 Digital. */
+extern DEV_digin_t LA2_side_line_1;
+
+/** Side line Sensor 2 Digital. */
+extern DEV_digin_t LA2_side_line_2;
 
 /** Input 1. */
 extern DEV_digin_t LA2_input_1;

@@ -1,0 +1,19 @@
+  ## extract gcc-3.4.6 and rename it to gcc-3.4.6-h8300
+  
+$ cd $MOST_ROOT/cross/src/gcc/gcc-3.4.6-h8300
+$ patch -p1 < ../../patches/h8300/gcc-3.4.6-binutils-version.patch
+$ patch -p2 < ../../patches/h8300/GCC-PR29377-h8300.patch
+$ patch -p0 < ../../patches/h8300/gcc-3.4.4-cross-compile.patch
+$ patch -p1 < ../../patches/h8300/00_all_gcc_unlink_if_ordinary.patch
+$ patch -p1 < ../../patches/h8300/16_all_gcc-open-perms.patch 
+$ ln -s ../../binutils-2.16.1/bfd
+$ ln -s ../../binutils-2.16.1/binutils
+$ ln -s ../../binutils-2.16.1/gas
+$ ln -s ../../binutils-2.16.1/gprof
+$ ln -s ../../binutils-2.16.1/ld
+$ ln -s ../../binutils-2.16.1/opcodes
+$ rm -rf libiberty
+$ ln -s ../../binutils-2.16.1/libiberty
+$ cd $MOST_ROOT/cross/src/binutils/binutils-2.16.1
+$ patch -p1 < ../../patches/h8300/binutils-overflow.patch
+$ cd $MOST_ROOT/cross

@@ -91,6 +91,7 @@ extern ACE_u32_t ACE_htonl (ACE_u32_t n);
  * This function must be called before you can use the stdlib functions.
  * @param heap : Pointer to a heap which will be used with the malloc and free functions.
  * @param abort_handler: function which will be called in an abort.
+ * @param panic_handler: function which will be called for a panic.
  */
 extern void ACE_stdlib_init (USO_heap_t * heap,
                              void (*abort_handler) (char *msg, char *file, int line),
@@ -109,6 +110,8 @@ extern void *ACE_malloc (ACE_size_t size);
  */
 extern void ACE_free (void *block);
 
+#define ACE_ABORT(msg) ACE_abort(msg, __FILE__, __LINE__)
+
 /**
  * Abort program execution. Not correctable error
  * but you should be able to print the error message.
@@ -119,10 +122,9 @@ extern void ACE_free (void *block);
  * This function will not return.
  * If you have registered an abort handler, this handler is called.
  */
-
-#define ACE_ABORT(msg) ACE_abort(msg, __FILE__, __LINE__)
-
 extern void ACE_abort (char *msg, char *file, int line);
+
+#define ACE_PANIC(msg) ACE_panic(msg, __FILE__, __LINE__)
 
 /**
  * Abort program execution immediate, system is corrupted and
@@ -134,9 +136,6 @@ extern void ACE_abort (char *msg, char *file, int line);
  * This function will not return.
  * If you have registered an panic handler, this handler is called.
  */
-
-#define ACE_PANIC(msg) ACE_panic(msg, __FILE__, __LINE__)
-
 extern void ACE_panic (char *msg, char *file, int line);
 
 extern USO_mutex_t ACE_lock;

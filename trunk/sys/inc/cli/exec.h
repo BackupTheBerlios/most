@@ -43,7 +43,7 @@ typedef struct CLI_exec CLI_exec_t;
  *  @param dir : Directory descriptor to which the executeable will be installed.
  *  @param exec : Pointer to a CLI_exec_t.
  *  @param name : Pointer to name of executeable.
- *  @param desc :  Pointer to a short description of the executeable.
+ *  @param description :  Pointer to a short description of the executeable.
  *  @param f : Function which will be executed with the commands exec or run.
  */
 extern void CLI_exec_init (MFS_descriptor_t * dir, CLI_exec_t * exec,

@@ -1,3 +1,4 @@
+#include <ace/stddef.h>
 #include <dev/cpu.h>
 #include <dpy/led_bar.h>
 
@@ -7,6 +8,7 @@
 #define RED       0x0001
 #define YELLOW    0x0002
 
+
 static void
 send_16bit_data(DPY_led_bar_t *led, unsigned int data)
 {
@@ -15,15 +17,15 @@ send_16bit_data(DPY_led_bar_t *led, unsigned int data)
         if(data&0x8000)
         {
             DEV_digout_set(led->data);
-            //DEV_cpudelay(DEV_NSEC_2_LOOPS(100));
+            if (led->delay) led->delay();
         }
         else
         {
             DEV_digout_clear(led->data);
-            //DEV_cpudelay(DEV_NSEC_2_LOOPS(100));
+            if (led->delay) led->delay();
         }
         DEV_digout_toggle(led->clk);
-        //DEV_cpudelay(DEV_NSEC_2_LOOPS(100));
+        if (led->delay) led->delay();
         data <<= 1;
     }
 }
@@ -36,7 +38,7 @@ latch_data(DPY_led_bar_t *led)
     for(unsigned int i=0; i < 8; i++)
     {
         DEV_digout_toggle(led->data);
-        //DEV_cpudelay(DEV_NSEC_2_LOOPS(100));
+        if (led->delay) led->delay();
     }
 }
 
@@ -55,24 +57,12 @@ set_mask (DPY_led_bar_t *led, unsigned int mask)
     }
 }
 
-static unsigned int
-set_range (unsigned int mask, unsigned int range1, unsigned int range2)
-{
-    unsigned int i;
-    unsigned int bit = 1;
-    for (i = 0; i < 12; i++)
-    {
-        if (i >= range1 && i < range2)
-            mask |= bit;
-        bit = bit << 1;
-    }
-    return mask;
-}
 
-void DPY_led_bar_init(DPY_led_bar_t *led, DEV_digout_t *clk, DEV_digout_t *data)
+void DPY_led_bar_init(DPY_led_bar_t *led, DEV_digout_t *clk, DEV_digout_t *data, void (*delay)(void))
 {
     led->clk = clk;
     led->data = data;
+    led->delay = delay;
 }
 
 
@@ -85,20 +75,13 @@ void DPY_led_bar_set_mask(DPY_led_bar_t *led, unsigned int mask)
 }
 
 
-//range : range 1~10.for example: 5, the 1~5 would be light 
-
-void DPY_led_bar_set_range(DPY_led_bar_t *led, unsigned int range1, unsigned int range2)
-{
-    set_mask(led, set_range (0, range1, range1));
-    latch_data (led);
-}
-
-void DPY_led_bar_set(DPY_led_bar_t *led, unsigned int green_range, unsigned int yellow, unsigned int red)
+void DPY_led_bar_set(DPY_led_bar_t *led, ACE_u8_t green, unsigned int yellow, unsigned int red)
 {
     unsigned int mask = 0;
     if (red) mask |= RED;
     if (yellow) mask |= YELLOW;
-    set_mask(led, set_range (mask, 2, 2 + green_range));
+    mask |= (green << 2);
+    set_mask(led, mask);
     latch_data (led);
 }
 

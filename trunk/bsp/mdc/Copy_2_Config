@@ -11,7 +11,7 @@ MOST_GCC:=3.4.6
 
 ## for patched gcc extend your path name to distinguish it from the original
 #MOST_GCC_PATCH:=
-MOST_GCC_PATCH:=-h8
+MOST_GCC_PATCH:=-h8300
 
 ## target cpu of your toolchain
 MOST_CPU:=h8300

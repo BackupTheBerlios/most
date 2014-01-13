@@ -155,8 +155,8 @@ MFS_control_desc (MFS_descriptor_t * desc, int number, MFS_ctrl_entry_t *entry)
     }
     else
     {
-        entry->type = MFS_CTRL_INFO;
-        entry->value.s = "ctrl not avail";
+        entry->type = MFS_CTRL_HELP;
+        entry->value.s = "not implemented";
     }
 }
 

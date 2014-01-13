@@ -50,9 +50,10 @@ typedef struct MFS_info_entry MFS_info_entry_t;
 
 enum MFS_ctrl_type
 {
-    MFS_CTRL_INFO,            /**< get ctrl entries info in value.s */
+    MFS_CTRL_HELP,            /**< get ctrl entries info in value.s */
     MFS_CTRL_LONG,            /**< signed 32 bit integer value */
     MFS_CTRL_SIZE,            /**< ACE_size_t (unsigned long) */
+    MFS_CTRL_HEX,             /**< unsigned long in hex */
     MFS_CTRL_STRING           /**< char *,-> c string (terminated with 0) */
 };
 
@@ -60,6 +61,7 @@ union MFS_ctrl_value
 {
     long l;
     ACE_size_t z;
+    unsigned long u;
     char *s;
 };
 
